@@ -1,0 +1,4 @@
+interface:
+  display_name: "SRSS Design System"
+  short_description: "Design and build polished SRSS digital experiences"
+  default_prompt: "Use $srssdesign to design or refine an SRSS website page, school-hub module, or uploaded photo set."
