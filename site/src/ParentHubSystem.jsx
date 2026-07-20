@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CalendarBlank, CheckCircle, DownloadSimple, EnvelopeSimple, FileArrowUp, FileText, GearSix, GraduationCap, Plus, SignOut, UserCircle } from "@phosphor-icons/react";
+import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
+import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
+import { CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
+import { DownloadSimple } from "@phosphor-icons/react/dist/csr/DownloadSimple";
+import { EnvelopeSimple } from "@phosphor-icons/react/dist/csr/EnvelopeSimple";
+import { FileArrowUp } from "@phosphor-icons/react/dist/csr/FileArrowUp";
+import { FileText } from "@phosphor-icons/react/dist/csr/FileText";
+import { GearSix } from "@phosphor-icons/react/dist/csr/GearSix";
+import { GraduationCap } from "@phosphor-icons/react/dist/csr/GraduationCap";
+import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
+import { SignOut } from "@phosphor-icons/react/dist/csr/SignOut";
+import { UserCircle } from "@phosphor-icons/react/dist/csr/UserCircle";
 import { loadParentHubData, saveParentHubData, signInParentHub } from "./lib/parentHubStore";
 
 const sections = ["Dashboard", "Notices", "Calendar", "Forms Centre", "Parent essentials", "Class page", "Contacts"];

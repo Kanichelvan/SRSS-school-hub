@@ -1,38 +1,36 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ArrowRight,
-  BookOpen,
-  CalendarBlank,
-  CaretLeft,
-  CaretRight,
-  CheckCircle,
-  ChalkboardTeacher,
-  Clock,
-  Compass,
-  EnvelopeSimple,
-  FacebookLogo,
-  GraduationCap,
-  GlobeHemisphereEast,
-  HandHeart,
-  FloppyDisk,
-  HandsClapping,
-  Heart,
-  LockKey,
-  MapPin,
-  Megaphone,
-  Newspaper,
-  Phone,
-  PersonSimpleRun,
-  Plus,
-  Quotes,
-  Sparkle,
-  TreeStructure,
-  UploadSimple,
-  UsersThree,
-  List,
-  MagnifyingGlass,
-  X,
-} from "@phosphor-icons/react";
+import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
+import { BookOpen } from "@phosphor-icons/react/dist/csr/BookOpen";
+import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
+import { CaretLeft } from "@phosphor-icons/react/dist/csr/CaretLeft";
+import { CaretRight } from "@phosphor-icons/react/dist/csr/CaretRight";
+import { CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
+import { ChalkboardTeacher } from "@phosphor-icons/react/dist/csr/ChalkboardTeacher";
+import { Clock } from "@phosphor-icons/react/dist/csr/Clock";
+import { Compass } from "@phosphor-icons/react/dist/csr/Compass";
+import { EnvelopeSimple } from "@phosphor-icons/react/dist/csr/EnvelopeSimple";
+import { FacebookLogo } from "@phosphor-icons/react/dist/csr/FacebookLogo";
+import { FloppyDisk } from "@phosphor-icons/react/dist/csr/FloppyDisk";
+import { GlobeHemisphereEast } from "@phosphor-icons/react/dist/csr/GlobeHemisphereEast";
+import { GraduationCap } from "@phosphor-icons/react/dist/csr/GraduationCap";
+import { HandHeart } from "@phosphor-icons/react/dist/csr/HandHeart";
+import { HandsClapping } from "@phosphor-icons/react/dist/csr/HandsClapping";
+import { Heart } from "@phosphor-icons/react/dist/csr/Heart";
+import { List } from "@phosphor-icons/react/dist/csr/List";
+import { LockKey } from "@phosphor-icons/react/dist/csr/LockKey";
+import { MagnifyingGlass } from "@phosphor-icons/react/dist/csr/MagnifyingGlass";
+import { MapPin } from "@phosphor-icons/react/dist/csr/MapPin";
+import { Megaphone } from "@phosphor-icons/react/dist/csr/Megaphone";
+import { Newspaper } from "@phosphor-icons/react/dist/csr/Newspaper";
+import { PersonSimpleRun } from "@phosphor-icons/react/dist/csr/PersonSimpleRun";
+import { Phone } from "@phosphor-icons/react/dist/csr/Phone";
+import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
+import { Quotes } from "@phosphor-icons/react/dist/csr/Quotes";
+import { Sparkle } from "@phosphor-icons/react/dist/csr/Sparkle";
+import { TreeStructure } from "@phosphor-icons/react/dist/csr/TreeStructure";
+import { UploadSimple } from "@phosphor-icons/react/dist/csr/UploadSimple";
+import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
+import { X } from "@phosphor-icons/react/dist/csr/X";
 import { ParentHubSystem } from "./ParentHubSystem.jsx";
 
 const navItems = [
@@ -125,20 +123,23 @@ const defaultAboutContent = {
   heroEyebrow: "About SRSS · 25th year", heroTitle: "Our Story", heroBody: "At SRSS, education begins with a simple belief: every child carries within them the capacity for wisdom, kindness and purposeful action.", heroImage: "/assets/photos/processed/assembly-achievements-1280.jpg", heroAlt: "SRSS pupils gathered at a school assembly", foundingTitle: "A school built on what matters most.", foundingBody: "Sekolah Rendah Sathya Sai was established to offer an education in which strong learning and strong character belong together. Inspired by the education vision of Sathya Sai Baba, the school seeks to draw out the human values already present in every child.", foundingSupport: "SRSS is part of a worldwide family of Sathya Sai schools: locally rooted, globally connected, and united by a commitment to academic confidence, compassionate leadership and service to society.", milestones: aboutMilestones.map(([year, title, copy]) => ({ year, title, copy })), valueWeek: { title: "Love in action", prompt: "Notice one thoughtful way you can make someone’s day lighter.", route: "#students" }, principal: { heading: "Every child deserves to be known.", quote: "Our work is not only to help children succeed in school, but to help them grow into people who can bring courage, care and clarity to the world around them.", body: "SRSS is a community of educators, families and pupils learning together. We hold high expectations with warmth, and create space for every child to discover both their strengths and their responsibility to others.", image: "/assets/photos/processed/student-speaker-960.jpg", alt: "An SRSS pupil sharing a reflection at school" }, updatedAt: null,
 };
 
+const missionPillars = [["Academic Excellence", "Developing knowledgeable, confident and capable lifelong learners."], ["Character Excellence", "Nurturing integrity, self-awareness, compassion, responsibility and strength of character."], ["Civic Stewardship", "Developing responsible Malaysians who respect their nation, its diversity and the wider human family."], ["Altruistic Responsibility", "Inspiring children to recognise their responsibility to serve society and care for the world around them."]];
+const aboutLinks = [["Our Story", "/about/our-story"], ["Vision & Mission", "/about/vision-mission"], ["Sathya Sai Education & Educare", "#educare"], ["Leadership & Governance", "/about/governance"], ["Our People", "#our-people"], ["School Profile", "#school-profile"], ["Campus & Contact", "#campus"], ["25 Years of SRSS", "#srss25"]];
+
 function AboutPage({ onVisit, content }) {
-  const about = { ...defaultAboutContent, ...content, principal: { ...defaultAboutContent.principal, ...(content?.principal || {}) }, valueWeek: { ...defaultAboutContent.valueWeek, ...(content?.valueWeek || {}) } };
-  return <main id="main" className="about-page">
-    <section className="about-hero" aria-labelledby="about-title"><div className="about-inner about-hero-grid"><div><p className="eyebrow">{about.heroEyebrow}</p><h1 id="about-title">{about.heroTitle}</h1><p>{about.heroBody}</p><a className="primary-button" href="#our-story">Discover our foundation <ArrowRight size={18} weight="bold" /></a></div><figure className="about-hero-photo"><img src={about.heroImage} alt={about.heroAlt} /><figcaption>Growing in knowledge, character and service.</figcaption></figure></div></section>
-    <section className="about-intro about-inner" id="our-story" aria-labelledby="foundation-title"><div><p className="eyebrow">Founded with purpose</p><h2 id="foundation-title">{about.foundingTitle}</h2></div><div className="about-rich-copy"><p>{about.foundingBody}</p><p>{about.foundingSupport}</p></div></section>
-    <section className="milestone-section" aria-labelledby="milestones-title"><div className="about-inner"><p className="eyebrow">2001–2026</p><h2 id="milestones-title">A journey of human excellence.</h2><ol className="milestone-line">{about.milestones.map(({ year, title, copy }) => <li key={year}><span>{year}</span><h3>{title}</h3><p>{copy}</p></li>)}</ol></div></section>
-    <section className="vision-section about-inner" aria-labelledby="vision-title"><div className="vision-heading"><p className="eyebrow">Vision &amp; mission</p><h2 id="vision-title">The direction behind each day.</h2></div><article><span>Our vision</span><h3>To nurture young people of character, confidence and compassion who contribute to a more peaceful world.</h3></article><article><span>Our mission</span><p>We integrate Malaysia’s national curriculum with Sathya Sai Education in Human Values, creating daily experiences that develop intellect, integrity, wellbeing and a spirit of service.</p></article></section>
-    <section className="ssehv-section" aria-labelledby="ssehv-title"><div className="about-inner ssehv-grid"><div><p className="eyebrow">The SRSS difference</p><h2 id="ssehv-title">Values are not added on. They are the foundation.</h2><p>Sathya Sai Education in Human Values (SSEHV) does not place values beside academics as a separate lesson. It brings values into the way children enquire, collaborate, lead, respond and serve.</p></div><div className="ssehv-list"><div><BookOpen size={26} /><span><strong>Academic learning</strong>Knowledge becomes meaningful through curiosity, honesty and responsibility.</span></div><div><Heart size={26} /><span><strong>Inner development</strong>Quiet reflection and thoughtful relationships help children know themselves.</span></div><div><HandsClapping size={26} /><span><strong>Ethical action</strong>Service and everyday choices turn good intentions into lived character.</span></div></div></div></section>
-    <section className="whole-child about-inner" aria-labelledby="whole-child-title"><div className="whole-child-copy"><p className="eyebrow">Whole-child approach</p><h2 id="whole-child-title">Head, Heart, Hands and Health.</h2><p>Our approach recognises that a child’s education is most complete when intellectual, emotional, ethical and physical growth move together.</p></div><div className="dimensions-grid"><article><BookOpen size={25}/><span>Head</span><h3>Academics</h3><p>Curiosity, knowledge and the confidence to think clearly.</p></article><article><Heart size={25}/><span>Heart</span><h3>Character</h3><p>Values, empathy and the inner strength to choose well.</p></article><article><HandsClapping size={25}/><span>Hands</span><h3>Service</h3><p>Practical contribution, teamwork and responsibility in action.</p></article><article><PersonSimpleRun size={25}/><span>Health</span><h3>Well-being</h3><p>Movement, balance and care for the body and mind.</p></article></div></section>
-    <section className="values-page-section" id="srss-values" aria-labelledby="values-page-title"><div className="about-inner"><div className="values-page-heading"><p className="eyebrow">Our values</p><h2 id="values-page-title">Five Values. One Foundation.</h2><p>Every child carries truth, love, peace, right conduct and non-violence within. Education helps these qualities find their voice in daily life.</p></div><div className="values-editorial-list">{humanValues.map(([sanskrit, name, definition, ...examples]) => <article key={name}><div><span>{sanskrit}</span><h3>{name}</h3><p>{definition}</p></div><ul>{examples.map(example => <li key={example}>{example}</li>)}</ul></article>)}</div><div className="value-week"><Sparkle size={24}/><div><span>Value of the week</span><strong>{about.valueWeek.title}</strong><p>{about.valueWeek.prompt}</p></div><a href={about.valueWeek.route}>Student challenge <ArrowRight size={17}/></a></div></div></section>
-    <section className="tree-section about-inner" aria-labelledby="tree-title"><div><p className="eyebrow">A living metaphor</p><h2 id="tree-title">Character grows from deep roots.</h2><p>In our values tree, the five human values form the roots. Character is the trunk. Academic and life skills reach outward as branches; service and contribution are the fruit.</p></div><div className="values-tree" role="img" aria-label="Tree of values: human values form roots, character forms the trunk, academic and life skills form branches, and service and contribution are the fruit."><div className="tree-fruit">Service &amp;<br/>contribution</div><div className="tree-branches">Academic &amp; life skills</div><div className="tree-trunk">Character</div><div className="tree-roots">Truth · Right Conduct · Peace · Love · Non-Violence</div></div></section>
-    <section className="leadership-section" aria-labelledby="leadership-title"><div className="about-inner leadership-grid"><figure><img src={about.principal.image} alt={about.principal.alt} /></figure><div><p className="eyebrow">A message from school leadership</p><h2 id="leadership-title">{about.principal.heading}</h2><blockquote>“{about.principal.quote}”</blockquote><p>{about.principal.body}</p><a className="source-link" href="#contact">Meet our leadership team <ArrowRight size={17}/></a></div></div></section>
-    <section className="network-section about-inner" id="network" aria-labelledby="network-title"><div><p className="eyebrow">SSIOM &amp; global network</p><h2 id="network-title">Local commitment. Shared worldwide purpose.</h2></div><div><p>SRSS is supported by the Sathya Sai International Organisation of Malaysia (SSIOM) and connected to a worldwide network of Sathya Sai schools. This affiliation provides governance, guidance and an enduring community of practice centred on human values education.</p><a className="text-link" href="https://sathyasai.org.my/" target="_blank" rel="noreferrer">Discover SSIOM <ArrowRight size={17}/></a></div></section>
-    <section className="about-closing"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">The next chapter</p><h2>Rooted in values. Focused on the future.</h2><p>We invite families to see how learning, character and community come together at SRSS.</p><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit <ArrowRight size={18} weight="bold" /></button></div></section>
+  const about = { ...defaultAboutContent, ...content };
+  return <main id="main" className="about-page about-refresh">
+    <section className="about-hero"><div className="about-inner about-hero-grid"><div><p className="eyebrow">ABOUT SRSS · EDUCATION FOR LIFE</p><h1>Education for Life,<br/>Not Mere Living.</h1><p>Sekolah Rendah Sathya Sai is a Malaysian primary school dedicated to helping every child grow into the fullest and finest expression of who they can become.</p><a className="primary-button" href="#who-we-are">Discover who we are <ArrowRight size={18}/></a></div><figure className="about-hero-photo"><img src={about.heroImage} alt={about.heroAlt}/></figure></div></section>
+    <nav className="about-directory about-inner" aria-label="About SRSS sections">{aboutLinks.map(([label, href]) => <a key={label} href={href}>{label}<ArrowRight size={15}/></a>)}</nav>
+    <section className="about-intro about-inner" id="who-we-are"><div><p className="eyebrow">Who we are</p><h2>A school for the mind, heart and character.</h2></div><div className="about-rich-copy"><p>At SRSS, education is more than the acquisition of knowledge or preparation for examinations. We believe a truly educated child develops an intelligent mind, a strong character, a compassionate heart, practical abilities and responsibility towards others.</p><p>Inspired by the educational philosophy of Sri Sathya Sai Baba, we combine the Malaysian National Curriculum with an integral approach that nurtures body, mind, heart and spirit.</p><a className="text-link" href="/about/our-story">Explore Our Story <ArrowRight size={17}/></a></div></section>
+    <section className="purpose-refresh" id="vision-mission"><div className="about-inner"><div className="purpose-refresh-heading"><p className="eyebrow">Our purpose</p><h2>Human Excellence, lived with purpose.</h2><p><strong>Vision</strong> — to nurture young people of character, confidence and compassion who contribute to a more peaceful world.</p><p><strong>Mission</strong> — to integrate Malaysia’s national curriculum with an education that develops intellect, integrity, wellbeing and service.</p></div><div className="mission-pillars">{missionPillars.map(([title, copy], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div><a className="text-link" href="/about/vision-mission">Discover Our Vision &amp; Mission <ArrowRight size={17}/></a></div></section>
+    <section className="educare-refresh" id="educare"><div className="about-inner educare-grid"><div><p className="eyebrow">Sathya Sai Education &amp; Educare</p><h2>Drawing out what is already within.</h2><p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p><p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p></div><div className="integral-model" role="img" aria-label="Body plus mind plus heart plus spirit leads to human excellence"><span>BODY</span><b>+</b><span>MIND</span><b>+</b><span>HEART</span><b>+</b><span>SPIRIT</span><i>↓</i><strong>HUMAN EXCELLENCE</strong></div></div><div className="about-inner global-line"><p><strong>A global educational movement.</strong> Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p></div></section>
+    <section className="learning-refresh about-inner"><div><p className="eyebrow">Learning at SRSS</p><h2>More Than Schooling, <em>Educating the Whole Child.</em></h2><p>Children do not all learn in the same way, develop at the same pace or reveal their strengths through examinations alone. Our educational model creates space to know, become, think, live, do and serve.</p></div><div className="excellence-framework"><strong>HUMAN EXCELLENCE</strong><div><span><b>KNOWING</b>Academics</span><span><b>BECOMING</b>Character</span><span><b>THINKING</b>Critical thinking</span><span><b>LIVING</b>Human Values</span><span><b>DOING</b>Practical skills</span><span><b>SERVING</b>Social responsibility</span></div></div></section>
+    <section className="spaces-refresh" id="school-profile"><div className="about-inner"><p className="eyebrow">Spaces designed for learning</p><h2>Opportunity to enquire, create and grow.</h2><div>{[["Science & Discovery", "Hands-on experimentation, scientific inquiry, observation and problem-solving.", "science-microscope-1600.jpg"], ["Digital Learning", "Digital literacy, research, creativity and responsible use of technology.", "classroom-art-1280.jpg"], ["Library & Reading", "Reading culture, literacy development and independent discovery.", "chess-competition-1280.jpg"], ["Learning Support", "Targeted intervention and personalised support for every learner.", "student-speaker-960.jpg"]].map(([title, copy, image]) => <article key={title}><img src={`./assets/photos/processed/${image}`} alt=""/><h3>{title}</h3><p>{copy}</p></article>)}</div></div></section>
+    <section className="community-refresh" id="our-people"><div className="about-inner"><p className="eyebrow">It takes a community to educate a child</p><h2>Every day is an opportunity to grow.</h2><div className="partnership"><strong>CHILD</strong><span>TEACHERS</span><span>PARENTS</span><span>VOLUNTEERS</span></div><p>Teachers, parents and volunteers each bring something essential to the child’s learning. Together, they create the conditions in which confidence, character and capability can flourish.</p><a className="text-link" href="#contact">Discover how you can be part of SRSS <ArrowRight size={17}/></a></div></section>
+    <section className="people-refresh about-inner"><figure><img src={about.principal?.image || defaultAboutContent.principal.image} alt="SRSS pupil sharing a reflection"/></figure><div><p className="eyebrow">Our people</p><h2>Leadership, teachers and family partnership.</h2><p>Our people include the Board of Directors, school leadership, teachers, administrators, support staff and Teacher-Parent Association — each contributing to a school community in which every child is known and encouraged.</p><a className="text-link" href="/about/governance">Learn about Governance <ArrowRight size={17}/></a></div></section>
+    <section className="anniversary-refresh" id="srss25"><div className="about-inner"><p className="eyebrow">SRSS25 · 25 years of educating the heart</p><h2>2002 <span>—</span> 2027</h2><div>{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((item) => <article key={item}><i>↓</i><strong>{item}</strong></article>)}</div><p>Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS.</p><a className="primary-button" href="#contact">Join the SRSS Alumni Network <ArrowRight size={18}/></a></div></section>
+    <section className="about-closing" id="campus"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">About SRSS</p><h2>Discover who we are and what shapes our approach to education.</h2><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit <ArrowRight size={18}/></button></div></section>
   </main>;
 }
 
@@ -275,7 +276,7 @@ function HubSection({ section, onDashboard, onAbsence, onCalendar }) {
 
 export function App() {
   const [hubRoute, setHubRoute] = useState(() => window.location.pathname.startsWith("/parent-hub") ? window.location.pathname : null);
-  const [isAbout, setIsAbout] = useState(() => window.location.hash === "#about" || window.location.pathname === "/about");
+  const [isAbout, setIsAbout] = useState(() => window.location.hash === "#about" || window.location.pathname.startsWith("/about"));
   const [adminOpen, setAdminOpen] = useState(() => window.location.pathname === "/admin" || window.location.hash === "#admin");
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -320,7 +321,7 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const handleRouteChange = () => { setIsAbout(window.location.hash === "#about" || window.location.pathname === "/about"); setAdminOpen(window.location.pathname === "/admin" || window.location.hash === "#admin"); };
+    const handleRouteChange = () => { setIsAbout(window.location.hash === "#about" || window.location.pathname.startsWith("/about")); setAdminOpen(window.location.pathname === "/admin" || window.location.hash === "#admin"); };
     window.addEventListener("hashchange", handleRouteChange); window.addEventListener("popstate", handleRouteChange);
     return () => { window.removeEventListener("hashchange", handleRouteChange); window.removeEventListener("popstate", handleRouteChange); };
   }, []);
