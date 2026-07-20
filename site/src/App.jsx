@@ -28,6 +28,7 @@ import {
   Sparkle,
   TreeStructure,
   UploadSimple,
+  UsersThree,
   List,
   MagnifyingGlass,
   X,
@@ -80,6 +81,20 @@ const galleryItems = [
   ["./assets/photos/processed/sports-day-podium-1600.jpg", "Celebrating effort", "Pupils and staff celebrating Sports Day achievements at the awards podium."],
   ["./assets/photos/processed/facebook-jejak-juara-02.jpg", "Confident voices", "An SRSS pupil presenting classroom work beside a digital display."],
   ["./assets/photos/processed/facebook-jejak-juara-06.jpg", "Active bodies", "Two SRSS pupils with their coach on a badminton court."],
+];
+
+const roleRoutes = [
+  ["Parent", "Notices, forms, dates and class updates.", "parent", UsersThree],
+  ["Student", "Learning links, reading and values challenges.", "#students", GraduationCap],
+  ["Teacher", "Timetables, resources and staff essentials.", "#teachers", ChalkboardTeacher],
+  ["Exploring the school", "Our story, learning approach and admissions.", "#about", Compass],
+  ["Part of the Sai community", "Events, seva and ways to stay connected.", "#community", HandHeart],
+];
+
+const whySrss = [
+  [BookOpen, "Values-integrated curriculum", "Human values shape how pupils enquire, collaborate and apply Malaysia’s national curriculum each day."],
+  [Heart, "Whole-child development", "Head, Heart, Hands and Health grow together through learning, reflection, movement and service."],
+  [GlobeHemisphereEast, "Sai education philosophy", "Sathya Sai Educare helps each child draw out the character, confidence and compassion already within."],
 ];
 
 const learningTabs = [
