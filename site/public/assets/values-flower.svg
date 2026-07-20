@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Five-petal SRSS values flower">
+  <defs><filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#06162f" flood-opacity=".12"/></filter></defs>
+  <g filter="url(#soft)" stroke="#fbfaf7" stroke-width="12" stroke-linejoin="round">
+    <path fill="#d71920" d="M400 40C505 40 568 143 529 276c-25 84-83 134-129 164-46-30-104-80-129-164C232 143 295 40 400 40Z"/>
+    <path fill="#5c2583" d="M730 210c52 89 5 195-126 231-83 23-157 3-208-20 4-56 25-129 88-189 98-94 194-111 246-22Z"/>
+    <path fill="#f05a28" d="M662 636c-67 80-181 60-249-58-42-74-43-151-34-207 55-10 132-9 207 32 119 66 144 153 76 233Z"/>
+    <path fill="#008c57" d="M138 636c-68-80-43-167 76-233 75-41 152-42 207-32 9 56 8 133-34 207-68 118-182 138-249 58Z"/>
+    <path fill="#0f4da8" d="M70 210c52-89 148-72 246 22 63 60 84 133 88 189-51 23-125 43-208 20C65 405 18 299 70 210Z"/>
+    <path fill="#efb51e" d="M246 86l53 99-90 26 37-125Zm308 0-53 99 90 26-37-125ZM740 470l-113 10 17 92 96-102ZM400 760l-53-111h106L400 760ZM60 470l113 10-17 92-96-102Z"/>
+    <circle cx="400" cy="410" r="211" fill="#0a1e3e"/>
+  </g>
+</svg>

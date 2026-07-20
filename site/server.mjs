@@ -3,6 +3,7 @@ import { readFile, mkdir, writeFile, stat } from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { basename, extname, join, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
+import { parentHubSeed } from "./src/data/parentHubData.js";
 
 const root = resolve(import.meta.dirname);
 const dbPath = join(root, "data", "srss-db.json");
@@ -17,8 +18,9 @@ const readBody = async (req) => new Promise((resolveBody, reject) => { let body 
 const readDb = async () => JSON.parse(await readFile(dbPath, "utf8"));
 const writeDb = async (db) => writeFile(dbPath, `${JSON.stringify(db, null, 2)}\n`);
 const isAdmin = (req) => req.headers["x-srss-admin-key"] === adminKey;
-const publicData = (db) => ({ news: db.news.filter((item) => item.published), events: db.events.filter((item) => item.published), assets: db.assets });
+const publicData = (db) => ({ news: db.news.filter((item) => item.published), events: db.events.filter((item) => item.published), assets: db.assets, about: db.about || {} });
 const safeName = (name) => basename(name).replace(/[^a-zA-Z0-9._-]/g, "-");
+const parentHubData = (db) => db.parentHub || structuredClone(parentHubSeed);
 
 async function staticFile(res, filePath) {
   try { const info = await stat(filePath); if (!info.isFile()) return false; res.writeHead(200, { "content-type": contentTypes[extname(filePath).toLowerCase()] || "application/octet-stream" }); createReadStream(filePath).pipe(res); return true; } catch { return false; }
@@ -28,6 +30,16 @@ const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   try {
     if (url.pathname === "/api/health") return send(res, 200, { ok: true });
+    if (url.pathname === "/api/parent-hub/data" && req.method === "GET") return send(res, 200, parentHubData(await readDb()));
+    if (url.pathname === "/api/parent-hub/data" && req.method === "PUT") {
+      const body = await readBody(req); const db = await readDb(); db.parentHub = body; await writeDb(db); return send(res, 200, db.parentHub);
+    }
+    if (url.pathname === "/api/parent-hub/login" && req.method === "POST") {
+      const { email = "", password = "" } = await readBody(req);
+      if (password !== "srss2026") return send(res, 401, { error: "Invalid credentials" });
+      const admin = email.toLowerCase().startsWith("admin");
+      return send(res, 200, { user: { name: admin ? "SRSS Administrator" : "Priya Raman", role: admin ? "admin" : "parent", email } });
+    }
     if (url.pathname === "/api/content" && req.method === "GET") return send(res, 200, publicData(await readDb()));
     if (url.pathname === "/api/enquiries" && req.method === "POST") {
       const body = await readBody(req); if (!body.parentName || !body.email || !body.childName || !body.childAge) return send(res, 422, { error: "Please complete the required fields." });
@@ -40,7 +52,7 @@ const server = createServer(async (req, res) => {
     if (url.pathname === "/api/admin/content" && req.method === "GET") { if (!isAdmin(req)) return send(res, 401, { error: "Admin authorisation required." }); return send(res, 200, await readDb()); }
     if (url.pathname === "/api/admin/content" && req.method === "PUT") {
       if (!isAdmin(req)) return send(res, 401, { error: "Admin authorisation required." }); const body = await readBody(req);
-      const db = await readDb(); for (const key of ["news", "events"]) if (Array.isArray(body[key])) db[key] = body[key]; await writeDb(db); return send(res, 200, db);
+      const db = await readDb(); for (const key of ["news", "events"]) if (Array.isArray(body[key])) db[key] = body[key]; if (body.about && typeof body.about === "object") db.about = { ...db.about, ...body.about, updatedAt: new Date().toISOString() }; await writeDb(db); return send(res, 200, db);
     }
     if (url.pathname.startsWith("/api/admin/enquiries/") && req.method === "PATCH") {
       if (!isAdmin(req)) return send(res, 401, { error: "Admin authorisation required." }); const id = url.pathname.split("/").pop(); const body = await readBody(req); const db = await readDb(); const item = db.enquiries.find((entry) => entry.id === id); if (!item) return send(res, 404, { error: "Enquiry not found." }); item.status = body.status || item.status; await writeDb(db); return send(res, 200, item);

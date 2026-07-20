@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -6,18 +6,25 @@ import {
   CaretLeft,
   CaretRight,
   CheckCircle,
+  ChalkboardTeacher,
   Clock,
+  Compass,
   EnvelopeSimple,
   FacebookLogo,
   GraduationCap,
+  GlobeHemisphereEast,
+  HandHeart,
   FloppyDisk,
   HandsClapping,
   Heart,
   LockKey,
   MapPin,
+  Megaphone,
+  Newspaper,
   Phone,
   PersonSimpleRun,
   Plus,
+  Quotes,
   Sparkle,
   TreeStructure,
   UploadSimple,
@@ -25,6 +32,7 @@ import {
   MagnifyingGlass,
   X,
 } from "@phosphor-icons/react";
+import { ParentHubSystem } from "./ParentHubSystem.jsx";
 
 const navItems = [
   ["About", "/about#about"],
@@ -99,15 +107,15 @@ const defaultAboutContent = {
 function AboutPage({ onVisit, content }) {
   const about = { ...defaultAboutContent, ...content, principal: { ...defaultAboutContent.principal, ...(content?.principal || {}) }, valueWeek: { ...defaultAboutContent.valueWeek, ...(content?.valueWeek || {}) } };
   return <main id="main" className="about-page">
-    <section className="about-hero" aria-labelledby="about-title"><div className="about-inner about-hero-grid"><div><p className="eyebrow">About SRSS · 25th year</p><h1 id="about-title">Our Story</h1><p>At SRSS, education begins with a simple belief: every child carries within them the capacity for wisdom, kindness and purposeful action.</p><a className="primary-button" href="#our-story">Discover our foundation <ArrowRight size={18} weight="bold" /></a></div><figure className="about-hero-photo"><img src="./assets/photos/processed/assembly-achievements-1280.jpg" alt="SRSS pupils gathered at a school assembly" /><figcaption>Growing in knowledge, character and service.</figcaption></figure></div></section>
-    <section className="about-intro about-inner" id="our-story" aria-labelledby="foundation-title"><div><p className="eyebrow">Founded with purpose</p><h2 id="foundation-title">A school built on what matters most.</h2></div><div className="about-rich-copy"><p>Sekolah Rendah Sathya Sai was established to offer an education in which strong learning and strong character belong together. Inspired by the education vision of Sathya Sai Baba, the school seeks to draw out the human values already present in every child.</p><p>SRSS is part of a worldwide family of Sathya Sai schools: locally rooted, globally connected, and united by a commitment to academic confidence, compassionate leadership and service to society.</p></div></section>
-    <section className="milestone-section" aria-labelledby="milestones-title"><div className="about-inner"><p className="eyebrow">2001–2026</p><h2 id="milestones-title">A journey of human excellence.</h2><ol className="milestone-line">{aboutMilestones.map(([year, title, copy]) => <li key={year}><span>{year}</span><h3>{title}</h3><p>{copy}</p></li>)}</ol></div></section>
+    <section className="about-hero" aria-labelledby="about-title"><div className="about-inner about-hero-grid"><div><p className="eyebrow">{about.heroEyebrow}</p><h1 id="about-title">{about.heroTitle}</h1><p>{about.heroBody}</p><a className="primary-button" href="#our-story">Discover our foundation <ArrowRight size={18} weight="bold" /></a></div><figure className="about-hero-photo"><img src={about.heroImage} alt={about.heroAlt} /><figcaption>Growing in knowledge, character and service.</figcaption></figure></div></section>
+    <section className="about-intro about-inner" id="our-story" aria-labelledby="foundation-title"><div><p className="eyebrow">Founded with purpose</p><h2 id="foundation-title">{about.foundingTitle}</h2></div><div className="about-rich-copy"><p>{about.foundingBody}</p><p>{about.foundingSupport}</p></div></section>
+    <section className="milestone-section" aria-labelledby="milestones-title"><div className="about-inner"><p className="eyebrow">2001–2026</p><h2 id="milestones-title">A journey of human excellence.</h2><ol className="milestone-line">{about.milestones.map(({ year, title, copy }) => <li key={year}><span>{year}</span><h3>{title}</h3><p>{copy}</p></li>)}</ol></div></section>
     <section className="vision-section about-inner" aria-labelledby="vision-title"><div className="vision-heading"><p className="eyebrow">Vision &amp; mission</p><h2 id="vision-title">The direction behind each day.</h2></div><article><span>Our vision</span><h3>To nurture young people of character, confidence and compassion who contribute to a more peaceful world.</h3></article><article><span>Our mission</span><p>We integrate Malaysia’s national curriculum with Sathya Sai Education in Human Values, creating daily experiences that develop intellect, integrity, wellbeing and a spirit of service.</p></article></section>
     <section className="ssehv-section" aria-labelledby="ssehv-title"><div className="about-inner ssehv-grid"><div><p className="eyebrow">The SRSS difference</p><h2 id="ssehv-title">Values are not added on. They are the foundation.</h2><p>Sathya Sai Education in Human Values (SSEHV) does not place values beside academics as a separate lesson. It brings values into the way children enquire, collaborate, lead, respond and serve.</p></div><div className="ssehv-list"><div><BookOpen size={26} /><span><strong>Academic learning</strong>Knowledge becomes meaningful through curiosity, honesty and responsibility.</span></div><div><Heart size={26} /><span><strong>Inner development</strong>Quiet reflection and thoughtful relationships help children know themselves.</span></div><div><HandsClapping size={26} /><span><strong>Ethical action</strong>Service and everyday choices turn good intentions into lived character.</span></div></div></div></section>
     <section className="whole-child about-inner" aria-labelledby="whole-child-title"><div className="whole-child-copy"><p className="eyebrow">Whole-child approach</p><h2 id="whole-child-title">Head, Heart, Hands and Health.</h2><p>Our approach recognises that a child’s education is most complete when intellectual, emotional, ethical and physical growth move together.</p></div><div className="dimensions-grid"><article><BookOpen size={25}/><span>Head</span><h3>Academics</h3><p>Curiosity, knowledge and the confidence to think clearly.</p></article><article><Heart size={25}/><span>Heart</span><h3>Character</h3><p>Values, empathy and the inner strength to choose well.</p></article><article><HandsClapping size={25}/><span>Hands</span><h3>Service</h3><p>Practical contribution, teamwork and responsibility in action.</p></article><article><PersonSimpleRun size={25}/><span>Health</span><h3>Well-being</h3><p>Movement, balance and care for the body and mind.</p></article></div></section>
-    <section className="values-page-section" id="srss-values" aria-labelledby="values-page-title"><div className="about-inner"><div className="values-page-heading"><p className="eyebrow">Our values</p><h2 id="values-page-title">Five Values. One Foundation.</h2><p>Every child carries truth, love, peace, right conduct and non-violence within. Education helps these qualities find their voice in daily life.</p></div><div className="values-editorial-list">{humanValues.map(([sanskrit, name, definition, ...examples]) => <article key={name}><div><span>{sanskrit}</span><h3>{name}</h3><p>{definition}</p></div><ul>{examples.map(example => <li key={example}>{example}</li>)}</ul></article>)}</div><div className="value-week"><Sparkle size={24}/><div><span>Value of the week</span><strong>Love in action</strong><p>Notice one thoughtful way you can make someone’s day lighter.</p></div><a href="#students">Student challenge <ArrowRight size={17}/></a></div></div></section>
+    <section className="values-page-section" id="srss-values" aria-labelledby="values-page-title"><div className="about-inner"><div className="values-page-heading"><p className="eyebrow">Our values</p><h2 id="values-page-title">Five Values. One Foundation.</h2><p>Every child carries truth, love, peace, right conduct and non-violence within. Education helps these qualities find their voice in daily life.</p></div><div className="values-editorial-list">{humanValues.map(([sanskrit, name, definition, ...examples]) => <article key={name}><div><span>{sanskrit}</span><h3>{name}</h3><p>{definition}</p></div><ul>{examples.map(example => <li key={example}>{example}</li>)}</ul></article>)}</div><div className="value-week"><Sparkle size={24}/><div><span>Value of the week</span><strong>{about.valueWeek.title}</strong><p>{about.valueWeek.prompt}</p></div><a href={about.valueWeek.route}>Student challenge <ArrowRight size={17}/></a></div></div></section>
     <section className="tree-section about-inner" aria-labelledby="tree-title"><div><p className="eyebrow">A living metaphor</p><h2 id="tree-title">Character grows from deep roots.</h2><p>In our values tree, the five human values form the roots. Character is the trunk. Academic and life skills reach outward as branches; service and contribution are the fruit.</p></div><div className="values-tree" role="img" aria-label="Tree of values: human values form roots, character forms the trunk, academic and life skills form branches, and service and contribution are the fruit."><div className="tree-fruit">Service &amp;<br/>contribution</div><div className="tree-branches">Academic &amp; life skills</div><div className="tree-trunk">Character</div><div className="tree-roots">Truth · Right Conduct · Peace · Love · Non-Violence</div></div></section>
-    <section className="leadership-section" aria-labelledby="leadership-title"><div className="about-inner leadership-grid"><figure><img src="./assets/photos/processed/student-speaker-960.jpg" alt="An SRSS pupil sharing a reflection at school" /></figure><div><p className="eyebrow">A message from school leadership</p><h2 id="leadership-title">Every child deserves to be known.</h2><blockquote>“Our work is not only to help children succeed in school, but to help them grow into people who can bring courage, care and clarity to the world around them.”</blockquote><p>SRSS is a community of educators, families and pupils learning together. We hold high expectations with warmth, and create space for every child to discover both their strengths and their responsibility to others.</p><a className="source-link" href="#contact">Meet our leadership team <ArrowRight size={17}/></a></div></div></section>
+    <section className="leadership-section" aria-labelledby="leadership-title"><div className="about-inner leadership-grid"><figure><img src={about.principal.image} alt={about.principal.alt} /></figure><div><p className="eyebrow">A message from school leadership</p><h2 id="leadership-title">{about.principal.heading}</h2><blockquote>“{about.principal.quote}”</blockquote><p>{about.principal.body}</p><a className="source-link" href="#contact">Meet our leadership team <ArrowRight size={17}/></a></div></div></section>
     <section className="network-section about-inner" id="network" aria-labelledby="network-title"><div><p className="eyebrow">SSIOM &amp; global network</p><h2 id="network-title">Local commitment. Shared worldwide purpose.</h2></div><div><p>SRSS is supported by the Sathya Sai International Organisation of Malaysia (SSIOM) and connected to a worldwide network of Sathya Sai schools. This affiliation provides governance, guidance and an enduring community of practice centred on human values education.</p><a className="text-link" href="https://sathyasai.org.my/" target="_blank" rel="noreferrer">Discover SSIOM <ArrowRight size={17}/></a></div></section>
     <section className="about-closing"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">The next chapter</p><h2>Rooted in values. Focused on the future.</h2><p>We invite families to see how learning, character and community come together at SRSS.</p><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit <ArrowRight size={18} weight="bold" /></button></div></section>
   </main>;
@@ -130,6 +138,12 @@ const faqs = [
   ["What is the language of instruction?", "Teaching is delivered in line with the national curriculum, with language support provided as appropriate for each child."],
   ["Are uniform, transport and after-school care available?", "Our admissions team can share the current practical arrangements and options during your visit or enquiry."],
 ];
+
+function AboutEditor({ about = defaultAboutContent, onChange }) {
+  const update = (key, value) => onChange({ ...about, [key]: value });
+  const updateNested = (key, nested, value) => onChange({ ...about, [key]: { ...(about[key] || {}), [nested]: value } });
+  return <section className="admin-panel about-admin-panel"><div className="admin-panel-head"><div><h2>About SRSS page</h2><span>Public page content and managed assets</span></div><a href="/about#about" target="_blank" rel="noreferrer">Preview page</a></div><div className="about-admin-grid"><label>Hero eyebrow<input value={about.heroEyebrow || ""} onChange={(event) => update("heroEyebrow", event.target.value)} /></label><label>Hero title<input value={about.heroTitle || ""} onChange={(event) => update("heroTitle", event.target.value)} /></label><label className="wide-label">Hero message<textarea rows="3" value={about.heroBody || ""} onChange={(event) => update("heroBody", event.target.value)} /></label><label>Hero image URL<input value={about.heroImage || ""} onChange={(event) => update("heroImage", event.target.value)} /></label><label>Hero image alt text<input value={about.heroAlt || ""} onChange={(event) => update("heroAlt", event.target.value)} /></label><label>Founding heading<input value={about.foundingTitle || ""} onChange={(event) => update("foundingTitle", event.target.value)} /></label><label className="wide-label">Founding story<textarea rows="4" value={about.foundingBody || ""} onChange={(event) => update("foundingBody", event.target.value)} /></label><label className="wide-label">Founding support<textarea rows="3" value={about.foundingSupport || ""} onChange={(event) => update("foundingSupport", event.target.value)} /></label><label>Value of the week<input value={about.valueWeek?.title || ""} onChange={(event) => updateNested("valueWeek", "title", event.target.value)} /></label><label>Student challenge link<input value={about.valueWeek?.route || ""} onChange={(event) => updateNested("valueWeek", "route", event.target.value)} /></label><label className="wide-label">Weekly prompt<textarea rows="2" value={about.valueWeek?.prompt || ""} onChange={(event) => updateNested("valueWeek", "prompt", event.target.value)} /></label><label>Leadership heading<input value={about.principal?.heading || ""} onChange={(event) => updateNested("principal", "heading", event.target.value)} /></label><label>Leadership image URL<input value={about.principal?.image || ""} onChange={(event) => updateNested("principal", "image", event.target.value)} /></label><label className="wide-label">Leadership message<textarea rows="4" value={about.principal?.quote || ""} onChange={(event) => updateNested("principal", "quote", event.target.value)} /></label></div></section>;
+}
 
 function AdminHub({ onExit }) {
   const [key, setKey] = useState(() => sessionStorage.getItem("srss-admin-key") || "");
@@ -239,7 +253,7 @@ function HubSection({ section, onDashboard, onAbsence, onCalendar }) {
 }
 
 export function App() {
-  const [parentHubOpen, setParentHubOpen] = useState(false);
+  const [hubRoute, setHubRoute] = useState(() => window.location.pathname.startsWith("/parent-hub") ? window.location.pathname : null);
   const [isAbout, setIsAbout] = useState(() => window.location.hash === "#about" || window.location.pathname === "/about");
   const [adminOpen, setAdminOpen] = useState(() => window.location.pathname === "/admin" || window.location.hash === "#admin");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -258,6 +272,7 @@ export function App() {
   const [managedContent, setManagedContent] = useState({
     news: newsItems.map(([category, title, date, image], index) => ({ id: `fallback-news-${index}`, category, title, date: `2026-${date.slice(3, 6) === "Jul" ? "07" : "07"}-${date.slice(0, 2)}`, image })),
     events: events.map(([date, title, category, time], index) => ({ id: `fallback-event-${index}`, date: `2026-${date.endsWith("JUL") ? "07" : "08"}-${date.slice(0, 2)}`, title, category, time })),
+    about: defaultAboutContent,
   });
 
   useEffect(() => {
@@ -270,6 +285,12 @@ export function App() {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  useEffect(() => {
+    const handleRoute = () => setHubRoute(window.location.pathname.startsWith("/parent-hub") ? window.location.pathname : null);
+    window.addEventListener("popstate", handleRoute);
+    return () => window.removeEventListener("popstate", handleRoute);
   }, []);
 
   useEffect(() => {
@@ -301,7 +322,19 @@ export function App() {
     URL.revokeObjectURL(link.href);
   };
 
-  if (parentHubOpen) return <ParentHub onExit={() => setParentHubOpen(false)} />;
+  const openParentHub = (path = "/parent-hub") => {
+    window.history.pushState({}, "", path);
+    setHubRoute(path);
+    window.scrollTo(0, 0);
+  };
+
+  const exitParentHub = () => {
+    window.history.pushState({}, "", "/");
+    setHubRoute(null);
+    window.scrollTo(0, 0);
+  };
+
+  if (hubRoute) return <ParentHubSystem route={hubRoute} onExit={exitParentHub} />;
   if (adminOpen) return <AdminHub onExit={() => { window.history.pushState({}, "", "/"); setAdminOpen(false); }} />;
 
   return (
@@ -336,7 +369,7 @@ export function App() {
 
             <div className="nav-actions">
               <button className="icon-action" type="button" onClick={() => setSearchOpen(true)} aria-label="Search SRSS"><MagnifyingGlass size={22} /></button>
-              <button className="parent-link" type="button" onClick={() => setParentHubOpen(true)}>Parent Hub</button>
+              <button className="parent-link" type="button" onClick={() => openParentHub()}>Parent Hub</button>
               <a className="admissions-button" href="#admissions">Admissions &amp; Visits</a>
               <button className="mobile-menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">{menuOpen ? <X size={25} /> : <List size={25} />}</button>
             </div>
@@ -345,7 +378,7 @@ export function App() {
           {menuOpen && (
             <nav className="mobile-nav" aria-label="Mobile navigation">
               {navItems.map(([label, href]) => <a key={label} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}
-              <button type="button" onClick={() => { setMenuOpen(false); setParentHubOpen(true); }}>Parent Hub</button>
+              <button type="button" onClick={() => { setMenuOpen(false); openParentHub(); }}>Parent Hub</button>
               <button type="button" onClick={() => { setMenuOpen(false); setVisitOpen(true); }}>Admissions &amp; Visits</button>
             </nav>
           )}
@@ -363,7 +396,7 @@ export function App() {
         </div>
       )}
 
-      {isAbout ? <AboutPage onVisit={() => { setSent(false); setVisitOpen(true); }} /> : <main id="main">
+      {isAbout ? <AboutPage content={managedContent.about} onVisit={() => { setSent(false); setVisitOpen(true); }} /> : <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="hero-copy">
             <p className="eyebrow">Sekolah Rendah Sathya Sai&nbsp;&nbsp;·&nbsp;&nbsp;Since 2002</p>
@@ -463,7 +496,7 @@ export function App() {
           <article className="hub-panel" id="hub-panel" role="tabpanel" aria-live="polite">
             <div><span>0{activeHub + 1}</span><h3>{hubs[activeHub][0]}</h3></div>
             <p>{hubs[activeHub][1]}</p>
-            <a href={hubs[activeHub][2]} onClick={(event) => { if (activeHub === 0) { event.preventDefault(); setParentHubOpen(true); } }}>Open {hubs[activeHub][0]} <ArrowRight size={18} /></a>
+            <a href={hubs[activeHub][2]} onClick={(event) => { if (activeHub === 0) { event.preventDefault(); openParentHub(); } }}>Open {hubs[activeHub][0]} <ArrowRight size={18} /></a>
           </article>
         </section>
 
@@ -474,8 +507,8 @@ export function App() {
             <p>Find essential dates, forms, learning links and guidance without losing sight of what matters most: every child’s growth.</p>
           </div>
           <div className="essentials-list">
-            <button type="button" onClick={() => setParentHubOpen(true)}><CalendarBlank size={23} /><span><strong>Open Parent Hub</strong><small>Notices, calendar, forms and class updates</small></span><ArrowRight size={19} /></button>
-            <button type="button" id="students" onClick={() => setParentHubOpen(true)}><span className="list-index">02</span><span><strong>Student and family hub</strong><small>Learning resources, forms and notices</small></span><ArrowRight size={19} /></button>
+            <button type="button" onClick={() => openParentHub()}><CalendarBlank size={23} /><span><strong>Open Parent Hub</strong><small>Notices, calendar, forms and class updates</small></span><ArrowRight size={19} /></button>
+            <button type="button" id="students" onClick={() => openParentHub()}><span className="list-index">02</span><span><strong>Student and family hub</strong><small>Learning resources, forms and notices</small></span><ArrowRight size={19} /></button>
             <span id="teachers" className="anchor-target" />
           </div>
         </section>
@@ -551,7 +584,8 @@ export function App() {
           <nav className="footer-quick-links" aria-label="Footer quick links">
             <h2>Quick links</h2>
             <a href="#top">Home</a>
-            <button type="button" onClick={() => setParentHubOpen(true)}>Parents Hub</button>
+            <a href="/about#about">About SRSS</a>
+            <button type="button" onClick={() => openParentHub()}>Parents Hub</button>
             <a href="#students">Students Hub</a>
             <a href="#teachers">Teachers Hub</a>
             <a href="#learning">Resources</a>
