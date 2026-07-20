@@ -97,6 +97,12 @@ const whySrss = [
   [GlobeHemisphereEast, "Sai education philosophy", "Sathya Sai Educare helps each child draw out the character, confidence and compassion already within."],
 ];
 
+const defaultHomepageContent = {
+  stats: { years: 25, students: "Year 1–6", values: 5, motto: "The End of Education is Character" },
+  principal: { quote: "Each child enters our school with gifts waiting to be recognised. Our task is to nurture clear thinking, a compassionate heart and the courage to serve.", message: "Welcome to a school community where pupils are known, challenged and cared for. We invite your family to discover how character and learning grow together at SRSS.", image: "/assets/srss-hero-learning.png" },
+  anniversary: { title: "Celebrating 25 Years.", description: "A quarter-century of learning, service and Human Excellence. Follow the milestones and voices that continue to shape SRSS." },
+};
+
 const learningTabs = [
   ["Curious minds", "Through Malaysia’s national curriculum, pupils investigate, question and connect ideas. Classrooms are structured for strong foundations while leaving space for wonder, dialogue and independent thought."],
   ["Active bodies", "Movement, games and co-curricular experiences develop coordination, resilience and teamwork. Pupils learn to participate wholeheartedly, strive fairly and care for one another."],
@@ -292,6 +298,7 @@ export function App() {
     news: newsItems.map(([category, title, date, image], index) => ({ id: `fallback-news-${index}`, category, title, date: `2026-${date.slice(3, 6) === "Jul" ? "07" : "07"}-${date.slice(0, 2)}`, image })),
     events: events.map(([date, title, category, time], index) => ({ id: `fallback-event-${index}`, date: `2026-${date.endsWith("JUL") ? "07" : "08"}-${date.slice(0, 2)}`, title, category, time })),
     about: defaultAboutContent,
+    homepage: defaultHomepageContent,
   });
 
   useEffect(() => {
