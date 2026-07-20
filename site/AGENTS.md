@@ -8,6 +8,11 @@ When implementing from a selected generated mock, treat that image as the source
 
 ## SRSS design decisions
 
+- `SITEMAP.md` is the canonical information architecture and route plan for the public website and secure hubs.
+- Public navigation separates `Admissions & Visits` from `Community & Support`; `Be part of SRSS` may group them but is not one catch-all content page.
+- Use one `/sign-in` entry and a role-aware `/hub` shell. Parent, student, teacher and admin/staff access is enforced by the data/API layer, not by hidden navigation.
+- Google Workspace products support governed SRSS workflows; they are integrations rather than substitutes for clear SRSS pages, permissions, status and confirmation states.
+
 - Use the official SRSS logo only as a compact header and restrained footer brand mark. Do not refer to it as a crest or use oversized emblems, anniversary artwork, decorative school motifs, or unrelated multilingual/religious symbols.
 - The public homepage is calm and editorial: solid deep navy, ivory, white, and restrained gold. Reserve bright gradients for internal student-hub galleries only.
 - Homepage photography may feature fictional pupils, but uniforms must follow the real SRSS lavender-and-aubergine-purple uniform. Integrate imagery with softened photographic edges rather than visible rectangular cards.

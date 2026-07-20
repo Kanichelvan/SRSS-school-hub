@@ -4,6 +4,8 @@
 
 Make the public site a living invitation into SRSS rather than a brochure. A prospective parent should understand within seconds that academic excellence and character development belong together.
 
+Use `site/SITEMAP.md` as the canonical public route and content hierarchy. This reference governs presentation; the sitemap governs page boundaries, URLs, audiences and integrations.
+
 ## Header and navigation
 
 Use a two-tier solid-navy header.
@@ -21,8 +23,9 @@ Use a two-tier solid-navy header.
 - Height: approximately 88–105 px desktop.
 - Left: official school logo at 52–68 px and a two- or three-line school lockup.
 - Lockup: `Sekolah Rendah Sathya Sai`, `Kuala Lumpur, Malaysia`, optional small gold `Human Excellence · Kecemerlangan Insan`.
-- Centre: About, Learning/Academics, School Life, Values, Community.
-- Right: search, Parent Hub or Contact, and a restrained outlined `Admissions & Visits` action.
+- Centre: About, Learning, Student Life, Be part of SRSS, Resources.
+- `Be part of SRSS` groups two distinct destinations: Admissions & Visits, and Community & Support.
+- Right: search, Sign in, and a restrained outlined `Admissions & Visits` action.
 - Use the logo once. Do not place an anniversary mark beside it in standard navigation.
 - Collapse to logo, search and menu on mobile.
 
@@ -88,6 +91,8 @@ After the first viewport, introduce practical usefulness:
 - enquiry/visit request;
 - optional links to the student, teacher and community hubs.
 
+Route unauthenticated Student, Parent, Teacher and Admin/Staff Hub visitors through `/sign-in`; do not expose a role-specific sign-in form on the public homepage.
+
 Keep these sections simpler than the internal hubs. Use white/ivory surfaces and restrained borders.
 
 ## Footer
@@ -97,6 +102,7 @@ Use solid Navy 950 with a thin Gold 700 bottom rule. The school logo may appear 
 ## Interaction standards
 
 - Navigation links scroll or route correctly.
+- Use canonical, shareable routes for complete pages and hash links only for sections within those pages.
 - Search opens a labelled overlay and closes with Escape.
 - Admissions & Visits opens a labelled form or routes to a focused enquiry page.
 - Forms show labels, validation, focus and success states.
