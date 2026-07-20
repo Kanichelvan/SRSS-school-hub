@@ -22,6 +22,11 @@
     "valueWeek": { "title": "Love in action", "prompt": "Notice one thoughtful way you can make someone’s day lighter.", "route": "#students" },
     "principal": { "heading": "Every child deserves to be known.", "quote": "Our work is not only to help children succeed in school, but to help them grow into people who can bring courage, care and clarity to the world around them.", "body": "SRSS is a community of educators, families and pupils learning together. We hold high expectations with warmth, and create space for every child to discover both their strengths and their responsibility to others.", "image": "/assets/photos/processed/student-speaker-960.jpg", "alt": "An SRSS pupil sharing a reflection at school" }
   },
+  "homepage": {
+    "stats": { "years": 25, "students": "Year 1–6", "values": 5, "motto": "The End of Education is Character" },
+    "principal": { "quote": "Each child enters our school with gifts waiting to be recognised. Our task is to nurture clear thinking, a compassionate heart and the courage to serve.", "message": "Welcome to a school community where pupils are known, challenged and cared for. We invite your family to discover how character and learning grow together at SRSS.", "image": "/assets/srss-hero-learning.png" },
+    "anniversary": { "title": "Celebrating 25 Years.", "description": "A quarter-century of learning, service and Human Excellence. Follow the milestones and voices that continue to shape SRSS." }
+  },
   "enquiries": [],
   "messages": [],
   "assets": [],

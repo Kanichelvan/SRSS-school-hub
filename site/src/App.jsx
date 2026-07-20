@@ -325,7 +325,7 @@ export function App() {
     return () => { window.removeEventListener("hashchange", handleRouteChange); window.removeEventListener("popstate", handleRouteChange); };
   }, []);
 
-  useEffect(() => { fetch("/api/content").then((response) => response.ok ? response.json() : null).then((data) => { if (data) setManagedContent(data); }).catch(() => {}); }, []);
+  useEffect(() => { fetch("/api/content").then((response) => response.ok ? response.json() : null).then((data) => { if (data) setManagedContent((current) => ({ ...current, ...data, homepage: { ...current.homepage, ...(data.homepage || {}) } })); }).catch(() => {}); }, []);
 
   useEffect(() => { const target = window.location.hash.slice(1); if (target && target !== "about" && target !== "admin") window.setTimeout(() => document.getElementById(target)?.scrollIntoView(), 0); }, [isAbout, adminOpen]);
 
@@ -358,6 +358,16 @@ export function App() {
     () => [0, 1, 2].map((offset) => galleryItems[(galleryIndex + offset) % galleryItems.length]),
     [galleryIndex],
   );
+  const homepageCards = useMemo(() => {
+    const firstNews = managedContent.news?.[0];
+    const firstEvent = managedContent.events?.[0];
+    const announcement = managedContent.news?.[1];
+    return [
+      firstNews && { ...firstNews, type: "School news", excerpt: firstNews.excerpt || "A recent glimpse of curiosity, care and purposeful learning across SRSS.", Icon: Newspaper },
+      firstEvent && { ...firstEvent, type: "Upcoming event", excerpt: firstEvent.excerpt || "Families are invited to take part in the next shared school experience.", image: "/assets/photos/processed/sports-day-march-1600.jpg", Icon: CalendarBlank },
+      announcement && { ...announcement, type: "Announcement", excerpt: announcement.excerpt || "An important update for pupils, families and the wider school community.", Icon: Megaphone },
+    ].filter(Boolean);
+  }, [managedContent.news, managedContent.events]);
 
   const handleVisitSubmit = (event) => {
     event.preventDefault();
@@ -461,11 +471,25 @@ export function App() {
           <img className="hero-image" src="./assets/srss-hero-learning.png" alt="Teacher and pupils reading together in SRSS uniform" />
         </section>
 
+        <section className="role-router" aria-labelledby="role-router-title">
+          <div className="role-router-heading"><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div>
+          <div className="role-router-grid">{roleRoutes.map(([label, copy, target, Icon]) => target === "parent" ? <button key={label} type="button" className="role-card" onClick={() => setParentHubOpen(true)}><Icon size={25} weight="duotone" /><span><strong>{label}</strong><small>{copy}</small></span><ArrowRight size={17} /></button> : <a key={label} className="role-card" href={target}><Icon size={25} weight="duotone" /><span><strong>{label}</strong><small>{copy}</small></span><ArrowRight size={17} /></a>)}</div>
+        </section>
+
         <section className="purpose-section" id="purpose" aria-labelledby="purpose-title">
           <p className="eyebrow">Our purpose</p>
           <h2 id="purpose-title">Learning that reaches <em>beyond the classroom.</em></h2>
           <p>Sekolah Rendah Sathya Sai is a values-based learning community where academic excellence meets character development. Rooted in the timeless principles of Truth, Right Conduct, Peace, Love, and Nonviolence, we empower every child to realise their highest potential and become a positive force for humanity.</p>
         </section>
+
+        <section className="glance-section" ref={glanceRef} aria-labelledby="glance-title">
+          <div className="section-intro glance-heading"><p className="eyebrow">School at a glance</p><h2 id="glance-title">A quarter-century of <em>purposeful learning.</em></h2></div>
+          <div className="glance-grid"><article><strong>{statCounts.years}</strong><span>Years</span><p>Serving families since 2002</p></article><article><strong>{managedContent.homepage?.stats?.students || "Year 1–6"}</strong><span>Students</span><p>A close-knit primary community</p></article><article><strong>{statCounts.values}</strong><span>Human Values</span><p>One foundation for daily life</p></article><article className="motto-stat"><strong>“{managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto}”</strong><span>School motto</span><p>Learning with mind, heart and hands</p></article></div>
+        </section>
+
+        <section className="why-section" aria-labelledby="why-title"><div className="why-heading"><p className="eyebrow">Why SRSS</p><h2 id="why-title">Learning with depth. <em>Growing with purpose.</em></h2><p>SRSS brings academic confidence and character formation into one connected school experience.</p></div><div className="why-grid">{whySrss.map(([Icon, title, copy]) => <article key={title}><Icon size={29} weight="duotone" /><h3>{title}</h3><p>{copy}</p></article>)}</div><div className="why-links"><a href="#about">About SRSS <ArrowRight size={16} /></a><a href="#learning">Explore the learning experience <ArrowRight size={16} /></a></div></section>
+
+        <section className="principal-section" aria-labelledby="principal-title"><figure><img src={managedContent.homepage?.principal?.image || defaultHomepageContent.principal.image} alt="An SRSS teacher reading with pupils" /></figure><div><p className="eyebrow">Message from the Principal</p><Quotes size={34} weight="duotone" aria-hidden="true" /><blockquote id="principal-title">“{managedContent.homepage?.principal?.quote || defaultHomepageContent.principal.quote}”</blockquote><p>{managedContent.homepage?.principal?.message || defaultHomepageContent.principal.message}</p><a href="#about">Read the Principal’s message <ArrowRight size={17} /></a></div></section>
 
         <section className="values-garden" id="values" aria-labelledby="garden-title">
           <div className="section-intro">
@@ -474,7 +498,7 @@ export function App() {
             <p>Select a petal to see how each human value becomes part of everyday school life.</p>
           </div>
           <div className="values-flower" role="group" aria-label="The five human values">
-              <img src="./assets/values-flower.png" alt="" aria-hidden="true" />
+              <img src="./assets/values-flower.svg" alt="" aria-hidden="true" />
               {values.map((value, index) => (
                 <button
                   key={value.name}
@@ -495,7 +519,7 @@ export function App() {
           </div>
         </section>
 
-        <section className="life-section" id="school-life" aria-labelledby="life-title">
+        <section className="life-section" id="school-life" aria-labelledby="life-title" onMouseEnter={() => setGalleryPaused(true)} onMouseLeave={() => setGalleryPaused(false)} onFocusCapture={() => setGalleryPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setGalleryPaused(false); }}>
           <div className="section-head-row">
             <div>
               <p className="eyebrow">Life at SRSS</p>
@@ -505,6 +529,7 @@ export function App() {
               <button type="button" onClick={() => setGalleryIndex((galleryIndex - 1 + galleryItems.length) % galleryItems.length)} aria-label="Previous gallery images"><CaretLeft size={21} /></button>
               <span>{String(galleryIndex + 1).padStart(2, "0")} / {String(galleryItems.length).padStart(2, "0")}</span>
               <button type="button" onClick={() => setGalleryIndex((galleryIndex + 1) % galleryItems.length)} aria-label="Next gallery images"><CaretRight size={21} /></button>
+              <small>{galleryPaused ? "Paused" : "Auto"}</small>
             </div>
           </div>
           <div className="gallery-grid" aria-live="polite">
@@ -603,11 +628,11 @@ export function App() {
 
         <section className="news-hero" id="news" aria-labelledby="news-title"><p className="eyebrow">News & events</p><h2 id="news-title">Stories &amp; <em>Happenings.</em></h2><p>Moments of learning, service and celebration from the SRSS community.</p></section>
         <section className="news-section" aria-label="Latest news">
-          <div className="news-head"><h3>Latest news</h3><div className="news-filters">{["All", "School News", "Achievements", "Values in Action"].map(filter => <button type="button" key={filter} onClick={() => setActiveNews(filter)} aria-pressed={activeNews === filter}>{filter}</button>)}</div></div>
-          <div className="news-grid">{managedContent.news.filter((item) => activeNews === "All" || item.category === activeNews).map((item) => <article key={item.id}><img src={item.image || "./assets/photos/processed/classroom-art-1280.jpg"} alt="" /><div><span>{item.category}</span><h3>{item.title}</h3><time>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}</time><a href="/contact#contact">Read story <ArrowRight size={15} /></a></div></article>)}</div>
+          <div className="news-head"><h3>Latest news &amp; events</h3><a href="#news">View all updates <ArrowRight size={16} /></a></div>
+          <div className="news-grid home-news-grid">{homepageCards.map((item) => <article key={`${item.type}-${item.id}`}><img src={item.image || "./assets/photos/processed/classroom-art-1280.jpg"} alt="" /><div><span><item.Icon size={15} />{item.type}</span><time>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}</time><h3>{item.title}</h3><p>{item.excerpt}</p><a href="#news">Read more <ArrowRight size={15} /></a></div></article>)}</div>
         </section>
         <section className="events-section" aria-labelledby="events-title"><div><p className="eyebrow">Mark your calendar</p><h2 id="events-title">Upcoming <em>togetherness.</em></h2><p>Join in the academic, cultural, seva and community life of our school.</p></div><div className="event-list">{managedContent.events.map((item) => <article key={item.id}><time>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit", month: "short" }).toUpperCase()}</time><div><span>{item.category}</span><h3>{item.title}</h3><p><Clock size={14} /> {item.time}</p></div><button type="button" onClick={() => addToCalendar(item.title, item.date)} aria-label={`Add ${item.title} to calendar`}><CalendarBlank size={20} /></button></article>)}</div></section>
-        <section className="anniversary-section"><img src="./assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><div><p className="eyebrow">25th anniversary year</p><h2>25 years of <em>Human Excellence.</em></h2><p>Follow alumni stories, school memories and anniversary events as we celebrate the people and values that have shaped SRSS.</p><a href="#contact">Share an alumni story <ArrowRight size={17} /></a></div></section>
+        <section className="anniversary-section"><img src="./assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><div><p className="eyebrow">2002–2027</p><h2>{managedContent.homepage?.anniversary?.title || defaultHomepageContent.anniversary.title}</h2><p>{managedContent.homepage?.anniversary?.description || defaultHomepageContent.anniversary.description}</p><div className="anniversary-timeline"><span><strong>2002</strong>First cohort</span><span><strong>2012</strong>A growing community</span><span><strong>2027</strong>25th anniversary</span></div><a href="#news">Explore the anniversary story <ArrowRight size={17} /></a></div></section>
         <section className="community-strip" aria-label="Community, achievements and newsletter"><article><Heart size={28} weight="duotone" /><p className="eyebrow">Seva & community</p><h3>Small hands, meaningful service.</h3><p>Find upcoming seva opportunities and ways families can contribute to the wider community.</p><a href="#contact">Volunteer with SRSS <ArrowRight size={16} /></a></article><article><Sparkle size={28} weight="duotone" /><p className="eyebrow">Student achievements</p><h3>Every effort has a story.</h3><p>Discover academic, co-curricular and values-led achievements from across our school.</p><a href="#news">Celebrate with us <ArrowRight size={16} /></a></article><article><BookOpen size={28} weight="duotone" /><p className="eyebrow">Newsletter archive</p><h3>Keep up with each term.</h3><p>Read school news, learning highlights and family updates in our newsletter archive.</p><a href="#contact">Request newsletters <ArrowRight size={16} /></a></article></section>
 
         <section className="page-hero contact-hero" id="contact" aria-labelledby="contact-title"><div><p className="eyebrow">Contact</p><h2 id="contact-title">Get in <em>Touch.</em></h2><p>Whether you have a question, wish to visit, or want to connect with a particular department, the right person is close by.</p></div><img src="./assets/photos/processed/assembly-achievements-1280.jpg" alt="SRSS pupils gathered at a school assembly" /></section>

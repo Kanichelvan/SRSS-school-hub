@@ -18,7 +18,7 @@ const readBody = async (req) => new Promise((resolveBody, reject) => { let body 
 const readDb = async () => JSON.parse(await readFile(dbPath, "utf8"));
 const writeDb = async (db) => writeFile(dbPath, `${JSON.stringify(db, null, 2)}\n`);
 const isAdmin = (req) => req.headers["x-srss-admin-key"] === adminKey;
-const publicData = (db) => ({ news: db.news.filter((item) => item.published), events: db.events.filter((item) => item.published), assets: db.assets, about: db.about || {} });
+const publicData = (db) => ({ news: db.news.filter((item) => item.published), events: db.events.filter((item) => item.published), assets: db.assets, about: db.about || {}, homepage: db.homepage || {} });
 const safeName = (name) => basename(name).replace(/[^a-zA-Z0-9._-]/g, "-");
 const parentHubData = (db) => db.parentHub || structuredClone(parentHubSeed);
 
@@ -52,7 +52,7 @@ const server = createServer(async (req, res) => {
     if (url.pathname === "/api/admin/content" && req.method === "GET") { if (!isAdmin(req)) return send(res, 401, { error: "Admin authorisation required." }); return send(res, 200, await readDb()); }
     if (url.pathname === "/api/admin/content" && req.method === "PUT") {
       if (!isAdmin(req)) return send(res, 401, { error: "Admin authorisation required." }); const body = await readBody(req);
-      const db = await readDb(); for (const key of ["news", "events"]) if (Array.isArray(body[key])) db[key] = body[key]; if (body.about && typeof body.about === "object") db.about = { ...db.about, ...body.about, updatedAt: new Date().toISOString() }; await writeDb(db); return send(res, 200, db);
+      const db = await readDb(); for (const key of ["news", "events"]) if (Array.isArray(body[key])) db[key] = body[key]; if (body.about && typeof body.about === "object") db.about = { ...db.about, ...body.about, updatedAt: new Date().toISOString() }; if (body.homepage && typeof body.homepage === "object") db.homepage = { ...db.homepage, ...body.homepage, updatedAt: new Date().toISOString() }; await writeDb(db); return send(res, 200, db);
     }
     if (url.pathname.startsWith("/api/admin/enquiries/") && req.method === "PATCH") {
       if (!isAdmin(req)) return send(res, 401, { error: "Admin authorisation required." }); const id = url.pathname.split("/").pop(); const body = await readBody(req); const db = await readDb(); const item = db.enquiries.find((entry) => entry.id === id); if (!item) return send(res, 404, { error: "Enquiry not found." }); item.status = body.status || item.status; await writeDb(db); return send(res, 200, item);
