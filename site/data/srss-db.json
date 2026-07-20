@@ -1,0 +1,15 @@
+{
+  "news": [
+    { "id": "news-1", "category": "School News", "title": "A new term of curious, caring learning", "date": "2026-07-20", "image": "/assets/photos/processed/science-microscope-1600.jpg", "published": true },
+    { "id": "news-2", "category": "Achievements", "title": "Celebrating effort, teamwork and every growing voice", "date": "2026-07-14", "image": "/assets/photos/processed/sports-day-podium-1600.jpg", "published": true },
+    { "id": "news-3", "category": "Values in Action", "title": "Pupils bring care and responsibility into daily life", "date": "2026-07-08", "image": "/assets/photos/processed/classroom-art-1280.jpg", "published": true }
+  ],
+  "events": [
+    { "id": "event-1", "date": "2026-07-25", "title": "Open morning for prospective families", "category": "Parent", "time": "9.30–11.30 am", "published": true },
+    { "id": "event-2", "date": "2026-07-31", "title": "Community seva day", "category": "Seva", "time": "8.30–11.00 am", "published": true },
+    { "id": "event-3", "date": "2026-08-08", "title": "National Day cultural celebration", "category": "Cultural", "time": "8.00 am–12.00 pm", "published": true }
+  ],
+  "enquiries": [],
+  "messages": [],
+  "assets": []
+}

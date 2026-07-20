@@ -10,24 +10,28 @@ import {
   EnvelopeSimple,
   FacebookLogo,
   GraduationCap,
+  FloppyDisk,
   HandsClapping,
   Heart,
+  LockKey,
   MapPin,
   Phone,
   PersonSimpleRun,
   Plus,
   Sparkle,
   TreeStructure,
+  UploadSimple,
   List,
   MagnifyingGlass,
   X,
 } from "@phosphor-icons/react";
 
 const navItems = [
-  ["Learning", "#learning"],
-  ["Admissions", "#admissions"],
-  ["News & Events", "#news"],
-  ["Contact", "#contact"],
+  ["About", "/about#about"],
+  ["Learning", "/learning#learning"],
+  ["Admissions", "/admissions#admissions"],
+  ["News & Events", "/news#news"],
+  ["Contact", "/contact#contact"],
 ];
 
 const values = [
@@ -88,7 +92,12 @@ const aboutMilestones = [["2001", "A shared vision", "A values-based primary sch
 
 const humanValues = [["Sathya", "Truth", "Integrity in thought, word and action.", "Speaking honestly in a classroom discussion", "Owning a mistake and making it right", "Bringing sincere effort to each task"], ["Dharma", "Right Conduct", "Doing what is right with care and responsibility.", "Arriving prepared and on time", "Taking care of shared spaces", "Offering a helping hand without being asked"], ["Shanti", "Peace", "Finding steadiness within and respect around us.", "Beginning with a quiet moment", "Choosing calm words in a disagreement", "Reflecting before responding"], ["Prema", "Love", "Seeing and serving the good in every person.", "Including a classmate at play", "Encouraging a friend who is trying", "Showing gratitude to those who care for us"], ["Ahimsa", "Non-Violence", "Gentleness towards people, animals and the earth.", "Solving conflict without hurtful words", "Caring for the school garden", "Making choices that protect our shared world"]];
 
-function AboutPage({ onVisit }) {
+const defaultAboutContent = {
+  heroEyebrow: "About SRSS · 25th year", heroTitle: "Our Story", heroBody: "At SRSS, education begins with a simple belief: every child carries within them the capacity for wisdom, kindness and purposeful action.", heroImage: "/assets/photos/processed/assembly-achievements-1280.jpg", heroAlt: "SRSS pupils gathered at a school assembly", foundingTitle: "A school built on what matters most.", foundingBody: "Sekolah Rendah Sathya Sai was established to offer an education in which strong learning and strong character belong together. Inspired by the education vision of Sathya Sai Baba, the school seeks to draw out the human values already present in every child.", foundingSupport: "SRSS is part of a worldwide family of Sathya Sai schools: locally rooted, globally connected, and united by a commitment to academic confidence, compassionate leadership and service to society.", milestones: aboutMilestones.map(([year, title, copy]) => ({ year, title, copy })), valueWeek: { title: "Love in action", prompt: "Notice one thoughtful way you can make someone’s day lighter.", route: "#students" }, principal: { heading: "Every child deserves to be known.", quote: "Our work is not only to help children succeed in school, but to help them grow into people who can bring courage, care and clarity to the world around them.", body: "SRSS is a community of educators, families and pupils learning together. We hold high expectations with warmth, and create space for every child to discover both their strengths and their responsibility to others.", image: "/assets/photos/processed/student-speaker-960.jpg", alt: "An SRSS pupil sharing a reflection at school" }, updatedAt: null,
+};
+
+function AboutPage({ onVisit, content }) {
+  const about = { ...defaultAboutContent, ...content, principal: { ...defaultAboutContent.principal, ...(content?.principal || {}) }, valueWeek: { ...defaultAboutContent.valueWeek, ...(content?.valueWeek || {}) } };
   return <main id="main" className="about-page">
     <section className="about-hero" aria-labelledby="about-title"><div className="about-inner about-hero-grid"><div><p className="eyebrow">About SRSS · 25th year</p><h1 id="about-title">Our Story</h1><p>At SRSS, education begins with a simple belief: every child carries within them the capacity for wisdom, kindness and purposeful action.</p><a className="primary-button" href="#our-story">Discover our foundation <ArrowRight size={18} weight="bold" /></a></div><figure className="about-hero-photo"><img src="./assets/photos/processed/assembly-achievements-1280.jpg" alt="SRSS pupils gathered at a school assembly" /><figcaption>Growing in knowledge, character and service.</figcaption></figure></div></section>
     <section className="about-intro about-inner" id="our-story" aria-labelledby="foundation-title"><div><p className="eyebrow">Founded with purpose</p><h2 id="foundation-title">A school built on what matters most.</h2></div><div className="about-rich-copy"><p>Sekolah Rendah Sathya Sai was established to offer an education in which strong learning and strong character belong together. Inspired by the education vision of Sathya Sai Baba, the school seeks to draw out the human values already present in every child.</p><p>SRSS is part of a worldwide family of Sathya Sai schools: locally rooted, globally connected, and united by a commitment to academic confidence, compassionate leadership and service to society.</p></div></section>
@@ -122,6 +131,21 @@ const faqs = [
   ["Are uniform, transport and after-school care available?", "Our admissions team can share the current practical arrangements and options during your visit or enquiry."],
 ];
 
+function AdminHub({ onExit }) {
+  const [key, setKey] = useState(() => sessionStorage.getItem("srss-admin-key") || "");
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const load = async (event) => { event?.preventDefault(); setError(""); try { const response = await fetch("/api/admin/content", { headers: { "x-srss-admin-key": key } }); const result = await response.json(); if (!response.ok) throw new Error(result.error); sessionStorage.setItem("srss-admin-key", key); setData(result); } catch (reason) { setError(reason.message || "Unable to connect to the Admin Hub."); } };
+  const save = async () => { setSaving(true); setError(""); try { const response = await fetch("/api/admin/content", { method: "PUT", headers: { "content-type": "application/json", "x-srss-admin-key": key }, body: JSON.stringify(data) }); const result = await response.json(); if (!response.ok) throw new Error(result.error); setData(result); } catch (reason) { setError(reason.message); } finally { setSaving(false); } };
+  const updateEnquiry = async (id, status) => { const response = await fetch(`/api/admin/enquiries/${id}`, { method: "PATCH", headers: { "content-type": "application/json", "x-srss-admin-key": key }, body: JSON.stringify({ status }) }); const result = await response.json(); if (response.ok) setData({ ...data, enquiries: data.enquiries.map((item) => item.id === id ? result : item) }); else setError(result.error); };
+  const upload = async (event) => { const file = event.target.files?.[0]; if (!file) return; const base64 = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); }); const response = await fetch("/api/admin/assets", { method: "POST", headers: { "content-type": "application/json", "x-srss-admin-key": key }, body: JSON.stringify({ filename: file.name, mimeType: file.type, base64, alt: "" }) }); const result = await response.json(); if (!response.ok) setError(result.error); else setData({ ...data, assets: [result, ...data.assets] }); };
+
+  if (!data) return <div className="admin-shell"><header><button type="button" onClick={onExit}>← Return to SRSS</button><img src="./assets/srss-logo.png" alt="SRSS logo" /><span>Admin Hub</span></header><main className="admin-login"><p className="hub-eyebrow">Staff management</p><h1>Manage public school information.</h1><p>Review admissions enquiries, refresh news and events, and add approved image assets.</p><form onSubmit={load}><label>Admin key<input required type="password" value={key} onChange={(event) => setKey(event.target.value)} autoComplete="current-password" /></label><button className="hub-primary" type="submit"><LockKey size={17} /> Open Admin Hub</button></form>{error && <p className="admin-error">{error}</p>}<small>Set <code>SRSS_ADMIN_KEY</code> before deploying. Local development uses <code>srss-local-admin</code>.</small></main></div>;
+  return <div className="admin-shell"><header><button type="button" onClick={onExit}>← Return to SRSS</button><img src="./assets/srss-logo.png" alt="SRSS logo" /><span>Admin Hub</span><button type="button" onClick={load}>Refresh</button></header><main className="admin-main"><div className="admin-heading"><div><p className="hub-eyebrow">Public site management</p><h1>Today’s school story, in hand.</h1></div><button className="hub-primary" type="button" disabled={saving} onClick={save}><FloppyDisk size={17} /> {saving ? "Saving…" : "Save public content"}</button></div>{error && <p className="admin-error">{error}</p>}<section className="admin-stat-grid"><article><strong>{data.enquiries.filter((item) => item.status === "new").length}</strong><span>New admissions enquiries</span></article><article><strong>{data.news.length}</strong><span>News stories</span></article><article><strong>{data.events.length}</strong><span>Upcoming events</span></article><article><strong>{data.assets.length}</strong><span>Managed assets</span></article></section><section className="admin-columns"><div><section className="admin-panel"><div className="admin-panel-head"><h2>Admissions queue</h2><span>{data.enquiries.length} total</span></div>{data.enquiries.length ? data.enquiries.map((item) => <article className="admin-enquiry" key={item.id}><div><strong>{item.parentName}</strong><span>{item.childName} · age {item.childAge}</span><small>{item.email} · {new Date(item.createdAt).toLocaleDateString()}</small></div><select value={item.status} onChange={(event) => updateEnquiry(item.id, event.target.value)} aria-label={`Status for ${item.parentName}`}><option value="new">New</option><option value="in progress">In progress</option><option value="closed">Closed</option></select></article>) : <p className="admin-empty">New family enquiries will appear here.</p>}</section><section className="admin-panel"><div className="admin-panel-head"><h2>Asset library</h2><label className="asset-upload"><UploadSimple size={16} /> Upload image<input type="file" accept="image/jpeg,image/png,image/webp" onChange={upload} /></label></div><div className="asset-list">{data.assets.length ? data.assets.map((asset) => <a key={asset.id} href={asset.url} target="_blank" rel="noreferrer">{asset.filename}</a>) : <p className="admin-empty">Upload approved JPEG, PNG or WebP files (up to 5 MB).</p>}</div></section></div><div><section className="admin-panel"><div className="admin-panel-head"><h2>News</h2><button type="button" onClick={() => setData({ ...data, news: [{ id: `news-${Date.now()}`, category: "School News", title: "New school story", date: new Date().toISOString().slice(0, 10), image: "", published: false }, ...data.news] })}>Add story</button></div>{data.news.map((item, index) => <div className="content-editor" key={item.id}><input value={item.title} onChange={(event) => { const news = [...data.news]; news[index] = { ...item, title: event.target.value }; setData({ ...data, news }); }} aria-label="News title" /><div><select value={item.category} onChange={(event) => { const news = [...data.news]; news[index] = { ...item, category: event.target.value }; setData({ ...data, news }); }}><option>School News</option><option>Achievements</option><option>Values in Action</option><option>Community</option></select><input type="date" value={item.date} onChange={(event) => { const news = [...data.news]; news[index] = { ...item, date: event.target.value }; setData({ ...data, news }); }} /><label><input type="checkbox" checked={item.published} onChange={(event) => { const news = [...data.news]; news[index] = { ...item, published: event.target.checked }; setData({ ...data, news }); }} /> Published</label></div></div>)}</section><section className="admin-panel"><div className="admin-panel-head"><h2>Events</h2><button type="button" onClick={() => setData({ ...data, events: [{ id: `event-${Date.now()}`, title: "New school event", date: new Date().toISOString().slice(0, 10), category: "Community", time: "", published: false }, ...data.events] })}>Add event</button></div>{data.events.map((item, index) => <div className="content-editor" key={item.id}><input value={item.title} onChange={(event) => { const events = [...data.events]; events[index] = { ...item, title: event.target.value }; setData({ ...data, events }); }} aria-label="Event title" /><div><input type="date" value={item.date} onChange={(event) => { const events = [...data.events]; events[index] = { ...item, date: event.target.value }; setData({ ...data, events }); }} /><input value={item.time} placeholder="Time" onChange={(event) => { const events = [...data.events]; events[index] = { ...item, time: event.target.value }; setData({ ...data, events }); }} /><label><input type="checkbox" checked={item.published} onChange={(event) => { const events = [...data.events]; events[index] = { ...item, published: event.target.checked }; setData({ ...data, events }); }} /> Published</label></div></div>)}</section></div></section></main></div>;
+}
+
 const parentNotices = [
   { date: "20 Jul", title: "Reminder: National Day cultural celebration", detail: "Please send your child in the requested attire by 7.45 am on Friday, 8 August.", tag: "School-wide" },
   { date: "18 Jul", title: "Year 3 weekly update", detail: "This week, pupils will explore measurement through practical activities and reading reflections.", tag: "Year 3 Amanah" },
@@ -142,6 +166,16 @@ function ParentHub({ onExit }) {
   const [absenceSent, setAbsenceSent] = useState(false);
   const [noticePreference, setNoticePreference] = useState(true);
   const sections = ["Dashboard", "Notices", "Calendar", "Forms & documents", "Parent essentials", "Class page", "Contacts"];
+  const addCalendarEvent = (title, date) => {
+    const [day, month] = date.split(" ");
+    const yyyyMmDd = `2026${month === "JUL" ? "07" : "08"}${day.padStart(2, "0")}`;
+    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART;VALUE=DATE:${yyyyMmDd}\nSUMMARY:${title}\nEND:VEVENT\nEND:VCALENDAR`;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    link.download = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.ics`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
 
   if (!authenticated) {
     return (
@@ -188,7 +222,7 @@ function ParentHub({ onExit }) {
             </div>
             <section className="hub-quick-links"><div><p className="hub-eyebrow">Useful today</p><h2>Quick links</h2></div><div className="quick-link-list"><button type="button" onClick={() => setActiveSection("Class page")}><GraduationCap size={22} /><span><strong>Class page</strong><small>Weekly update & homework</small></span></button><button type="button" onClick={() => setActiveSection("Parent essentials")}><CheckCircle size={22} /><span><strong>Parent essentials</strong><small>Arrival, uniform & handbook</small></span></button><button type="button" onClick={() => setActiveSection("Contacts")}><EnvelopeSimple size={22} /><span><strong>Contact school</strong><small>Teachers & office directory</small></span></button></div></section>
             <section className="hub-notice-list"><div className="hub-card-heading"><div><p className="hub-eyebrow">Latest updates</p><h2>Notices for your family</h2></div><button type="button" onClick={() => setActiveSection("Notices")}>View all notices</button></div>{parentNotices.slice(1).map((notice) => <article key={notice.title}><time>{notice.date}</time><div><span>{notice.tag}</span><h3>{notice.title}</h3><p>{notice.detail}</p></div><ArrowRight size={19} /></article>)}</section>
-          </> : <HubSection section={activeSection} onDashboard={() => setActiveSection("Dashboard")} onAbsence={() => { setAbsenceSent(false); setAbsenceOpen(true); }} />}
+          </> : <HubSection section={activeSection} onDashboard={() => setActiveSection("Dashboard")} onAbsence={() => { setAbsenceSent(false); setAbsenceOpen(true); }} onCalendar={addCalendarEvent} />}
         </main>
       </div>
       {absenceOpen && <div className="hub-modal-backdrop"><section className="hub-form-modal" role="dialog" aria-modal="true" aria-labelledby="absence-title"><button className="modal-close" type="button" onClick={() => setAbsenceOpen(false)} aria-label="Close"><X size={21} /></button>{absenceSent ? <div className="absence-success"><CheckCircle size={38} weight="fill" /><h2 id="absence-title">Absence notice sent</h2><p>The class teacher and school office have been notified.</p><button className="hub-primary" type="button" onClick={() => setAbsenceOpen(false)}>Return to dashboard</button></div> : <><p className="hub-eyebrow">Forms Centre</p><h2 id="absence-title">Submit an absence notice</h2><p>Let Aarav’s class teacher know as early as you can.</p><form onSubmit={(event) => { event.preventDefault(); setAbsenceSent(true); }}><label>Date of absence<input type="date" required /></label><label>Reason<select required defaultValue=""><option value="" disabled>Select a reason</option><option>Unwell</option><option>Medical appointment</option><option>Family matter</option><option>Other</option></select></label><label>Additional note<textarea rows="3" placeholder="Optional details for the class teacher" /></label><button className="hub-primary" type="submit">Send absence notice <ArrowRight size={17} /></button></form></>}</section></div>}
@@ -196,17 +230,18 @@ function ParentHub({ onExit }) {
   );
 }
 
-function HubSection({ section, onDashboard, onAbsence }) {
+function HubSection({ section, onDashboard, onAbsence, onCalendar }) {
   const copy = {
     Notices: ["Notices & announcements", "School-wide and class updates, most recent first."], Calendar: ["School calendar", "Academic dates, events, seva days and parent meetings in one place."], "Forms & documents": ["Forms Centre", "Submit practical requests and find documents for the school year."], "Parent essentials": ["Parent essentials", "Everything families need for smooth school days."], "Class page": ["Year 3 Amanah", "Weekly learning, homework and messages from the class teacher."], Contacts: ["Contacts", "The right person to speak with, when you need help."],
   };
   const [title, subtitle] = copy[section];
-  return <section className="hub-section-page"><button type="button" className="back-dashboard" onClick={onDashboard}>← Dashboard</button><p className="hub-eyebrow">Parent Hub</p><h1>{title}</h1><p className="section-subtitle">{subtitle}</p><div className="section-placeholder">{section === "Forms & documents" ? <><h2>Make a request</h2><button className="hub-primary" type="button" onClick={onAbsence}>Submit absence notice <ArrowRight size={17} /></button><h2>Downloads</h2><p>School handbook · Uniform guide · Term calendar · Arrival & dismissal procedures</p></> : section === "Contacts" ? <><h2>School contacts</h2><p><strong>Class teacher</strong><br />Ms. Kavitha · Year 3 Amanah<br />class3@srss.edu.my</p><p><strong>School office</strong><br />+60 12-600 1926 · saischoolpuchong@gmail.com</p></> : <><h2>Coming into focus</h2><p>This prototype provides the dashboard workflow; this page is ready for the relevant school content and integrations.</p></>}</div></section>;
+  return <section className="hub-section-page"><button type="button" className="back-dashboard" onClick={onDashboard}>← Dashboard</button><p className="hub-eyebrow">Parent Hub</p><h1>{title}</h1><p className="section-subtitle">{subtitle}</p><div className="section-placeholder">{section === "Forms & documents" ? <><h2>Make a request</h2><button className="hub-primary" type="button" onClick={onAbsence}>Submit absence notice <ArrowRight size={17} /></button><h2>Downloads</h2><p>School handbook · Uniform guide · Term calendar · Arrival & dismissal procedures</p></> : section === "Calendar" ? <><div className="calendar-filter"><span>Showing</span><button type="button">All</button><button type="button">Academic</button><button type="button">Events</button><button type="button">Seva</button><button type="button">Holidays</button></div><div className="hub-calendar-list">{parentEvents.map(([day, month, event, time]) => <article key={event}><time><strong>{day}</strong><span>{month}</span></time><div><h2>{event}</h2><p>{time}</p></div><button type="button" onClick={() => onCalendar(event, `${day} ${month}`)}>Add to calendar</button></article>)}</div></> : section === "Contacts" ? <><h2>School contacts</h2><p><strong>Class teacher</strong><br />Ms. Kavitha · Year 3 Amanah<br />class3@srss.edu.my</p><p><strong>School office</strong><br />+60 12-600 1926 · saischoolpuchong@gmail.com</p></> : <><h2>Coming into focus</h2><p>This prototype provides the dashboard workflow; this page is ready for the relevant school content and integrations.</p></>}</div></section>;
 }
 
 export function App() {
   const [parentHubOpen, setParentHubOpen] = useState(false);
-  const [isAbout, setIsAbout] = useState(() => window.location.hash === "#about");
+  const [isAbout, setIsAbout] = useState(() => window.location.hash === "#about" || window.location.pathname === "/about");
+  const [adminOpen, setAdminOpen] = useState(() => window.location.pathname === "/admin" || window.location.hash === "#admin");
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [visitOpen, setVisitOpen] = useState(false);
@@ -219,6 +254,11 @@ export function App() {
   const [openFaq, setOpenFaq] = useState(null);
   const [enquirySent, setEnquirySent] = useState(false);
   const [contactSent, setContactSent] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [managedContent, setManagedContent] = useState({
+    news: newsItems.map(([category, title, date, image], index) => ({ id: `fallback-news-${index}`, category, title, date: `2026-${date.slice(3, 6) === "Jul" ? "07" : "07"}-${date.slice(0, 2)}`, image })),
+    events: events.map(([date, title, category, time], index) => ({ id: `fallback-event-${index}`, date: `2026-${date.endsWith("JUL") ? "07" : "08"}-${date.slice(0, 2)}`, title, category, time })),
+  });
 
   useEffect(() => {
     const handleKey = (event) => {
@@ -233,10 +273,14 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const handleHashChange = () => setIsAbout(window.location.hash === "#about");
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
+    const handleRouteChange = () => { setIsAbout(window.location.hash === "#about" || window.location.pathname === "/about"); setAdminOpen(window.location.pathname === "/admin" || window.location.hash === "#admin"); };
+    window.addEventListener("hashchange", handleRouteChange); window.addEventListener("popstate", handleRouteChange);
+    return () => { window.removeEventListener("hashchange", handleRouteChange); window.removeEventListener("popstate", handleRouteChange); };
   }, []);
+
+  useEffect(() => { fetch("/api/content").then((response) => response.ok ? response.json() : null).then((data) => { if (data) setManagedContent(data); }).catch(() => {}); }, []);
+
+  useEffect(() => { const target = window.location.hash.slice(1); if (target && target !== "about" && target !== "admin") window.setTimeout(() => document.getElementById(target)?.scrollIntoView(), 0); }, [isAbout, adminOpen]);
 
   const visibleGallery = useMemo(
     () => [0, 1, 2].map((offset) => galleryItems[(galleryIndex + offset) % galleryItems.length]),
@@ -248,7 +292,17 @@ export function App() {
     setSent(true);
   };
 
+  const addToCalendar = (title, date) => {
+    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART;VALUE=DATE:${date.replaceAll("-", "")}\nSUMMARY:${title}\nEND:VEVENT\nEND:VCALENDAR`;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    link.download = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.ics`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
   if (parentHubOpen) return <ParentHub onExit={() => setParentHubOpen(false)} />;
+  if (adminOpen) return <AdminHub onExit={() => { window.history.pushState({}, "", "/"); setAdminOpen(false); }} />;
 
   return (
     <div className="site-shell">
@@ -448,11 +502,11 @@ export function App() {
 
         <section className="enquiry-section" id="enquiry" aria-labelledby="enquiry-title">
           <div className="form-intro"><p className="eyebrow">Start here</p><h2 id="enquiry-title">Tell us about <em>your family.</em></h2><p>Your enquiry goes directly to the SRSS Admin Hub. We will be in touch with a thoughtful next step.</p><div className="visit-note"><CalendarBlank size={20} /><span><strong>Visit the school</strong>Arrange a personalised visit or join our next open morning on 25 July 2026.</span></div></div>
-          {enquirySent ? <div className="form-success"><CheckCircle size={38} weight="duotone" /><h3>Your enquiry is on its way.</h3><p>Thank you. The admissions team will contact you shortly.</p></div> : <form className="school-form" onSubmit={(event) => { event.preventDefault(); setEnquirySent(true); }}>
-            <label>Parent / guardian name<input required autoComplete="name" /></label><label>Email address<input required type="email" autoComplete="email" /></label>
-            <label>Child’s name<input required /></label><label>Child’s age<select required defaultValue=""><option value="" disabled>Select age</option>{[5,6,7,8,9,10,11,12].map(age => <option key={age}>{age}</option>)}</select></label>
-            <label>Current school<input /></label><label>How did you hear about SRSS?<select defaultValue=""><option value="" disabled>Select one</option><option>Family or friend</option><option>Social media</option><option>School event</option><option>Online search</option><option>Other</option></select></label>
-            <label className="wide-label">Questions or anything you would like us to know<textarea rows="4" /></label><button className="primary-button" type="submit">Send enquiry <ArrowRight size={18} weight="bold" /></button>
+          {enquirySent ? <div className="form-success"><CheckCircle size={38} weight="duotone" /><h3>Your enquiry is on its way.</h3><p>Thank you. The admissions team will contact you shortly.</p></div> : <form className="school-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); const payload = Object.fromEntries(new FormData(event.currentTarget)); try { const response = await fetch("/api/enquiries", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) }); const result = await response.json(); if (!response.ok) throw new Error(result.error); setEnquirySent(true); } catch (reason) { setFormError(reason.message || "Your enquiry could not be sent. Please try again."); } }}>
+            <label>Parent / guardian name<input required name="parentName" autoComplete="name" /></label><label>Email address<input required name="email" type="email" autoComplete="email" /></label>
+            <label>Child’s name<input required name="childName" /></label><label>Child’s age<select required name="childAge" defaultValue=""><option value="" disabled>Select age</option>{[5,6,7,8,9,10,11,12].map(age => <option key={age}>{age}</option>)}</select></label>
+            <label>Current school<input name="currentSchool" /></label><label>How did you hear about SRSS?<select name="referralSource" defaultValue=""><option value="" disabled>Select one</option><option>Family or friend</option><option>Social media</option><option>School event</option><option>Online search</option><option>Other</option></select></label>
+            <label className="wide-label">Questions or anything you would like us to know<textarea name="questions" rows="4" /></label>{formError && <p className="form-error wide-label">{formError}</p>}<button className="primary-button" type="submit">Send enquiry <ArrowRight size={18} weight="bold" /></button>
           </form>}
         </section>
 
@@ -466,14 +520,15 @@ export function App() {
         <section className="news-hero" id="news" aria-labelledby="news-title"><p className="eyebrow">News & events</p><h2 id="news-title">Stories &amp; <em>Happenings.</em></h2><p>Moments of learning, service and celebration from the SRSS community.</p></section>
         <section className="news-section" aria-label="Latest news">
           <div className="news-head"><h3>Latest news</h3><div className="news-filters">{["All", "School News", "Achievements", "Values in Action"].map(filter => <button type="button" key={filter} onClick={() => setActiveNews(filter)} aria-pressed={activeNews === filter}>{filter}</button>)}</div></div>
-          <div className="news-grid">{newsItems.filter(([category]) => activeNews === "All" || category === activeNews).map(([category,title,date,image]) => <article key={title}><img src={image} alt="" /><div><span>{category}</span><h3>{title}</h3><time>{date}</time><a href="#contact">Read story <ArrowRight size={15} /></a></div></article>)}</div>
+          <div className="news-grid">{managedContent.news.filter((item) => activeNews === "All" || item.category === activeNews).map((item) => <article key={item.id}><img src={item.image || "./assets/photos/processed/classroom-art-1280.jpg"} alt="" /><div><span>{item.category}</span><h3>{item.title}</h3><time>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}</time><a href="/contact#contact">Read story <ArrowRight size={15} /></a></div></article>)}</div>
         </section>
-        <section className="events-section" aria-labelledby="events-title"><div><p className="eyebrow">Mark your calendar</p><h2 id="events-title">Upcoming <em>togetherness.</em></h2><p>Join in the academic, cultural, seva and community life of our school.</p></div><div className="event-list">{events.map(([date,title,type,time]) => <article key={title}><time>{date}</time><div><span>{type}</span><h3>{title}</h3><p><Clock size={14} /> {time}</p></div><button type="button" aria-label={`Add ${title} to calendar`}><CalendarBlank size={20} /></button></article>)}</div></section>
+        <section className="events-section" aria-labelledby="events-title"><div><p className="eyebrow">Mark your calendar</p><h2 id="events-title">Upcoming <em>togetherness.</em></h2><p>Join in the academic, cultural, seva and community life of our school.</p></div><div className="event-list">{managedContent.events.map((item) => <article key={item.id}><time>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit", month: "short" }).toUpperCase()}</time><div><span>{item.category}</span><h3>{item.title}</h3><p><Clock size={14} /> {item.time}</p></div><button type="button" onClick={() => addToCalendar(item.title, item.date)} aria-label={`Add ${item.title} to calendar`}><CalendarBlank size={20} /></button></article>)}</div></section>
         <section className="anniversary-section"><img src="./assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><div><p className="eyebrow">25th anniversary year</p><h2>25 years of <em>Human Excellence.</em></h2><p>Follow alumni stories, school memories and anniversary events as we celebrate the people and values that have shaped SRSS.</p><a href="#contact">Share an alumni story <ArrowRight size={17} /></a></div></section>
+        <section className="community-strip" aria-label="Community, achievements and newsletter"><article><Heart size={28} weight="duotone" /><p className="eyebrow">Seva & community</p><h3>Small hands, meaningful service.</h3><p>Find upcoming seva opportunities and ways families can contribute to the wider community.</p><a href="#contact">Volunteer with SRSS <ArrowRight size={16} /></a></article><article><Sparkle size={28} weight="duotone" /><p className="eyebrow">Student achievements</p><h3>Every effort has a story.</h3><p>Discover academic, co-curricular and values-led achievements from across our school.</p><a href="#news">Celebrate with us <ArrowRight size={16} /></a></article><article><BookOpen size={28} weight="duotone" /><p className="eyebrow">Newsletter archive</p><h3>Keep up with each term.</h3><p>Read school news, learning highlights and family updates in our newsletter archive.</p><a href="#contact">Request newsletters <ArrowRight size={16} /></a></article></section>
 
         <section className="page-hero contact-hero" id="contact" aria-labelledby="contact-title"><div><p className="eyebrow">Contact</p><h2 id="contact-title">Get in <em>Touch.</em></h2><p>Whether you have a question, wish to visit, or want to connect with a particular department, the right person is close by.</p></div><img src="./assets/photos/processed/assembly-achievements-1280.jpg" alt="SRSS pupils gathered at a school assembly" /></section>
         <section className="contact-section"><div className="key-contacts"><p className="eyebrow">Key contacts</p><h2>Here to <em>help.</em></h2><article><strong>School office</strong><a href="tel:+60126001926"><Phone size={16} /> +60 12-600 1926</a><a href="mailto:saischoolpuchong@gmail.com"><EnvelopeSimple size={16} /> saischoolpuchong@gmail.com</a></article><article><strong>Admissions</strong><a href="mailto:saischoolpuchong@gmail.com?subject=Admissions%20enquiry"><EnvelopeSimple size={16} /> Admissions enquiries</a></article><article><strong>Office hours</strong><span>Monday–Friday · 8.00 am–4.00 pm<br />School hours · 7.30 am–1.30 pm</span></article></div>
-          {contactSent ? <div className="form-success"><CheckCircle size={38} weight="duotone" /><h3>Thank you for writing.</h3><p>We will route your message to the right team.</p></div> : <form className="school-form contact-form" onSubmit={(event) => { event.preventDefault(); setContactSent(true); }}><label>Name<input required autoComplete="name" /></label><label>Email<input required type="email" autoComplete="email" /></label><label className="wide-label">Subject<select required defaultValue=""><option value="" disabled>Select a subject</option><option>General</option><option>Admissions</option><option>Feedback</option><option>Other</option></select></label><label className="wide-label">Message<textarea required rows="5" /></label><button className="primary-button" type="submit">Send message <ArrowRight size={18} weight="bold" /></button></form>}</section>
+          {contactSent ? <div className="form-success"><CheckCircle size={38} weight="duotone" /><h3>Thank you for writing.</h3><p>We will route your message to the right team.</p></div> : <form className="school-form contact-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); try { const response = await fetch("/api/messages", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))) }); const result = await response.json(); if (!response.ok) throw new Error(result.error); setContactSent(true); } catch (reason) { setFormError(reason.message || "Your message could not be sent. Please try again."); } }}><label>Name<input required name="name" autoComplete="name" /></label><label>Email<input required name="email" type="email" autoComplete="email" /></label><label className="wide-label">Subject<select required name="subject" defaultValue=""><option value="" disabled>Select a subject</option><option>General</option><option>Admissions</option><option>Feedback</option><option>Other</option></select></label><label className="wide-label">Message<textarea required name="message" rows="5" /></label>{formError && <p className="form-error wide-label">{formError}</p>}<button className="primary-button" type="submit">Send message <ArrowRight size={18} weight="bold" /></button></form>}</section>
         <section className="location-section"><div><p className="eyebrow">Visit SRSS</p><h2>Find your way <em>here.</em></h2><address><MapPin size={20} />6, Jalan Puchong, Taman Tan Yew Lai,<br />58200 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur</address><p>Visitor parking is available by arrangement. Please contact the office before your visit.</p><a href="https://maps.google.com/?q=6+Jalan+Puchong+Taman+Tan+Yew+Lai+58200+Kuala+Lumpur" target="_blank" rel="noreferrer">Get directions <ArrowRight size={17} /></a><a className="social-link" href="https://www.facebook.com/SSPSM/" target="_blank" rel="noreferrer"><FacebookLogo size={19} /> Follow school life on Facebook</a></div><iframe title="Map showing Sekolah Rendah Sathya Sai" src="https://www.google.com/maps?q=6%20Jalan%20Puchong%20Taman%20Tan%20Yew%20Lai%2058200%20Kuala%20Lumpur&output=embed" loading="lazy" /></section>
       </main>}
 

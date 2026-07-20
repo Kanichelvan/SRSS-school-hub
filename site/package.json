@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/build-standalone.mjs",
-    "preview": "vite preview"
+    "api": "node server.mjs",
+    "serve": "node server.mjs",
+    "build": "vite build"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
