@@ -277,6 +277,10 @@ export function App() {
   const [sent, setSent] = useState(false);
   const [activeValue, setActiveValue] = useState(0);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [galleryPaused, setGalleryPaused] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const [statCounts, setStatCounts] = useState({ years: 0, values: 0 });
+  const glanceRef = useRef(null);
   const [activeLearning, setActiveLearning] = useState(0);
   const [activeHub, setActiveHub] = useState(0);
   const [activeNews, setActiveNews] = useState("All");
@@ -317,6 +321,31 @@ export function App() {
   useEffect(() => { fetch("/api/content").then((response) => response.ok ? response.json() : null).then((data) => { if (data) setManagedContent(data); }).catch(() => {}); }, []);
 
   useEffect(() => { const target = window.location.hash.slice(1); if (target && target !== "about" && target !== "admin") window.setTimeout(() => document.getElementById(target)?.scrollIntoView(), 0); }, [isAbout, adminOpen]);
+
+  useEffect(() => {
+    const node = glanceRef.current;
+    if (!node || statsVisible) return undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setStatsVisible(true); observer.disconnect(); }
+    }, { threshold: 0.3 });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [statsVisible]);
+
+  useEffect(() => {
+    if (!statsVisible) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setStatCounts({ years: 25, values: 5 }); return undefined; }
+    const start = performance.now(); let frame;
+    const tick = (now) => { const progress = Math.min((now - start) / 900, 1); const eased = 1 - Math.pow(1 - progress, 3); setStatCounts({ years: Math.round(25 * eased), values: Math.round(5 * eased) }); if (progress < 1) frame = requestAnimationFrame(tick); };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [statsVisible]);
+
+  useEffect(() => {
+    if (galleryPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const timer = window.setInterval(() => setGalleryIndex((index) => (index + 1) % galleryItems.length), 5200);
+    return () => window.clearInterval(timer);
+  }, [galleryPaused]);
 
   const visibleGallery = useMemo(
     () => [0, 1, 2].map((offset) => galleryItems[(galleryIndex + offset) % galleryItems.length]),
