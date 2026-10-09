@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Five-petal SRSS values flower">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#06162f" flood-opacity=".2"/></filter>
+    <radialGradient id="red" cx="28%" cy="18%" r="92%"><stop offset="0" stop-color="#ff3158"/><stop offset=".54" stop-color="#ed0032"/><stop offset="1" stop-color="#b51532"/></radialGradient>
+    <radialGradient id="blue" cx="28%" cy="18%" r="98%"><stop offset="0" stop-color="#3495ff"/><stop offset=".5" stop-color="#0867d8"/><stop offset="1" stop-color="#003b8e"/></radialGradient>
+    <radialGradient id="purple" cx="28%" cy="18%" r="98%"><stop offset="0" stop-color="#b457f6"/><stop offset=".52" stop-color="#7624c4"/><stop offset="1" stop-color="#42106f"/></radialGradient>
+    <radialGradient id="orange" cx="28%" cy="18%" r="98%"><stop offset="0" stop-color="#ffb129"/><stop offset=".5" stop-color="#ff7200"/><stop offset="1" stop-color="#df3d18"/></radialGradient>
+    <radialGradient id="green" cx="28%" cy="18%" r="98%"><stop offset="0" stop-color="#2bd18b"/><stop offset=".5" stop-color="#00975b"/><stop offset="1" stop-color="#005b38"/></radialGradient>
+    <radialGradient id="gold" cx="30%" cy="18%" r="96%"><stop offset="0" stop-color="#ffe35a"/><stop offset=".52" stop-color="#ffbd17"/><stop offset="1" stop-color="#ef8500"/></radialGradient>
+    <radialGradient id="centre" cx="32%" cy="20%" r="94%"><stop offset="0" stop-color="#193f82"/><stop offset=".48" stop-color="#0b2b5a"/><stop offset="1" stop-color="#06162f"/></radialGradient>
+  </defs>
+  <g filter="url(#soft)" stroke="#fbfaf7" stroke-width="12" stroke-linejoin="round">
+    <ellipse cx="400" cy="190" rx="142" ry="185" fill="url(#red)"/>
+    <ellipse cx="600" cy="335" rx="142" ry="185" fill="url(#purple)" transform="rotate(-108 600 335)"/>
+    <ellipse cx="523" cy="570" rx="142" ry="185" fill="url(#orange)" transform="rotate(-36 523 570)"/>
+    <ellipse cx="277" cy="570" rx="142" ry="185" fill="url(#green)" transform="rotate(36 277 570)"/>
+    <ellipse cx="200" cy="335" rx="142" ry="185" fill="url(#blue)" transform="rotate(108 200 335)"/>
+    <path fill="url(#gold)" d="M400 38C330 110 334 218 400 302c66-84 70-192 0-264Z" transform="rotate(36 400 400)"/>
+    <path fill="url(#gold)" d="M400 38C330 110 334 218 400 302c66-84 70-192 0-264Z" transform="rotate(108 400 400)"/>
+    <path fill="url(#gold)" d="M400 38C330 110 334 218 400 302c66-84 70-192 0-264Z" transform="rotate(180 400 400)"/>
+    <path fill="url(#gold)" d="M400 38C330 110 334 218 400 302c66-84 70-192 0-264Z" transform="rotate(252 400 400)"/>
+    <path fill="url(#gold)" d="M400 38C330 110 334 218 400 302c66-84 70-192 0-264Z" transform="rotate(324 400 400)"/>
+    <circle cx="400" cy="400" r="225" fill="url(#centre)"/>
+  </g>
+</svg>

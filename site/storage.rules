@@ -1,0 +1,49 @@
+rules_version = '2';
+
+// SRSS file storage. Institutional documents and media live primarily in Google Shared Drives, with the
+// hub storing only metadata and Drive references (PRD §38, §46). Firebase Storage covers the few cases
+// that need hub-controlled access:
+//   media/public/**                  approved public website images and downloads
+//   documents/{docId}/{file}         files whose access follows the Firestore `documents` register entry
+//   portfolio/{studentId}/{file}     small evidence uploads attached to portfolio entries
+//   applications/{applicantUid}/**   admissions documents uploaded by applicants
+// Uploads are type- and size-checked. Nothing is deletable from the client.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() { return request.auth != null; }
+    function roles() { return signedIn() ? request.auth.token.get('roles', []) : []; }
+    function me() { return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data; }
+    function sizeUnder(mb) { return request.resource.size < mb * 1024 * 1024; }
+
+    // Website image library (registered in Firestore mediaRegistry). The hub resizes images before upload.
+    match /media/public/{path=**} {
+      allow read: if true;
+      allow create, update: if roles().hasAny(['contentEditor', 'schoolAdmin', 'leadership']) && sizeUnder(10)
+        && request.resource.contentType.matches('image/(jpeg|png|webp)|application/pdf');
+    }
+
+    match /documents/{docId}/{fileName} {
+      function entry() { return firestore.get(/databases/(default)/documents/documents/$(docId)).data; }
+      allow read: if entry().classification == 'public'
+        || (entry().classification in ['internal', 'confidential'] && signedIn() && ('schoolAdmin' in roles() || entry().get('audienceKeys', []).hasAny(me().get('audienceKeys', []))))
+        || (entry().classification == 'restricted' && signedIn() && request.auth.uid in entry().get('allowedUids', []));
+      // The register entry must exist first, so every file has owner, classification and retention metadata.
+      allow create, update: if 'schoolAdmin' in roles() && entry() != null && sizeUnder(25)
+        && request.resource.contentType.matches('application/pdf|image/(jpeg|png|webp)');
+    }
+
+    match /portfolio/{studentId}/{fileName} {
+      function teaches() { return roles().hasAny(['teacher', 'classTeacher', 'specialistTeacher']) && (studentId in me().get('assignedStudentIds', []) || request.resource.metadata.get('classId', '') in me().get('classIds', [])); }
+      function family() { return ('student' in roles() && me().get('studentId', '') == studentId) || ('parent' in roles() && studentId in me().get('childIds', [])); }
+      allow read: if signedIn() && (family() || roles().hasAny(['academicCoordinator', 'portfolioModerator', 'leadership'])
+        || (roles().hasAny(['teacher', 'classTeacher', 'specialistTeacher']) && (studentId in me().get('assignedStudentIds', []) || resource.metadata.get('classId', '') in me().get('classIds', []))));
+      allow create: if signedIn() && (teaches() || ('student' in roles() && me().get('studentId', '') == studentId)) && sizeUnder(15)
+        && request.resource.contentType.matches('application/pdf|image/(jpeg|png|webp)|audio/(mpeg|mp4)');
+    }
+
+    match /applications/{applicantUid}/{fileName} {
+      allow read: if signedIn() && (request.auth.uid == applicantUid || roles().hasAny(['admissionsOfficer', 'schoolAdmin']));
+      allow create: if signedIn() && request.auth.uid == applicantUid && sizeUnder(10) && request.resource.contentType.matches('application/pdf|image/(jpeg|png)');
+    }
+  }
+}

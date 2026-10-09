@@ -1,0 +1,136 @@
+import { BrowserRouter, Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "../auth/AuthProvider";
+import { MODULES, ROLES, can, canOpen } from "../auth/permissions";
+import { HUB_LABELS, ROUTE_ALIASES, hubIndex, hubRoutes } from "./routes";
+import { SignIn } from "./SignIn";
+import { AdminDashboard, ParentDashboard, StudentDashboard, TeacherDashboard } from "./screens/dashboards";
+import { Academics, StaffDirectory, Student360, StudentRegister } from "./screens/records";
+import { AttendanceHome, AttendanceOverview, ChildAttendance } from "./screens/attendance";
+import { Journey, MyChildren } from "./screens/family";
+import { Announcements, Calendar, Notifications, Profile } from "./screens/comms";
+import { Admissions, Audit, ConsentOverview, Showcase } from "./screens/admin";
+import { Content, Inbox } from "./screens/content";
+import { getMany, useLoad } from "./data";
+import { EmptyState, Loading, PageHeader, Section } from "./ui";
+import "./hub.css";
+
+const SCREENS = {
+  adminDashboard: AdminDashboard, teacherDashboard: TeacherDashboard, parentDashboard: ParentDashboard, studentDashboard: StudentDashboard,
+  studentRegister: StudentRegister, student360: Student360, staffDirectory: StaffDirectory, academics: Academics,
+  attendance: AttendanceHome, attendanceOverview: AttendanceOverview, childAttendance: ChildAttendance,
+  myChildren: MyChildren, journey: Journey, myClasses: MyClasses,
+  announcements: Announcements, calendar: Calendar, notifications: Notifications, profile: Profile,
+  admissions: Admissions, consentOverview: ConsentOverview, showcase: Showcase, content: Content, inbox: Inbox, audit: Audit,
+};
+
+function routeAllowed(route, auth) {
+  if (route.requiresClaim) return auth.claims[route.requiresClaim] === true;
+  if (route.hub !== "shared" && !auth.hubs.includes(route.hub)) return false;
+  return canOpen(auth.roles, route.module);
+}
+
+function RequireSignIn() {
+  const auth = useAuth();
+  const location = useLocation();
+  if (auth.status === "loading") return <div className="hub-loading" role="status">Loading your hub…</div>;
+  if (auth.status === "signedOut") return <Navigate to="/sign-in" replace state={auth.userSignedOut ? null : { from: location.pathname + location.search }} />;
+  if (!auth.roles.length) return <AccountPending />;
+  return <Outlet />;
+}
+
+function AccountPending() {
+  const { user, signOut, refresh } = useAuth();
+  return <div className="hub-message"><h1>Your account isn't linked yet</h1><p>You're signed in as <strong>{user.email}</strong>, but the school office hasn't assigned a hub role to this account.</p><p>Please contact the office, then refresh.</p><div><button type="button" className="hub-button" onClick={refresh}>Refresh access</button><button type="button" className="hub-button hub-button-quiet" onClick={signOut}>Sign out</button></div></div>;
+}
+
+function HubHome() {
+  const { currentHub } = useAuth();
+  return <Navigate to={hubIndex(currentHub)?.path || "/hub/profile"} replace />;
+}
+
+function Shell() {
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const nav = [
+    { hub: "dashboard", routes: [hubIndex(auth.currentHub)].filter(Boolean) },
+    { hub: "shared", routes: hubRoutes.filter((route) => route.hub === "shared" && !route.hidden && routeAllowed(route, auth)) },
+    { hub: auth.currentHub, routes: hubRoutes.filter((route) => route.hub === auth.currentHub && !route.index && !route.hidden && routeAllowed(route, auth)) },
+  ].filter((group) => group.routes.length);
+  const switchTo = (hub) => { auth.switchHub(hub); navigate(hubIndex(hub)?.path || "/hub"); };
+
+  return <div className={`hub-shell hub-shell-${auth.currentHub}`}>
+    <a className="hub-skip" href="#hub-main">Skip to content</a>
+    <header className="hub-topbar">
+      <Link to="/hub" className="hub-brand"><img src="/assets/srss-logo.png" alt="" /><span><strong>SRSS Digital Hub</strong><small>Sekolah Rendah Sathya Sai</small></span></Link>
+      <div className="hub-topbar-actions">
+        {/* Role switcher for people holding several roles (AUTH-001 AC3). */}
+        {auth.hubs.length > 1 && <label className="hub-switcher"><span className="hub-visually-hidden">View as</span><select value={auth.currentHub} onChange={(event) => switchTo(event.target.value)}>{auth.hubs.map((hub) => <option key={hub} value={hub}>{HUB_LABELS[hub]}</option>)}</select></label>}
+        <Link to="/hub/notifications" className="hub-topbar-link">Notifications</Link>
+        <Link to="/hub/profile" className="hub-topbar-link hub-account" title={auth.roles.map((role) => ROLES[role]?.label).join(", ")}>{auth.user.displayName || auth.user.email}</Link>
+        <button type="button" onClick={auth.signOut}>Sign out</button>
+      </div>
+    </header>
+    <div className="hub-body">
+      <nav aria-label="Hub navigation" className="hub-nav">{nav.map(({ hub, routes }) => <div key={hub}>{hub !== "dashboard" && <p>{HUB_LABELS[hub]}</p>}<ul>{routes.map((route) => <li key={route.path}><NavLink to={route.path} end>{route.index ? "Dashboard" : route.label}{MODULES[route.module]?.phase > 1 && <span className="hub-phase" title={`Planned for phase ${MODULES[route.module].phase}`}>P{MODULES[route.module].phase}</span>}</NavLink></li>)}</ul></div>)}</nav>
+      <main className="hub-main" id="hub-main"><Outlet /></main>
+    </div>
+  </div>;
+}
+
+function Guarded({ route }) {
+  const auth = useAuth();
+  if (!routeAllowed(route, auth)) return <Unauthorized />;
+  const Screen = route.screen && SCREENS[route.screen];
+  return Screen ? <Screen /> : <ModulePlaceholder route={route} />;
+}
+
+// Modules scheduled for later phases: route, navigation and access boundary exist; the workflow follows.
+function ModulePlaceholder({ route }) {
+  const { roles } = useAuth();
+  const module = MODULES[route.module];
+  const names = { V: "View", C: "Create", U: "Update", A: "Approve" };
+  const scopes = ["V", "C", "U", "A"].map((action) => [action, can(roles, route.module, action)]).filter(([, scope]) => scope && scope !== "restricted");
+  return <>
+    <PageHeader kicker={`${module?.label} · Phase ${module?.phase}`} title={route.label}>{module?.phase > 1 ? `Scheduled for phase ${module.phase} of the SRSS Digital Hub roadmap.` : "This Jubilee-launch module is being built next."}</PageHeader>
+    <Section title="Access and integrations"><dl className="hub-facts">
+      <div><dt>Your access</dt><dd>{scopes.length ? scopes.map(([action, scope]) => `${names[action]} (${scope})`).join(", ") : "Navigation only"}</dd></div>
+      <div><dt>Google services</dt><dd>{route.google.length ? route.google.join(", ") : "SRSS-native"}</dd></div>
+    </dl></Section>
+  </>;
+}
+
+function MyClasses() {
+  const auth = useAuth();
+  const classIds = auth.scope?.classIds || [];
+  const { data, loading } = useLoad(() => getMany("classes", classIds), [classIds.join("|")]);
+  return <>
+    <PageHeader kicker="Teaching" title="My classes">Classes you teach this year.</PageHeader>
+    {loading ? <Loading /> : !data.length ? <EmptyState title="No classes assigned yet." /> : <ul className="hub-cards">{data.sort((a, b) => a.standard - b.standard).map((cls) => <li key={cls.id} className="hub-card"><div className="hub-card-top"><strong>{cls.name}</strong>{auth.scope?.homeroomClassIds?.includes(cls.id) && <span className="hub-badge hub-tone-info">Class teacher</span>}</div><small>Standard {cls.standard} · {cls.room}</small><div className="hub-form-actions"><Link className="hub-button hub-button-small" to={`/hub/teacher/attendance/${cls.id}`}>Attendance</Link><Link className="hub-button hub-button-quiet hub-button-small" to="/hub/teacher/students">Students</Link></div></li>)}</ul>}
+  </>;
+}
+
+function Unauthorized() {
+  return <div className="hub-message"><h1>You don't have access to this page</h1><p>Your role doesn't include this area of the hub. If you need access, ask the school office — exceptions are approved and recorded.</p><Link className="hub-button" to="/hub">Go to my dashboard</Link></div>;
+}
+
+function NotFound() {
+  return <div className="hub-message"><h1>Page not found</h1><p>This hub address doesn't exist.</p><Link className="hub-button" to="/hub">Go to my dashboard</Link></div>;
+}
+
+export function HubApp() {
+  return <AuthProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/sign-in" element={<SignIn />} />
+        {ROUTE_ALIASES.map(([from, to]) => <Route key={from} path={from} element={<Navigate to={to} replace />} />)}
+        <Route path="/hub" element={<RequireSignIn />}>
+          <Route element={<Shell />}>
+            <Route index element={<HubHome />} />
+            {hubRoutes.map((route) => <Route key={route.path} path={route.path} element={<Guarded route={route} />} />)}
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </AuthProvider>;
+}

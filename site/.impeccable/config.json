@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/hub/hub.css"
+        ],
+        "createdAt": "2026-10-09T18:57:24.470Z",
+        "reason": "Claude: L238 is the Journey timeline's vertical rail (border-left on the ul), not a card accent; card side-tabs at L91/L120 were removed"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/hub/hub.css"
+        ],
+        "createdAt": "2026-10-09T18:57:28.595Z",
+        "reason": "Claude: L195 is the Student 360 tab underline (border-bottom on an unrounded tab button), a standard active-tab indicator"
+      }
+    ]
+  }
+}
