@@ -25,6 +25,10 @@ import { Plus } from "@phosphor-icons/react/dist/csr/Plus";
 import { TreeStructure } from "@phosphor-icons/react/dist/csr/TreeStructure";
 import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
 import { X } from "@phosphor-icons/react/dist/csr/X";
+import { ArrowUp } from "@phosphor-icons/react/dist/csr/ArrowUp";
+import { Pause } from "@phosphor-icons/react/dist/csr/Pause";
+import { Play } from "@phosphor-icons/react/dist/csr/Play";
+import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
 import { loadPublicContent, submitPublicForm } from "./lib/publicContent.js";
 import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs } from "./data/faqs.js";
@@ -78,6 +82,12 @@ const values = [
 ];
 
 const galleryItems = [
+  ["/assets/photos/processed/science-lab-lesson-1600.jpg", "Curious minds", "A teacher demonstrating a science experiment to SRSS pupils in the laboratory."],
+  ["/assets/photos/processed/classroom-assessment-1280.jpg", "Focused minds", "SRSS pupils working quietly at their desks during a classroom assessment."],
+  ["/assets/photos/processed/values-signs-graduation-1600.jpg", "Values on display", "SRSS pupils holding Truth, Right Conduct, Love and Non-violence signs beside the school emblem."],
+  ["/assets/photos/processed/chess-tournament-960.jpg", "Every move counts", "SRSS pupils competing at a chess tournament."],
+  ["/assets/photos/processed/field-friends-1052.jpg", "Joy together", "Smiling SRSS pupils sitting together on the school field."],
+  ["/assets/photos/processed/scouts-outing-544.jpg", "Ready to explore", "SRSS Scouts walking together during an outdoor activity."],
   ["/assets/photos/processed/science-microscope-1600.jpg", "Looking closer", "An SRSS pupil examining a specimen through a microscope during a science activity."],
   ["/assets/photos/processed/chess-competition-1280.jpg", "Minds at play", "SRSS pupils concentrating during a chess competition."],
   ["/assets/photos/processed/classroom-art-1280.jpg", "Making together", "SRSS pupils painting and creating together during a classroom art activity."],
@@ -90,11 +100,11 @@ const galleryItems = [
 ];
 
 const roleRoutes = [
-  ["Parent", "Notices, forms, dates and class updates.", "/hub/parent", UsersThree],
-  ["Student", "Learning links, reading and values challenges.", "/hub/student", GraduationCap],
-  ["Teacher", "Timetables, resources and staff essentials.", "/hub/teacher", ChalkboardTeacher],
-  ["Exploring the school", "Visitors, guests and prospective families.", "/about#top", Compass],
-  ["Admin", "School operations, records and publishing.", "/hub/admin", LockKey],
+  ["Parent", "Notices, forms, dates and class updates.", "/hub/parent", UsersThree, "Go to the Parent Hub"],
+  ["Student", "Learning links, reading and values challenges.", "/hub/student", GraduationCap, "Go to the Student Hub"],
+  ["Teacher", "Timetables, resources and staff essentials.", "/hub/teacher", ChalkboardTeacher, "Go to the Teacher Hub"],
+  ["Exploring the school", "Visitors, guests and prospective families.", "/about#top", Compass, "Discover About SRSS"],
+  ["Admin", "School operations, records and publishing.", "/hub/admin", LockKey, "Go to the Admin Hub"],
 ];
 
 const whySrss = [
@@ -106,7 +116,7 @@ const whySrss = [
 const defaultHomepageContent = {
   stats: { years: 25, students: "Year 1–6", values: 5, motto: "Human Excellence | Kecemerlangan Insan" },
   principal: { quote: "The real magic of SRSS lies in our teachers and staff, who teach by example every day.", message: "After twenty-five years, our vision is brighter than ever. We want to nurture young people who meet challenges with courage, embrace opportunities with wisdom, and become champions of peace, unity and care for our planet.", image: "/assets/photos/processed/principal-uma-devi-1086x1358.jpg", alt: "Portrait of Uma Devi Jenes Nayagam, Principal of Sekolah Rendah Sathya Sai" },
-  anniversary: { title: "Celebrating 25 Years.", description: "A quarter-century of learning, service and Human Excellence. Follow the milestones and voices that continue to shape SRSS." },
+  anniversary: { title: "Celebrating 25 Years of SRSS.", description: "A quarter-century of learning, growing and nurturing human values." },
 };
 
 const inspirationQuote = "Education is not for mere living; it is for life, a fuller life, a more meaningful, and a more worthwhile life.";
@@ -119,6 +129,16 @@ function InspirationPage() {
     <section className="inspiration-closing"><div className="about-inner"><p className="eyebrow">Rooted in Educare</p><h2>Human excellence is the<br/><em>journey we share.</em></h2><a className="text-link" href="/about#educare">Explore Sathya Sai Educare <ArrowRight size={17}/></a></div></section>
   </main>;
 }
+
+// Pictures for events published without their own image.
+const eventFallbackImages = ["/assets/photos/processed/sports-day-march-1600.jpg", "/assets/photos/processed/assembly-achievements-1280.jpg", "/assets/photos/processed/values-signs-graduation-1600.jpg", "/assets/photos/processed/field-friends-1052.jpg"];
+
+// Photo for each learning theme; "Human Values" shows the interactive Values Garden instead.
+const learningImages = {
+  "Curious minds": ["/assets/photos/processed/science-microscope-1600.jpg", "An SRSS pupil examining a specimen through a microscope during a science activity."],
+  "Active bodies": ["/assets/photos/processed/football-match-1600.jpg", "SRSS pupils competing in a football match."],
+  "Loving learning environment": ["/assets/photos/processed/assembly-silent-sitting-1600.jpg", "SRSS pupils sitting together in quiet reflection at morning assembly."],
+};
 
 const learningTabs = [
   ["Curious minds", "Through Malaysia’s national curriculum, pupils investigate, question and connect ideas. Classrooms are structured for strong foundations while leaving space for wonder, dialogue and independent thought."],
@@ -282,7 +302,13 @@ function SchoolCalendar({ items, onAdd }) {
   const cells = [...Array(leadingDays).fill(null), ...Array.from({ length: daysInMonth }, (_, index) => index + 1)];
   while (cells.length % 7) cells.push(null);
   const moveMonth = (offset) => setVisibleMonth(new Date(year, month + offset, 1));
-  return <section className="calendar-section" aria-labelledby="events-title"><div className="calendar-heading"><div><p className="eyebrow">Mark your calendar</p><h2 id="events-title">Upcoming <em>togetherness.</em></h2><p>Academic, cultural, seva and community dates at a glance.</p></div><div className="calendar-month-nav"><button type="button" onClick={() => moveMonth(-1)} aria-label="Previous month"><CaretLeft size={20} /></button><strong>{visibleMonth.toLocaleDateString("en-MY", { month: "long", year: "numeric" })}</strong><button type="button" onClick={() => moveMonth(1)} aria-label="Next month"><CaretRight size={20} /></button></div></div><div className="calendar-layout"><div className="month-grid" aria-label={`${visibleMonth.toLocaleDateString("en-MY", { month: "long", year: "numeric" })} calendar`}>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <span className="weekday" key={day}>{day}</span>)}{cells.map((day, index) => <span className={`calendar-day ${day && eventDates.has(day) ? "has-event" : ""}`} key={`${day || "blank"}-${index}`}>{day ? <><time dateTime={`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`}>{day}</time>{eventDates.has(day) ? <i aria-label="School event" /> : null}</> : null}</span>)}</div><div className="event-side-list"><p className="event-list-label">Dates this month</p>{monthEvents.length ? monthEvents.map((item) => <article key={item.id}><time dateTime={item.date}><strong>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit" })}</strong><span>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { month: "short" }).toUpperCase()}</span></time><div><span>{item.category}</span><h3>{item.title}</h3><p><Clock size={14} /> {item.time}</p></div><button type="button" onClick={() => onAdd(item.title, item.date)} aria-label={`Add ${item.title} to calendar`}><CalendarBlank size={20} /></button></article>) : <p className="calendar-empty">No published events for this month.</p>}</div></div></section>;
+  const [showMonth, setShowMonth] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = items.filter((item) => item.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+  const listed = (upcoming.length ? upcoming : [...items].sort((a, b) => b.date.localeCompare(a.date))).slice(0, 5);
+  const eventRow = (item) => <article key={item.id}><time dateTime={item.date}><strong>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit" })}</strong><span>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { month: "short" }).toUpperCase()}</span></time><div><span>{item.category}</span><h3>{item.title}</h3>{item.time && <p><Clock size={14} /> {item.time}</p>}</div><button type="button" onClick={() => onAdd(item.title, item.date)} aria-label={`Add ${item.title} to calendar`}><CalendarBlank size={20} /></button></article>;
+  if (!showMonth) return <section className="calendar-section" aria-labelledby="events-title"><div className="calendar-heading"><div><p className="eyebrow">Mark your calendar</p><h2 id="events-title">Upcoming <em>togetherness.</em></h2><p>Academic, cultural, seva and community dates at a glance.</p></div><button type="button" className="reveal-toggle" aria-expanded="false" onClick={() => setShowMonth(true)}>Show month calendar <CalendarBlank size={16} /></button></div><div className="event-side-list event-list-compact"><p className="event-list-label">{upcoming.length ? "Coming up" : "Recent dates"}</p>{listed.length ? listed.map(eventRow) : <p className="calendar-empty">No published events yet.</p>}</div></section>;
+  return <section className="calendar-section" aria-labelledby="events-title"><div className="calendar-heading"><div><p className="eyebrow">Mark your calendar</p><h2 id="events-title">Upcoming <em>togetherness.</em></h2><p>Academic, cultural, seva and community dates at a glance.</p></div><div className="calendar-month-nav"><button type="button" className="reveal-toggle" aria-expanded="true" onClick={() => setShowMonth(false)}>Show list</button><button type="button" onClick={() => moveMonth(-1)} aria-label="Previous month"><CaretLeft size={20} /></button><strong>{visibleMonth.toLocaleDateString("en-MY", { month: "long", year: "numeric" })}</strong><button type="button" onClick={() => moveMonth(1)} aria-label="Next month"><CaretRight size={20} /></button></div></div><div className="calendar-layout"><div className="month-grid" aria-label={`${visibleMonth.toLocaleDateString("en-MY", { month: "long", year: "numeric" })} calendar`}>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <span className="weekday" key={day}>{day}</span>)}{cells.map((day, index) => <span className={`calendar-day ${day && eventDates.has(day) ? "has-event" : ""}`} key={`${day || "blank"}-${index}`}>{day ? <><time dateTime={`${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`}>{day}</time>{eventDates.has(day) ? <i aria-label="School event" /> : null}</> : null}</span>)}</div><div className="event-side-list"><p className="event-list-label">Dates this month</p>{monthEvents.length ? monthEvents.map((item) => <article key={item.id}><time dateTime={item.date}><strong>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit" })}</strong><span>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { month: "short" }).toUpperCase()}</span></time><div><span>{item.category}</span><h3>{item.title}</h3><p><Clock size={14} /> {item.time}</p></div><button type="button" onClick={() => onAdd(item.title, item.date)} aria-label={`Add ${item.title} to calendar`}><CalendarBlank size={20} /></button></article>) : <p className="calendar-empty">No published events for this month.</p>}</div></div></section>;
 }
 
 export function App() {
@@ -296,17 +322,25 @@ export function App() {
   const [visitOpen, setVisitOpen] = useState(false);
   const [sent, setSent] = useState(false);
   const [activeValue, setActiveValue] = useState(null);
-  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [gallery, setGallery] = useState({ index: 0, prev: null, dir: "next" });
+  const galleryIndex = gallery.index;
   const [galleryPaused, setGalleryPaused] = useState(false);
+  const [galleryStopped, setGalleryStopped] = useState(false);
+  const [activeRole, setActiveRole] = useState(null);
+  const [faqExpanded, setFaqExpanded] = useState(false);
+  const [storiesExpanded, setStoriesExpanded] = useState(false);
+  const [tickerPaused, setTickerPaused] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
+  const [showTop, setShowTop] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const [statCounts, setStatCounts] = useState({ years: 0, values: 0 });
   const glanceRef = useRef(null);
-  const [activeLearning, setActiveLearning] = useState(0);
+  const [activeLearning, setActiveLearning] = useState(() => (window.location.hash === "#values" ? learningTabs.findIndex(([label]) => label === "Human Values") : 0));
   const [activeNews, setActiveNews] = useState("All");
   const [openFaq, setOpenFaq] = useState(null);
   const [enquirySent, setEnquirySent] = useState(false);
   const [contactSent, setContactSent] = useState(false);
-  const [formMode, setFormMode] = useState("enquiry");
+  const [formMode, setFormMode] = useState(null);
   const [formError, setFormError] = useState("");
   const [managedContent, setManagedContent] = useState({
     news: newsItems.map(([category, title, date, image], index) => ({ id: `fallback-news-${index}`, category, title, date: `2026-${date.slice(3, 6) === "Jul" ? "07" : "07"}-${date.slice(0, 2)}`, image })),
@@ -322,6 +356,7 @@ export function App() {
         setSearchOpen(false);
         setMenuOpen(false);
         setVisitOpen(false);
+        setFabOpen(false);
       }
     };
     window.addEventListener("keydown", handleKey);
@@ -367,6 +402,13 @@ export function App() {
     return () => observer.disconnect();
   }, [statsVisible]);
 
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 900);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   // Scroll reveal: sections fade up once as they enter the viewport. Content stays visible when motion
   // is reduced or IntersectionObserver is unavailable, because `reveal-ready` is never added then.
   useEffect(() => {
@@ -388,26 +430,19 @@ export function App() {
     return () => cancelAnimationFrame(frame);
   }, [statsVisible]);
 
+  // Photo carousel: one slide at a time; the outgoing slide slides left and fades (right when going back).
+  const goToSlide = (target, dir = "next") => setGallery((current) => ({ index: (target + galleryItems.length) % galleryItems.length, prev: current.index, dir }));
   useEffect(() => {
-    if (galleryPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
-    const timer = window.setInterval(() => setGalleryIndex((index) => (index + 1) % galleryItems.length), 5200);
+    if (galleryPaused || galleryStopped || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const timer = window.setInterval(() => setGallery((current) => ({ index: (current.index + 1) % galleryItems.length, prev: current.index, dir: "next" })), 5600);
     return () => window.clearInterval(timer);
-  }, [galleryPaused]);
-
-  const visibleGallery = useMemo(
-    () => [0, 1, 2].map((offset) => galleryItems[(galleryIndex + offset) % galleryItems.length]),
-    [galleryIndex],
-  );
-  const homepageCards = useMemo(() => {
-    const firstNews = managedContent.news?.[0];
-    const firstEvent = managedContent.events?.[0];
-    const announcement = managedContent.news?.[1];
-    return [
-      firstNews && { ...firstNews, type: "School news", excerpt: firstNews.excerpt || "A recent glimpse of curiosity, care and purposeful learning across SRSS.", Icon: Newspaper },
-      firstEvent && { ...firstEvent, type: "Upcoming event", excerpt: firstEvent.excerpt || "Families are invited to take part in the next shared school experience.", image: "/assets/photos/processed/sports-day-march-1600.jpg", Icon: CalendarBlank },
-      announcement && { ...announcement, type: "Announcement", excerpt: announcement.excerpt || "An important update for pupils, families and the wider school community.", Icon: Megaphone },
-    ].filter(Boolean);
-  }, [managedContent.news, managedContent.events]);
+  }, [galleryPaused, galleryStopped]);
+  // Stories & Happenings gallery: published news and public events, newest first.
+  const storyItems = useMemo(() => [
+    ...(managedContent.news || []).map((item) => ({ ...item, type: item.category || "School news", Icon: Newspaper })),
+    ...(managedContent.events || []).map((item, index) => ({ ...item, type: "Event", image: item.image || eventFallbackImages[index % eventFallbackImages.length], Icon: CalendarBlank })),
+  ].filter((item) => item.date).sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 8), [managedContent.news, managedContent.events]);
+  const tickerItems = useMemo(() => storyItems.slice(0, 6).map((item) => ({ id: `${item.type}-${item.id}`, date: item.date, title: item.title })), [storyItems]);
 
   const handleVisitSubmit = (event) => {
     event.preventDefault();
@@ -429,13 +464,12 @@ export function App() {
       <a className="skip-link" href="#main">Skip to content</a>
 
       <header className="site-header">
-        <div className="updates-bar">
+        <div className={`updates-bar${tickerPaused ? " is-paused" : ""}`} role="region" aria-label="Announcements">
           <div className="header-wrap updates-inner">
             <span className="updates-label">Updates</span>
-            <span className="updates-pause" aria-hidden="true">Ⅱ</span>
-            <time dateTime="2026-07-20">20 Jul 2026</time>
-            <p>Discover school life, upcoming dates and the latest news from the SRSS community.</p>
-            <a href="/#school-life">View all updates <ArrowRight size={15} weight="bold" /></a>
+            <button type="button" className="updates-toggle" onClick={() => setTickerPaused(!tickerPaused)} aria-pressed={tickerPaused} aria-label={tickerPaused ? "Play announcements" : "Pause announcements"}>{tickerPaused ? <Play size={13} weight="fill" /> : <Pause size={13} weight="fill" />}</button>
+            <div className="updates-ticker"><div className="updates-track">{[0, 1].map((copy) => <ul key={copy} aria-hidden={copy === 1}>{(tickerItems.length ? tickerItems : [{ id: "welcome", title: "Discover school life, upcoming dates and the latest news from the SRSS community." }]).map((item) => <li key={`${copy}-${item.id}`}>{item.date && <time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short" })}</time>}<span>{item.title}</span></li>)}</ul>)}</div></div>
+            <a href="/#news">View all updates <ArrowRight size={15} weight="bold" /></a>
           </div>
         </div>
 
@@ -462,6 +496,7 @@ export function App() {
             </div>
           </div>
 
+          {menuOpen && <button type="button" className="mobile-nav-backdrop" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
           {menuOpen && (
             <nav className="mobile-nav" aria-label="Mobile navigation">
               {navItems.map(([label, href]) => <a key={label} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}
@@ -497,42 +532,98 @@ export function App() {
           <img className="hero-image" src="/assets/srss-hero-learning.png" alt="Teacher and pupils reading together in SRSS uniform" />
         </section>
 
-        <section className="role-router" aria-labelledby="role-router-title">
-          <div className="role-router-heading"><div><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div><p>Choose your role for school information and secure hub access.</p></div>
-          <div className="role-router-grid">{roleRoutes.map(([label, copy, target, Icon]) => <a key={label} className="role-card" href={target}><Icon size={25} weight="duotone" /><span><strong>{label}</strong><small>{copy}</small></span><ArrowRight size={17} /></a>)}</div>
-          
-        </section>
-
-        <section className="home-purpose" id="purpose" aria-labelledby="purpose-title">
-          <div className="home-purpose-intro" data-reveal>
-            <p className="eyebrow">Our purpose</p>
-            <h2 id="purpose-title">Learning that reaches beyond the classroom.</h2>
-            <p>Sekolah Rendah Sathya Sai is a values-based learning community where academic excellence meets character development. Rooted in Truth, Right Conduct, Peace, Love and Nonviolence, we help every child realise their potential and become a positive force for others.</p>
-            <div className="home-links"><a className="text-link" href="/about#top">Discover About SRSS <ArrowRight size={16} /></a><a className="text-link" href="#learning">The learning experience <ArrowRight size={16} /></a></div>
+        <section className="home-welcome" id="purpose" aria-labelledby="welcome-title">
+          <div className="home-welcome-intro">
+            <div><h2 id="welcome-title">Welcome to SRSS Digital Hub</h2><p className="home-welcome-sub">Learning beyond classroom.</p></div>
+            <p>Sekolah Rendah Sathya Sai by the Sathya Sai International Organisation of Malaysia is a human values-centered learning community where academic excellence meets character development. Rooted in Truth, Right Conduct, Peace, Love and Nonviolence, we help every child realise their potential and empower them to contribute positively to their communities, the nation and the wider world.</p>
           </div>
           <ul className="home-pillars" id="about-preview" data-reveal-stagger>{whySrss.map(([Icon, title, copy]) => <li key={title}><Icon size={26} weight="duotone" aria-hidden="true" /><div><h3>{title}</h3><p>{copy}</p></div></li>)}</ul>
-          <dl className="home-stats" ref={glanceRef} data-reveal-stagger>
-            <div><dt>Years serving families</dt><dd>{statCounts.years}</dd></div>
-            <div><dt>Primary years</dt><dd>{managedContent.homepage?.stats?.students || "Year 1–6"}</dd></div>
-            <div><dt>Human values, one foundation</dt><dd>{statCounts.values}</dd></div>
-            <div className="home-stats-motto"><dt>School motto</dt><dd>{managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto}</dd></div>
-          </dl>
         </section>
 
-        <section className="learning-experience" id="learning" aria-labelledby="learning-title">
-          <div className="learning-visual" data-reveal="image"><img src="/assets/srss-learning-strip.png" alt="Pupils exploring science, design and nature" /></div>
+        <section className="role-router" aria-labelledby="role-router-title">
+          <div className="role-router-heading"><div><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div><p>Choose your role for school information and secure hub access.</p></div>
+          <div className="role-pills" role="group" aria-label="Choose your role">{roleRoutes.map(([label, , , Icon], index) => <button key={label} type="button" className="role-pill" aria-expanded={activeRole === index} aria-controls="role-detail" onClick={() => setActiveRole(activeRole === index ? null : index)}><Icon size={20} weight="duotone" aria-hidden="true" />{label}</button>)}</div>
+          {activeRole !== null && (() => { const [label, copy, target, Icon, cta] = roleRoutes[activeRole]; return <div className="role-detail" id="role-detail" key={label}><Icon size={30} weight="duotone" aria-hidden="true" /><div><strong>{label}</strong><p>{copy}</p></div><a className="primary-button" href={target}>{cta} <ArrowRight size={17} weight="bold" /></a></div>; })()}
+        </section>
+
+        <section className="home-jubilee" aria-labelledby="jubilee-title">
+          <figure className="home-jubilee-mark" data-reveal><img src="/assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><figcaption>{managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto}</figcaption></figure>
+          <div data-reveal>
+            <p className="eyebrow">2002–2027 · Silver Jubilee</p>
+            <h2 id="jubilee-title">{managedContent.homepage?.anniversary?.title || defaultHomepageContent.anniversary.title}</h2>
+            <p className="home-jubilee-lede">{managedContent.homepage?.anniversary?.description || defaultHomepageContent.anniversary.description}</p>
+            <ul className="home-jubilee-facts" ref={glanceRef} data-reveal-stagger>
+              <li><strong>Since 2002</strong><a href="#learning" onClick={() => setActiveLearning(0)}>Sai Educare in action <ArrowRight size={15} /></a></li>
+              <li><strong>Year 1–6</strong><span>KSSR infused with 5 human values</span></li>
+              <li><strong>{statCounts.years} years</strong><a href="/about#srss25">Explore our journey <ArrowRight size={15} /></a></li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="life-section news-life-section" id="school-life" aria-labelledby="life-title" aria-roledescription="carousel" onMouseEnter={() => setGalleryPaused(true)} onMouseLeave={() => setGalleryPaused(false)} onFocusCapture={() => setGalleryPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setGalleryPaused(false); }} onKeyDown={(event) => { if (event.key === "ArrowRight") goToSlide(galleryIndex + 1); if (event.key === "ArrowLeft") goToSlide(galleryIndex - 1, "back"); }}>
+          <div className="section-head-row" data-reveal>
+            <div><p className="eyebrow">School life in motion</p><h2 id="life-title">Small moments. <em>Lasting roots.</em></h2></div>
+            <div className="carousel-controls" aria-label="Gallery controls">
+              <button type="button" onClick={() => goToSlide(galleryIndex - 1, "back")} aria-label="Previous photo"><CaretLeft size={21} /></button>
+              <span aria-live="polite">{String(galleryIndex + 1).padStart(2, "0")} / {String(galleryItems.length).padStart(2, "0")}</span>
+              <button type="button" onClick={() => goToSlide(galleryIndex + 1)} aria-label="Next photo"><CaretRight size={21} /></button>
+              <button type="button" className="carousel-play" onClick={() => setGalleryStopped(!galleryStopped)} aria-pressed={galleryStopped} aria-label={galleryStopped ? "Play slideshow" : "Pause slideshow"}>{galleryStopped ? <Play size={16} weight="fill" /> : <Pause size={16} weight="fill" />}</button>
+            </div>
+          </div>
+          <div className={`photo-carousel is-${gallery.dir}`} data-reveal>
+            {galleryItems.map(([src, title, alt], index) => <figure key={src} className={`photo-slide${index === galleryIndex ? " is-active" : index === gallery.prev ? " is-leaving" : ""}`} aria-hidden={index !== galleryIndex} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${galleryItems.length}: ${title}`} style={{ "--slide-bg": `url(${src})` }}>
+              <img src={src} alt={alt} loading={index < 2 ? "eager" : "lazy"} />
+              <figcaption><span>{title}</span><small>{alt}</small></figcaption>
+            </figure>)}
+          </div>
+          <div className="photo-dots" role="group" aria-label="Choose a photo">{galleryItems.map(([, title], index) => <button key={title} type="button" className={index === galleryIndex ? "is-active" : ""} aria-label={`Show photo ${index + 1}: ${title}`} aria-current={index === galleryIndex} onClick={() => goToSlide(index, index < galleryIndex ? "back" : "next")} />)}</div>
+          <a className="source-link" href="https://www.facebook.com/SSPSM/" target="_blank" rel="noreferrer">See more school moments on Facebook <ArrowRight size={17} /></a>
+        </section>
+
+        <section className={`learning-experience${learningTabs[activeLearning][0] === "Human Values" ? " is-values" : ""}`} id="learning" aria-labelledby="learning-title">
+          <div className="learning-visual" data-reveal="image">
+            {learningTabs[activeLearning][0] === "Human Values" ? <div className="learning-garden" id="values">
+          <div className="values-flower" role="group" aria-label="The five human values" onMouseLeave={() => setActiveValue(null)}>
+            <div className="values-art">
+              <img src="/assets/values-flower-2026.svg" alt="" aria-hidden="true" />
+              <img className="values-crest-watermark" src="/assets/srss-logo.png" alt="" aria-hidden="true" />
+              {values.map((value, index) => (
+                <button
+                  key={value.name}
+                  type="button"
+                  className={`value-petal petal-${index + 1} ${value.className} ${activeValue === index ? "active" : ""}`}
+                  aria-label={`Explore ${value.name}`}
+                  title={`Explore ${value.name}`}
+                  aria-pressed={activeValue === index}
+                  aria-controls="learning-panel"
+                  onMouseEnter={() => setActiveValue(index)}
+                  onFocus={() => setActiveValue(index)}
+                  onClick={() => setActiveValue(index)}
+                >
+                  <span className="petal-label">{value.petalLabel.map((line) => <span key={line}>{line}</span>)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+            </div> : <img key={activeLearning} src={learningImages[learningTabs[activeLearning][0]][0]} alt={learningImages[learningTabs[activeLearning][0]][1]} />}
+          </div>
           <div className="learning-content" data-reveal>
             <p className="eyebrow">Learning experience</p>
             <h2 id="learning-title">Strong foundations. Open hearts.</h2>
             <p className="learning-summary">SRSS integrates Malaysia’s national curriculum with the philosophy of Sathya Sai Educare, so intellect and character grow together.</p>
             <div className="learning-tabs" role="tablist" aria-label="Learning experience themes">
               {learningTabs.map(([label], index) => (
-                <button key={label} type="button" role="tab" aria-selected={activeLearning === index} aria-controls="learning-panel" onClick={() => setActiveLearning(index)}>{label}</button>
+                <button key={label} type="button" role="tab" aria-selected={activeLearning === index} aria-controls="learning-panel" onClick={() => { setActiveLearning(index); setActiveValue(null); }}>{label}</button>
               ))}
             </div>
-            <div className="learning-panel" id="learning-panel" role="tabpanel" aria-live="polite" key={activeLearning}>
-              <h3>{learningTabs[activeLearning][0]}</h3>
-              <p>{learningTabs[activeLearning][1]}</p>
+            <div className="learning-panel" id="learning-panel" role="tabpanel" aria-live="polite" key={`${activeLearning}-${activeValue}`}>
+              {learningTabs[activeLearning][0] === "Human Values" && activeValue !== null ? <div className={`learning-value ${values[activeValue].className}`}>
+                <span>Human value</span><h3>{values[activeValue].name}</h3><p>{values[activeValue].description}</p><p className="value-practice">{values[activeValue].practice}</p>
+              </div> : <>
+                <h3>{learningTabs[activeLearning][0]}</h3>
+                <p>{learningTabs[activeLearning][1]}</p>
+                {learningTabs[activeLearning][0] === "Human Values" && <p className="values-interaction-cue"><CursorClick size={17} weight="duotone" aria-hidden="true" /> Choose a petal in the Values Garden to explore each value</p>}
+              </>}
             </div>
           </div>
         </section>
@@ -555,50 +646,14 @@ export function App() {
           </div>
         </section>
 
-        <section className="values-garden" id="values" aria-labelledby="garden-title">
-          <div className="section-intro" data-reveal>
-            <p className="eyebrow">The Values Garden</p>
-            <h2 id="garden-title">What we nurture <em>takes root for life.</em></h2>
-            <p>Select a petal to see how each human value becomes part of everyday school life.</p>
-            <p className="values-interaction-cue"><CursorClick size={17} weight="duotone" aria-hidden="true" /> Choose any value to explore it</p>
-          </div>
-          <div className="values-flower" data-reveal role="group" aria-label="The five human values" onMouseLeave={() => setActiveValue(null)}>
-            <div className="values-art">
-              <img src="/assets/values-flower-2026.svg" alt="" aria-hidden="true" />
-              <img className="values-crest-watermark" src="/assets/srss-logo.png" alt="" aria-hidden="true" />
-              {values.map((value, index) => (
-                <button
-                  key={value.name}
-                  type="button"
-                  className={`value-petal petal-${index + 1} ${value.className} ${activeValue === index ? "active" : ""}`}
-                  aria-label={`Explore ${value.name}`}
-                  title={`Explore ${value.name}`}
-                  aria-pressed={activeValue === index}
-                  aria-controls="value-description"
-                  onMouseEnter={() => setActiveValue(index)}
-                  onFocus={() => setActiveValue(index)}
-                  onClick={() => setActiveValue(index)}
-                >
-                  <span className="petal-label">{value.petalLabel.map((line) => <span key={line}>{line}</span>)}</span>
-                </button>
-              ))}
-            </div>
-            {activeValue === null ? <article className="value-description value-default" id="value-description" aria-live="polite"><span>Head · Heart · Hands</span><h3>Education for Human Excellence</h3><p>At SRSS, education draws out the human values of Truth, Right Conduct, Peace, Love and Nonviolence so that every child can lead a fully human, meaningful and balanced life.</p><p className="value-quote">“Love in speech is Truth. Love in action is Right Conduct. Love in thought is Peace. Love in understanding is Nonviolence.”<br/><small>— Sri Sathya Sai Baba</small></p></article> : <article className={`value-description ${values[activeValue].className}`} id="value-description" aria-live="polite"><span>Human value</span><h3>{values[activeValue].name}</h3><p>{values[activeValue].description}</p><p className="value-practice">{values[activeValue].practice}</p></article>}
-          </div>
-        </section>
+        <section className="faq-section home-faq-section" id="faq" aria-labelledby="faq-title"><div data-reveal><p className="eyebrow">Helpful answers</p><h2 id="faq-title">Questions, welcomed.</h2><p>Start with the questions families ask most often, or open the complete FAQ for detailed school information.</p><a className="text-link" href="/faq">View all frequently asked questions <ArrowRight size={16} /></a></div><div><FaqAccordion items={(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, faqExpanded ? 8 : 4)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /><button type="button" className="reveal-toggle" aria-expanded={faqExpanded} onClick={() => { setFaqExpanded(!faqExpanded); if (faqExpanded && openFaq > 3) setOpenFaq(null); }}>{faqExpanded ? "Show fewer questions" : "Show more questions"} <CaretRight size={15} className={faqExpanded ? "turned-up" : "turned-down"} /></button></div></section>
 
-        <section className="faq-section home-faq-section" id="faq" aria-labelledby="faq-title"><div data-reveal><p className="eyebrow">Helpful answers</p><h2 id="faq-title">Questions, welcomed.</h2><p>Start with the questions families ask most often, or open the complete FAQ for detailed school information.</p><a className="text-link" href="/faq">View all frequently asked questions <ArrowRight size={16} /></a></div><FaqAccordion items={(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, 8)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /></section>
-
-        <section className="stories-band" id="news" aria-labelledby="news-title">
-          <div className="stories-head" data-reveal><p className="eyebrow">News &amp; events</p><h2 id="news-title">Stories &amp; <em>Happenings.</em></h2><p>Moments of learning, service and celebration from the SRSS community.</p></div>
-          <div className="stories-jubilee" data-reveal>
-            <img src="/assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" />
-            <div><p className="eyebrow">2002–2027 · Silver Jubilee</p><h3>{managedContent.homepage?.anniversary?.title || defaultHomepageContent.anniversary.title}</h3><p>{managedContent.homepage?.anniversary?.description || defaultHomepageContent.anniversary.description}</p><div className="anniversary-timeline"><span><strong>2002</strong>Our beginning</span><span><strong>2012</strong>Our journey</span><span><strong>2027</strong>Our future</span></div><a className="text-link" href="/about#srss25">Explore 25 years of SRSS <ArrowRight size={16} /></a></div>
-          </div>
+        <section className="news-section" id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">Stories &amp; <em>Happenings.</em></h2></div><a href="#events-title">See the calendar <ArrowRight size={16} /></a></div>
+          {storyItems.length ? <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`} data-reveal-stagger>{storyItems.map((item) => <li key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" /><div><span><item.Icon size={14} aria-hidden="true" />{item.type}</span><time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time><h3>{item.title}</h3>{item.excerpt && <p>{item.excerpt}</p>}</div></li>)}</ul> : <p className="calendar-empty">News and events will appear here once they are published.</p>}
+          {storyItems.length > 4 && <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>{storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} /></button>}
         </section>
-        <section className="news-section" aria-label="Latest news"><div className="news-head" data-reveal><h3>Latest news &amp; events</h3><a href="#news">View all updates <ArrowRight size={16} /></a></div><div className="news-grid home-news-grid" data-reveal-stagger>{homepageCards.map((item) => <article key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" /><div><span><item.Icon size={15} />{item.type}</span><time>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })}</time><h3>{item.title}</h3><p>{item.excerpt}</p><a href="#news">Read more <ArrowRight size={15} /></a></div></article>)}</div></section>
-        <section className="life-section news-life-section" id="school-life" aria-labelledby="life-title" onMouseEnter={() => setGalleryPaused(true)} onMouseLeave={() => setGalleryPaused(false)} onFocusCapture={() => setGalleryPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setGalleryPaused(false); }}><div className="section-head-row" data-reveal><div><p className="eyebrow">School life in motion</p><h2 id="life-title">Small moments. <em>Lasting roots.</em></h2></div><div className="carousel-controls" aria-label="Gallery controls"><button type="button" onClick={() => setGalleryIndex((galleryIndex - 1 + galleryItems.length) % galleryItems.length)} aria-label="Previous gallery images"><CaretLeft size={21} /></button><span>{String(galleryIndex + 1).padStart(2, "0")} / {String(galleryItems.length).padStart(2, "0")}</span><button type="button" onClick={() => setGalleryIndex((galleryIndex + 1) % galleryItems.length)} aria-label="Next gallery images"><CaretRight size={21} /></button><small>{galleryPaused ? "Paused" : "Auto"}</small></div></div><div className="gallery-grid" data-reveal aria-live="polite">{visibleGallery.map(([src, title, alt], index) => <figure key={`${src}-${galleryIndex}`} className={index === 0 ? "featured" : ""}><img src={src} alt={alt} /><figcaption><span>{title}</span><small>SRSS school life</small></figcaption></figure>)}</div><a className="source-link" href="https://www.facebook.com/SSPSM/" target="_blank" rel="noreferrer">See more school moments on Facebook <ArrowRight size={17} /></a></section>
         <SchoolCalendar items={managedContent.events || []} onAdd={addToCalendar} />
+
 
         <section className="home-join" id="admissions" aria-labelledby="admissions-title">
           <div className="home-join-intro" data-reveal>
@@ -609,11 +664,15 @@ export function App() {
             <div className="home-links"><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Fee%20enquiry">Request fee information <ArrowRight size={16} /></a><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Prospectus%20request">Request the prospectus <ArrowRight size={16} /></a></div>
           </div>
           <div className="home-join-card" id="enquiry" data-reveal>
-            <div className="home-form-switch" role="tablist" aria-label="What would you like to send?">
+            {!formMode ? <div className="home-form-choice">
+              <p className="eyebrow">How can we help?</p>
+              <button type="button" onClick={() => { setFormMode("enquiry"); setFormError(""); }}><GraduationCap size={26} weight="duotone" aria-hidden="true" /><span><strong>Make an admissions enquiry</strong><small>Tell us about your child and we will plan a next step with you.</small></span><ArrowRight size={18} /></button>
+              <button type="button" onClick={() => { setFormMode("question"); setFormError(""); }}><EnvelopeSimple size={26} weight="duotone" aria-hidden="true" /><span><strong>Ask a general question</strong><small>Reach the school office about anything else.</small></span><ArrowRight size={18} /></button>
+            </div> : <div className="home-form-switch" role="tablist" aria-label="What would you like to send?">
               <button type="button" role="tab" aria-selected={formMode === "enquiry"} onClick={() => { setFormMode("enquiry"); setFormError(""); }}>Admissions enquiry</button>
               <button type="button" role="tab" aria-selected={formMode === "question"} onClick={() => { setFormMode("question"); setFormError(""); }}>General question</button>
-            </div>
-            {formMode === "enquiry" ? (enquirySent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Your enquiry is on its way.</h3><p>The admissions team will contact you with a next step, usually within two school days.</p></div> : <form className="school-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); const { questions, ...payload } = Object.fromEntries(new FormData(event.currentTarget)); try { await submitPublicForm("admissionEnquiries", { ...payload, message: questions, source: "website" }); setEnquirySent(true); } catch (reason) { setFormError(reason.message || "Your enquiry could not be sent. Please try again."); } }}>
+            </div>}
+            {!formMode ? null : formMode === "enquiry" ? (enquirySent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Your enquiry is on its way.</h3><p>The admissions team will contact you with a next step, usually within two school days.</p></div> : <form className="school-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); const { questions, ...payload } = Object.fromEntries(new FormData(event.currentTarget)); try { await submitPublicForm("admissionEnquiries", { ...payload, message: questions, source: "website" }); setEnquirySent(true); } catch (reason) { setFormError(reason.message || "Your enquiry could not be sent. Please try again."); } }}>
               <label>Parent / guardian name<input required name="parentName" autoComplete="name" /></label><label>Email address<input required name="email" type="email" autoComplete="email" /></label>
               <label>Child’s name<input required name="childName" /></label><label>Child’s age<select required name="childAge" defaultValue=""><option value="" disabled>Select age</option>{[5,6,7,8,9,10,11,12].map(age => <option key={age}>{age}</option>)}</select></label>
               <label>Current school<input name="currentSchool" /></label><label>How did you hear about SRSS?<select name="referralSource" defaultValue=""><option value="" disabled>Select one</option><option>Family or friend</option><option>Social media</option><option>School event</option><option>Online search</option><option>Other</option></select></label>
@@ -657,17 +716,29 @@ export function App() {
           </address>
           <nav className="footer-quick-links" aria-label="Footer quick links">
             <h2>Quick links</h2>
-            <a href="/">Home</a>
-            <a href="/about#top">About SRSS</a>
-            <a href="/hub/parent">Parents Hub</a>
-            <a href="/#students">Students Hub</a>
-            <a href="/#teachers">Teachers Hub</a>
-            <a href="/resources/prayer-pledge-anthem">Prayer, Pledge &amp; Anthem</a>
+            <a href="/about#top">About us</a>
             <a href="/faq">FAQ</a>
+            <a href="/#contact">Visit SRSS</a>
+            <a href="/hub/student">Student Hub</a>
+            <a href="/hub/teacher">Teachers Hub</a>
+            <a href="/hub/admin">Admin Hub</a>
+            <a href="/hub/parent">Parents Hub</a>
+            <a href="/resources/prayer-pledge-anthem">Resources</a>
           </nav>
         </div>
         <div className="footer-base"><span>© 2026 Sekolah Rendah Sathya Sai</span><button type="button" onClick={() => setVisitOpen(true)}>Contact the school</button></div>
       </footer>
+
+      <div className={`floating-actions${fabOpen ? " is-open" : ""}`}>
+        <button type="button" className={`to-top${showTop ? " is-visible" : ""}`} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })} aria-label="Back to top" tabIndex={showTop ? 0 : -1} aria-hidden={!showTop}><ArrowUp size={20} weight="bold" /></button>
+        {fabOpen && <div className="fab-menu" id="fab-menu" role="menu" aria-label="Quick actions">
+          <button type="button" role="menuitem" onClick={() => { setFabOpen(false); setSent(false); setVisitOpen(true); }}><CalendarBlank size={19} aria-hidden="true" /> Arrange a visit</button>
+          <a role="menuitem" href="/#enquiry" onClick={() => { setFabOpen(false); setFormMode("enquiry"); }}><GraduationCap size={19} aria-hidden="true" /> Admissions enquiry</a>
+          <a role="menuitem" href="/#contact" onClick={() => setFabOpen(false)}><Phone size={19} aria-hidden="true" /> Contact the school</a>
+          <a role="menuitem" href="/sign-in" onClick={() => setFabOpen(false)}><SignIn size={19} aria-hidden="true" /> Sign in to the hub</a>
+        </div>}
+        <button type="button" className="fab" onClick={() => setFabOpen(!fabOpen)} aria-expanded={fabOpen} aria-controls="fab-menu" aria-label={fabOpen ? "Close quick actions" : "Open quick actions"}><Plus size={24} weight="bold" /></button>
+      </div>
 
       {visitOpen && (
         <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setVisitOpen(false); }}>
