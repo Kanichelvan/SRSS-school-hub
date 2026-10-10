@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { BookOpen } from "@phosphor-icons/react/dist/csr/BookOpen";
 import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
+import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
 import { CaretLeft } from "@phosphor-icons/react/dist/csr/CaretLeft";
 import { CaretRight } from "@phosphor-icons/react/dist/csr/CaretRight";
 import { CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
@@ -33,15 +34,7 @@ import { loadPublicContent, submitPublicForm } from "./lib/publicContent.js";
 import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
-
-const navItems = [
-  ["About Us", "/about#top"],
-  ["Learning", "/#learning"],
-  ["Prayer & Pledge", "/resources/prayer-pledge-anthem"],
-  ["Admissions", "/#admissions"],
-  ["News & Events", "/#news"],
-  ["Contact", "/#contact"],
-];
+import { siteNav } from "./data/navigation.js";
 
 const values = [
   {
@@ -319,6 +312,8 @@ export function App() {
   const [isPrayerPage, setIsPrayerPage] = useState(() => window.location.pathname === "/resources/prayer-pledge-anthem");
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(null);
+  const [mobileSection, setMobileSection] = useState(null);
   const [visitOpen, setVisitOpen] = useState(false);
   const [sent, setSent] = useState(false);
   const [activeValue, setActiveValue] = useState(null);
@@ -326,7 +321,6 @@ export function App() {
   const galleryIndex = gallery.index;
   const [galleryPaused, setGalleryPaused] = useState(false);
   const [galleryStopped, setGalleryStopped] = useState(false);
-  const [activeRole, setActiveRole] = useState(null);
   const [faqExpanded, setFaqExpanded] = useState(false);
   const [storiesExpanded, setStoriesExpanded] = useState(false);
   const [tickerPaused, setTickerPaused] = useState(false);
@@ -357,6 +351,7 @@ export function App() {
         setMenuOpen(false);
         setVisitOpen(false);
         setFabOpen(false);
+        setNavOpen(null);
       }
     };
     window.addEventListener("keydown", handleKey);
@@ -409,6 +404,11 @@ export function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle("nav-locked", menuOpen);
+    return () => document.documentElement.classList.remove("nav-locked");
+  }, [menuOpen]);
+
   // Scroll reveal: sections fade up once as they enter the viewport. Content stays visible when motion
   // is reduced or IntersectionObserver is unavailable, because `reveal-ready` is never added then.
   useEffect(() => {
@@ -459,11 +459,25 @@ export function App() {
   };
 
 
+  const closeMenus = () => { setNavOpen(null); setMenuOpen(false); };
+  const navLink = (label, href, className = "") => href === null
+    ? <span className={`nav-soon ${className}`} aria-disabled="true">{label}<em>Soon</em></span>
+    : href === "visit"
+      ? <button type="button" className={className} onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>{label}</button>
+      : <a className={className} href={href} onClick={closeMenus}>{label}</a>;
+  const hubIcons = [GraduationCap, ChalkboardTeacher, UsersThree, LockKey];
+  const menuBody = (item) => <>
+    {item.groups && <div className="mega-groups">{item.groups.map((group) => <div className="mega-group" key={group.title}>{navLink(group.title, group.href, "mega-group-title")}{group.note && <small>{group.note}</small>}{group.links && <ul>{group.links.map(([label, href]) => <li key={label}>{navLink(label, href)}</li>)}</ul>}</div>)}</div>}
+    {item.links && <ul className="mega-links">{item.links.map(([label, href]) => <li key={label}>{navLink(label, href)}</li>)}</ul>}
+    {item.hubs && <ul className="mega-hubs">{item.hubs.map(([label, href, note], index) => { const Icon = hubIcons[index]; return <li key={label}><a href={href} onClick={closeMenus}><Icon size={24} weight="duotone" aria-hidden="true" /><span><strong>{label}</strong><small>{note}</small></span><ArrowRight size={16} aria-hidden="true" /></a></li>; })}</ul>}
+  </>;
+  const activeNav = siteNav.find((item) => item.label === navOpen);
+
   return (
     <div className="site-shell">
       <a className="skip-link" href="#main">Skip to content</a>
 
-      <header className="site-header">
+      <header className="site-header" onMouseLeave={() => setNavOpen(null)}>
         <div className={`updates-bar${tickerPaused ? " is-paused" : ""}`} role="region" aria-label="Announcements">
           <div className="header-wrap updates-inner">
             <span className="updates-label">Updates</span>
@@ -485,23 +499,32 @@ export function App() {
             </a>
 
             <nav className="desktop-nav" aria-label="Primary navigation">
-              {navItems.map(([label, href]) => <a key={label} href={href}>{label}</a>)}
+              {siteNav.map((item) => <button key={item.label} type="button" className={navOpen === item.label ? "is-open" : ""} aria-expanded={navOpen === item.label} aria-controls="site-mega-menu" onMouseEnter={() => setNavOpen(item.label)} onFocus={() => setNavOpen(item.label)} onClick={() => setNavOpen(navOpen === item.label ? null : item.label)}>{item.label}<CaretDown size={12} weight="bold" aria-hidden="true" /></button>)}
             </nav>
 
             <div className="nav-actions">
               <button className="icon-action" type="button" onClick={() => setSearchOpen(true)} aria-label="Search SRSS"><MagnifyingGlass size={22} /></button>
-              <a className="parent-link" href="/hub/parent">Parent Hub</a>
               <a className="admissions-button" href="/#admissions">Admissions &amp; Visits</a>
               <button className="mobile-menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">{menuOpen ? <X size={25} /> : <List size={25} />}</button>
             </div>
           </div>
 
+          {activeNav && <div className="mega-panel" id="site-mega-menu" role="region" aria-label={`${activeNav.label} menu`} key={activeNav.label}>
+            <div className="header-wrap mega-inner">
+              <div className="mega-intro"><p className="eyebrow">{activeNav.label}</p><p>{activeNav.intro}</p>{!activeNav.hubs && <a className="text-link" href={activeNav.href} onClick={closeMenus}>{activeNav.label} overview <ArrowRight size={15} /></a>}</div>
+              <div className="mega-content">{menuBody(activeNav)}</div>
+            </div>
+          </div>}
+
           {menuOpen && <button type="button" className="mobile-nav-backdrop" aria-label="Close menu" onClick={() => setMenuOpen(false)} />}
           {menuOpen && (
-            <nav className="mobile-nav" aria-label="Mobile navigation">
-              {navItems.map(([label, href]) => <a key={label} href={href} onClick={() => setMenuOpen(false)}>{label}</a>)}
-              <a href="/hub/parent" onClick={() => setMenuOpen(false)}>Parent Hub</a>
-              <button type="button" onClick={() => { setMenuOpen(false); setVisitOpen(true); }}>Admissions &amp; Visits</button>
+            <nav className="nav-drawer" aria-label="Site menu">
+              <div className="nav-drawer-head"><strong>Menu</strong><button type="button" onClick={() => setMenuOpen(false)} aria-label="Close menu"><X size={22} /></button></div>
+              <div className="nav-drawer-body">{siteNav.map((item) => <section key={item.label}>
+                <button type="button" className="nav-acc" aria-expanded={mobileSection === item.label} onClick={() => setMobileSection(mobileSection === item.label ? null : item.label)}>{item.label}<CaretDown size={16} weight="bold" aria-hidden="true" /></button>
+                {mobileSection === item.label && <div className="nav-acc-panel">{!item.hubs && <a className="nav-acc-overview" href={item.href} onClick={closeMenus}>{item.label} overview <ArrowRight size={14} /></a>}{menuBody(item)}</div>}
+              </section>)}</div>
+              <div className="nav-drawer-foot"><button type="button" className="primary-button" onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>Arrange a visit <ArrowRight size={17} /></button><a href="/#enquiry" onClick={closeMenus}>Make an enquiry</a></div>
             </nav>
           )}
         </div>
@@ -542,8 +565,7 @@ export function App() {
 
         <section className="role-router" aria-labelledby="role-router-title">
           <div className="role-router-heading"><div><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div><p>Choose your role for school information and secure hub access.</p></div>
-          <div className="role-pills" role="group" aria-label="Choose your role">{roleRoutes.map(([label, , , Icon], index) => <button key={label} type="button" className="role-pill" aria-expanded={activeRole === index} aria-controls="role-detail" onClick={() => setActiveRole(activeRole === index ? null : index)}><Icon size={20} weight="duotone" aria-hidden="true" />{label}</button>)}</div>
-          {activeRole !== null && (() => { const [label, copy, target, Icon, cta] = roleRoutes[activeRole]; return <div className="role-detail" id="role-detail" key={label}><Icon size={30} weight="duotone" aria-hidden="true" /><div><strong>{label}</strong><p>{copy}</p></div><a className="primary-button" href={target}>{cta} <ArrowRight size={17} weight="bold" /></a></div>; })()}
+          <div className="role-router-grid">{roleRoutes.map(([label, copy, target, Icon]) => <a key={label} className="role-card" href={target}><Icon size={25} weight="duotone" /><span><strong>{label}</strong><small>{copy}</small></span><ArrowRight size={17} /></a>)}</div>
         </section>
 
         <section className="home-jubilee" aria-labelledby="jubilee-title">

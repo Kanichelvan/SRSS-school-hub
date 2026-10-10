@@ -16,13 +16,20 @@ Status: planning baseline, aligned on 9 Oct 2026 with the *SRSS Digital Hub Mast
 
 ## Public website
 
-### Primary navigation (merged PRD + Dual-Plane brief, decision D1, 10 Oct 2026)
+### Primary navigation (user-supplied IA, 10 Oct 2026 — supersedes D1)
 
-**About · Learning · Student Life · Admissions · Community · SRSS25 · Sign in**
+**About · Academics · Admissions · Student Life · Resources · Hubs**, plus search and the **Admissions & Visits** action. Desktop shows a drop-down panel per menu; phones and tablets use an accordion drawer. Menu data lives in `src/data/navigation.js`.
 
-Utility links: **Calendar · Downloads · News · Contact** (plus the Enquire action). News & Events and Resources keep their routes and are reached from the utility links, the homepage and the footer. Achievements live within Student Life and homepage storytelling. On mobile, preserve the same hierarchy in one accessible menu.
+| Menu | Items (→ current destination; *Soon* = planned page, shown but not linked) |
+|---|---|
+| About | Welcome — Principal’s message (→ `/about/voices#principal`) · Our history (→ `/about#who-we-are`): Sathya Sai Baba (→ `/about/inspiration`), SSIOM (→ `/about/inspiration#organisation`) · Our vision & mission (→ `/about#vision-mission`): Human Excellence, Character development (→ `/about#educare`), Values integration & academics (→ `/#learning`) · Our community (→ `/about#our-people`): Management & governance, Staff, Parent–Teacher Association (*Soon*), Alumni (→ `/about/voices#alumni`) · Facilities (→ `/about#campus`): SRSS spaces, Address & contact (→ `/#contact`), A day at SRSS (→ `/resources/prayer-pledge-anthem`), Uniform, transport & meals (→ `/faq`) |
+| Academics | Curriculum & academic pathway, Learning labs (→ `/#learning`) · Assessment structure (→ `/faq`) · Co-curricular and Enrichment activities (→ `/#school-life`) |
+| Admissions | Apply now, Registration (→ `/#enquiry`) · Admission process (→ `/#admissions`) · Entry requirements, Fee structure (→ `/faq`) · Refund policy (*Soon*) · Open house (→ calendar) · Contact details (→ `/#contact`) · Visit SRSS (opens the visit form) |
+| Student Life | Morning assembly, Well-being (→ `/resources/prayer-pledge-anthem#silent-sitting`) · Prayer & pledge (→ `…#prayers`) · Dress code, Leadership (*Soon*) · Achievements (→ `/#news`) · Facilities usage (→ `/about#campus`) |
+| Resources | Forms (→ `/hub/forms`) · Useful links, Parents’ handbook (*Soon*) · Calendar, Monthly events (→ calendar) · News (→ `/#news`) |
+| Hubs | Student Hub · Teachers Hub · Parents Hub · Admin Hub (→ `/hub/{role}`, sign-in first) |
 
-> **Live header.** The live header still uses the earlier grouping (About · Learning · Student Life · *Be part of SRSS* → Admissions & Visits / Community & Support · Resources). Changing it is a separate, approved design change; until then, this plan is the target.
+Pages still to create so every item has its own home: Parent–Teacher Association, Refund policy, Dress code, Leadership, Useful links, Parents’ handbook, and dedicated pages for Fees, Entry requirements, Assessment, Uniform/transport/meals, Co-curricular and Enrichment (currently FAQ or homepage sections).
 
 ### Homepage — `/`
 

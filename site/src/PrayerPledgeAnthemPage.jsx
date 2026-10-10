@@ -1,26 +1,54 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { BookOpen } from "@phosphor-icons/react/dist/csr/BookOpen";
+import { Clock } from "@phosphor-icons/react/dist/csr/Clock";
 import { Flag } from "@phosphor-icons/react/dist/csr/Flag";
 import { HandHeart } from "@phosphor-icons/react/dist/csr/HandHeart";
+import { Headphones } from "@phosphor-icons/react/dist/csr/Headphones";
+import { Info } from "@phosphor-icons/react/dist/csr/Info";
 import { Moon } from "@phosphor-icons/react/dist/csr/Moon";
 import { MusicNotes } from "@phosphor-icons/react/dist/csr/MusicNotes";
-import { Pause } from "@phosphor-icons/react/dist/csr/Pause";
 import { Play } from "@phosphor-icons/react/dist/csr/Play";
 import { Printer } from "@phosphor-icons/react/dist/csr/Printer";
 import { Sparkle } from "@phosphor-icons/react/dist/csr/Sparkle";
-import { SpeakerHigh } from "@phosphor-icons/react/dist/csr/SpeakerHigh";
 import { Sun } from "@phosphor-icons/react/dist/csr/Sun";
+import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
+import { X } from "@phosphor-icons/react/dist/csr/X";
 
 const ASSET_ROOT = "/assets/prayer-page";
 
 const ORDER = [
-  { id: "silent-sitting", label: "Silent Sitting", note: "Two minutes of stillness", Icon: Sparkle },
+  { id: "silent-sitting", label: "Silent Sitting", note: "Ten minutes · 7.30 am", Icon: Sparkle },
+  { id: "prayers", label: "School Prayers", note: "Morning, lunch and close", Icon: Sun },
   { id: "negaraku", label: "Negaraku", note: "The national anthem", Icon: Flag },
-  { id: "anthem", label: "SRSS Anthem", note: "Keunggulan insan", Icon: MusicNotes },
   { id: "rukun-negara", label: "Rukun Negara", note: "Five national principles", Icon: BookOpen },
-  { id: "pledge", label: "School Pledge", note: "Right hand on heart", Icon: HandHeart },
-  { id: "prayers", label: "Prayers", note: "Through the school day", Icon: Sun },
+  { id: "anthem", label: "SRSS Anthem", note: "Keunggulan insan", Icon: MusicNotes },
+  { id: "pledge", label: "School Pledge", note: "Right hand raised", Icon: HandHeart },
+];
+
+// Daily guided visualisations (audio by the Sathya Sai Baba Centre of Bandar Klang).
+const VISUALISATIONS = [
+  { id: "YLbwrteoGS8", title: "Jyothi meditation", theme: "Light", accent: "nonviolence" },
+  { id: "sXLdBVWFrSE", title: "Courage visualisation", theme: "Courage", accent: "truth" },
+  { id: "SoBIt6-9FmE", title: "Trust visualisation", theme: "Trust", accent: "peace" },
+  { id: "fgy7n-AvypY", title: "Colour breathing visualisation", theme: "Breathing", accent: "love" },
+  { id: "wxUpC_MHjdg", title: "Treehouse meditation", theme: "Imagination", accent: "conduct" },
+];
+
+const SILENT_AIMS = [
+  "The ability to be calm and to concentrate (physical and mental alertness).",
+  "The ability to listen and to be aware of one’s inner feelings and inner voice (conscience).",
+  "The awareness that happiness, peace and love come from inside and not from outside.",
+  "The creation of an inner world of positive images and feelings, building confidence in oneself and good feeling towards others.",
+  "The ability to identify with others, and to expand these positive feelings to include all of the outside world.",
+];
+
+const SILENT_REFERENCES = [
+  "Bealing, J. (1997). Meditation prescribed for unruly children. Times Educational Supplement, 13 June 1997, Issue 4224, p. 23.",
+  "Jumsai Na Ayudhya, A. (1997). The Five Human Values and Human Excellence. Bangkok: International Institute of Sathya Sai Education.",
+  "Kratter, J. & Hogan, J. (1982). The Use of Meditation in the Treatment of Attention Deficit Disorder with Hyperactivity. ERIC Document ED232787.",
+  "Rickard, J. (1994). Relaxation for Children. Melbourne: Australian Council for Educational Research.",
+  "Rozman, D. (1994). Meditation with Children: The Art of Concentration and Centering. Boulder Creek, CA: Planetary Publications.",
 ];
 
 const NEGARAKU = [
@@ -58,7 +86,7 @@ const ANTHEM = [
 ];
 
 const GLOSSES = [
-  { id: "en", label: "English", note: "An unofficial reading for meaning, not a singing translation." },
+  { id: "en", label: "English meaning", note: "An unofficial reading for meaning, not a singing translation." },
   { id: "ta", label: "தமிழ்", note: "Tamil reading for meaning — pending review by the language panel." },
   { id: "zh", label: "中文", note: "Mandarin reading for meaning — pending review by the language panel." },
   { id: "ph", label: "Pronunciation", note: "A syllable guide for singing; capitals mark the stressed syllable." },
@@ -68,21 +96,35 @@ const RUKUN = [
   ["Kepercayaan kepada Tuhan", "Belief in God", "truth"],
   ["Kesetiaan kepada Raja dan Negara", "Loyalty to King and Country", "conduct"],
   ["Keluhuran Perlembagaan", "Upholding the Constitution", "peace"],
-  ["Kedaulatan Undang-Undang", "Rule of Law", "love"],
-  ["Kesopanan dan Kesusilaan", "Courtesy and Morality", "nonviolence"],
+  ["Kedaulatan undang-undang", "Rule of Law", "love"],
+  ["Kesopanan dan kesusilaan", "Courtesy and Morality", "nonviolence"],
 ];
 
-const PLEDGE_VALUES = [
-  ["Truth", "Kebenaran", "uphold", "to be honest in my work, clear in my words, and true to myself, even when no one is watching.", "truth"],
-  ["Right Conduct", "Kesucian", "follow", "to respect the rules, own my actions, and do my duty with a willing heart.", "conduct"],
-  ["Peace", "Keamanan", "cultivate", "to keep a calm mind, master my feelings, and make my classroom a place of harmony.", "peace"],
-  ["Love", "Cinta", "practise", "to be kind, to encourage others, and to help everyone grow with confidence.", "love"],
-  ["Non-Violence", "Tanpa Kekerasan", "live", "to solve problems by talking, not hurting, and to choose gentle words and caring actions.", "nonviolence"],
+const PLEDGE = [
+  ["We are the children of Sathya Sai,", "Proud students of SRSS,", "Striving to be our very best."],
+  ["With Devotion in our hearts,", "Duty in our actions,", "Discipline in our lives,", "Discrimination in our choices,", "And Determination in all our efforts."],
+  ["We pledge to live the Five Human Values:", "Truth, Right Conduct, Peace, Love and Non-violence,", "In all that we think, say and do."],
+  ["We shall honour our parents, teachers and elders,", "Love and serve Malaysia, our Motherland,", "And remember that service to humanity is service to God."],
+  ["We shall use our senses wisely,", "Do our duties wholeheartedly,", "And strive for excellence in all that we do."],
+  ["With noble thoughts, loving hearts and helping hands,", "We shall bring honour to our families, our school and our nation."],
+  ["We are the children of SRSS", "We shall be the best that we can be!"],
 ];
+
+// Words highlighted in the pledge: the five Ds in gold, each human value in its own colour.
+const PLEDGE_ACCENTS = [["Devotion", "d"], ["Duty", "d"], ["Discipline", "d"], ["Discrimination", "d"], ["Determination", "d"], ["Truth", "truth"], ["Right Conduct", "conduct"], ["Peace", "peace"], ["Love", "love"], ["Non-violence", "nonviolence"]];
+function accentLine(line) {
+  // The value colours belong to the line that names the Five Human Values, not to verbs like "Love and serve".
+  const accents = line.startsWith("Truth,") ? PLEDGE_ACCENTS : PLEDGE_ACCENTS.filter(([, kind]) => kind === "d");
+  const pattern = new RegExp(`\\b(${accents.map(([word]) => word).join("|")})\\b`, "g");
+  return line.split(pattern).map((part, index) => {
+    const match = accents.find(([word]) => word === part);
+    return match ? <span key={index} className={match[1] === "d" ? "ppa-pledge-d" : `ppa-value-${match[1]}`}>{part}</span> : part;
+  });
+}
 
 const PRAYERS = [
   {
-    id: "morning", tab: "Morning", title: "Universal Prayer", when: "Morning assembly", Icon: Sun,
+    id: "morning", tab: "Morning", title: "Universal Prayer", when: "Morning assembly", Icon: Sun, accent: "nonviolence",
     stanzas: [
       ["Dear God, as this new day begins,", "be the light that shines within."],
       ["Be in my mind, and make my thinking clear.", "Be in my eyes, and let me see the good in all.", "Be in my ears, and let me listen with care.", "Be in my mouth, and let my words be true and kind.", "Be in my hands, and let them help and serve.", "Be in my feet, and guide me on the right path.", "Be in my heart, and let me love all."],
@@ -90,7 +132,7 @@ const PRAYERS = [
     ],
   },
   {
-    id: "lunch", tab: "Lunchtime", title: "Food Prayer", when: "Before the midday meal", Icon: HandHeart,
+    id: "lunch", tab: "Lunchtime", title: "Food Prayer", when: "Before the midday meal", Icon: HandHeart, accent: "love",
     stanzas: [
       ["Thank You, God, for this food,", "for sun and rain that made it grow,", "for farmers’ hands and cooks’ kind care,", "for all the love that brought it here."],
       ["Thank you dear parents, teachers, and uncles and aunties", "who have prepared this food for us today.", "Thank you, God, for the food."],
@@ -98,7 +140,7 @@ const PRAYERS = [
     ],
   },
   {
-    id: "closing", tab: "Closing", title: "Peace Prayer", when: "End of the school day", Icon: Moon,
+    id: "closing", tab: "Closing", title: "Peace Prayer", when: "End of the school day", Icon: Moon, accent: "peace",
     stanzas: [
       ["For the lessons I have learnt today,", "for friends who shared my work and play,", "for teachers who have shown the way,", "thank You, God, for this day."],
       ["Let there be Peace in my heart,", "Peace in my home,", "Peace in my country,", "and Peace in all the world."],
@@ -106,17 +148,9 @@ const PRAYERS = [
       ["Let there be Love in my heart,", "Love in my home,", "Love in my country,", "and Love in all the world."],
     ],
   },
-  {
-    id: "surrender", tab: "Dedication", title: "Prayer of Surrender", when: "Closing dedication", Icon: HandHeart,
-    stanzas: [
-      ["O Lord, take my love,", "and let it flow in full devotion to You."],
-      ["O Lord, take my hands,", "and let them work tirelessly for You."],
-      ["O Lord, take my mind and thoughts,", "and keep them in tune with You."],
-      ["O Lord, take my soul,", "and let it merge as one with You."],
-      ["O Lord, take my everything,", "and make me Your instrument of Love."],
-    ],
-  },
 ];
+const PRAYER_WORDS = { Peace: "peace", Joy: "nonviolence", Love: "love" };
+const prayerLine = (line) => line.split(/\b(Peace|Joy|Love)\b/).map((part, index) => PRAYER_WORDS[part] ? <span key={index} className={`ppa-prayer-word ppa-tint-${PRAYER_WORDS[part]}`}>{part}</span> : part);
 
 function SectionHero({ image, imagePosition, eyebrow, title, subtitle, children, align = "left" }) {
   return <section className={`ppa-section-hero ppa-align-${align}`}>
@@ -133,68 +167,61 @@ function SectionHero({ image, imagePosition, eyebrow, title, subtitle, children,
   </section>;
 }
 
+// One look for every recording: a designed cover that turns into the YouTube player when pressed.
+// (YouTube's terms require the player to stay visible, so playback opens in a small video frame.)
+function MediaCard({ videoId, title, meta, accent = "peace", label = "Listen" }) {
+  const [playing, setPlaying] = useState(false);
+  return <figure className={`ppa-media ppa-accent-${accent}`}>
+    {playing
+      ? <iframe src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`} title={title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+      : <button type="button" className="ppa-media-cover" onClick={() => setPlaying(true)} aria-label={`${label}: ${title}`}>
+        <span className="ppa-media-rings" aria-hidden="true" /><span className="ppa-media-play" aria-hidden="true"><Play size={22} weight="fill" /></span>
+        <span className="ppa-media-text"><strong>{title}</strong><small>{meta}</small></span>
+      </button>}
+  </figure>;
+}
+
 function SilentSittingPanel() {
-  const [seconds, setSeconds] = useState(120);
-  const [running, setRunning] = useState(false);
-
-  useEffect(() => {
-    if (!running || seconds === 0) return undefined;
-    const timer = window.setInterval(() => setSeconds((value) => value - 1), 1000);
-    return () => window.clearInterval(timer);
-  }, [running, seconds]);
-
-  useEffect(() => { if (seconds === 0) setRunning(false); }, [seconds]);
-  const display = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
-
   return <>
-    <SectionHero image="silent-sitting.jpg" imagePosition="50% 34%" eyebrow="01 · The loudest lesson is silence" title="Silent Sitting">
-      The first moments at SRSS are among the hardest and most important parts of the morning. Eyes closed, hands resting and breathing slow, the whole school sits still. Before the mind can learn, it must first be quiet.
+    <SectionHero image="silent-sitting-practice.jpg" imagePosition="50% 40%" eyebrow="01 · Every school day begins here" title="Silent Sitting">
+      Every SRSS day begins with ten minutes of Silent Sitting for every pupil and teacher. It is not a religious practice. It is a mindfulness experience, guided by creative visualisation, that helps the mind settle before learning begins.
     </SectionHero>
-    <section className="ppa-timer-section">
-      <div className="ppa-wrap ppa-timer-grid">
-        <div><p className="eyebrow">A quiet beginning</p><h3>Two minutes of stillness.</h3><p>Use this simple timer for practice at home or in class. Sit comfortably, soften your gaze or close your eyes, and bring your attention to the breath.</p></div>
-        <div className="ppa-timer" aria-live="polite"><strong>{display}</strong><span>{seconds === 0 ? "Stillness complete" : running ? "Breathe slowly" : "Ready when you are"}</span><div><button type="button" onClick={() => setRunning((value) => !value)} disabled={seconds === 0}>{running ? <Pause size={17} weight="fill" /> : <Play size={17} weight="fill" />}{running ? "Pause" : "Begin"}</button><button type="button" onClick={() => { setRunning(false); setSeconds(120); }}>Reset</button></div></div>
+    <section className="ppa-light-section ppa-silent">
+      <div className="ppa-wrap">
+        <ul className="ppa-silent-facts">
+          <li><Clock size={24} aria-hidden="true" /><strong>7.30 am sharp</strong><span>Ten minutes, every school day. Silent Sitting is compulsory for all, with no exceptions.</span></li>
+          <li><UsersThree size={24} aria-hidden="true" /><strong>Mondays, together</strong><span>The whole school practises as one at the Monday assembly.</span></li>
+          <li><BookOpen size={24} aria-hidden="true" /><strong>Other days, in class</strong><span>Each class practises together at the start of its first period.</span></li>
+        </ul>
+        <div className="ppa-silent-grid">
+          <article>
+            <p className="eyebrow">Why we begin in silence</p>
+            <h3>A calm start makes everything easier.</h3>
+            <p>Teaching is harder today. Teachers everywhere face more trouble with discipline, shorter attention spans and pupils who struggle to stay motivated. Life is busier and more complicated for children too.</p>
+            <p>For the good of both pupils and teachers, we look for simple ways to help, ones that work in the classroom without taking much time from lessons. Silent Sitting and creative visualisation are two of them.</p>
+            <h4>Learning to enjoy our own company</h4>
+            <p>Part of finding inner peace is learning to be happy in our own company, rather than always looking for others to fill the quiet. Everyone needs time to be completely alone, and to enjoy it. Yet many children have never been fully alone, out of sight and hearing of another person.</p>
+          </article>
+          <article className="ppa-silent-aims">
+            <p className="eyebrow">Aim and objectives</p>
+            <h3>Stillness lets us see who we really are.</h3>
+            <p>When the mind is full of one thought after another, we cannot look inside ourselves. In stillness, children can experience the qualities of Peace, Love, Truth, Right Conduct and Non-violence that lie within, listen to the voice of God, their conscience, and discover a happiness that lasts. In the Sathya Sai Human Values Programme, Silent Sitting aims to develop:</p>
+            <ul>{SILENT_AIMS.map((aim) => <li key={aim}>{aim}</li>)}</ul>
+            <p>There are sound reasons in brain physiology for the practice, but perhaps its greatest gift is the chance to develop control over the mind.</p>
+          </article>
+        </div>
+        <section className="ppa-research" aria-labelledby="ppa-research-title">
+          <h3 id="ppa-research-title">What the research says</h3>
+          <div><p>Meditation and quiet reflection have helped disruptive or inattentive pupils (Bealing, 1997). One study found that it improved children’s decision making and put them in touch with their deeper values (Rozman, 1994); another found it helped them cope better with stressful events (Rickard, 1994). Other benefits have included less impulsive behaviour, longer attention spans and better behaviour overall (Kratter &amp; Hogan, 1982).</p>
+          <details><summary>References</summary><ol>{SILENT_REFERENCES.map((item) => <li key={item}>{item}</li>)}</ol></details></div>
+        </section>
+        <section className="ppa-guides" aria-labelledby="ppa-guides-title">
+          <div className="ppa-guides-head"><Headphones size={28} aria-hidden="true" /><div><p className="eyebrow">Daily guided visualisations</p><h3 id="ppa-guides-title">A different journey each morning.</h3><p>Each day pupils follow a 7–10 minute audio guide, exploring themes such as love, light, courage and gratitude. Try one at home.</p></div></div>
+          <div className="ppa-guides-grid">{VISUALISATIONS.map((item) => <MediaCard key={item.id} videoId={item.id} title={item.title} meta={`${item.theme} · guided audio`} accent={item.accent} />)}</div>
+          <p className="ppa-credit">Audio guides by the Sathya Sai Baba Centre of Bandar Klang.</p>
+        </section>
       </div>
     </section>
-  </>;
-}
-
-function NegarakuPanel() {
-  const [showAudio, setShowAudio] = useState(false);
-  return <>
-    <SectionHero image="malaysia-flag.jpg" imagePosition="70% 40%" eyebrow="02 · Standing to attention" title="Negaraku">
-      Our first lesson in duty is not taught in a textbook — it is practised each morning. Standing tall, the school sings the national anthem as the Jalur Gemilang is raised.
-    </SectionHero>
-    <section className="ppa-light-section"><div className="ppa-wrap ppa-lyrics-layout"><article><span className="ppa-gold-rule" />{NEGARAKU.map((line, index) => <p className={index === 0 ? "lead" : ""} key={line + index}>{line}</p>)}<small>Patriotism · Negaraku</small></article><aside><SpeakerHigh size={28} /><h3>Listen and practise</h3><p>Load a classroom-practice recording when you are ready to sing.</p><button type="button" className="ppa-outline-button" onClick={() => setShowAudio((value) => !value)}>{showAudio ? "Close recording" : "Load recording"}</button>{showAudio && <iframe src="https://www.youtube-nocookie.com/embed/t44hyUvRe8Y" title="Negaraku — national anthem of Malaysia" allow="encrypted-media; picture-in-picture" allowFullScreen />}</aside></div></section>
-  </>;
-}
-
-function AnthemPanel() {
-  const [gloss, setGloss] = useState("en");
-  const active = GLOSSES.find((item) => item.id === gloss);
-  return <>
-    <SectionHero image="school-sunrise.jpg" imagePosition="50% 50%" align="right" eyebrow="03 · The school’s own song" title="SRSS Anthem" subtitle="Keunggulan insan tujuan kami">
-      Our anthem names what we are here for: human excellence. Truth and justice are its call; kindness is its golden rule.
-    </SectionHero>
-    <section className="ppa-anthem-section"><div className="ppa-wrap"><div className="ppa-anthem-heading"><div><p className="eyebrow">The words</p><h3>Verse by verse.</h3></div><div className="ppa-gloss-tabs" role="tablist" aria-label="Anthem reading language">{GLOSSES.map((item) => <button type="button" role="tab" aria-selected={gloss === item.id} key={item.id} onClick={() => setGloss(item.id)}>{item.label}</button>)}</div></div><p className="ppa-gloss-note">{active.note} The anthem is always sung in Bahasa Melayu.</p><div className="ppa-anthem-verses">{ANTHEM.map((verse, index) => <article key={index}><span>Verse {index + 1}</span><div>{verse.ms.map((line, lineIndex) => <div className="ppa-anthem-line" key={line}><strong>{line}</strong><p lang={gloss === "ta" ? "ta" : gloss === "zh" ? "zh" : undefined}>{verse[gloss][lineIndex]}</p></div>)}</div></article>)}</div></div></section>
-  </>;
-}
-
-function RukunPanel() {
-  return <>
-    <SectionHero image="assembly-rows.jpg" imagePosition="50% 55%" eyebrow="04 · Recited together" title="Rukun Negara">
-      The five national principles are recited by the whole school after the anthem — one community, speaking with shared purpose.
-    </SectionHero>
-    <section className="ppa-rukun-section"><div className="ppa-wrap"><blockquote>Maka kami, rakyat Malaysia, berikrar akan menumpukan seluruh tenaga dan usaha kami untuk mencapai cita-cita tersebut berdasarkan atas prinsip-prinsip yang berikut<cite>Rukun Negara · preamble</cite></blockquote><div className="ppa-rukun-grid">{RUKUN.map(([ms, en, value], index) => <article className={`ppa-value-${value}`} key={ms}><strong>{index + 1}</strong><h3>{ms}</h3><p>{en}</p></article>)}</div></div></section>
-  </>;
-}
-
-function PledgePanel() {
-  return <>
-    <SectionHero image="values-boards.jpg" imagePosition="70% 50%" eyebrow="05 · Right hand on heart" title="The SRSS School Pledge">
-      Five values, said aloud each morning. The pledge helps every child name what they are practising — and promise it in their own voice.
-    </SectionHero>
-    <section className="ppa-pledge-section"><div className="ppa-wrap"><p className="ppa-pledge-opening">We are the children of Sathya Sai,<br/>striving to be ideal Sai students,<br/>shaped by Devotion, Duty and Discipline,<br/>guided by Discrimination and Determination.</p><div className="ppa-pledge-values">{PLEDGE_VALUES.map(([value, ms, verb, lines, color]) => <article className={`ppa-value-${color}`} key={value}><span /><div><small>I pledge to {verb}</small><h3>{value}</h3><em>{ms}</em></div><p>{lines}</p></article>)}</div><div className="ppa-pledge-closing"><p>I will love and respect my parents, teachers and elders in all circumstances.<br/>I will use my senses wisely, serve society and protect my country.<br/>I will bring a good name to my family, my school and to Swami,<br/>and let Love flow in all I think, say and do.</p><div><strong>Love all, Serve all.</strong><span>The last line of the pledge, and the first rule of the school.</span></div></div></div></section>
   </>;
 }
 
@@ -202,24 +229,92 @@ function PrayersPanel() {
   const [activeId, setActiveId] = useState("morning");
   const active = useMemo(() => PRAYERS.find((prayer) => prayer.id === activeId), [activeId]);
   return <>
-    <SectionHero image="prayer-leader.jpg" imagePosition="60% 35%" align="right" eyebrow="06 · Through the day" title="Prayers">
-      Four prayers mark the school day — one to open it, one over lunch, one to close it, and one to dedicate everything in between.
+    <SectionHero image="prayer-at-microphone.jpg" imagePosition="35% 30%" align="right" eyebrow="02 · After the silence" title="School Prayers">
+      After Silent Sitting, the school prays together. Three prayers mark the day: one to open it, one before lunch and one to close it.
     </SectionHero>
-    <section className="ppa-prayers-section"><div className="ppa-wrap ppa-prayer-reader"><div className="ppa-prayer-tabs" role="tablist" aria-label="School prayers">{PRAYERS.map(({ id, tab, title, Icon }) => <button type="button" role="tab" aria-selected={activeId === id} onClick={() => setActiveId(id)} key={id}><Icon size={20} /><span><strong>{tab}</strong><small>{title}</small></span></button>)}</div><article><p className="eyebrow">{active.when}</p><h3>{active.title}</h3><span className="ppa-gold-rule" />{active.stanzas.map((stanza, index) => <p className="ppa-prayer-stanza" key={index}>{stanza.map((line) => <span key={line}>{line}</span>)}</p>)}</article></div></section>
+    <section className="ppa-prayers-section"><div className="ppa-wrap ppa-prayer-reader"><div className="ppa-prayer-tabs" role="tablist" aria-label="School prayers">{PRAYERS.map(({ id, tab, title, Icon, accent }) => <button type="button" role="tab" aria-selected={activeId === id} className={`ppa-tint-${accent}`} onClick={() => setActiveId(id)} key={id}><Icon size={20} /><span><strong>{tab}</strong><small>{title}</small></span></button>)}</div><article className={`ppa-prayer-text ppa-tint-${active.accent}`} key={active.id}><p className="eyebrow">{active.when}</p><h3>{active.title}</h3><span className="ppa-spectrum-rule" aria-hidden="true" />{active.stanzas.map((stanza, index) => <p className="ppa-prayer-stanza" key={index}>{stanza.map((line) => <span key={line}>{prayerLine(line)}</span>)}</p>)}</article></div></section>
+  </>;
+}
+
+function NegarakuPanel() {
+  const [factsOpen, setFactsOpen] = useState(false);
+  const dialog = useRef(null);
+  useEffect(() => { if (factsOpen) dialog.current?.showModal(); }, [factsOpen]);
+  return <>
+    <SectionHero image="negaraku-flag-raising.jpg" imagePosition="40% 30%" eyebrow="03 · Standing to attention" title="Negaraku">
+      Our first lesson in duty is not taught in a textbook. It is practised each morning. Standing tall, the school sings the national anthem as the Jalur Gemilang is raised.
+    </SectionHero>
+    <section className="ppa-light-section"><div className="ppa-wrap ppa-lyrics-layout"><article><span className="ppa-gold-rule" />{NEGARAKU.map((line, index) => <p className={index === 0 ? "lead" : ""} key={line + index}>{line}</p>)}<small>Patriotism · Negaraku</small></article>
+      <aside><MediaCard videoId="Kpi8lB4srDU" title="Lagu Negaraku" meta="Official version · Jabatan Penerangan Malaysia" accent="truth" label="Play" /><button type="button" className="ppa-facts-button" onClick={() => setFactsOpen(true)}><Info size={20} aria-hidden="true" /> Did you know?</button></aside>
+    </div></section>
+    {factsOpen && <dialog ref={dialog} className="ppa-facts" aria-labelledby="ppa-facts-title" onClose={() => setFactsOpen(false)} onCancel={() => setFactsOpen(false)}>
+      <button type="button" className="ppa-facts-close" onClick={() => dialog.current?.close()} aria-label="Close"><X size={20} /></button>
+      <p className="eyebrow">Did you know?</p>
+      <h3 id="ppa-facts-title">The story behind Negaraku</h3>
+      <ul>
+        <li><strong>A melody that travelled.</strong> The tune is traced to “La Rosalie”, a 19th-century French melody associated with Pierre-Jean de Béranger, which later became the traditional Malay and Indonesian song “Terang Bulan”.</li>
+        <li><strong>From a state anthem.</strong> Negaraku comes from the state anthem of Perak, “Allah Lanjutkan Usia Sultan”.</li>
+        <li><strong>Chosen in 1957.</strong> When a worldwide contest failed to produce a suitable national song, a committee led by Tunku Abdul Rahman chose the Perak melody for the newly independent Federation of Malaya.</li>
+      </ul>
+    </dialog>}
+  </>;
+}
+
+function RukunPanel() {
+  return <>
+    <SectionHero image="assembly-rows.jpg" imagePosition="50% 55%" eyebrow="04 · Recited together" title="Rukun Negara">
+      The five national principles are recited by the whole school after the anthem: one community, speaking with shared purpose.
+    </SectionHero>
+    <section className="ppa-rukun-section"><div className="ppa-wrap">
+      <div className="ppa-rukun-preamble">
+        <p className="ppa-rukun-lead">Maka kami, rakyat Malaysia, berikrar akan menumpukan seluruh tenaga dan usaha kami untuk mencapai cita-cita tersebut berdasarkan atas prinsip-prinsip yang berikut:</p>
+      </div>
+      <div className="ppa-rukun-grid">{RUKUN.map(([ms, en, value], index) => <article className={`ppa-value-${value}`} key={ms}><strong>{index + 1}</strong><h3>{ms}</h3><p>{en}</p></article>)}</div>
+    </div></section>
+  </>;
+}
+
+function AnthemPanel() {
+  const [gloss, setGloss] = useState(null);
+  const active = GLOSSES.find((item) => item.id === gloss);
+  return <>
+    <SectionHero image="school-flag-raising.jpg" imagePosition="40% 35%" align="right" eyebrow="05 · The school’s own song" title="SRSS Anthem" subtitle="Keunggulan insan tujuan kami">
+      Our anthem names what we are here for: human excellence. Truth and justice are its call; kindness is its golden rule.
+    </SectionHero>
+    <section className="ppa-anthem-section"><div className="ppa-wrap"><div className="ppa-anthem-heading"><div><p className="eyebrow">Sung in Bahasa Melayu</p><h3>The whole anthem.</h3></div><div className="ppa-gloss-tabs" role="group" aria-label="Show the meaning">{GLOSSES.map((item) => <button type="button" aria-pressed={gloss === item.id} key={item.id} onClick={() => setGloss(gloss === item.id ? null : item.id)}>{item.label}</button>)}</div></div>
+      <p className="ppa-gloss-note">{active ? `${active.note} The anthem is always sung in Bahasa Melayu.` : "Choose a language above to show the meaning beside each line."}</p>
+      <div className={`ppa-anthem-verses${gloss ? " has-gloss" : ""}`}>{ANTHEM.map((verse, index) => <article key={index}>{verse.ms.map((line, lineIndex) => <div className="ppa-anthem-line" key={line}><strong>{line}</strong>{gloss && <p lang={gloss === "ta" ? "ta" : gloss === "zh" ? "zh" : undefined}>{verse[gloss][lineIndex]}</p>}</div>)}</article>)}</div>
+    </div></section>
+  </>;
+}
+
+function PledgePanel() {
+  return <>
+    <SectionHero image="pledge-hand-raised.jpg" imagePosition="45% 35%" eyebrow="06 · Right hand raised" title="SRSS School Pledge">
+      Said aloud each morning, the pledge helps every child name the values they practise, and promise them in their own voice.
+    </SectionHero>
+    <section className="ppa-pledge-section"><div className="ppa-wrap ppa-pledge-text">{PLEDGE.map((stanza, index) => <p key={index} className={index === PLEDGE.length - 1 ? "ppa-pledge-final" : ""}>{stanza.map((line) => <span key={line}>{accentLine(line)}</span>)}</p>)}</div></section>
   </>;
 }
 
 const PANELS = {
   "silent-sitting": SilentSittingPanel,
-  negaraku: NegarakuPanel,
-  anthem: AnthemPanel,
-  "rukun-negara": RukunPanel,
-  pledge: PledgePanel,
   prayers: PrayersPanel,
+  negaraku: NegarakuPanel,
+  "rukun-negara": RukunPanel,
+  anthem: AnthemPanel,
+  pledge: PledgePanel,
 };
 
 export function PrayerPledgeAnthemPage() {
-  const [active, setActive] = useState("silent-sitting");
+  // Deep links such as /resources/prayer-pledge-anthem#prayers open that part of the sequence.
+  const fromHash = () => { const id = window.location.hash.slice(1); return ORDER.some((item) => item.id === id) ? id : null; };
+  const [active, setActive] = useState(() => fromHash() || "silent-sitting");
+  useEffect(() => {
+    const onHash = () => { const id = fromHash(); if (id) setActive(id); };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
   const ActivePanel = PANELS[active];
   const selectPanel = (id) => { setActive(id); window.setTimeout(() => document.querySelector(".ppa-active-panel")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }), 0); };
 
@@ -227,7 +322,7 @@ export function PrayerPledgeAnthemPage() {
     <section className="ppa-page-hero">
       <img src={`${ASSET_ROOT}/seated-rows.png`} alt="SRSS pupils seated together during morning assembly" />
       <div className="ppa-page-hero-scrim" />
-      <div className="ppa-wrap ppa-page-hero-inner"><nav aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/#learning">Resources</a><span>›</span><strong>Prayer, Pledge &amp; Anthem</strong></nav><p className="eyebrow">Anthem · Pledge · Silence · Prayer</p><h1>Before the<br/><em>First Bell</em></h1><p>Anthem. Pledge. Silence. Prayer. This is how an SRSS morning begins — and why it stays with a child for life. Learn the words, practise them at home and carry their meaning into the day.</p></div>
+      <div className="ppa-wrap ppa-page-hero-inner"><nav aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/#learning">Resources</a><span>›</span><strong>Prayer, Pledge &amp; Anthem</strong></nav><p className="eyebrow">Silence · Prayer · Anthem · Pledge</p><h1>Before the<br/><em>First Bell</em></h1><p>Silence. Prayer. Anthem. Pledge. This is how an SRSS morning begins — and why it stays with a child for life. Learn the words, practise them at home and carry their meaning into the day.</p></div>
     </section>
 
     <section className="ppa-order-section" aria-label="Assembly order"><div className="ppa-wrap ppa-order" role="tablist" aria-label="Choose an assembly practice">{ORDER.map(({ id, label, note, Icon }, index) => <button type="button" role="tab" aria-selected={active === id} aria-controls={`ppa-panel-${id}`} key={id} onClick={() => selectPanel(id)}><span><Icon size={18} /><b>{String(index + 1).padStart(2, "0")}</b></span><strong>{label}</strong><small>{note}</small></button>)}</div></section>
