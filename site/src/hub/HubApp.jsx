@@ -61,7 +61,7 @@ function Shell() {
   return <div className={`hub-shell hub-shell-${auth.currentHub}`}>
     <a className="hub-skip" href="#hub-main">Skip to content</a>
     <header className="hub-topbar">
-      <Link to="/hub" className="hub-brand"><img src="/assets/srss-logo.png" alt="" /><span><strong>SRSS Digital Hub</strong><small>Sekolah Rendah Sathya Sai</small></span></Link>
+      <a href="/" className="hub-brand" aria-label="SRSS Digital Hub · go to the school homepage"><img src="/assets/srss-logo.png" alt="" /><span><strong>SRSS Digital Hub</strong><small>Sekolah Rendah Sathya Sai</small></span></a>
       <div className="hub-topbar-actions">
         {/* Role switcher for people holding several roles (AUTH-001 AC3). */}
         {auth.hubs.length > 1 && <label className="hub-switcher"><span className="hub-visually-hidden">View as</span><select value={auth.currentHub} onChange={(event) => switchTo(event.target.value)}>{auth.hubs.map((hub) => <option key={hub} value={hub}>{HUB_LABELS[hub]}</option>)}</select></label>}
@@ -74,6 +74,7 @@ function Shell() {
       <nav aria-label="Hub navigation" className="hub-nav">{nav.map(({ hub, routes }) => <div key={hub}>{hub !== "dashboard" && <p>{HUB_LABELS[hub]}</p>}<ul>{routes.map((route) => <li key={route.path}><NavLink to={route.path} end>{route.index ? "Dashboard" : route.label}{MODULES[route.module]?.phase > 1 && <span className="hub-phase" title={`Planned for phase ${MODULES[route.module].phase}`}>P{MODULES[route.module].phase}</span>}</NavLink></li>)}</ul></div>)}</nav>
       <main className="hub-main" id="hub-main"><Outlet /></main>
     </div>
+    <HubFooter />
   </div>;
 }
 
@@ -133,4 +134,13 @@ export function HubApp() {
       </Routes>
     </BrowserRouter>
   </AuthProvider>;
+}
+
+// Shared footer for the hub and sign-in pages: the way back to the public website and the school office.
+export function HubFooter() {
+  return <footer className="hub-footer">
+    <div><strong>Sekolah Rendah Sathya Sai</strong><span>6, Jalan Puchong, Taman Tan Yew Lai, 58200 Kuala Lumpur · <a href="tel:+60126001926">+60 12-600 1926</a> · <a href="mailto:saischoolpuchong@gmail.com">saischoolpuchong@gmail.com</a></span></div>
+    <nav aria-label="Hub footer"><a href="/">School website</a><a href="/about#top">About us</a><a href="/faq">FAQ</a><a href="/#contact">Contact the school</a></nav>
+    <small>© 2026 Sekolah Rendah Sathya Sai</small>
+  </footer>;
 }

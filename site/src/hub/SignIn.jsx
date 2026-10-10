@@ -1,3 +1,4 @@
+import { HubFooter } from "./HubApp";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
@@ -25,7 +26,7 @@ export function SignIn() {
   const run = async (action) => { setBusy(true); setError(""); setNotice(""); try { await action(); } catch (reason) { setError(authErrorMessage(reason)); } finally { setBusy(false); } };
 
   return <div className="hub-signin">
-    <header><Link to="/" reloadDocument>← Return to SRSS</Link><span><img src="/assets/srss-logo.png" alt="" /><strong>SRSS Digital Hub</strong></span></header>
+    <header><Link to="/" reloadDocument>← Return to SRSS</Link><a href="/" className="hub-brand" aria-label="SRSS Digital Hub · go to the school homepage"><img src="/assets/srss-logo.png" alt="" /><strong>SRSS Digital Hub</strong></a></header>
     <main>
       <section aria-labelledby="signin-title">
         <p className="hub-kicker">Sekolah Rendah Sathya Sai</p>
@@ -60,5 +61,6 @@ export function SignIn() {
         <p className="hub-fineprint">Accounts are issued by the school office — there is no self-registration. Trouble signing in? Contact the office.</p>
       </section>
     </main>
+    <HubFooter />
   </div>;
 }
