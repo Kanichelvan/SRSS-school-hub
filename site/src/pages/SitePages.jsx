@@ -2,11 +2,16 @@
 // shared homepage blocks (passed in as `blocks`), FAQ records and the route map. Child URLs that are
 // "sections" scroll to the matching anchor here until they earn standalone pages (see src/data/siteMap.js).
 import { useMemo, useState } from "react";
+import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
+import { CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/csr/MagnifyingGlass";
 import { FaqList, FAQ_TOPICS } from "../components/Faq.jsx";
 import { breadcrumbs, childrenOf, searchSite } from "../data/siteMap.js";
 import { contact, safeguardingLead } from "../legal/registry.js";
+import { submitPublicForm } from "../lib/publicContent.js";
+import { STUDENT_LIFE_CATEGORIES } from "../data/stories.js";
+import { srssVoices } from "../data/voices.js";
 
 const OFFICE = "saischoolpuchong@gmail.com";
 const mailto = (subject) => `mailto:${OFFICE}?subject=${encodeURIComponent(subject)}`;
@@ -102,7 +107,12 @@ export function LearningPage({ blocks, faqs }) {
 }
 
 // ---------- 03 Student Life ----------
-export function StudentLifePage({ blocks, faqs }) {
+// Category chips link to the Student Life pages, so every filter has its own address.
+export function StoryFilters({ current }) {
+  return <nav className="story-filters" aria-label="Story categories"><a href="/student-life/stories" aria-current={!current ? "page" : undefined}>All stories</a>{STUDENT_LIFE_CATEGORIES.map(([label, href]) => <a key={href} href={href} aria-current={current === label ? "page" : undefined}>{label}</a>)}</nav>;
+}
+
+export function StudentLifePage({ blocks, faqs, entry }) {
   return <main id="main" className="site-page">
     <PageHero eyebrow="Student Life" title="Growing Together. Learning for Life." image="/assets/photos/processed/sports-day-march-1600.jpg" alt="SRSS pupils taking part in a Sports Day march."
       actions={<><a className="primary-button" href="/student-life/gallery">See school life <ArrowRight size={18} /></a><a className="text-button" href="/student-life/stories">Read our stories <ArrowRight size={18} /></a></>}>
@@ -116,7 +126,7 @@ export function StudentLifePage({ blocks, faqs }) {
       </div>
     </PageSection>
     <div id="gallery" className="anchor-block">{blocks.gallery({ all: true })}</div>
-    <div id="stories" className="anchor-block">{blocks.news()}</div>
+    <div id="stories" className="anchor-block">{blocks.news({ category: entry?.category })}</div>
     <div id="events" className="anchor-block">{blocks.calendar()}</div>
     <Closing title="Come and see a school day for yourself.">
       <button type="button" className="primary-button" onClick={blocks.openVisit}>Arrange a visit <ArrowRight size={18} /></button>
@@ -126,12 +136,57 @@ export function StudentLifePage({ blocks, faqs }) {
 }
 
 // ---------- 04 Join SRSS ----------
+// Community sign-ups go to the hub’s website inbox (contactMessages) — one place for the office to reply.
+// Extra answers are folded into the message so the inbox needs no new fields.
+export function CommunityForm({ subject, intro, extra = [], messageLabel, submitLabel, note, done }) {
+  const [state, setState] = useState({ busy: false, sent: false, error: "" });
+  async function submit(event) {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(event.currentTarget));
+    const details = extra.map(([name, label]) => (data[name] ? `${label}: ${data[name]}` : "")).filter(Boolean).join("\n");
+    setState({ busy: true, sent: false, error: "" });
+    try {
+      await submitPublicForm("contactMessages", { name: data.name, email: data.email, subject, message: [details, data.message].filter(Boolean).join("\n\n") });
+      setState({ busy: false, sent: true, error: "" });
+    } catch (reason) { setState({ busy: false, sent: false, error: reason.message }); }
+  }
+  if (state.sent) return <div className="form-success community-sent" role="status"><CheckCircle size={30} weight="duotone" /><p>{done}</p></div>;
+  return (
+    <form className="school-form community-form" onSubmit={submit}>
+      {intro && <p className="wide-label community-form-intro">{intro}</p>}
+      <label>Your name<input required name="name" autoComplete="name" maxLength={120} /></label>
+      <label>Email address<input required type="email" name="email" autoComplete="email" maxLength={200} /></label>
+      {extra.map(([name, label, placeholder]) => <label key={name}>{label}<input name={name} placeholder={placeholder} maxLength={120} /></label>)}
+      <label className="wide-label">{messageLabel}<textarea required name="message" rows="4" maxLength={3500} /></label>
+      <p className="form-privacy wide-label">{note} The School uses these details to reply to you, as described in our <a href="/legal/privacy">Privacy Policy</a>.</p>
+      {state.error && <p className="form-error wide-label" role="alert">{state.error}</p>}
+      <button className="primary-button" type="submit" disabled={state.busy}>{state.busy ? "Sending…" : submitLabel} <ArrowRight size={18} weight="bold" /></button>
+    </form>
+  );
+}
+
+const MEMORY_FORM = { subject: "SRSS25 memory", extra: [["years", "Years at SRSS", "For example 2002–2007"], ["role", "You were a…", "Pupil, parent, teacher, volunteer"]], messageLabel: "Your memory of SRSS", submitLabel: "Share my memory", note: "We will ask your permission before publishing anything you share.", done: "Thank you for sharing your memory. The SRSS25 team will be in touch before using it." };
+
 const COMMUNITY = [
-  { id: "alumni", title: "Alumni", copy: "Reconnect with the school that shaped you, and share your memories for our Silver Jubilee.", actions: [["Share your SRSS memory", mailto("SRSS25 alumni memory")], ["Read alumni voices", "/about/our-people"]] },
-  { id: "volunteer", title: "Volunteer", copy: "Offer your time, expertise or practical support to school activities. Volunteers working with pupils follow our Child Protection & Safeguarding Policy.", actions: [["Offer to volunteer", mailto("Volunteering at SRSS")], ["Safeguarding policy", "/legal/child-safeguarding"]] },
-  { id: "support-srss", title: "Support SRSS", copy: "Contribute to approved school initiatives, including SRSS25 anniversary projects.", actions: [["Ask how to help", mailto("Supporting SRSS")]] },
-  { id: "parents-community", title: "Parents & Community", copy: "Take part in school-community life alongside our teachers, including through the Teacher-Parent Association.", actions: [["Contact the school office", mailto("Parents and community")], ["Current families: sign in", "/login"]] },
+  { id: "alumni", title: "Alumni", copy: "Reconnect with the school that shaped you. Tell us where life has taken you, and stay in touch for SRSS25.", form: { subject: "Alumni", extra: [["years", "Years at SRSS", "For example 2002–2007"]], messageLabel: "Where life has taken you, and how you’d like to stay in touch", submitLabel: "Register as an alumnus", note: "", done: "Thank you — you’re on the SRSS alumni list. We’ll be in touch about SRSS25." }, links: [["Read alumni voices", "/about/our-people#alumni"], ["Share an SRSS memory", "/about/silver-jubilee#memories"]] },
+  { id: "volunteer", title: "Volunteer", copy: "Offer your time, expertise or practical support to school activities.", form: { subject: "Volunteer", extra: [["availability", "When you’re available", "Weekdays, weekends, events"]], messageLabel: "How you’d like to help", submitLabel: "Offer to volunteer", note: "Volunteers who work with pupils follow the Child Protection & Safeguarding Policy, including suitability checks.", done: "Thank you for offering to help. The school office will contact you." }, links: [["Safeguarding policy", "/legal/child-safeguarding"]] },
+  { id: "support-srss", title: "Support SRSS", copy: "Contribute to approved school initiatives, including SRSS25 anniversary projects.", form: { subject: "Support SRSS", extra: [], messageLabel: "How you’d like to support the school", submitLabel: "Ask how to help", note: "", done: "Thank you. The school office will reply with the current approved initiatives." }, links: [] },
+  { id: "parents-community", title: "Parents & Community", copy: "Take part in school-community life alongside our teachers, including through the Teacher-Parent Association.", links: [["Contact the school office", "/resources/contact"], ["Current families: sign in", "/login"]] },
 ];
+
+function CommunityCard({ item }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <article id={item.id}>
+      <h3>{item.title}</h3><p>{item.copy}</p>
+      <div>
+        {item.form && <button type="button" className="reveal-toggle community-toggle" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? "Close the form" : item.form.submitLabel} <CaretDown size={15} className={open ? "turned-up" : "turned-down"} /></button>}
+        {item.links.map(([label, href]) => <a key={label} className="text-link" href={href}>{label} <ArrowRight size={15} /></a>)}
+      </div>
+      {open && <CommunityForm {...item.form} />}
+    </article>
+  );
+}
 
 export function JoinPage() {
   return <main id="main" className="site-page">
@@ -143,7 +198,7 @@ export function JoinPage() {
       <a href="/join/get-involved" className="pathway-card"><p className="eyebrow">Pathway B</p><h2>Join Our Community</h2><p>For alumni, volunteers, supporters and current families.</p><span>Get involved <ArrowRight size={17} /></span></a>
     </section>
     <PageSection id="community" eyebrow="Get involved" title="A School Built by a Community." intro="Teachers, parents, alumni and volunteers each bring something essential to a child’s education." tone="ivory">
-      <div className="community-grid">{COMMUNITY.map((item) => <article key={item.id} id={item.id}><h3>{item.title}</h3><p>{item.copy}</p><div>{item.actions.map(([label, href]) => <a key={label} className="text-link" href={href}>{label} <ArrowRight size={15} /></a>)}</div></article>)}</div>
+      <div className="community-grid">{COMMUNITY.map((item) => <CommunityCard key={item.id} item={item} />)}</div>
     </PageSection>
   </main>;
 }
@@ -250,5 +305,144 @@ export function NotFoundPage() {
     <nav className="page-directory page-inner" aria-label="Main sections">
       {[["About SRSS", "/about"], ["Learning", "/learning"], ["Student Life", "/student-life"], ["Join SRSS", "/join"], ["Resources", "/resources"]].map(([label, href]) => <a key={href} href={href}><strong>{label}</strong><ArrowRight size={16} aria-hidden="true" /></a>)}
     </nav>
+  </main>;
+}
+
+// ---------- 01C Sathya Sai Education ----------
+// Body · Mind · Heart · Spirit around Human Excellence. Replaces the static equation (Architecture v2.0
+// design correction); also used on the About page so the explanation has one source.
+const DIMENSIONS = [
+  ["Body", "Health, discipline and practical skill — caring for the body as the instrument for learning and service."],
+  ["Mind", "Knowledge, concentration and clear thinking, developed through the national curriculum and inquiry."],
+  ["Heart", "Compassion, empathy and love for others, nurtured through friendships, reflection and service."],
+  ["Spirit", "Inner peace, conscience and a sense of unity with all life, cultivated through silent sitting and reflection."],
+];
+export function IntegralFramework({ tone = "dark" }) {
+  const [active, setActive] = useState(0);
+  return (
+    <div className={`integral-framework integral-${tone}`}>
+      <div className="integral-ring" role="tablist" aria-label="The four dimensions of integral education">
+        {DIMENSIONS.map(([name], index) => <button key={name} type="button" role="tab" id={`dimension-${name}`} aria-selected={active === index} aria-controls="dimension-panel" className={`integral-node integral-node-${index + 1}`} onClick={() => setActive(index)} onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)}>{name}</button>)}
+        <div className="integral-core"><span>Human</span><strong>Excellence</strong></div>
+      </div>
+      <div className="integral-panel" id="dimension-panel" role="tabpanel" aria-labelledby={`dimension-${DIMENSIONS[active][0]}`} aria-live="polite">
+        <p className="eyebrow">Integral education</p>
+        <h3>{DIMENSIONS[active][0]}</h3>
+        <p>{DIMENSIONS[active][1]}</p>
+        <p className="integral-hint">Choose a dimension to explore how it grows at SRSS.</p>
+      </div>
+    </div>
+  );
+}
+
+// The five human values as cards in the SRSS25 petal colours; each reveals how children practise it.
+export function ValueCards({ values }) {
+  const [open, setOpen] = useState(null);
+  return (
+    <ul className="value-cards">{values.map((value, index) => (
+      <li key={value.name} className={`value-card value-card-${index + 1}`}>
+        <span className="value-card-petal" aria-hidden="true" />
+        <h3>{value.name}</h3>
+        <p>{value.description}</p>
+        <button type="button" className="value-card-toggle" aria-expanded={open === index} onClick={() => setOpen(open === index ? null : index)}>{open === index ? "Hide" : "How children practise it"} <CaretDown size={14} className={open === index ? "turned-up" : "turned-down"} /></button>
+        {open === index && <p className="value-card-practice">{value.practice}</p>}
+      </li>
+    ))}</ul>
+  );
+}
+
+const SECTIONS_SSE = [["The inspiration", "inspiration"], ["Educare", "educare"], ["Five human values", "five-values"], ["Integral education", "integral-education"], ["Head, Heart, Hands", "three-hs"], ["Around the world", "around-the-world"], ["At SRSS", "educare-in-action"], ["Questions", "questions"]];
+
+export function SathyaSaiEducationPage({ values, quote, faqs }) {
+  return <main id="main" className="site-page">
+    <PageHero eyebrow="Sathya Sai Education" title="Drawing Out What Is Already Within." image="/assets/sathya-sai-baba-portrait.jpg" alt="Illustrated portrait of Bhagawan Sri Sathya Sai Baba in an orange robe">
+      <p>Discover the philosophy of Sathya Sai Educare and an approach to education that seeks to develop the whole person.</p>
+    </PageHero>
+    <nav className="page-subnav" aria-label="On this page"><div className="page-inner">{SECTIONS_SSE.map(([label, id]) => <a key={id} href={`#${id}`}>{label}</a>)}</div></nav>
+    <PageSection id="inspiration" eyebrow="01 · The inspiration" title="Education for life, not mere living.">
+      <div className="page-split">
+        <div className="page-prose"><p>SRSS is guided by the educational vision of Bhagawan Sri Sathya Sai Baba: to draw out the human values already present in every child and help them live with purpose.</p></div>
+        <blockquote className="page-quote">“{quote}”<cite>Sathya Sai Baba · Maharani’s Women’s College, Mysore, September 1963</cite></blockquote>
+      </div>
+    </PageSection>
+    <PageSection id="educare" eyebrow="02 · Education and Educare" title="Knowledge from outside. Values from within." tone="ivory">
+      <div className="page-prose">
+        <p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p>
+        <p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p>
+      </div>
+    </PageSection>
+    <PageSection id="five-values" eyebrow="03 · The five human values" title="Truth, Right Conduct, Peace, Love and Non-Violence.">
+      <ValueCards values={values} />
+    </PageSection>
+    <section className="page-section page-section-navy" id="integral-education" aria-labelledby="integral-education-title">
+      <div className="page-inner">
+        <header className="page-section-head"><p className="eyebrow">04 · Integral education</p><h2 id="integral-education-title">Body, mind, heart and spirit, growing together.</h2></header>
+        <IntegralFramework />
+      </div>
+    </section>
+    <PageSection id="three-hs" eyebrow="05 · Head, Heart and Hands" title="Understanding, compassion and action.">
+      <ul className="page-pillars">{[["Head", "Strong learning and clear thinking."], ["Heart", "Steady character and compassion for others."], ["Hands", "Practical capability and compassionate service."]].map(([title, copy]) => <li key={title}><h3>{title}</h3><p>{copy}</p></li>)}</ul>
+      <p className="page-note">Together they make up <a href="/learning">Human Excellence</a>: developing character alongside academic capability.</p>
+    </PageSection>
+    <PageSection id="around-the-world" eyebrow="06 · Around the world" title="A global educational movement." tone="ivory">
+      <div className="page-prose"><p>Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p></div>
+    </PageSection>
+    <PageSection id="educare-in-action" eyebrow="07 · Educare in action at SRSS" title="How it shows up in a school day.">
+      <ul className="resource-list">
+        <li><a href="/resources/prayer-pledge-anthem#silent-sitting"><strong>Silent sitting</strong><span>Every morning begins with ten minutes of quiet reflection</span><ArrowRight size={16} aria-hidden="true" /></a></li>
+        <li><a href="/learning/human-values"><strong>Values in every lesson</strong><span>How the five values are woven through learning</span><ArrowRight size={16} aria-hidden="true" /></a></li>
+        <li><a href="/student-life/service"><strong>Service in action</strong><span>Stories of pupils serving their community</span><ArrowRight size={16} aria-hidden="true" /></a></li>
+      </ul>
+    </PageSection>
+    <PageSection id="questions" eyebrow="08 · Questions" title="Questions about Sathya Sai Education." tone="ivory">
+      <FaqList items={faqs} questions={FAQ_TOPICS.whySrss} idPrefix="sse" firstOpen />
+    </PageSection>
+    <Closing title="See how we integrate human values.">
+      <a className="primary-button" href="/learning/human-values">Human Values in Learning <ArrowRight size={18} /></a>
+      <a className="text-button" href="/about/our-people">Meet Our People <ArrowRight size={18} /></a>
+    </Closing>
+  </main>;
+}
+
+// ---------- 01H Silver Jubilee (SRSS25 mini-site) ----------
+const JUBILEE_NAV = [["Our journey", "journey"], ["Voices", "voices"], ["Updates", "updates"], ["Events", "events"], ["Get involved", "get-involved"], ["Share a memory", "memories"]];
+
+export function JubileePage({ blocks, motto }) {
+  const alumni = srssVoices.find((voice) => voice.id === "alumni");
+  return <main id="main" className="site-page jubilee-page">
+    <section className="landing-hero jubilee-hero" id="top">
+      <div className="page-inner jubilee-hero-grid">
+        <div>
+          <p className="eyebrow">SRSS25 · 2002–2027 · Silver Jubilee</p>
+          <h1>25 Years of Education for Life.</h1>
+          <div className="landing-hero-copy"><p>A quarter-century of learning, growing and nurturing human values — and an invitation to everyone who has been part of the journey.</p></div>
+          <div className="landing-hero-actions"><a className="primary-button" href="#memories">Share your SRSS memory <ArrowRight size={18} /></a><a className="text-button" href="#events">Anniversary events <ArrowRight size={18} /></a></div>
+        </div>
+        <figure className="jubilee-mark"><img src="/assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><figcaption>{motto}</figcaption></figure>
+      </div>
+    </section>
+    <nav className="page-subnav jubilee-subnav" aria-label="SRSS25"><div className="page-inner">{JUBILEE_NAV.map(([label, id]) => <a key={id} href={`#${id}`}>{label}</a>)}</div></nav>
+    <PageSection id="journey" eyebrow="Our 25-year journey" title="2002 — 2027.">
+      <ul className="jubilee-themes">{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((theme) => <li key={theme}><span className="value-card-petal" aria-hidden="true" /><strong>{theme}</strong></li>)}</ul>
+      <p className="page-note">Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS. The anniversary archive is being gathered now — <a href="#memories">share your memory</a> or photographs to help tell the story.</p>
+    </PageSection>
+    {alumni && <PageSection id="voices" eyebrow="Alumni memories" title="We were the beginning of something." tone="ivory">
+      <article className="jubilee-voice">
+        <img src={alumni.image} alt={alumni.alt} />
+        <div><blockquote>“{alumni.excerpt}”</blockquote><p className="quote-source">{alumni.name} · {alumni.role}</p><a className="text-link" href="/about/our-people#alumni">Read the full message <ArrowRight size={16} /></a></div>
+      </article>
+    </PageSection>}
+    <div id="updates" className="anchor-block">{blocks.news({ category: "SRSS25" })}</div>
+    <div id="events" className="anchor-block">{blocks.calendar({ category: "SRSS25" })}</div>
+    <PageSection id="get-involved" eyebrow="Get involved" title="Help write the next chapter.">
+      <ul className="resource-list">
+        <li><a href="/join/alumni"><strong>Alumni</strong><span>Register and stay in touch for SRSS25</span><ArrowRight size={16} aria-hidden="true" /></a></li>
+        <li><a href="/join/volunteer"><strong>Volunteer</strong><span>Help with anniversary events and projects</span><ArrowRight size={16} aria-hidden="true" /></a></li>
+        <li><a href="/join/support-srss"><strong>Support SRSS</strong><span>Contribute to approved anniversary projects</span><ArrowRight size={16} aria-hidden="true" /></a></li>
+      </ul>
+    </PageSection>
+    <PageSection id="memories" eyebrow="Share your SRSS memory" title="25 stories for 25 years." intro="Pupils, parents, teachers and volunteers — tell us a moment from your time at SRSS." tone="ivory">
+      <CommunityForm {...MEMORY_FORM} />
+    </PageSection>
   </main>;
 }

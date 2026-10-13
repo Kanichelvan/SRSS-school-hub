@@ -2113,3 +2113,97 @@ html.nav-locked { overflow: hidden; }
 .site-page :is(.learning-refresh, .spaces-refresh) :is(h2, h3) { color: var(--navy-950); font-family: var(--serif); font-weight: 600; letter-spacing: -.025em; }
 .site-page :is(.learning-refresh, .spaces-refresh) h2 { margin: 0; font-size: clamp(32px, 3.2vw, 46px); line-height: 1.08; }
 .site-page :is(.learning-refresh, .spaces-refresh) p { color: var(--muted); line-height: 1.8; }
+
+/* ===== Phase 2: stories, community forms, Sathya Sai Education, Silver Jubilee ===== */
+.story-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.story-filters a { padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--navy-950); background: white; font: 600 12px var(--ui); }
+.story-filters a:hover, .story-filters a:focus-visible { border-color: var(--purple-700); color: var(--purple-700); }
+.story-filters a[aria-current="page"] { border-color: var(--navy-950); color: white; background: var(--navy-950); }
+.news-head { flex-wrap: wrap; }
+
+.community-toggle { margin: 0; }
+.community-toggle .turned-down { rotate: 0deg; } .community-toggle .turned-up { rotate: 180deg; }
+.community-form { margin-top: 16px; padding-top: 18px; border-top: 1px solid var(--line); }
+.community-form-intro { margin: 0; color: var(--muted); }
+.community-sent { margin-top: 14px; padding: 22px; }
+.community-sent p { margin: 10px 0 0; }
+.jubilee-page .community-form, .page-section .community-form { max-width: 860px; }
+
+/* Body · Mind · Heart · Spirit around Human Excellence */
+.integral-framework { display: grid; grid-template-columns: minmax(260px, 420px) minmax(0, 1fr); gap: 48px; align-items: center; }
+.integral-ring { position: relative; aspect-ratio: 1; width: 100%; max-width: 420px; border: 1px dashed rgba(227, 216, 115, .45); border-radius: 50%; }
+.integral-node { position: absolute; display: grid; place-items: center; width: 31%; aspect-ratio: 1; border: 2px solid rgba(227, 216, 115, .55); border-radius: 50%; color: white; background: rgba(255, 255, 255, .06); font: 600 15px var(--ui); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: background .2s ease, border-color .2s ease, scale .2s ease; }
+.integral-node-1 { top: -4%; left: 34.5%; } .integral-node-2 { top: 34.5%; right: -4%; } .integral-node-3 { bottom: -4%; left: 34.5%; } .integral-node-4 { top: 34.5%; left: -4%; }
+.integral-node[aria-selected="true"], .integral-node:hover { border-color: var(--gold-500); color: var(--navy-950); background: var(--gold-500); scale: 1.06; }
+.integral-node:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+.integral-core { position: absolute; inset: 33%; display: grid; place-content: center; text-align: center; border-radius: 50%; background: var(--navy-800); box-shadow: 0 0 0 6px rgba(227, 216, 115, .18); }
+.integral-core span { color: rgba(255, 255, 255, .7); font: 500 11px var(--ui); letter-spacing: .14em; text-transform: uppercase; }
+.integral-core strong { color: var(--gold-500); font: 600 clamp(15px, 1.6vw, 20px) var(--serif); }
+.integral-panel { min-height: 190px; }
+.integral-panel .eyebrow { color: var(--gold-500); }
+.integral-panel h3 { margin: 6px 0 12px; color: white; font: 600 clamp(30px, 3vw, 42px) var(--serif); }
+.integral-panel p:not(.eyebrow) { margin: 0; color: rgba(255, 255, 255, .85); font-size: 17px; line-height: 1.75; }
+.integral-panel .integral-hint { margin-top: 18px; color: rgba(255, 255, 255, .55); font-size: 13px; }
+.educare-grid .integral-framework { grid-template-columns: 1fr; gap: 28px; }
+.educare-grid .integral-ring { max-width: 360px; margin: 0 auto; }
+
+/* Five human values — SRSS25 petal colours */
+.value-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.value-card { display: grid; align-content: start; gap: 10px; padding: 22px 18px; border: 1px solid var(--line); border-radius: 16px; background: white; }
+.value-card-petal { width: 30px; height: 30px; border-radius: 50% 50% 50% 10%; box-shadow: var(--petal-rim); rotate: -45deg; }
+.value-card-1 .value-card-petal, .jubilee-themes li:nth-child(1) .value-card-petal { background: var(--petal-truth); }
+.value-card-2 .value-card-petal, .jubilee-themes li:nth-child(2) .value-card-petal { background: var(--petal-conduct); }
+.value-card-3 .value-card-petal, .jubilee-themes li:nth-child(3) .value-card-petal { background: var(--petal-peace); }
+.value-card-4 .value-card-petal, .jubilee-themes li:nth-child(4) .value-card-petal { background: var(--petal-love); }
+.value-card-5 .value-card-petal, .jubilee-themes li:nth-child(5) .value-card-petal { background: var(--petal-nonviolence); }
+.value-card h3 { margin: 6px 0 0; color: var(--navy-950); font: 600 20px var(--serif); }
+.value-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.value-card-toggle { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 0; border: 0; color: var(--purple-700); background: none; font: 600 12px var(--ui); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.value-card-toggle:hover { color: var(--navy-800); }
+.value-card-toggle .turned-down { rotate: 0deg; } .value-card-toggle .turned-up { rotate: 180deg; }
+.value-card-practice { padding: 10px 12px; border-radius: 10px; color: var(--navy-950) !important; background: var(--cream); }
+
+/* Page sub-navigation, prose and quotes */
+.page-subnav { position: sticky; top: 0; z-index: 15; border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, .96); backdrop-filter: blur(6px); }
+.page-subnav .page-inner { display: flex; gap: 6px 22px; overflow-x: auto; padding: 12px 0; scrollbar-width: none; }
+.page-subnav a { flex-shrink: 0; color: var(--navy-950); font: 600 12px var(--ui); white-space: nowrap; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 4px; }
+.page-subnav a:hover, .page-subnav a:focus-visible { color: var(--purple-700); text-decoration-color: currentColor; }
+.site-page .page-section, .site-page .anchor-block { scroll-margin-top: 52px; }
+.page-section-navy { color: white; background: var(--navy-900); }
+.page-section-navy .page-section-head .eyebrow { color: var(--gold-500); }
+.page-section-navy .page-section-head h2 { color: white; }
+.page-prose { max-width: 760px; }
+.page-prose p { margin: 0 0 14px; color: var(--ink); font-size: 17px; line-height: 1.8; }
+.page-quote { margin: 0; padding: 26px 28px; border-left: 4px solid var(--gold-700); border-radius: 0 16px 16px 0; color: var(--navy-950); background: var(--cream); font: italic 600 22px/1.45 var(--serif); }
+.page-quote cite { display: block; margin-top: 14px; color: var(--muted); font: normal 500 12px var(--ui); letter-spacing: .04em; }
+
+/* Silver Jubilee mini-site */
+.jubilee-hero-grid { display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; gap: 48px; padding: 64px 0; }
+.jubilee-mark { display: grid; justify-items: center; gap: 14px; margin: 0; }
+.jubilee-mark img { width: min(100%, 300px); }
+.jubilee-mark figcaption { color: var(--gold-500); font: 600 13px var(--ui); letter-spacing: .06em; text-align: center; }
+.jubilee-subnav { background: rgba(255, 255, 255, .97); }
+.jubilee-themes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+.jubilee-themes li { display: grid; justify-items: start; gap: 12px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: white; }
+.jubilee-themes strong { color: var(--navy-950); font: 600 18px var(--serif); }
+.jubilee-voice { display: grid; grid-template-columns: 200px 1fr; gap: 32px; align-items: center; max-width: 860px; }
+.jubilee-voice img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 16px; }
+.jubilee-voice blockquote { margin: 0; color: var(--navy-950); font: italic 600 clamp(22px, 2.4vw, 30px)/1.35 var(--serif); }
+
+@media (max-width: 1100px) {
+  .value-cards, .jubilee-themes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .integral-framework, .jubilee-hero-grid, .jubilee-voice { grid-template-columns: 1fr; }
+  .integral-ring { max-width: 340px; margin: 0 auto; }
+  .jubilee-voice img { max-width: 200px; }
+}
+@media (max-width: 620px) {
+  .value-cards, .jubilee-themes { grid-template-columns: 1fr; }
+  .integral-node { font-size: 12px; }
+  .community-form { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .integral-node { transition: none; }
+  .integral-node[aria-selected="true"], .integral-node:hover { scale: 1; }
+}

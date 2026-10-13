@@ -218,6 +218,7 @@ describe("PUB-002 CMS and public admissions", () => {
     await assertSucceeds(setDoc(doc(anon(), "contactMessages/m1"), message));
     await assertFails(setDoc(doc(anon(), "contactMessages/m2"), { ...message, subject: "Spam" }));
     await assertFails(setDoc(doc(anon(), "contactMessages/m3"), { ...message, extra: true }));
+    for (const subject of ["Alumni", "Volunteer", "Support SRSS", "SRSS25 memory"]) await assertSucceeds(setDoc(doc(anon(), `contactMessages/c-${subject.replace(/\W/g, "")}`), { ...message, subject }));
     await assertFails(getDoc(doc(anon(), "contactMessages/m1")));
     await assertFails(getDoc(doc(as("teacher"), "contactMessages/m1")));
     await assertSucceeds(getDoc(doc(as("admin"), "contactMessages/m1")));

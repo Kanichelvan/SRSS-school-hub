@@ -19,7 +19,7 @@ export const SITE = [
   { path: "/about/our-people", label: "Our People", parent: "/about", page: "ourPeople", status: "page", owner: "Leadership", summary: "The Principal’s welcome and the voices of our teachers and alumni." },
   { path: "/about/school-profile", label: "School Profile", parent: "/about", page: "about", anchor: "school-profile", status: "section", owner: "School office", summary: "Key facts: registration, levels, curriculum, hours and location." },
   { path: "/about/campus", label: "Campus", parent: "/about", page: "about", anchor: "campus", status: "section", owner: "School office", summary: "The spaces where children learn, play and grow." },
-  { path: "/about/silver-jubilee", label: "Silver Jubilee", parent: "/about", page: "about", anchor: "srss25", status: "section", owner: "Content editor", summary: "SRSS25 — 25 years of education for life." },
+  { path: "/about/silver-jubilee", label: "Silver Jubilee", parent: "/about", page: "jubilee", status: "page", owner: "Content editor", summary: "SRSS25 — 25 years of education for life." },
 
   // 02 Learning — how we educate
   { path: "/learning", label: "Learning", page: "learning", status: "page", owner: "Academic coordinator", summary: "How SRSS educates the whole child." },
@@ -34,11 +34,11 @@ export const SITE = [
   // 03 Student Life — what children experience
   { path: "/student-life", label: "Student Life", page: "studentLife", status: "page", owner: "Content editor", summary: "What children experience at SRSS." },
   { path: "/student-life/events", label: "Events", parent: "/student-life", page: "studentLife", anchor: "events", status: "section", owner: "Content editor", summary: "School celebrations and upcoming dates." },
-  { path: "/student-life/sports", label: "Sports", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "Sports, physical education and house activities." },
-  { path: "/student-life/arts-culture", label: "Arts & Culture", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "Music, performances, arts and cultural activities." },
-  { path: "/student-life/service", label: "Service", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "Community service and character in action." },
-  { path: "/student-life/leadership", label: "Student Leadership", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "Leadership opportunities and responsibilities." },
-  { path: "/student-life/achievements", label: "Achievements", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "Competitions, awards and accomplishments." },
+  { path: "/student-life/sports", label: "Sports", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Sports", status: "section", owner: "Content editor", summary: "Sports, physical education and house activities." },
+  { path: "/student-life/arts-culture", label: "Arts & Culture", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Arts & Culture", status: "section", owner: "Content editor", summary: "Music, performances, arts and cultural activities." },
+  { path: "/student-life/service", label: "Service", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Service", status: "section", owner: "Content editor", summary: "Community service and character in action." },
+  { path: "/student-life/leadership", label: "Student Leadership", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Leadership", status: "section", owner: "Content editor", summary: "Leadership opportunities and responsibilities." },
+  { path: "/student-life/achievements", label: "Achievements", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Achievements", status: "section", owner: "Content editor", summary: "Competitions, awards and accomplishments." },
   { path: "/student-life/stories", label: "Stories", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "School stories and student experiences." },
   { path: "/student-life/gallery", label: "Gallery", parent: "/student-life", page: "studentLife", anchor: "gallery", status: "section", owner: "Content editor", summary: "Curated photographs of school life." },
 

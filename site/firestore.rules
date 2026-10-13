@@ -373,7 +373,7 @@ service cloud.firestore {
         && data().status == 'new' && data().createdAt == request.time
         && data().name is string && data().name.size() > 0 && data().name.size() <= 120
         && data().email is string && data().email.size() <= 200
-        && data().subject in ['General', 'Admissions', 'Feedback', 'Other']
+        && data().subject in ['General', 'Admissions', 'Feedback', 'Other', 'Alumni', 'Volunteer', 'Support SRSS', 'SRSS25 memory']
         && data().message is string && data().message.size() > 0 && data().message.size() <= 4000;
       allow read: if hasAny(['schoolAdmin', 'leadership', 'admissionsOfficer']);
       allow update: if hasAny(['schoolAdmin', 'leadership']) && unchanged(['name', 'email', 'subject', 'message', 'createdAt']);

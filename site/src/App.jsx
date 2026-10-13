@@ -36,8 +36,9 @@ import { defaultFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
 import { signInLink, siteNav } from "./data/navigation.js";
 import { resolvePath } from "./data/siteMap.js";
+import { storyCategory } from "./data/stories.js";
 import { FaqAccordion, FaqList, FAQ_TOPICS } from "./components/Faq.jsx";
-import { AdmissionsPage, Breadcrumbs, GovernancePage, JoinPage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SiteSearch, StudentLifePage } from "./pages/SitePages.jsx";
+import { AdmissionsPage, Breadcrumbs, GovernancePage, IntegralFramework, JoinPage, JubileePage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SathyaSaiEducationPage, SiteSearch, StoryFilters, StudentLifePage } from "./pages/SitePages.jsx";
 import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
 
 // Policy pages load on demand so their text never weighs on the homepage.
@@ -131,13 +132,6 @@ const defaultHomepageContent = {
 
 const inspirationQuote = "Education is not for mere living; it is for life, a fuller life, a more meaningful, and a more worthwhile life.";
 
-function InspirationPage() {
-  return <main id="main" className="inspiration-page">
-    <section className="inspiration-hero"><div className="about-inner inspiration-hero-grid"><div><p className="eyebrow">Our inspiration · Founder</p><h1>Education for life,<br/><em>inspired by character.</em></h1><p>SRSS is guided by the educational vision of Bhagawan Sri Sathya Sai Baba: to draw out the human values already present in every child and help them live with purpose.</p><a className="primary-button" href="/about/our-people">Meet the SRSS community <ArrowRight size={18}/></a></div><figure><img src="/assets/sathya-sai-baba-portrait.jpg" alt="Illustrated portrait of Bhagawan Sri Sathya Sai Baba in an orange robe" /></figure></div></section>
-    <section className="inspiration-quote about-inner"><p className="eyebrow">A life-giving education</p><blockquote>“{inspirationQuote}”</blockquote><p className="quote-source">— Sathya Sai Baba, Maharani’s Women’s College in Mysore, September 1963</p><p>At SRSS, this vision is lived through the Head, Heart and Hands: strong learning, steady character, practical capability and compassionate service.</p></section>
-    <section className="inspiration-closing"><div className="about-inner"><p className="eyebrow">Rooted in Educare</p><h2>Human excellence is the<br/><em>journey we share.</em></h2><a className="text-link" href="/learning/human-values">See how we integrate human values <ArrowRight size={17}/></a></div></section>
-  </main>;
-}
 
 // Pictures for events published without their own image.
 const eventFallbackImages = ["/assets/photos/processed/sports-day-march-1600.jpg", "/assets/photos/processed/assembly-achievements-1280.jpg", "/assets/photos/processed/values-signs-graduation-1600.jpg", "/assets/photos/processed/field-friends-1052.jpg"];
@@ -175,11 +169,11 @@ function AboutPage({ onVisit, content, faqs }) {
     <section className="about-intro about-inner" id="who-we-are"><div><p className="eyebrow">Who we are</p><h2>A school for the mind, heart and character.</h2></div><div className="about-rich-copy"><p>At SRSS, education is more than the acquisition of knowledge or preparation for examinations. We believe a truly educated child develops an intelligent mind, a strong character, a compassionate heart, practical abilities and responsibility towards others.</p><p>Inspired by the educational philosophy of Sri Sathya Sai Baba, we combine the Malaysian National Curriculum with an integral approach that nurtures body, mind, heart and spirit.</p><a className="text-link" href="/about/our-story">Explore Our Story <ArrowRight size={17}/></a></div></section>
     <section className="about-profile about-inner" id="school-profile"><div><p className="eyebrow">School profile</p><h2>SRSS at a glance.</h2><p>Key facts about the school. Families can find more in the <a className="text-link" href="/resources/faq">FAQs</a>.</p></div><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="profile" firstOpen /></section>
     <section className="purpose-refresh" id="vision-mission"><div className="about-inner"><div className="purpose-refresh-heading"><p className="eyebrow">Our purpose</p><h2>Human Excellence, lived with purpose.</h2><p><strong>Vision</strong> — to nurture young people of character, confidence and compassion who contribute to a more peaceful world.</p><p><strong>Mission</strong> — to integrate Malaysia’s national curriculum with an education that develops intellect, integrity, wellbeing and service.</p></div><div className="mission-pillars">{missionPillars.map(([title, copy], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div><a className="text-link" href="/about/vision-mission">Discover Our Vision &amp; Mission <ArrowRight size={17}/></a></div></section>
-    <section className="educare-refresh" id="educare"><div className="about-inner educare-grid"><div><p className="eyebrow">Sathya Sai Education &amp; Educare</p><h2>Drawing out what is already within.</h2><p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p><p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p></div><div className="integral-model" role="img" aria-label="Body plus mind plus heart plus spirit leads to human excellence"><span>BODY</span><b>+</b><span>MIND</span><b>+</b><span>HEART</span><b>+</b><span>SPIRIT</span><i>↓</i><strong>HUMAN EXCELLENCE</strong></div></div><div className="about-inner global-line"><p><strong>A global educational movement.</strong> Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p><a className="text-link" href="/about/sathya-sai-education">Discover Sathya Sai Education <ArrowRight size={17}/></a></div></section>
+    <section className="educare-refresh" id="educare"><div className="about-inner educare-grid"><div><p className="eyebrow">Sathya Sai Education &amp; Educare</p><h2>Drawing out what is already within.</h2><p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p><p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p></div><IntegralFramework /></div><div className="about-inner global-line"><p><strong>A global educational movement.</strong> Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p><a className="text-link" href="/about/sathya-sai-education">Discover Sathya Sai Education <ArrowRight size={17}/></a></div></section>
     <section className="community-refresh" id="our-people"><div className="about-inner"><p className="eyebrow">It takes a community to educate a child</p><h2>Every day is an opportunity to grow.</h2><div className="partnership"><strong>CHILD</strong><span>TEACHERS</span><span>PARENTS</span><span>VOLUNTEERS</span></div><p>Teachers, parents and volunteers each bring something essential to the child’s learning. Together, they create the conditions in which confidence, character and capability can flourish.</p><a className="text-link" href="/join/get-involved">Discover how you can be part of SRSS <ArrowRight size={17}/></a></div></section>
     <section className="people-refresh about-inner"><figure><img src={about.principal?.image || defaultAboutContent.principal.image} alt={about.principal?.alt || defaultAboutContent.principal.alt}/></figure><div><p className="eyebrow">Our people</p><h2>Leadership, teachers and family partnership.</h2><p>Our people include the Board of Directors, school leadership, teachers, administrators, support staff and Teacher-Parent Association — each contributing to a school community in which every child is known and encouraged.</p><a className="text-link" href="/about/our-people">Read the voices of SRSS <ArrowRight size={17}/></a></div></section>
     <LearningSpaces id="campus" eyebrow="Our campus" />
-    <section className="anniversary-refresh" id="srss25"><div className="about-inner"><p className="eyebrow">SRSS25 · 25 years of educating the heart</p><h2>2002 <span>—</span> 2027</h2><div>{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((item) => <article key={item}><i>↓</i><strong>{item}</strong></article>)}</div><p>Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS.</p><a className="primary-button" href="/join/alumni">Join the SRSS Alumni Network <ArrowRight size={18}/></a></div></section>
+    <section className="anniversary-refresh" id="srss25"><div className="about-inner"><p className="eyebrow">SRSS25 · 25 years of educating the heart</p><h2>2002 <span>—</span> 2027</h2><div>{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((item) => <article key={item}><i>↓</i><strong>{item}</strong></article>)}</div><p>Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS.</p><a className="primary-button" href="/about/silver-jubilee">Celebrating 25 Years <ArrowRight size={18}/></a></div></section>
     <section className="about-closing" id="about-closing"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">About SRSS</p><h2>Discover who we are and what shapes our approach to education.</h2><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit <ArrowRight size={18}/></button></div></section>
   </main>;
 }
@@ -428,10 +422,11 @@ export function App() {
     return () => window.clearInterval(timer);
   }, [galleryPaused, galleryStopped, galleryList.length]);
   // Stories & Happenings gallery: published news and public events, newest first.
-  const storyItems = useMemo(() => [
+  const allStories = useMemo(() => [
     ...(managedContent.news || []).map((item) => ({ ...item, type: item.category || "School news", Icon: Newspaper })),
     ...(managedContent.events || []).map((item, index) => ({ ...item, type: "Event", image: item.image || eventFallbackImages[index % eventFallbackImages.length], Icon: CalendarBlank })),
-  ].filter((item) => item.date).sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 8), [managedContent.news, managedContent.events]);
+  ].filter((item) => item.date).sort((a, b) => String(b.date).localeCompare(String(a.date))), [managedContent.news, managedContent.events]);
+  const storyItems = useMemo(() => allStories.slice(0, 8), [allStories]);
   const tickerItems = useMemo(() => storyItems.slice(0, 6).map((item) => ({ id: `${item.type}-${item.id}`, date: item.date, title: item.title })), [storyItems]);
 
   // The homepage already ends with Contact & visit, so the pre-footer invitation shows on other public pages.
@@ -595,14 +590,18 @@ export function App() {
     faq: () => (
           <section className="faq-section home-faq-section" id="faq" aria-labelledby="faq-title"><div data-reveal><p className="eyebrow">Helpful answers</p><h2 id="faq-title">Questions, welcomed.</h2><p>Start with the questions families ask most often, or open the complete FAQ for detailed school information.</p><a className="text-link" href="/resources/faq">View all frequently asked questions <ArrowRight size={16} /></a></div><div><FaqAccordion items={(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, 5)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /></div></section>
     ),
-    news: () => (
-          <section className="news-section" id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">Stories &amp; <em>Happenings.</em></h2></div><a href={route.page === "home" ? "/resources/news" : "#events-title"}>{route.page === "home" ? "View all news" : "See the calendar"} <ArrowRight size={16} /></a></div>
-            {storyItems.length ? <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`} data-reveal-stagger>{storyItems.map((item) => <li key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" /><div><span><item.Icon size={14} aria-hidden="true" />{item.type}</span><time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time><h3>{item.title}</h3>{item.excerpt && <p>{item.excerpt}</p>}</div></li>)}</ul> : <p className="calendar-empty">News and events will appear here once they are published.</p>}
-            {storyItems.length > 4 && <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>{storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} /></button>}
+    // A category shows only that kind of story (Student Life pages, SRSS25 updates); otherwise the latest eight.
+    news: ({ category } = {}) => {
+      const list = category ? allStories.filter((item) => storyCategory(item) === category) : storyItems;
+      return (
+          <section className="news-section" id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">{category ? <>{category} <em>stories.</em></> : <>Stories &amp; <em>Happenings.</em></>}</h2></div>{route.page === "studentLife" && <StoryFilters current={category} />}<a href={route.page === "home" ? "/resources/news" : "#events-title"}>{route.page === "home" ? "View all news" : "See the calendar"} <ArrowRight size={16} /></a></div>
+            {list.length ? <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`} data-reveal-stagger>{list.map((item) => <li key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" /><div><span><item.Icon size={14} aria-hidden="true" />{item.type}</span><time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time><h3>{item.title}</h3>{item.excerpt && <p>{item.excerpt}</p>}</div></li>)}</ul> : <p className="calendar-empty">{category ? "No stories in this category have been published yet. They appear here as soon as the school publishes them." : "News and events will appear here once they are published."}</p>}
+            {list.length > 4 && <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>{storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} /></button>}
           </section>
-    ),
-    calendar: () => (
-          <SchoolCalendar items={managedContent.events || []} onAdd={addToCalendar} />
+    );
+    },
+    calendar: ({ category } = {}) => (
+          <SchoolCalendar items={(managedContent.events || []).filter((item) => !category || item.category === category)} onAdd={addToCalendar} />
     ),
     admissions: () => (
           <section className="home-join" id="admissions" aria-labelledby="admissions-title">
@@ -660,11 +659,12 @@ export function App() {
   const pages = {
     legal: () => <Suspense fallback={<main id="main" className="legal-page" />}><LegalPage slug={route.slug || ""} /></Suspense>,
     about: () => <AboutPage content={managedContent.about} faqs={pageFaqs} onVisit={blocks.openVisit} />,
-    sathyaSai: () => <InspirationPage />,
+    sathyaSai: () => <SathyaSaiEducationPage values={values} quote={inspirationQuote} faqs={pageFaqs} />,
+    jubilee: () => <JubileePage blocks={blocks} motto={managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto} />,
     governance: () => <GovernancePage />,
     ourPeople: () => <VoicesPage />,
     learning: () => <LearningPage blocks={blocks} faqs={pageFaqs} />,
-    studentLife: () => <StudentLifePage blocks={blocks} faqs={pageFaqs} />,
+    studentLife: () => <StudentLifePage blocks={blocks} faqs={pageFaqs} entry={route} />,
     join: () => <JoinPage />,
     admissions: () => <AdmissionsPage blocks={blocks} faqs={pageFaqs} pillars={whySrss} />,
     resources: () => <ResourcesPage blocks={blocks} />,

@@ -12,8 +12,10 @@ import { MAX_EDGE, formatBytes, prepareImage, uploadToLibrary } from "../media";
 import { useAuth } from "../../auth/AuthProvider";
 import { list, one, useLoad } from "../data";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, Section, StatusBadge, formatDate } from "../ui";
+import { STORY_CATEGORIES } from "../../data/stories.js";
 
-const NEWS_CATEGORIES = ["School News", "Achievements", "Values in Action", "Events", "SRSS25"];
+// One School Stories system: the same categories drive Student Life, SRSS25 updates and the homepage.
+const NEWS_CATEGORIES = STORY_CATEGORIES;
 const EVENT_CATEGORIES = ["Academic", "Parent", "Events", "Seva", "Holidays", "SRSS25"];
 const STATUS_OPTIONS = [["draft", "Draft"], ["review", "In review"], ["published", "Published"], ["archived", "Archived"]];
 const PAGES = { homepage: "Homepage", about: "About page", faqs: "FAQs" };
