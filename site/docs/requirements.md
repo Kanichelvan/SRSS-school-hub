@@ -19,6 +19,14 @@ Maps the Developer PRD v1.0 requirements to code and tests. "Verified" means che
 | DASH-001 | Parent Actions Required above announcements | `parentActions` + `ActionsRequired` component | `tests/dashboard.test.mjs` | Verified (form, payment, grouped consents) |
 | DASH-002 | Targeted announcements; rules enforce audience | `audienceKeys` model, announcement composer (`src/hub/screens/comms.jsx`) | `tests/rules` "DASH-001 / DASH-002" | Verified |
 
+| ACAD-001 | Curriculum structure: year × Standard × subject plans with topics, objectives and learning-standard codes from approved documents; coverage per class | `src/hub/screens/academics.jsx` (`CurriculumPlans`, `AcademicsOverview`), `curriculumCoverage` in `src/hub/logic/academics.js`, rules `curriculumPlans` | `tests/academics.test.mjs`, `tests/rules/academics.rules.test.mjs` | Tested (unit, rules, browser) |
+| ACAD-002 | Lesson planning (fields, Human Values, Draft → Ready → Completed → Reviewed, plan content in a Google Doc without a second copy) | `LessonPlans`, `LessonPlanEditor`, `ReviewPanel`; rules `lessonPlans` (subject-level `teachingKeys`) | unit + rules + `tests/e2e/stage1.e2e.mjs` | Tested |
+| ACAD-003 | Learning tasks: assign to a class, due dates, resources, completion, feedback; pupils hand in; families see published tasks | `LearningTasks`, `LearningTaskDetail`, `TaskProgress`, `FamilyTasks`; rules `learningTasks`, `learningTaskProgress` | unit + rules + e2e | Tested |
+| ASMT-001 | Assessment configuration: periods, components, weightings (validated), maximum marks, grading bands, publication setting | `AssessmentSetup`, `validateAssessment`; rules `assessmentPeriods`, `assessments` | unit + rules | Tested |
+| ASMT-002 | Spreadsheet-style marks entry: draft, absent/exempt, validation, Sheets template export and controlled import into draft | `MarkEntry`, `ImportDialog`, `importMarks`/`marksTemplateCsv`; rules `markSheets`, `studentResults` | unit + rules + e2e | Tested |
+| ASMT-003 | Approval workflow Draft → Submitted → Reviewed → Approved → Published → Locked; families see published only; amendments with a reason; audit | `sheetActions`, workflow `move()`; rules; existing `auditResults` trigger | unit + rules + e2e | Tested |
+| WS-001 | Shared Workspace modal returning structured metadata (attach by link, create Doc/Sheet/Slides/Form in Google then attach) | `src/hub/workspace.jsx`, `src/hub/logic/workspace.js` | unit + e2e | Tested (link flow). Drive Picker / API creation: Stage 5 |
+
 Additional PRD capabilities in place: audit trail triggers (§42), absence notifications to guardians (srss §8), admissions → SIS conversion without re-keying (`enrolApplication`, §33), data classification and restricted records (§49–50), WCAG-minded components with 48px touch targets (§54).
 
 ## Next build steps (Phase 1)

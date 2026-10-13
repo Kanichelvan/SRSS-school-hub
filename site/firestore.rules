@@ -173,27 +173,89 @@ service cloud.firestore {
         && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other'];
     }
 
-    // ===================== ACADEMICS (phase 2) =====================
-    match /assessmentPeriods/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
+    // ===================== ASSESSMENTS (ASMT-001 … ASMT-003) =====================
+    // Mirrors src/hub/logic/academics.js. Structures are configured by the Academic Coordinator or School
+    // Admin. Marks are written only by a teacher assigned to that class AND subject (users.teachingKeys).
+    // Draft → Submitted → Reviewed → Approved → Published → Locked: the teacher submits; the coordinator
+    // reviews or returns (never changes marks); leadership approves, publishes, locks, returns, and amends
+    // published results only with a recorded reason. Families see published results; pupils only when the
+    // period allows it (studentVisible). Every change is audited by Cloud Functions.
+    function teachesSubject(classId, subjectId) { return teaching() && (classId + '|' + subjectId) in me().get('teachingKeys', []); }
+    function configuresAssessments() { return hasAny(['academicCoordinator', 'schoolAdmin']); }
+    function publishesResults() { return isLeader(); }
+    function stamped() { return data().updatedBy == uid() && data().updatedAt == request.time; }
+    // A workflow step records who took it, at request time (e.g. submittedBy / submittedAt).
+    function movedBy(step) { return data().get(step + 'By', '') == uid() && data().get(step + 'At', null) == request.time; }
+    function moved(from, to) { return resource.data.status == from && data().status == to; }
+    function returnedWithNote() { return data().status == 'draft' && movedBy('returned') && data().get('returnNote', '') is string && data().get('returnNote', '').size() > 0; }
+
+    match /assessmentPeriods/{id} {
+      allow read: if signedIn();
+      allow create, update: if configuresAssessments() && stamped() && data().name is string && data().name.size() > 0 && data().name.size() <= 120
+        && data().status in ['planned', 'open', 'closed'] && data().get('resultsVisibleToStudents', false) is bool;
+    }
+    // One structure per period × Standard × subject; components (type, maximum marks, weight) are embedded so
+    // the weighting is validated as a whole (the separate assessmentComponents collection is not used).
     match /assessments/{id} {
-      allow read: if isStaff() || (resource.data.get('classId', '') in me().get('familyClassIds', []));
-      allow create, update: if hasRole('academicCoordinator') || (teaching() && inClassScope(data().classId));
+      allow read: if signedIn();
+      allow create, update: if configuresAssessments() && stamped() && data().periodId is string && data().standard is int && data().subjectId is string
+        && data().components is list && data().components.size() > 0 && data().components.size() <= 12
+        && data().weighting in ['weighted', 'rawTotal'] && data().absentPolicy in ['exclude', 'zero'];
     }
-    match /assessmentComponents/{id} {
-      allow read: if isStaff();
-      allow create, update: if hasRole('academicCoordinator') || (teaching() && inClassScope(data().classId));
+
+    function sheetFields() {
+      return ['periodId', 'assessmentId', 'classId', 'subjectId', 'standard', 'academicYearId', 'status', 'progress', 'returnNote',
+        'submittedBy', 'submittedAt', 'reviewedBy', 'reviewedAt', 'approvedBy', 'approvedAt', 'publishedBy', 'publishedAt',
+        'lockedBy', 'lockedAt', 'returnedBy', 'returnedAt', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'];
     }
-    // Draft → Submitted → Reviewed → Approved → Published → Locked. Families see published results only;
-    // changes after publication need leadership (PRD §23).
+    // One mark sheet per period × assessment × class carries the workflow state for that class's results.
+    match /markSheets/{sheetId} {
+      // A sheet nobody has started yet reads as "not found" to staff rather than "denied".
+      allow read: if wideStudentRead() || (teaching() && (resource == null || inClassScope(resource.data.classId)));
+      allow create: if teachesSubject(data().classId, data().subjectId) && data().status == 'draft' && createdByMe() && stamped()
+        && data().keys().hasOnly(sheetFields()) && sheetId == data().periodId + '_' + data().assessmentId + '_' + data().classId;
+      allow update: if stamped() && data().keys().hasOnly(sheetFields())
+        && unchanged(['periodId', 'assessmentId', 'classId', 'subjectId', 'standard', 'createdBy', 'createdAt'])
+        && ((teachesSubject(resource.data.classId, resource.data.subjectId) && resource.data.status == 'draft'
+              && ((data().status == 'draft' && onlyChanges(['progress', 'updatedAt', 'updatedBy']))
+                || (data().status == 'submitted' && movedBy('submitted') && onlyChanges(['status', 'progress', 'submittedBy', 'submittedAt', 'updatedAt', 'updatedBy']))))
+          || (hasRole('academicCoordinator')
+              && ((moved('submitted', 'reviewed') && movedBy('reviewed') && onlyChanges(['status', 'reviewedBy', 'reviewedAt', 'updatedAt', 'updatedBy']))
+                || (resource.data.status in ['submitted', 'reviewed'] && returnedWithNote() && onlyChanges(['status', 'returnNote', 'returnedBy', 'returnedAt', 'updatedAt', 'updatedBy']))))
+          || (publishesResults()
+              && ((moved('reviewed', 'approved') && movedBy('approved') && onlyChanges(['status', 'approvedBy', 'approvedAt', 'updatedAt', 'updatedBy']))
+                || (moved('approved', 'published') && movedBy('published') && onlyChanges(['status', 'publishedBy', 'publishedAt', 'updatedAt', 'updatedBy']))
+                || (moved('published', 'locked') && movedBy('locked') && onlyChanges(['status', 'lockedBy', 'lockedAt', 'updatedAt', 'updatedBy']))
+                || (resource.data.status in ['reviewed', 'approved'] && returnedWithNote() && onlyChanges(['status', 'returnNote', 'returnedBy', 'returnedAt', 'updatedAt', 'updatedBy'])))));
+    }
+
+    function resultFields() {
+      return ['periodId', 'assessmentId', 'classId', 'subjectId', 'standard', 'academicYearId', 'studentId', 'sheetId', 'marks', 'flags',
+        'percent', 'grade', 'comment', 'status', 'studentVisible', 'amendmentReason', 'amendedBy', 'amendedAt', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'];
+    }
+    function resultShapeOk() {
+      return data().keys().hasOnly(resultFields()) && data().marks is map && data().get('flags', {}) is map
+        && (data().get('percent', null) == null || (data().percent is number && data().percent >= 0 && data().percent <= 100))
+        && data().get('comment', '') is string && data().get('comment', '').size() <= 1000;
+    }
     match /studentResults/{id} {
       allow read: if staffCanSee(resource.data.studentId, resource.data.classId)
-        || (familyCanSee(resource.data.studentId) && resource.data.status in ['published', 'locked']);
-      allow create: if teacherCanWrite(data().studentId, data().classId) && data().status in ['draft', 'submitted'] && createdByMe();
-      allow update: if (teacherCanWrite(resource.data.studentId, resource.data.classId) && resource.data.status in ['draft', 'submitted'] && data().status in ['draft', 'submitted'])
-        || (hasRole('academicCoordinator') && resource.data.status in ['submitted', 'reviewed', 'approved'] && data().status in ['submitted', 'reviewed', 'approved', 'published'])
-        || isLeader();
+        || (isGuardianOf(resource.data.studentId) && resource.data.status in ['published', 'locked'])
+        || (isSelf(resource.data.studentId) && resource.data.status in ['published', 'locked'] && resource.data.get('studentVisible', false) == true);
+      allow create: if teachesSubject(data().classId, data().subjectId) && studentIsInClass(data().studentId, data().classId)
+        && data().status == 'draft' && createdByMe() && stamped() && resultShapeOk() && id == data().sheetId + '_' + data().studentId;
+      allow update: if stamped() && resultShapeOk() && unchanged(['periodId', 'assessmentId', 'classId', 'subjectId', 'studentId', 'sheetId', 'createdBy', 'createdAt'])
+        && ((teachesSubject(resource.data.classId, resource.data.subjectId) && resource.data.status == 'draft' && data().status in ['draft', 'submitted']
+              && unchanged(['studentVisible', 'amendmentReason', 'amendedBy', 'amendedAt']))
+          || (hasRole('academicCoordinator') && onlyChanges(['status', 'updatedAt', 'updatedBy'])
+              && (moved('submitted', 'reviewed') || (resource.data.status in ['submitted', 'reviewed'] && data().status == 'draft')))
+          || (publishesResults() && onlyChanges(['status', 'studentVisible', 'updatedAt', 'updatedBy'])
+              && (moved('reviewed', 'approved') || moved('approved', 'published') || moved('published', 'locked') || (resource.data.status in ['reviewed', 'approved'] && data().status == 'draft')))
+          || (publishesResults() && resource.data.status in ['published', 'locked'] && data().status == resource.data.status
+              && data().get('amendmentReason', '') is string && data().get('amendmentReason', '').size() >= 5 && data().amendedBy == uid() && data().amendedAt == request.time
+              && onlyChanges(['marks', 'flags', 'percent', 'grade', 'comment', 'amendmentReason', 'amendedBy', 'amendedAt', 'updatedAt', 'updatedBy'])));
     }
-    // Teacher Entry → Review → Academic Approval → Headmistress Approval → Publish (srss §10).
+    // Teacher Entry → Review → Academic Approval → Headmistress Approval → Publish (srss §10). Stage 2.
     match /reportCards/{id} {
       allow read: if staffCanSee(resource.data.studentId, resource.data.classId)
         || (familyCanSee(resource.data.studentId) && resource.data.status in ['published', 'locked']);
@@ -202,12 +264,71 @@ service cloud.firestore {
         || isLeader();
     }
 
-    // ===================== LEARNING (phase 2) =====================
-    match /curriculumPlans/{id} { allow read: if isStaff(); allow create, update: if hasRole('academicCoordinator') || (teaching() && data().ownerUid == uid()); }
-    match /lessonPlans/{id} { allow read: if isStaff(); allow create, update: if teaching() && data().ownerUid == uid(); }
+    // ===================== ACADEMIC PLANNING (ACAD-001 … ACAD-003) =====================
+    // Firestore holds planning metadata and status; collaborative document content lives in Google Docs
+    // when a plan says so (contentSource 'googleDoc'), so there is one copy of each plan.
+    function attachmentsOk(field) { return data().get(field, []) is list && data().get(field, []).size() <= 20; }
+    function valuesOk() { return data().get('humanValues', []) is list && data().get('humanValues', []).hasOnly(fiveValues()); }
+
+    // Curriculum plans: one per year × Standard × subject, configured by the Academic Coordinator from the
+    // school's approved curriculum documents (linked in sourceRefs). Teachers read them.
+    match /curriculumPlans/{id} {
+      allow read: if isStaff();
+      allow create, update: if hasRole('academicCoordinator') && stamped() && data().standard is int && data().subjectId is string
+        && data().status in ['draft', 'active', 'archived'] && data().get('topics', []) is list && data().get('topics', []).size() <= 200 && attachmentsOk('sourceRefs');
+    }
+    // Draft → Ready → Completed (owner) → Reviewed (Academic Coordinator, never their own plan).
+    match /lessonPlans/{id} {
+      allow read: if signedIn() && (resource.data.ownerUid == uid() || hasAny(['academicCoordinator', 'leadership']) || (teaching() && inClassScope(resource.data.classId)));
+      allow create: if data().ownerUid == uid() && teachesSubject(data().classId, data().subjectId) && createdByMe() && stamped()
+        && data().status in ['draft', 'ready', 'completed'] && data().contentSource in ['hub', 'googleDoc'] && attachmentsOk('attachments') && valuesOk()
+        && data().get('reviewedBy', null) == null;
+      allow update: if stamped() && attachmentsOk('attachments') && unchanged(['ownerUid', 'createdBy', 'createdAt'])
+        && ((resource.data.ownerUid == uid() && teachesSubject(data().classId, data().subjectId) && resource.data.status != 'reviewed'
+              && data().status in ['draft', 'ready', 'completed'] && data().contentSource in ['hub', 'googleDoc'] && valuesOk() && unchanged(['reviewedBy', 'reviewedAt']))
+          || (hasRole('academicCoordinator') && resource.data.ownerUid != uid() && onlyChanges(['status', 'reviewNote', 'reviewedBy', 'reviewedAt', 'updatedAt', 'updatedBy'])
+              && ((moved('completed', 'reviewed') && data().reviewedBy == uid() && data().reviewedAt == request.time) || moved('reviewed', 'completed'))));
+    }
+    // Learning tasks: families and pupils see published tasks for their own class only.
+    function taskShapeOk() {
+      return data().title is string && data().title.size() > 0 && data().title.size() <= 200 && data().get('instructions', '') is string && data().get('instructions', '').size() <= 5000
+        && data().status in ['draft', 'published', 'closed'] && data().submissionMode in ['none', 'hub', 'classroom'] && attachmentsOk('attachments');
+    }
     match /learningTasks/{id} {
-      allow read: if isStaff() || resource.data.classId in me().get('familyClassIds', []);
-      allow create, update: if teaching() && inClassScope(data().classId);
+      allow read: if hasAny(['academicCoordinator', 'leadership']) || (teaching() && inClassScope(resource.data.classId))
+        || (resource.data.status in ['published', 'closed'] && resource.data.classId in me().get('familyClassIds', []));
+      allow create: if teachesSubject(data().classId, data().subjectId) && createdByMe() && stamped() && taskShapeOk();
+      allow update: if teachesSubject(resource.data.classId, resource.data.subjectId) && teachesSubject(data().classId, data().subjectId)
+        && unchanged(['createdBy', 'createdAt']) && stamped() && taskShapeOk();
+    }
+    // Completion per task × pupil ({taskId}_{studentId}). Teachers record completion and feedback; a pupil may
+    // hand in their own work when the task accepts hub submissions. Neither can rewrite the other's part.
+    function progressFields() {
+      return ['taskId', 'studentId', 'classId', 'subjectId', 'status', 'feedback', 'feedbackBy', 'feedbackAt', 'submissionText', 'submissionUrl', 'submittedAt', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'];
+    }
+    function submissionOk() {
+      return data().get('submissionText', '') is string && data().get('submissionText', '').size() <= 4000
+        && (data().get('submissionUrl', '') == '' || (data().submissionUrl is string && data().submissionUrl.size() <= 500 && data().submissionUrl.matches('https://.+')));
+    }
+    function acceptsHandIn(taskId, classId, subjectId) {
+      let task = get(/databases/$(database)/documents/learningTasks/$(taskId)).data;
+      return task.classId == classId && task.subjectId == subjectId && task.status == 'published' && task.submissionMode == 'hub';
+    }
+    match /learningTaskProgress/{id} {
+      allow read: if staffCanSee(resource.data.studentId, resource.data.classId) || familyCanSee(resource.data.studentId);
+      allow create: if id == data().taskId + '_' + data().studentId && stamped() && data().keys().hasOnly(progressFields()) && submissionOk()
+        && studentIsInClass(data().studentId, data().classId)
+        && ((teachesSubject(data().classId, data().subjectId) && data().status in ['submitted', 'completed', 'incomplete', 'excused']
+              && data().get('submissionText', '') == '' && data().get('submissionUrl', '') == '')
+          || (isSelf(data().studentId) && createdByMe() && data().status == 'submitted' && data().get('feedback', null) == null
+              && acceptsHandIn(data().taskId, data().classId, data().subjectId)));
+      allow update: if stamped() && data().keys().hasOnly(progressFields()) && submissionOk()
+        && unchanged(['taskId', 'studentId', 'classId', 'subjectId', 'createdBy', 'createdAt'])
+        && ((teachesSubject(resource.data.classId, resource.data.subjectId) && data().status in ['submitted', 'completed', 'incomplete', 'excused']
+              && unchanged(['submissionText', 'submissionUrl', 'submittedAt']))
+          || (isSelf(resource.data.studentId) && resource.data.status in ['submitted', 'incomplete'] && data().status == 'submitted'
+              && onlyChanges(['status', 'submissionText', 'submissionUrl', 'submittedAt', 'updatedAt', 'updatedBy'])
+              && acceptsHandIn(resource.data.taskId, resource.data.classId, resource.data.subjectId)));
     }
     match /classUpdates/{id} {
       allow read: if isStaff() || resource.data.classId in me().get('familyClassIds', []);

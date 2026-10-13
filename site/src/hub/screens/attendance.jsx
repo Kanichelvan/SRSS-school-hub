@@ -1,11 +1,12 @@
 // Attendance (ATT-001, ATT-002): teacher quick roster, admin daily overview, parent view.
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { doc, serverTimestamp, where, writeBatch } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, where, writeBatch } from "firebase/firestore";
 import { db } from "../../lib/firebase-firestore";
 import { useAuth } from "../../auth/AuthProvider";
 import { daysAgo, getMany, list, listIn, one, today, useLoad } from "../data";
 import { ATTENDANCE_LABELS, attendanceByClass, attendanceSummary } from "../logic/dashboard";
+import { chunk } from "../logic/academics";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, formatDate } from "../ui";
 
 const EXCEPTIONS = ["absent", "late", "excused", "schoolActivity", "medical", "other"];
@@ -64,15 +65,19 @@ function TakeAttendance({ classId }) {
   async function submit() {
     setSaving(true); setSaveError(null);
     try {
-      const batch = writeBatch(db);
       const stamp = serverTimestamp();
       const meta = { updatedAt: stamp, updatedBy: auth.user.uid, academicYearId: data.cls.academicYearId };
-      batch.set(doc(db, "attendanceSessions", sessionId), { classId, date, sessionType: "am", status: "submitted", openedBy: data.session?.openedBy || auth.user.uid, submittedBy: auth.user.uid, submittedAt: stamp, studentCount: data.students.length, createdAt: data.session?.createdAt || stamp, createdBy: data.session?.createdBy || auth.user.uid, ...meta }, { merge: true });
-      for (const student of data.students) {
-        const mark = marks[student.id];
-        batch.set(doc(db, "attendanceRecords", `${sessionId}_${student.id}`), { sessionId, classId, date, studentId: student.id, status: mark.status, reason: mark.status === "present" ? null : mark.reason || null, note: mark.note || null, markedBy: auth.user.uid, markedAt: stamp, ...meta });
+      // Rules check each new record's pupil against the class, and a batch may make only ~20 such lookups,
+      // so records go in small batches; the session is marked submitted last, once every record is saved.
+      for (const part of chunk(data.students)) {
+        const batch = writeBatch(db);
+        for (const student of part) {
+          const mark = marks[student.id];
+          batch.set(doc(db, "attendanceRecords", `${sessionId}_${student.id}`), { sessionId, classId, date, studentId: student.id, status: mark.status, reason: mark.status === "present" ? null : mark.reason || null, note: mark.note || null, markedBy: auth.user.uid, markedAt: stamp, ...meta });
+        }
+        await batch.commit();
       }
-      await batch.commit();
+      await setDoc(doc(db, "attendanceSessions", sessionId), { classId, date, sessionType: "am", status: "submitted", openedBy: data.session?.openedBy || auth.user.uid, submittedBy: auth.user.uid, submittedAt: stamp, studentCount: data.students.length, createdAt: data.session?.createdAt || stamp, createdBy: data.session?.createdBy || auth.user.uid, ...meta }, { merge: true });
       setSaved(true);
     } catch (reason) { setSaveError(reason); } finally { setSaving(false); }
   }

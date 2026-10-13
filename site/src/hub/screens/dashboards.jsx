@@ -8,6 +8,7 @@ import { announcementsFor, daysAgo, eventsFor, getMany, list, listIn, one, today
 import { HUMAN_VALUES, attendanceByClass, attendanceSummary, completeness, followUpPrompts, nextClass, parentActions, todaysLessons } from "../logic/dashboard";
 import { ActionsRequired, ChildSwitcher, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, TrendBars, formatDate } from "../ui";
 import { CONSENT_FORM_VERSION, CONSENT_ITEMS } from "../consentForm";
+import { RESULT_LABELS, markSheetId } from "../logic/academics";
 
 const greeting = () => { const hour = new Date().getHours(); return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"; };
 const firstName = (auth) => (auth.user.displayName || auth.user.email || "").split(/[ @]/)[0];
@@ -29,6 +30,40 @@ function UpcomingEvents({ keys }) {
   </Section>;
 }
 
+// Open assessment period, its structures and the mark sheets this person may read (Stage 1).
+const WIDE_RESULTS = ["academicCoordinator", "schoolAdmin", "leadership", "safeguardingLead", "privacySteward", "auditor"];
+function useAssessmentSummary(enabled = true) {
+  const auth = useAuth();
+  const wide = auth.roles.some((role) => WIDE_RESULTS.includes(role));
+  return useLoad(async () => {
+    if (!enabled) return null;
+    const settings = await one("settings/school");
+    const [period] = await list("assessmentPeriods", where("academicYearId", "==", settings?.currentAcademicYearId || ""), where("status", "==", "open"));
+    if (!period) return { period: null, assessments: [], sheets: [] };
+    const [assessments, sheets] = await Promise.all([list("assessments", where("periodId", "==", period.id)), wide ? list("markSheets", where("periodId", "==", period.id)) : listIn("markSheets", "classId", auth.scope?.classIds || [], where("periodId", "==", period.id))]);
+    return { period, assessments, sheets };
+  }, [auth.user.uid, enabled]);
+}
+
+function MyMarkSheets({ classes, subjects }) {
+  const auth = useAuth();
+  const { data, loading, error } = useAssessmentSummary();
+  const rows = !data?.period ? [] : (auth.scope?.teachingKeys || []).flatMap((key) => {
+    const [classId, subjectId] = key.split("|");
+    const cls = classes.find((item) => item.id === classId);
+    const assessment = data.assessments.find((item) => item.standard === cls?.standard && item.subjectId === subjectId);
+    if (!assessment) return [];
+    const sheet = data.sheets.find((item) => item.id === markSheetId(data.period.id, assessment.id, classId));
+    return [{ key, to: `/hub/assessments/marks/${data.period.id}/${assessment.id}/${classId}`, label: `${cls.name} · ${subjects.find((item) => item.id === subjectId)?.name || subjectId}`, sheet }];
+  }).filter((row) => !row.sheet || row.sheet.status === "draft");
+  return <Section title="Marks to enter" action={<Link to="/hub/assessments">Assessments</Link>}>
+    <ErrorNote error={error} />
+    {loading ? <Loading /> : !data?.period ? <EmptyState title="No assessment period is open." /> : !rows.length ? <EmptyState title="All your mark sheets are submitted.">{data.period.name}</EmptyState>
+      : <ul className="hub-list hub-list-compact">{rows.map((row) => <li key={row.key}><Link to={row.to}>{row.label}</Link>{row.sheet?.returnNote ? <StatusBadge status="overdue" label="Returned" /> : <StatusBadge status={row.sheet ? "open" : "missing"} label={row.sheet ? `Draft · ${row.sheet.progress?.done ?? 0}/${row.sheet.progress?.total ?? "—"}` : "Not started"} />}</li>)}</ul>}
+    {data?.period?.entryDeadline && rows.length > 0 && <p className="hub-hint">Due {formatDate(data.period.entryDeadline, { weekday: "long", day: "numeric", month: "long" })}.</p>}
+  </Section>;
+}
+
 // ---------- Admin / leadership ----------
 export function AdminDashboard() {
   const auth = useAuth();
@@ -39,6 +74,9 @@ export function AdminDashboard() {
   const canAdmissions = Boolean(can(roles, "admissions", "V"));
   const canFees = Boolean(can(roles, "fees", "V"));
   const canConsent = Boolean(can(roles, "consent", "V"));
+  const canAssessments = Boolean(can(roles, "assessments", "V"));
+  const assessmentSummary = useAssessmentSummary(canAssessments);
+  const sheetCount = (...statuses) => (assessmentSummary.data?.sheets || []).filter((sheet) => statuses.includes(sheet.status)).length;
 
   const { data, loading, error } = useLoad(async () => {
     const [students, staff, classes, sessions, records, enquiries, applications, consent, fees] = await Promise.all([
@@ -86,7 +124,11 @@ export function AdminDashboard() {
             {canAdmissions && <li><Link to="/hub/admin/admissions">Pending admissions</Link><strong>{data.enquiries.length + data.applications.length}</strong></li>}
             {canConsent && <li><Link to="/hub/admin/consent">Students missing photo/video consent</Link><strong>{view.consentGaps}</strong></li>}
             {canStudents && <li><Link to="/hub/admin/students">Incomplete student records</Link><strong>{view.incomplete.length}</strong></li>}
-            <li><span>Assessment & report completion</span><small>Phase 2 module</small></li>
+            {canAssessments && (assessmentSummary.data?.period ? <>
+              <li><Link to="/hub/assessments">Mark sheets awaiting review · {assessmentSummary.data.period.name}</Link><strong>{sheetCount("submitted")}</strong></li>
+              <li><Link to="/hub/assessments">Mark sheets awaiting approval or publication</Link><strong>{sheetCount("reviewed", "approved")}</strong></li>
+              <li><span>Mark sheets {RESULT_LABELS.published.toLowerCase()}</span><strong>{sheetCount("published", "locked")}</strong></li>
+            </> : <li><span>Assessments</span><small>{assessmentSummary.loading ? "…" : "No period open"}</small></li>)}
           </ul>
         </Section>
       </div>
@@ -147,7 +189,7 @@ export function TeacherDashboard() {
         <UpcomingEvents keys={keys} />
       </div>
       <div className="hub-grid-2">
-        <Section title="Pending assessments & report comments"><EmptyState title="Phase 2 module.">The gradebook and report-card workflow arrive with SRSS Learn.</EmptyState></Section>
+        <MyMarkSheets classes={data.classes} subjects={data.subjects} />
         <Announcements keys={keys} max={3} />
       </div>
     </>}

@@ -174,6 +174,51 @@ put("admissionEnquiries/enq-2", { parentName: "Kevin Ong", email: "kevin@example
 put("applications/app-1", meta({ applicantUid: null, status: "underReview", child: { name: "Zara Aziz", dateOfBirth: "2020-03-14" }, guardians: [{ name: "Farah Aziz", email: "farah@example.com", relationship: "mother" }], enteringStandard: 1, submittedAt: now, createdBy: uid.admissions }));
 put("applications/app-2", meta({ applicantUid: null, status: "accepted", child: { name: "Hannah Lee", dateOfBirth: "2019-07-02" }, guardians: [{ name: "Grace Lee", email: "grace@example.com", relationship: "mother" }], enteringStandard: 2, startDate: "2027-01-11", submittedAt: now, createdBy: uid.admissions }));
 
+// ---------- academic operations (Stage 1): curriculum, lesson plans, tasks, assessments ----------
+// Curriculum topics and Drive links are fictional placeholders, not official KSSR content.
+const demoDrive = (kind, fileId, title) => ({ provider: "google", kind, fileId, title, url: kind === "file" ? `https://drive.google.com/file/d/${fileId}/view` : `https://docs.google.com/${kind}/d/${fileId}/edit`, addedBy: uid.coordinator, addedAt: "2026-09-14T00:00:00.000Z" });
+put("curriculumPlans/cp-math-4", meta({ standard: 4, subjectId: "math", title: "Mathematics · Standard 4", status: "active", sourceRefs: [demoDrive("file", "1DemoSchemeOfWorkMath4", "Scheme of work (demo)")],
+  topics: [["tp-frac", "Fractions", ["Recognise equivalent fractions", "Compare and order fractions"], 1, 3], ["tp-dec", "Decimals", ["Read and write decimals to two places"], 4, 6], ["tp-money", "Money", ["Solve everyday money problems"], 7, 8], ["tp-time", "Time", ["Read 24-hour time"], 9, 10]]
+    .map(([id, title, objectives, weekFrom, weekTo]) => ({ id, title, objectives, learningStandards: "", weekFrom, weekTo })), updatedBy: uid.coordinator }));
+const lesson = (id, data) => put(`lessonPlans/${id}`, meta({ termId: "ay2026-t3", standard: 4, classId: "c26-4", subjectId: "math", ownerUid: uid.teacher, createdBy: uid.teacher, updatedBy: uid.teacher, curriculumPlanId: "cp-math-4", objectives: "", activities: "", materials: "", assessmentApproach: "", humanValues: [], humanValuesNote: "", reflection: "", attachments: [], primaryDoc: null, primaryDocId: null, contentSource: "hub", ...data }));
+lesson("lp-frac-1", { week: 2, date: day(-8), topicId: "tp-frac", topic: "Equivalent fractions with paper folding", objectives: "Recognise equivalent fractions", activities: "Fold paper strips into halves, quarters and eighths; pairs explain equal parts.", materials: "Paper strips, coloured pencils", assessmentApproach: "Exit ticket: two equivalent fractions", humanValues: ["love", "rightConduct"], humanValuesNote: "Helping a partner who is stuck; taking turns.", reflection: "Most pupils secure; three need more practice with eighths.", status: "completed", attachments: [demoDrive("presentation", "1DemoFractionsSlides", "Fractions slides (demo)")] });
+lesson("lp-dec-1", { week: 4, date: day(3), topicId: "tp-dec", topic: "Introducing decimals", status: "draft", contentSource: "googleDoc", primaryDoc: demoDrive("document", "1DemoDecimalsPlanDoc", "Decimals lesson plan (demo)"), primaryDocId: "1DemoDecimalsPlanDoc", humanValues: ["truth"] });
+const task = (id, data) => put(`learningTasks/${id}`, meta({ standard: 4, classId: "c26-4", subjectId: "math", createdBy: uid.teacher, updatedBy: uid.teacher, instructions: "", attachments: [], classroomUrl: "", ...data }));
+task("lt-frac-sheet", { title: "Fractions practice sheet", instructions: "Complete questions 1–10. Show how you folded or drew each fraction.", setDate: day(-1), dueDate: day(3), submissionMode: "hub", status: "published", attachments: [demoDrive("document", "1DemoFractionsWorksheet", "Fractions worksheet (demo)")] });
+task("lt-money-shop", { title: "Pretend shop: count the change", instructions: "With someone at home, pay for three items and count the change.", setDate: day(-12), dueDate: day(-5), submissionMode: "none", status: "closed" });
+put(`learningTaskProgress/lt-money-shop_${studentIds["Aarav Raman"]}`, { taskId: "lt-money-shop", studentId: studentIds["Aarav Raman"], classId: "c26-4", subjectId: "math", status: "completed", feedback: "Careful counting — and kind to your little sister as the shopkeeper!", feedbackBy: uid.teacher, feedbackAt: now, submissionText: "", submissionUrl: "", createdAt: now, createdBy: uid.teacher, updatedAt: now, updatedBy: uid.teacher });
+
+put("assessmentPeriods/ap-2026-t2", meta({ name: "Term 2 assessment", termId: "ay2026-t2", startDate: "2026-08-17", endDate: "2026-08-28", entryDeadline: "2026-09-02", status: "closed", resultsVisibleToStudents: true, updatedBy: uid.coordinator }));
+put("assessmentPeriods/ap-2026-t3", meta({ name: "Term 3 assessment", termId: "ay2026-t3", startDate: day(-3), endDate: day(7), entryDeadline: day(10), status: "open", resultsVisibleToStudents: true, updatedBy: uid.coordinator }));
+const MATH_COMPONENTS = [{ id: "wr", name: "Written", type: "written", maxMarks: 60, weight: 60 }, { id: "or", name: "Oral", type: "oral", maxMarks: 20, weight: 20 }, { id: "cw", name: "Coursework", type: "coursework", maxMarks: 20, weight: 20 }];
+const BANDS = { preset: "bands", bands: [{ min: 80, grade: "A" }, { min: 65, grade: "B" }, { min: 50, grade: "C" }, { min: 40, grade: "D" }, { min: 0, grade: "E" }] };
+const structure = (id, periodId, standard, subjectId, extra = {}) => put(`assessments/${id}`, meta({ periodId, standard, subjectId, name: subjects.find(([sid]) => sid === subjectId)[1], weighting: "weighted", absentPolicy: "exclude", components: MATH_COMPONENTS, grading: BANDS, updatedBy: uid.coordinator, ...extra }));
+for (const s of [3, 4, 5]) structure(`as-t3-math-${s}`, "ap-2026-t3", s, "math");
+structure("as-t3-ehv-4", "ap-2026-t3", 4, "ehv", { weighting: "rawTotal", components: [{ id: "pj", name: "Project", type: "project", maxMarks: 30 }, { id: "ob", name: "Teacher observation", type: "observation", maxMarks: 20 }], grading: { preset: "marksOnly", bands: [] } });
+structure("as-t2-math-4", "ap-2026-t2", 4, "math");
+// Mark sheets in different workflow states: Term 2 Std 4 published (families see it), Term 3 Std 3 submitted
+// (waiting for the coordinator), Term 3 Std 4 a part-filled draft.
+const marksFor = (n, of = 1) => ({ wr: Math.min(60, 30 + ((n * 7) % 31)), or: Math.min(20, 10 + ((n * 3) % 11)), cw: Math.min(20, 12 + ((n * 5) % 9)) * of });
+const pct = (m) => Math.round(((m.wr / 60) * 60 + (m.or / 20) * 20 + (m.cw / 20) * 20) * 10) / 10;
+const gradeOf = (p) => BANDS.bands.find((band) => p >= band.min).grade;
+const sheetSeed = (periodId, assessmentId, standard, status, extra = {}) => {
+  const classId = `c26-${standard}`; const sheetId = `${periodId}_${assessmentId}_${classId}`;
+  put(`markSheets/${sheetId}`, { periodId, assessmentId, classId, subjectId: "math", standard, academicYearId: YEAR, status, progress: { done: roster[standard].length, total: roster[standard].length }, createdAt: now, createdBy: uid.teacher, updatedAt: now, updatedBy: uid.teacher, ...extra });
+  return { classId, sheetId };
+};
+const t2 = sheetSeed("ap-2026-t2", "as-t2-math-4", 4, "published", { submittedBy: uid.teacher, submittedAt: now, reviewedBy: uid.coordinator, reviewedAt: now, approvedBy: uid.principal, approvedAt: now, publishedBy: uid.principal, publishedAt: now });
+const t3s3 = sheetSeed("ap-2026-t3", "as-t3-math-3", 3, "submitted", { submittedBy: uid.teacher, submittedAt: now });
+const t3s4 = sheetSeed("ap-2026-t3", "as-t3-math-4", 4, "draft", { progress: { done: 3, total: roster[4].length } });
+const resultSeed = ({ classId, sheetId }, periodId, assessmentId, standard, name, i, status, filled = true) => {
+  const marks = filled ? marksFor(i + standard) : { wr: i < 3 ? 40 + i : null, or: i < 3 ? 15 : null, cw: i < 3 ? 16 : null };
+  const complete = Object.values(marks).every((value) => value != null);
+  put(`studentResults/${sheetId}_${studentIds[name]}`, { periodId, assessmentId, classId, subjectId: "math", standard, academicYearId: YEAR, studentId: studentIds[name], sheetId, marks, flags: {}, percent: complete ? pct(marks) : null, grade: complete ? gradeOf(pct(marks)) : null,
+    comment: status === "published" && name === "Aarav Raman" ? "Explains his reasoning clearly; keep practising mental arithmetic." : "", status, studentVisible: status === "published", createdAt: now, createdBy: uid.teacher, updatedAt: now, updatedBy: uid.teacher });
+};
+roster[4].forEach((name, i) => resultSeed(t2, "ap-2026-t2", "as-t2-math-4", 4, name, i, "published"));
+roster[3].forEach((name, i) => resultSeed(t3s3, "ap-2026-t3", "as-t3-math-3", 3, name, i, "submitted"));
+roster[4].forEach((name, i) => resultSeed(t3s4, "ap-2026-t3", "as-t3-math-4", 4, name, i, "draft", false));
+
 // ---------- fees-lite (phase 2 data, shown on the parent dashboard when present) ----------
 put("feeStructures/fs-2026", meta({ name: "2026 tuition", amount: 1800, currency: "MYR", instalments: 3 }));
 put("studentFeeAssignments/sfa-aarav", meta({ studentId: studentIds["Aarav Raman"], feeStructureId: "fs-2026", amountDue: 1800, amountPaid: 1200, outstanding: 600, nextDueDate: day(14) }));

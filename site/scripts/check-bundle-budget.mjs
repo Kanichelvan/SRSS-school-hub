@@ -13,9 +13,10 @@ const budgets = [
 
 let failed = false;
 for (const budget of budgets) {
-  const file = files.find((name) => budget.pattern.test(name));
-  if (!file) throw new Error(`Could not find the ${budget.label} bundle in dist/assets.`);
-  const bytes = gzipSync(await readFile(join(assetDirectory, file))).byteLength;
+  // Rollup can emit small shared chunks with the same name (e.g. a react-dom re-export); measure the largest.
+  const sizes = await Promise.all(files.filter((name) => budget.pattern.test(name)).map(async (name) => gzipSync(await readFile(join(assetDirectory, name))).byteLength));
+  if (!sizes.length) throw new Error(`Could not find the ${budget.label} bundle in dist/assets.`);
+  const bytes = Math.max(...sizes);
   const kib = bytes / 1024;
   const status = kib <= budget.maximumKiB ? "PASS" : "FAIL";
   console.log(`${status} ${budget.label}: ${kib.toFixed(1)} KiB gzip (budget ${budget.maximumKiB} KiB)`);

@@ -41,6 +41,8 @@ export async function computeUserScope(db, uid, roles = []) {
 
   const childIds = unique(links.docs.map((doc) => doc.data().studentId));
   const teachingClassIds = unique(assignments.docs.map((doc) => doc.data().classId));
+  // "classId|subjectId" pairs: rules let a teacher write plans, tasks and marks only for subjects they teach.
+  const teachingKeys = unique(assignments.docs.map((doc) => (doc.data().classId && doc.data().subjectId ? `${doc.data().classId}|${doc.data().subjectId}` : null)));
   const homeroomClassIds = homerooms.docs.map((doc) => doc.id);
   const classIds = unique([...teachingClassIds, ...homeroomClassIds]);
   const assignedStudentIds = unique(supportPlans.docs.map((doc) => doc.data().studentId));
@@ -67,6 +69,7 @@ export async function computeUserScope(db, uid, roles = []) {
     staffId,
     childIds,
     teachingClassIds,
+    teachingKeys,
     homeroomClassIds,
     classIds,
     assignedStudentIds,

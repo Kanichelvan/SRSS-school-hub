@@ -46,7 +46,8 @@ No Firebase account is needed; everything runs against the offline `demo-srss` p
 2. Terminal 1: `npm run emulators` (Auth, Firestore, Functions, Storage; UI at http://localhost:4000).
 3. Terminal 2: `npm run seed` — 13 demo accounts (one per role), 36 fictional pupils, a week of attendance, consents, portfolio, admissions.
 4. Terminal 3: `npm run dev`, open `/sign-in` and use **Local demo accounts**.
-5. Tests: `npm test` (unit) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records).
+5. End-to-end (Stage 1 workflows in a real browser): with the emulators seeded and `npm run dev` running, `npm run test:e2e` (needs Playwright; point `PLAYWRIGHT_MODULE` at a global install if it isn't in `node_modules`). Re-seed before each run — it moves real records through the workflow.
+6. Tests: `npm test` (unit) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records).
 
 ### This Mac: iCloud "Optimize Mac Storage"
 

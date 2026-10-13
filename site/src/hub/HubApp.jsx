@@ -2,7 +2,7 @@ import { Suspense, lazy } from "react";
 import { BrowserRouter, Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "../auth/AuthProvider";
 import { MODULES, ROLES, can, canOpen } from "../auth/permissions";
-import { HUB_LABELS, ROUTE_ALIASES, hubIndex, hubRoutes } from "./routes";
+import { HUB_LABELS, ROUTE_ALIASES, hubIndex, hubRoutes, navRoutesFor } from "./routes";
 import { SignIn } from "./SignIn";
 import { getMany, useLoad } from "./data";
 import { EmptyState, Loading, PageHeader, Section } from "./ui";
@@ -17,6 +17,8 @@ const comms = () => import("./screens/comms");
 const admin = () => import("./screens/admin");
 const content = () => import("./screens/content");
 const consent = () => import("./screens/consent");
+const academics = () => import("./screens/academics");
+const assessments = () => import("./screens/assessments");
 
 const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
 
@@ -28,11 +30,15 @@ const SCREENS = {
   announcements: lazyNamed(comms, "Announcements"), calendar: lazyNamed(comms, "Calendar"), notifications: lazyNamed(comms, "Notifications"), profile: lazyNamed(comms, "Profile"),
   admissions: lazyNamed(admin, "Admissions"), consentOverview: lazyNamed(admin, "ConsentOverview"), showcase: lazyNamed(admin, "Showcase"), audit: lazyNamed(admin, "Audit"),
   content: lazyNamed(content, "Content"), inbox: lazyNamed(content, "Inbox"), parentConsent: lazyNamed(consent, "ParentConsent"), consentPrint: lazyNamed(consent, "ConsentPrint"),
+  academicsOverview: lazyNamed(academics, "AcademicsOverview"), curriculumPlans: lazyNamed(academics, "CurriculumPlans"), lessonPlans: lazyNamed(academics, "LessonPlans"), lessonPlanEditor: lazyNamed(academics, "LessonPlanEditor"),
+  learningTasks: lazyNamed(academics, "LearningTasks"), learningTaskDetail: lazyNamed(academics, "LearningTaskDetail"), familyTasks: lazyNamed(academics, "FamilyTasks"),
+  assessments: lazyNamed(assessments, "AssessmentsHome"), assessmentSetup: lazyNamed(assessments, "AssessmentSetup"), markEntry: lazyNamed(assessments, "MarkEntry"), familyResults: lazyNamed(assessments, "FamilyResults"),
 };
 
 function routeAllowed(route, auth) {
   if (route.requiresClaim) return auth.claims[route.requiresClaim] === true;
-  if (route.hub !== "shared" && !auth.hubs.includes(route.hub)) return false;
+  if (route.hub === "staff") { if (!route.navHubs.some((hub) => auth.hubs.includes(hub))) return false; }
+  else if (route.hub !== "shared" && !auth.hubs.includes(route.hub)) return false;
   return canOpen(auth.roles, route.module);
 }
 
@@ -61,7 +67,7 @@ function Shell() {
   const nav = [
     { hub: "dashboard", routes: [hubIndex(auth.currentHub)].filter(Boolean) },
     { hub: "shared", routes: hubRoutes.filter((route) => route.hub === "shared" && !route.hidden && routeAllowed(route, auth)) },
-    { hub: auth.currentHub, routes: hubRoutes.filter((route) => route.hub === auth.currentHub && !route.index && !route.hidden && routeAllowed(route, auth)) },
+    { hub: auth.currentHub, routes: navRoutesFor(auth.currentHub).filter((route) => !route.index && !route.hidden && routeAllowed(route, auth)) },
   ].filter((group) => group.routes.length);
   const switchTo = (hub) => { auth.switchHub(hub); navigate(hubIndex(hub)?.path || "/hub"); };
 
@@ -78,7 +84,7 @@ function Shell() {
       </div>
     </header>
     <div className="hub-body">
-      <nav aria-label="Hub navigation" className="hub-nav">{nav.map(({ hub, routes }) => <div key={hub}>{hub !== "dashboard" && <p>{HUB_LABELS[hub]}</p>}<ul>{routes.map((route) => <li key={route.path}><NavLink to={route.path} end>{route.index ? "Dashboard" : route.label}{MODULES[route.module]?.phase > 1 && <span className="hub-phase" title={`Planned for phase ${MODULES[route.module].phase}`}>P{MODULES[route.module].phase}</span>}</NavLink></li>)}</ul></div>)}</nav>
+      <nav aria-label="Hub navigation" className="hub-nav">{nav.map(({ hub, routes }) => <div key={hub}>{hub !== "dashboard" && <p>{HUB_LABELS[hub]}</p>}<ul>{routes.map((route) => <li key={route.path}><NavLink to={route.path} end={route.hub !== "staff"}>{route.index ? "Dashboard" : route.label}{MODULES[route.module]?.phase > 1 && <span className="hub-phase" title={`Planned for phase ${MODULES[route.module].phase}`}>P{MODULES[route.module].phase}</span>}</NavLink></li>)}</ul></div>)}</nav>
       <main className="hub-main" id="hub-main"><Suspense fallback={null}><StaffAcknowledgementCard /></Suspense><Outlet /></main>
     </div>
     <HubFooter />

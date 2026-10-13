@@ -191,10 +191,11 @@ Shared navigation: **Dashboard · Announcements · Calendar · Messages · Forms
 
 | Hub | Navigation (PRD final model) | Routes |
 |---|---|---|
-| Teacher | My Classes · Attendance · Teaching · Assessments · Students · Portfolios · Parents · Resources | `/hub/teacher`, `/hub/teacher/{classes,attendance,attendance/:classId,teaching,assessments,students,portfolios,parents,resources}` |
+| Teacher | My Classes · Attendance · Academics · Assessments · Students · Portfolios · Parents · Resources | `/hub/teacher`, `/hub/teacher/{classes,attendance,attendance/:classId,students,portfolios,parents,resources}`, plus the shared staff modules below |
 | Parent | My Children · Progress · Attendance · Portfolio · Tasks · Reports · Fees · Meetings | `/hub/parent`, `/hub/parent/{children,progress,attendance,portfolio,tasks,reports,fees,meetings}` |
 | Student | Today · My Learning · My Portfolio · My Progress · Achievements | `/hub/student`, `/hub/student/{learning,portfolio,progress,achievements}` |
-| Admin | Students · Staff · Academics · Admissions · Attendance · Assessments · Communications · Consent · Showcase · Content · Fees · Assets · Reports · Governance · Settings · Roles & access | `/hub/admin`, `/hub/admin/{students,staff,academics,admissions,attendance,assessments,communications,consent,showcase,content,fees,assets,reports,governance,settings,roles}` |
+| Admin | Students · Staff · Academic structure · Admissions · Attendance · Academics · Assessments · Communications · Consent · Showcase · Content · Fees · Assets · Reports · Governance · Settings · Roles & access | `/hub/admin`, `/hub/admin/{students,staff,academics,admissions,attendance,communications,consent,showcase,content,fees,assets,reports,governance,settings,roles}`, plus the shared staff modules below |
+| Staff modules (Teaching and Admin hubs) | Academics (overview, curriculum, lesson plans, learning tasks) · Assessments (mark sheets, setup) | `/hub/academics`, `/hub/academics/{curriculum,lessons,lessons/:lessonId,tasks,tasks/:taskId}`, `/hub/assessments`, `/hub/assessments/{setup,marks/:periodId/:assessmentId/:classId}`. `/hub/teacher/teaching`, `/hub/teacher/assessments` and `/hub/admin/assessments` redirect here (13 Oct 2026). |
 | Shared | Student 360° profile | `/hub/students/:studentId` (tabs filtered by role — SIS-002) |
 
 Aliases from the Developer PRD: `/login` → `/sign-in`; `/dashboard/{role}` → `/hub/{role}`. Proposed (D2): `/portal/{role}` → `/hub/{role}` from the Dual-Plane brief.

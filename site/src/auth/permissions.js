@@ -58,8 +58,9 @@ export const MODULES = {
   settings: { label: "Settings", phase: 1 },
   accessAdministration: { label: "Roles & access", phase: 1 },
   timetable: { label: "Timetable", phase: 2 },
-  teaching: { label: "Teaching & planning", phase: 2 },
-  assessments: { label: "Assessments & gradebook", phase: 2 },
+  // Brought forward to the launch phase by the extended brief (Stage 1, 13 Oct 2026).
+  teaching: { label: "Teaching & planning", phase: 1 },
+  assessments: { label: "Assessments & gradebook", phase: 1 },
   reportCards: { label: "Report cards", phase: 2 },
   support: { label: "Learning support", phase: 2 },
   incidents: { label: "Incidents & behaviour", phase: 2 },
@@ -134,7 +135,9 @@ const MATRIX = {
   teaching: { student: "V own", parent: "V child", teacher: "U", classTeacher: "U", specialistTeacher: "U", academicCoordinator: "A", leadership: "V summary" },
   assessments: {
     student: "V published", parent: "V published", teacher: "U class", classTeacher: "U class", specialistTeacher: "U assigned",
-    academicCoordinator: "A", leadership: "A", schoolAdmin: "V summary",
+    // School Admin configures assessment structures (periods, components, weightings) but enters no marks and
+    // publishes nothing; publication is leadership's (src/hub/logic/academics.js canPublishResults).
+    academicCoordinator: "A", leadership: "A", schoolAdmin: "U",
   },
   reportCards: { student: "V published", parent: "V published", teacher: "U class", classTeacher: "U class", academicCoordinator: "A", leadership: "A" },
   support: { parent: "V selected", classTeacher: "V class", specialistTeacher: "U assigned", academicCoordinator: "V", leadership: "V", safeguardingLead: "V", teacher: "R" },

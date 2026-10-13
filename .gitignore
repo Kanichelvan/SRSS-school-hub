@@ -55,3 +55,6 @@ node_modules.incomplete/
 
 # Design-hook cache (the shared .impeccable/config.json is committed)
 **/.impeccable/hook.cache.json
+
+# Browser test output
+test-results/
