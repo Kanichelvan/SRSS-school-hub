@@ -1,10 +1,12 @@
 // The SRSS consent form, built in so the office never has to set it up (user decision, 13 Oct 2026:
 // one page per child, a few yes/no choices, pre-filled, nothing for the office to approve).
 // Wording follows the Parental Consent policy §9–§14 and the Media Consent policy §4–§5 and §16.
-// Changing a question's meaning means raising CONSENT_FORM_VERSION so families are asked again.
+// These are the built-in questions. The privacy steward or office can reword, add or retire questions in
+// Admin › Settings › Consent questions (`consentDefinitions`); rewording a question raises that question's
+// version, so families are asked it again while their other answers still count.
 // Plain JS (no JSX) so the emulator seed script can import it too.
 
-export const CONSENT_FORM_VERSION = 1;
+export const CONSENT_FORM_VERSION = 1; // version of every built-in question
 
 export const CONSENT_ITEMS = [
   {
@@ -65,8 +67,21 @@ export function responseFor(answer, previous) {
   return previous === "granted" ? "withdrawn" : "declined";
 }
 
-// An answer counts only if it was given to the current version of the question.
-export const isCurrent = (entry) => Boolean(entry && (entry.version ?? CONSENT_FORM_VERSION) >= CONSENT_FORM_VERSION);
+// The questions in force: the built-in ones, as reworded by the school, plus any it added; retired ones drop out.
+export function mergeConsentItems(definitions = []) {
+  const byType = Object.fromEntries(definitions.map((definition) => [definition.type || definition.id, definition]));
+  const builtIn = CONSENT_ITEMS.map((item, index) => ({ ...item, version: CONSENT_FORM_VERSION, order: index + 1, builtIn: true, ...pick(byType[item.type]) }));
+  const added = definitions.filter((definition) => !CONSENT_ITEMS.some((item) => item.type === (definition.type || definition.id)))
+    .map((definition) => ({ type: definition.type || definition.id, policy: "/legal/parental-consent", order: 99, ...pick(definition) }));
+  return [...builtIn, ...added].filter((item) => item.status !== "archived").sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+}
+const pick = (definition) => (definition ? Object.fromEntries(["title", "question", "detail", "policy", "version", "order", "status"].filter((key) => definition[key] != null && definition[key] !== "").map((key) => [key, definition[key]])) : {});
+
+// An answer counts only if it was given to the current version of that question.
+export const isCurrent = (entry, item) => Boolean(entry && (entry.version ?? 1) >= (item?.version ?? CONSENT_FORM_VERSION));
 
 // The choices still waiting for an answer for one child.
-export const missingItems = (status = {}) => CONSENT_ITEMS.filter((item) => !isCurrent(status[item.type]));
+export const missingItems = (status = {}, items = CONSENT_ITEMS) => items.filter((item) => !isCurrent(status[item.type], item));
+
+// Shown on the printed form, so a signed paper copy can be matched to the wording it answered.
+export const formVersionLabel = (items = CONSENT_ITEMS) => items.map((item) => item.version ?? CONSENT_FORM_VERSION).reduce((a, b) => a + b - 1, 1);

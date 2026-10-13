@@ -11,7 +11,9 @@ Follows the PRD Firestore domain model (Master PRD §47, revised §18). Access r
 |---|---|
 | `childIds` | `studentGuardianLinks` where `guardianUid` = user, `hasPortalAccess`, active |
 | `studentId` / `guardianId` / `staffId` | the person record whose `uid` field is this account |
-| `teachingClassIds`, `homeroomClassIds`, `classIds` | `teacherAssignments` (current year) and `classes.classTeacherUid` |
+| `teachingClassIds`, `homeroomClassIds`, `classIds` | active `teacherAssignments` for the current year and active `classes.classTeacherUid` (archived ones grant nothing) |
+| `assignmentKeys` | `classId:subjectId` for each active assignment — subject-level permission (portfolio entries) |
+| `academicYearId` | `settings/school.currentAcademicYearId` when the scope was derived |
 | `assignedStudentIds` | active `studentSupportPlans.assignedStaffUids` |
 | `familyClassIds` | children's (or own) `students.currentClassId` |
 | `audienceKeys` | `school`, `role:*`, `class:*`, `standard:*`, `user:*` — used to target announcements, events and forms |
@@ -19,7 +21,9 @@ Follows the PRD Firestore domain model (Master PRD §47, revised §18). Access r
 
 3. **Records** — every per-child record carries `studentId` and `classId` (the enrolment class at the time), so rules check scope without extra reads. Queries must be constrained the same way: Firestore rejects a query unless every document it could return is readable.
 
-Triggers keep scope current whenever links, assignments, classes, support plans or enrolments change.
+Triggers keep scope current whenever links, assignments, classes, support plans, enrolments, a guardian's account or the current academic year change (`scopeOnSchoolYear` refreshes every pupil's current class, then every account).
+
+Roles: `superAdmin`, `schoolAdmin`, `teacher`, `parent`, `student`, `contentEditor` are the main roles; the others are added as extra responsibilities. Accounts and roles are written only by `provisionAccount`, `setUserRoles` and `setAccountStatus`; the office may grant only `parent`, `student` and the teacher roles.
 
 ## Collections
 
@@ -33,15 +37,16 @@ Launch phase (1) unless marked. ✱ = audited by the `audit*` triggers (PRD §42
 | Attendance | `attendanceSessions` (one per class/date/session — "not submitted" vs "all present", ATT-002) · `attendanceRecords` ✱ |
 | Academics (P2) | `assessmentPeriods` · `assessments` · `assessmentComponents` · `studentResults` ✱ · `reportCards` ✱ |
 | Learning (P2) | `curriculumPlans` · `lessonPlans` · `learningTasks` · `classUpdates` |
-| Portfolio / Human Excellence | `portfolioEntries` ✱ · `portfolioMedia` · `humanValuesObservations` · `studentReflections` |
-| Communication | `announcements` · `notificationRecords` · `messageThreads` (+ `messageItems` subcollection) |
-| Calendar | `events` · `registrations` · `appointments` (P2) |
+| Portfolio / Human Excellence | `portfolioEntries` ✱ (student, academic year, class, subject, category, title, description, learningObjective, `humanValues[]`, `achievementTags[]`, teacherObservation, studentReflection, `mediaReferences[]` Drive links, visibility, consentStatus, moderationStatus) · `showcaseItems` (server-written public copy of approved showcase entries: first name, Standard, title, description, values — no media) · `portfolioMedia` · `humanValuesObservations` · `studentReflections` |
+| Communication | `announcements` ✱ (category, `audienceKeys`, draft/scheduled/published/archived, `publishAt`, `expiresAt`, `pinned`, `attachments[]` links; scheduled ones published by `publishScheduledAnnouncements`) · `notificationRecords` · `messageThreads` (+ `messageItems` subcollection) |
+| Calendar | `events` ✱ (category school/class/academic/holiday/meeting, date/endDate, times, location, description, `audienceKeys`, `attachments[]`, publicListing; teachers add class events for their own classes) · `registrations` · `appointments` (P2) |
 | Forms & consent | `formDefinitions` · `formSubmissions` · `workflowActions` · `consentDefinitions` (dated audit copy; the live form is built into `src/hub/consentForm.js`) · `consentRecords` ✱ (append-only; `source` is `parentPortal` or `paperForm`, paper entries carry `guardianName` and `recordedBy`) · `studentConsentStatus` (server-derived latest response and form version per type) · `consentReminders` (server-written: last reminder per pupil) · `policyAcknowledgements` (one per staff member, versioned confidentiality and acceptable-use acknowledgement) |
 | Admissions | `admissionEnquiries` (public create) · `applications` · `applicationDocuments` · `applicationActions` |
 | Finance-lite (P2) | `feeStructures` · `studentFeeAssignments` · `payments` ✱ · `concessions` ✱ (restricted) |
 | Staff operations (P2) | `staffLeave` · `staffTraining` · `staffAppraisals` |
 | Assets (P3) | `assets` ✱ · `assetAssignments` · `assetMaintenance` |
 | Public website | `pages` (live copy) · `pageDrafts` (staff drafts) · `newsPosts` · `publicAchievements` · `mediaRegistry` (image library: staged → approved/archived; `url`, `storagePath`, required `alt`, `containsPupils` + `consentChecked`, size and dimensions; Storage reads consult the matching registry record) · `contactMessages` |
+| Configuration | `announcementCategories` · `portfolioCategories` · `portfolioTags` · `downloadCategories` (name, description, order, active/archived) ✱ |
 | Governance | `documents` · `auditLogs` (server-only) · `dataReviewTasks` · `settings` ✱ (`settings/school.currentAcademicYearId`) · `certificateVerifications` (public get, no list) |
 
 Library collections are intentionally absent until the Library & Resource Centre module.
@@ -50,7 +55,9 @@ Library collections are intentionally absent until the Library & Resource Centre
 
 | Record | States | Who moves it |
 |---|---|---|
-| Attendance session | `open` → `submitted` | Teacher of the class or school admin; `submittedBy` must be the user |
+| Attendance session | `open` → `submitted` (only submitted registers count) | Teacher of the class or school admin; records are saved first and the session is marked submitted last. Later changes are corrections: `correctionReason`, `correctedBy`, `correctedAt`, `previousStatus` |
+| Enrolment | `active` → `transferred` / `completed` / `withdrawn` | Office; moving class ends one enrolment and starts another — student, class, year and start date never change |
+| Teacher assignment | `active` → `archived` | Office or academic coordinator, never for themselves; teacher, class, subject and year never change |
 | Student result | `draft` → `submitted` → `reviewed` → `approved` → `published` → `locked` | Teacher (draft/submitted), Academic Coordinator (review/approve/publish), Leadership (any, incl. after publication) |
 | Report card | `draft` → `submitted` → `reviewed` → `academicApproved` → `published` | Teacher → Academic Coordinator → Headmistress |
 | Portfolio entry | `internal` → `family` → `showcaseCandidate` → `publicShowcase` | Teacher up to candidate; only Portfolio Moderator/Leadership to public, and only with public-showcase consent |

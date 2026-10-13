@@ -11,7 +11,9 @@
     "test:rules": "firebase --project demo-srss-tests emulators:exec --only firestore,storage \"node --test --test-concurrency=1 tests/rules/*.test.mjs\"",
     "emulators": "firebase emulators:start",
     "seed": "node scripts/seed-emulator.mjs",
-    "deploy:rules": "firebase deploy --only firestore:rules,storage"
+    "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "test:e2e": "firebase --project demo-srss-e2e emulators:exec --only auth,firestore,functions \"node --test --test-concurrency=1 tests/e2e/*.test.mjs\"",
+    "test:quest": "firebase --project demo-srss-quest-test --config firebase.quest-test.json emulators:exec --only auth,firestore,functions,storage \"QUEST_FUNCTIONS_EMULATOR_HOST=127.0.0.1:5201 node --test --test-concurrency=1 tests/e2e/quest.test.mjs tests/rules/quest.rules.test.mjs\""
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

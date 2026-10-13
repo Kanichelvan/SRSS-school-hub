@@ -16,6 +16,17 @@ service firebase.storage {
     function sizeUnder(mb) { return request.resource.size < mb * 1024 * 1024; }
 
     // Website image library. The Firestore registry is created first and carries the consent decision.
+    match /quest/{ownerUid}/{attemptId}/{fileName} {
+      function attempt() { return firestore.get(/databases/(default)/documents/challengeAttempts/$(attemptId)).data; }
+      function reviewer() { return roles().hasAny(['superAdmin', 'schoolAdmin', 'leadership'])
+        || (attempt().participantKind == 'student' && roles().hasAny(['teacher', 'classTeacher', 'specialistTeacher'])
+          && (attempt().classId in me().get('classIds', []) || attempt().studentId in me().get('assignedStudentIds', []))); }
+      allow read: if signedIn() && attempt().uid == ownerUid && (request.auth.uid == ownerUid || reviewer());
+      allow create: if signedIn() && request.auth.uid == ownerUid && attempt().uid == ownerUid
+        && attempt().definition.type == 'creative' && attempt().status in ['started', 'returned']
+        && sizeUnder(10) && request.resource.contentType.matches('image/(jpeg|png|webp)|application/pdf|audio/(mpeg|mp4)');
+      // Submitted evidence is immutable. No public download URLs are stored in engagement records.
+    }
     // Bytes remain private while staging and become public only when that same record is approved.
     match /media/public/{mediaId} {
       function entry() { return firestore.get(/databases/(default)/documents/mediaRegistry/$(mediaId)).data; }

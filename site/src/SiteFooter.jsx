@@ -102,11 +102,11 @@ export function SiteFooter({ onVisit }) {
       </nav>}
 
       <div className="site-footer-base">
-        <p>© {year} Sekolah Rendah Sathya Sai. All rights reserved.</p>
-        <p>An educational initiative of the Sathya Sai International Organisation of Malaysia.</p>
+        <div className="site-footer-legalese">
+          <p>© {year} Sathya Sai International Organisation of Malaysia. All rights reserved.</p>
+          <p className="site-footer-jubilee"><strong>SRSS25</strong> | 25 years of Shaping Minds. Nurturing Hearts. Inspiring Lives.</p>
+        </div>
         <p className="site-footer-utility"><a href="/legal/accessibility-complaints">Accessibility</a><span aria-hidden="true">·</span><a href="/legal/privacy">Privacy</a><span aria-hidden="true">·</span><button type="button" onClick={scrollToTop}>Back to Top <ArrowUp size={13} weight="bold" aria-hidden="true" /></button></p>
-        <p className="site-footer-jubilee"><strong>SRSS25</strong> | 25 years of Shaping Minds. Nurturing Hearts. Inspiring Lives.</p>
-        <p className="site-footer-platform">SRSS Digital Hub — an SSIOM Digital Initiative for Sekolah Rendah Sathya Sai. Platform software © {year} SSIOM.</p>
       </div>
     </footer>
   );

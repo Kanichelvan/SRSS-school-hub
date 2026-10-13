@@ -4,8 +4,7 @@ import { AuthProvider, useAuth } from "../auth/AuthProvider";
 import { MODULES, ROLES, can, canOpen } from "../auth/permissions";
 import { HUB_LABELS, ROUTE_ALIASES, hubIndex, hubRoutes } from "./routes";
 import { SignIn } from "./SignIn";
-import { getMany, useLoad } from "./data";
-import { EmptyState, Loading, PageHeader, Section } from "./ui";
+import { Loading, PageHeader, Section } from "./ui";
 import "./hub.css";
 
 const lazyNamed = (loader, name) => lazy(() => loader().then((module) => ({ default: module[name] })));
@@ -17,20 +16,44 @@ const comms = () => import("./screens/comms");
 const admin = () => import("./screens/admin");
 const content = () => import("./screens/content");
 const consent = () => import("./screens/consent");
+const setup = () => import("./screens/setup");
+const people = () => import("./screens/people");
+const system = () => import("./screens/system");
+const teaching = () => import("./screens/teaching");
+const student = () => import("./screens/student");
+const wizard = () => import("./screens/wizard");
+const quest = () => import("./screens/quest");
+const questAdmin = () => import("./screens/quest-admin");
+const nilam = () => import("./screens/nilam");
 
 const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
 
 const SCREENS = {
-  adminDashboard: lazyNamed(dashboards, "AdminDashboard"), teacherDashboard: lazyNamed(dashboards, "TeacherDashboard"), parentDashboard: lazyNamed(dashboards, "ParentDashboard"), studentDashboard: lazyNamed(dashboards, "StudentDashboard"),
+  quest: lazyNamed(quest, "QuestHome"), challenges: lazyNamed(quest, "MyChallenges"), challengePlayer: lazyNamed(quest, "ChallengePlayer"), questBadges: lazyNamed(quest, "QuestBadges"), questJourney: lazyNamed(quest, "QuestJourney"), questLeaderboard: lazyNamed(quest, "QuestLeaderboard"), staffQuest: lazyNamed(quest, "StaffQuest"),
+  challengeCms: lazyNamed(questAdmin, "ChallengeCMS"), questReleases: lazyNamed(questAdmin, "ReleaseCalendar"), badgeCms: lazyNamed(questAdmin, "BadgeCMS"), questReview: lazyNamed(questAdmin, "QuestReview"), questSettings: lazyNamed(questAdmin, "EngagementSettings"),
+  nilam: lazyNamed(nilam, "Nilam"), parentReading: lazyNamed(nilam, "ParentReading"),
+  adminDashboard: lazyNamed(dashboards, "AdminDashboard"), teacherDashboard: lazyNamed(dashboards, "TeacherDashboard"), parentDashboard: lazyNamed(dashboards, "ParentDashboard"), studentDashboard: lazyNamed(student, "StudentDashboard"),
   studentRegister: lazyNamed(records, "StudentRegister"), student360: lazyNamed(records, "Student360"), staffDirectory: lazyNamed(records, "StaffDirectory"), academics: lazyNamed(records, "Academics"),
   attendance: lazyNamed(attendance, "AttendanceHome"), attendanceOverview: lazyNamed(attendance, "AttendanceOverview"), childAttendance: lazyNamed(attendance, "ChildAttendance"),
-  myChildren: lazyNamed(family, "MyChildren"), journey: lazyNamed(family, "Journey"), myClasses: MyClasses,
+  myChildren: lazyNamed(family, "MyChildren"), journey: lazyNamed(family, "Journey"),
   announcements: lazyNamed(comms, "Announcements"), calendar: lazyNamed(comms, "Calendar"), notifications: lazyNamed(comms, "Notifications"), profile: lazyNamed(comms, "Profile"),
   admissions: lazyNamed(admin, "Admissions"), consentOverview: lazyNamed(admin, "ConsentOverview"), showcase: lazyNamed(admin, "Showcase"), audit: lazyNamed(admin, "Audit"),
   content: lazyNamed(content, "Content"), inbox: lazyNamed(content, "Inbox"), parentConsent: lazyNamed(consent, "ParentConsent"), consentPrint: lazyNamed(consent, "ConsentPrint"),
+  // School setup, people and assignments (Admin hub)
+  setupWizard: lazyNamed(wizard, "SetupWizard"), academicYears: lazyNamed(setup, "AcademicYears"), terms: lazyNamed(setup, "Terms"), standards: lazyNamed(setup, "Standards"), classes: lazyNamed(setup, "Classes"), subjects: lazyNamed(setup, "Subjects"),
+  teacherAssignments: lazyNamed(setup, "TeacherAssignments"), enrolments: lazyNamed(setup, "Enrolments"),
+  studentsAdmin: lazyNamed(people, "StudentsAdmin"), guardians: lazyNamed(people, "Guardians"), staffAdmin: lazyNamed(people, "StaffAdmin"), guardianLinks: lazyNamed(people, "GuardianLinks"), accounts: lazyNamed(people, "Accounts"),
+  rolesMatrix: lazyNamed(system, "RolesMatrix"), settings: lazyNamed(system, "Settings"), announcementsAdmin: lazyNamed(system, "AnnouncementsAdmin"), calendarAdmin: lazyNamed(system, "CalendarAdmin"),
+  // Teacher hub
+  myClasses: lazyNamed(teaching, "MyClasses"), classDashboard: lazyNamed(teaching, "ClassDashboard"), classRoster: lazyNamed(teaching, "ClassRoster"), teacherPortfolio: lazyNamed(teaching, "TeacherPortfolio"), teacherAnnouncements: lazyNamed(teaching, "TeacherAnnouncements"), teacherEvents: lazyNamed(teaching, "TeacherEvents"),
+  // Student hub
+  myClass: lazyNamed(student, "MyClass"), myAchievements: lazyNamed(student, "MyAchievements"),
 };
 
 function routeAllowed(route, auth) {
+  if (route.editorOnly && !can(auth.roles, "engagement", "C")) return false;
+  if (route.publisherOnly && !can(auth.roles, "engagement", "A")) return false;
+  if (route.staffOnly && !auth.roles.some((role) => !["parent", "student"].includes(role))) return false;
   if (route.requiresClaim) return auth.claims[route.requiresClaim] === true;
   if (route.hub !== "shared" && !auth.hubs.includes(route.hub)) return false;
   return canOpen(auth.roles, route.module);
@@ -58,10 +81,13 @@ function HubHome() {
 function Shell() {
   const auth = useAuth();
   const navigate = useNavigate();
+  const own = hubRoutes.filter((route) => route.hub === auth.currentHub && !route.index && !route.hidden && routeAllowed(route, auth));
+  // Pupils get one short list; the Admin hub is grouped; other hubs list their own pages, then shared ones.
+  const groups = auth.currentHub === "admin" ? [...new Set(own.map((route) => route.group || "More"))].map((group) => ({ hub: group, label: group, routes: own.filter((route) => (route.group || "More") === group) })) : [{ hub: auth.currentHub, label: HUB_LABELS[auth.currentHub], routes: own }];
   const nav = [
     { hub: "dashboard", routes: [hubIndex(auth.currentHub)].filter(Boolean) },
-    { hub: "shared", routes: hubRoutes.filter((route) => route.hub === "shared" && !route.hidden && routeAllowed(route, auth)) },
-    { hub: auth.currentHub, routes: hubRoutes.filter((route) => route.hub === auth.currentHub && !route.index && !route.hidden && routeAllowed(route, auth)) },
+    ...groups,
+    ...(auth.currentHub === "student" ? [] : [{ hub: "shared", label: HUB_LABELS.shared, routes: hubRoutes.filter((route) => route.hub === "shared" && !route.hidden && routeAllowed(route, auth)) }]),
   ].filter((group) => group.routes.length);
   const switchTo = (hub) => { auth.switchHub(hub); navigate(hubIndex(hub)?.path || "/hub"); };
 
@@ -78,7 +104,7 @@ function Shell() {
       </div>
     </header>
     <div className="hub-body">
-      <nav aria-label="Hub navigation" className="hub-nav">{nav.map(({ hub, routes }) => <div key={hub}>{hub !== "dashboard" && <p>{HUB_LABELS[hub]}</p>}<ul>{routes.map((route) => <li key={route.path}><NavLink to={route.path} end>{route.index ? "Dashboard" : route.label}{MODULES[route.module]?.phase > 1 && <span className="hub-phase" title={`Planned for phase ${MODULES[route.module].phase}`}>P{MODULES[route.module].phase}</span>}</NavLink></li>)}</ul></div>)}</nav>
+      <nav aria-label="Hub navigation" className="hub-nav">{nav.map(({ hub, label, routes }) => <div key={hub}>{hub !== "dashboard" && <p>{label}</p>}<ul>{routes.map((route) => <li key={route.path}><NavLink to={route.path} end={route.index || !hubRoutes.some((other) => other.hidden && other.path.startsWith(`${route.path}/`))}>{route.index ? "Dashboard" : route.label}{MODULES[route.module]?.phase > 1 && <span className="hub-phase" title={`Planned for phase ${MODULES[route.module].phase}`}>P{MODULES[route.module].phase}</span>}</NavLink></li>)}</ul></div>)}</nav>
       <main className="hub-main" id="hub-main"><Suspense fallback={null}><StaffAcknowledgementCard /></Suspense><Outlet /></main>
     </div>
     <HubFooter />
@@ -104,16 +130,6 @@ function ModulePlaceholder({ route }) {
       <div><dt>Your access</dt><dd>{scopes.length ? scopes.map(([action, scope]) => `${names[action]} (${scope})`).join(", ") : "Navigation only"}</dd></div>
       <div><dt>Google services</dt><dd>{route.google.length ? route.google.join(", ") : "SRSS-native"}</dd></div>
     </dl></Section>
-  </>;
-}
-
-function MyClasses() {
-  const auth = useAuth();
-  const classIds = auth.scope?.classIds || [];
-  const { data, loading } = useLoad(() => getMany("classes", classIds), [classIds.join("|")]);
-  return <>
-    <PageHeader kicker="Teaching" title="My classes">Classes you teach this year.</PageHeader>
-    {loading ? <Loading /> : !data.length ? <EmptyState title="No classes assigned yet." /> : <ul className="hub-cards">{data.sort((a, b) => a.standard - b.standard).map((cls) => <li key={cls.id} className="hub-card"><div className="hub-card-top"><strong>{cls.name}</strong>{auth.scope?.homeroomClassIds?.includes(cls.id) && <span className="hub-badge hub-tone-info">Class teacher</span>}</div><small>Standard {cls.standard} · {cls.room}</small><div className="hub-form-actions"><Link className="hub-button hub-button-small" to={`/hub/teacher/attendance/${cls.id}`}>Attendance</Link><Link className="hub-button hub-button-quiet hub-button-small" to="/hub/teacher/students">Students</Link></div></li>)}</ul>}
   </>;
 }
 

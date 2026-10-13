@@ -4,7 +4,8 @@
 //
 // status "page":    the URL renders its own page.
 // status "section": the URL is final, but its content currently lives as a section of the parent page
-//                   (`page` + `anchor`). Promote it to "page" once verified content justifies it.
+//                   (`page` + `anchor`). `editable` sections become full pages as soon as the school
+//                   publishes their content from the hub — no code change needed.
 // owner:            who keeps the content accurate (hub roles); Leadership approves anything published.
 
 export const SITE = [
@@ -12,24 +13,24 @@ export const SITE = [
 
   // 01 About SRSS — who we are
   { path: "/about", label: "About SRSS", page: "about", status: "page", owner: "Leadership", summary: "Our identity, philosophy, history and people." },
-  { path: "/about/our-story", label: "Our Story", parent: "/about", page: "about", anchor: "who-we-are", status: "section", owner: "Leadership", summary: "How SRSS began and grew since 2002." },
+  { path: "/about/our-story", label: "Our Story", parent: "/about", page: "about", anchor: "who-we-are", status: "section", editable: true, owner: "Leadership", summary: "How SRSS began and grew since 2002." },
   { path: "/about/vision-mission", label: "Vision & Mission", parent: "/about", page: "about", anchor: "vision-mission", status: "section", owner: "Leadership", summary: "Our purpose, our promise and the four mission pillars." },
   { path: "/about/sathya-sai-education", label: "Sathya Sai Education", parent: "/about", page: "sathyaSai", status: "page", owner: "Leadership", summary: "The philosophy of Sathya Sai Educare and the five human values." },
   { path: "/about/leadership-governance", label: "Leadership & Governance", parent: "/about", page: "governance", status: "page", owner: "Leadership", summary: "How the school is governed and led, and its relationship with SSIOM." },
-  { path: "/about/our-people", label: "Our People", parent: "/about", page: "ourPeople", status: "page", owner: "Leadership", summary: "The Principal’s welcome and the voices of our teachers and alumni." },
-  { path: "/about/school-profile", label: "School Profile", parent: "/about", page: "about", anchor: "school-profile", status: "section", owner: "School office", summary: "Key facts: registration, levels, curriculum, hours and location." },
-  { path: "/about/campus", label: "Campus", parent: "/about", page: "about", anchor: "campus", status: "section", owner: "School office", summary: "The spaces where children learn, play and grow." },
+  { path: "/about/our-people", label: "Our People", parent: "/about", page: "ourPeople", status: "page", editable: "append", owner: "Leadership", summary: "The Principal’s welcome and the voices of our teachers and alumni." },
+  { path: "/about/school-profile", label: "School Profile", parent: "/about", page: "about", anchor: "school-profile", status: "section", editable: true, owner: "School office", summary: "Key facts: registration, levels, curriculum, hours and location." },
+  { path: "/about/campus", label: "Campus", parent: "/about", page: "about", anchor: "campus", status: "section", editable: true, owner: "School office", summary: "The spaces where children learn, play and grow." },
   { path: "/about/silver-jubilee", label: "Silver Jubilee", parent: "/about", page: "jubilee", status: "page", owner: "Content editor", summary: "SRSS25 — 25 years of education for life." },
 
   // 02 Learning — how we educate
   { path: "/learning", label: "Learning", page: "learning", status: "page", owner: "Academic coordinator", summary: "How SRSS educates the whole child." },
-  { path: "/learning/curriculum", label: "Curriculum", parent: "/learning", page: "learning", anchor: "curriculum", status: "section", owner: "Academic coordinator", summary: "Subjects, structure, language of instruction and assessment." },
-  { path: "/learning/learning-journey", label: "Learning Journey", parent: "/learning", page: "learning", anchor: "learning-journey", status: "section", owner: "Academic coordinator", summary: "Standard 1 to 6: progression and expectations." },
+  { path: "/learning/curriculum", label: "Curriculum", parent: "/learning", page: "learning", anchor: "curriculum", status: "section", editable: true, owner: "Academic coordinator", summary: "Subjects, structure, language of instruction and assessment." },
+  { path: "/learning/learning-journey", label: "Learning Journey", parent: "/learning", page: "learning", anchor: "learning-journey", status: "section", editable: true, owner: "Academic coordinator", summary: "Standard 1 to 6: progression and expectations." },
   { path: "/learning/human-values", label: "Human Values", parent: "/learning", page: "learning", anchor: "human-values", status: "section", owner: "Academic coordinator", summary: "How the five human values are practised in everyday learning." },
-  { path: "/learning/enrichment", label: "Enrichment", parent: "/learning", page: "learning", anchor: "human-values", status: "section", owner: "Academic coordinator", summary: "Co-curricular programmes and learning beyond the classroom." },
-  { path: "/learning/reading-library", label: "Reading & Library", parent: "/learning", page: "learning", anchor: "learning-environment", status: "section", owner: "Academic coordinator", summary: "Reading culture, literacy and the library." },
-  { path: "/learning/learning-support", label: "Learning Support", parent: "/learning", page: "learning", anchor: "learning-environment", status: "section", owner: "Academic coordinator", summary: "Every child can learn: support, intervention and confidence." },
-  { path: "/learning/learning-environment", label: "Learning Environment", parent: "/learning", page: "learning", anchor: "learning-environment", status: "section", owner: "Academic coordinator", summary: "Learning spaces and their educational purpose." },
+  { path: "/learning/enrichment", label: "Enrichment", parent: "/learning", page: "learning", anchor: "human-values", status: "section", editable: true, owner: "Academic coordinator", summary: "Co-curricular programmes and learning beyond the classroom." },
+  { path: "/learning/reading-library", label: "Reading & Library", parent: "/learning", page: "learning", anchor: "learning-environment", status: "section", editable: true, owner: "Academic coordinator", summary: "Reading culture, literacy and the library." },
+  { path: "/learning/learning-support", label: "Learning Support", parent: "/learning", page: "learning", anchor: "learning-environment", status: "section", editable: true, owner: "Academic coordinator", summary: "Every child can learn: support, intervention and confidence." },
+  { path: "/learning/learning-environment", label: "Learning Environment", parent: "/learning", page: "learning", anchor: "learning-environment", status: "section", editable: true, owner: "Academic coordinator", summary: "Learning spaces and their educational purpose." },
 
   // 03 Student Life — what children experience
   { path: "/student-life", label: "Student Life", page: "studentLife", status: "page", owner: "Content editor", summary: "What children experience at SRSS." },
@@ -46,7 +47,7 @@ export const SITE = [
   { path: "/join", label: "Join SRSS", page: "join", status: "page", owner: "Admissions officer", summary: "Admissions, alumni, volunteering and support." },
   { path: "/join/admissions", label: "Admissions", parent: "/join", page: "admissions", status: "page", owner: "Admissions officer", summary: "Who can apply, the process, fees and enquiries." },
   { path: "/join/why-srss", label: "Why SRSS?", parent: "/join/admissions", page: "admissions", anchor: "why-srss", status: "section", owner: "Admissions officer", summary: "What makes an SRSS education distinctive." },
-  { path: "/join/how-to-apply", label: "How to Apply", parent: "/join/admissions", page: "admissions", anchor: "how-to-apply", status: "section", owner: "Admissions officer", summary: "The admissions process, step by step." },
+  { path: "/join/how-to-apply", label: "How to Apply", parent: "/join/admissions", page: "admissions", anchor: "how-to-apply", status: "section", editable: true, owner: "Admissions officer", summary: "The admissions process, step by step." },
   { path: "/join/fees", label: "Fees", parent: "/join/admissions", page: "admissions", anchor: "fees", status: "section", owner: "Admissions officer", summary: "Fees and how to request fee information." },
   { path: "/join/book-a-visit", label: "Book a Visit", parent: "/join/admissions", page: "admissions", anchor: "how-to-apply", status: "section", owner: "Admissions officer", openVisit: true, summary: "Request a school tour." },
   { path: "/join/admissions-faq", label: "Admissions FAQs", parent: "/join/admissions", page: "admissions", anchor: "admissions-faq", status: "section", owner: "Admissions officer", summary: "Questions families ask about joining SRSS." },
@@ -61,7 +62,7 @@ export const SITE = [
   { path: "/resources/calendar", label: "Calendar", parent: "/resources", page: "resources", anchor: "calendar", status: "section", owner: "School office", summary: "Term dates, holidays and public events." },
   { path: "/resources/news", label: "News & Updates", parent: "/resources", page: "resources", anchor: "news", status: "section", owner: "Content editor", summary: "Announcements, newsletters and school news." },
   { path: "/resources/notices", label: "Notices", parent: "/resources", page: "resources", anchor: "news", status: "section", owner: "School office", summary: "Public school notices." },
-  { path: "/resources/downloads", label: "Downloads", parent: "/resources", page: "resources", anchor: "downloads", status: "section", owner: "School office", summary: "Forms, brochures and approved documents." },
+  { path: "/resources/downloads", label: "Downloads", parent: "/resources", page: "resources", anchor: "downloads", status: "section", editable: true, owner: "School office", summary: "Forms, brochures and approved documents." },
   { path: "/resources/policies", label: "Policies", parent: "/resources", page: "resources", anchor: "policies", status: "section", owner: "Privacy steward", summary: "Public school policies, privacy and safeguarding." },
   { path: "/resources/faq", label: "FAQs", parent: "/resources", page: "faq", status: "page", owner: "School office", summary: "Clear answers about learning, admissions and school life." },
   { path: "/resources/contact", label: "Contact", parent: "/resources", page: "resources", anchor: "contact", status: "section", owner: "School office", summary: "Office details, directions and how to reach us." },
@@ -70,6 +71,34 @@ export const SITE = [
   // 07 Legal — handled by the legal registry (src/legal/registry.js)
   { path: "/legal", label: "Legal & Policies", page: "legal", status: "page", owner: "Privacy steward", summary: "Privacy, terms, safeguarding and the School’s other policies." },
 ];
+
+// Pages marked `editable` wait on verified content from the school. Staff write them in the hub
+// (Content › Website pages); once Leadership publishes, the address renders as a full page.
+export const sitePageId = (path) => `site${path.replace(/\//g, "-")}`;
+export const editablePages = () => SITE.filter((entry) => entry.editable);
+
+// The one template every editable page starts from. Empty fields and rows are simply not shown, so a
+// page can use any mix of sections, a timeline, people and documents.
+export const SITE_PAGE_TEMPLATE = {
+  title: "",
+  intro: "",
+  heroImage: "",
+  heroImageAlt: "",
+  sections: [{ heading: "", body: "", image: "", imageAlt: "" }],
+  timeline: [{ year: "", title: "", text: "" }],
+  people: [{ name: "", role: "", image: "", imageAlt: "" }],
+  documents: [{ title: "", description: "", link: "" }],
+};
+// The parts of a page that have content, or null when nothing has been written yet.
+export function pageContent(content) {
+  if (!content) return null;
+  const sections = (content.sections || []).filter((item) => item.heading?.trim() || item.body?.trim());
+  const timeline = (content.timeline || []).filter((item) => item.year?.trim() || item.title?.trim());
+  const people = (content.people || []).filter((item) => item.name?.trim());
+  const documents = (content.documents || []).filter((item) => item.title?.trim() && item.link?.trim());
+  const hasBody = content.intro?.trim() || sections.length || timeline.length || people.length || documents.length;
+  return hasBody ? { ...content, sections, timeline, people, documents } : null;
+}
 
 // Old addresses → canonical ones. Also mirrored as permanent (301) redirects in firebase.json.
 export const REDIRECTS = {

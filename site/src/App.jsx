@@ -30,15 +30,15 @@ import { ArrowUp } from "@phosphor-icons/react/dist/csr/ArrowUp";
 import { Pause } from "@phosphor-icons/react/dist/csr/Pause";
 import { Play } from "@phosphor-icons/react/dist/csr/Play";
 import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
-import { loadPublicContent, submitPublicForm } from "./lib/publicContent.js";
+import { loadPublicContent, loadSitePage, submitPublicForm } from "./lib/publicContent.js";
 import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
 import { signInLink, siteNav } from "./data/navigation.js";
-import { resolvePath } from "./data/siteMap.js";
+import { pageContent, resolvePath, siteEntry, sitePageId } from "./data/siteMap.js";
 import { storyCategory } from "./data/stories.js";
 import { FaqAccordion, FaqList, FAQ_TOPICS } from "./components/Faq.jsx";
-import { AdmissionsPage, Breadcrumbs, GovernancePage, IntegralFramework, JoinPage, JubileePage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SathyaSaiEducationPage, SiteSearch, StoryFilters, StudentLifePage } from "./pages/SitePages.jsx";
+import { AdmissionsPage, Breadcrumbs, ContentBody, ContentPage, GovernancePage, IntegralFramework, JoinPage, JubileePage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SathyaSaiEducationPage, SiteSearch, StoryFilters, StudentLifePage } from "./pages/SitePages.jsx";
 import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
 
 // Policy pages load on demand so their text never weighs on the homepage.
@@ -178,7 +178,7 @@ function AboutPage({ onVisit, content, faqs }) {
   </main>;
 }
 
-function VoicesPage() {
+function VoicesPage({ extra }) {
   return <main id="main" className="voices-page">
     <section className="voices-hero" id="top" aria-labelledby="voices-title">
       <div className="voices-shell voices-hero-grid">
@@ -239,6 +239,7 @@ function VoicesPage() {
       </article>)}
     </div>
 
+    {extra && <div id="staff" className="voices-directory-extra">{extra.title && <div className="page-inner content-intro"><p className="eyebrow">Our people</p><h2 className="content-heading">{extra.title}</h2>{extra.intro && <p>{extra.intro}</p>}</div>}<ContentBody content={extra} /></div>}
     <section className="voices-closing">
       <div className="voices-shell"><p className="eyebrow">25 years of human excellence</p><h2>The story continues with every child.</h2><p>Discover the educational philosophy and community that connect these reflections.</p><a className="primary-button" href="/about">Explore About SRSS <ArrowRight size={18}/></a></div>
     </section>
@@ -298,6 +299,8 @@ function SchoolCalendar({ items, onAdd }) {
 
 export function App() {
   const [route, setRoute] = useState(currentRoute);
+  // School-written content for editable addresses: undefined while loading, null when none is published.
+  const [sitePage, setSitePage] = useState({ path: null, content: undefined });
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(null);
@@ -362,10 +365,21 @@ export function App() {
   useEffect(() => { loadPublicContent().then((data) => setManagedContent((current) => ({ ...current, ...data, homepage: { ...current.homepage, ...(data.homepage || {}) } }))).catch(() => {}); }, []);
 
   useEffect(() => {
-    const target = window.location.hash.slice(1) || route.anchor;
+    if (!route.editable) return undefined;
+    let live = true;
+    setSitePage({ path: route.path, content: undefined });
+    loadSitePage(sitePageId(route.path)).then((content) => { if (live) setSitePage({ path: route.path, content: pageContent(content) }); }).catch(() => { if (live) setSitePage({ path: route.path, content: null }); });
+    return () => { live = false; };
+  }, [route]);
+  const pageReady = !route.editable || sitePage.path === route.path && sitePage.content !== undefined;
+  const standalone = route.editable === true && pageReady && Boolean(sitePage.content);
+
+  useEffect(() => {
+    if (!pageReady) return;
+    const target = window.location.hash.slice(1) || (standalone ? null : route.anchor);
     if (target) window.setTimeout(() => document.getElementById(target)?.scrollIntoView(), 0);
     else window.scrollTo(0, 0);
-  }, [route]);
+  }, [route, pageReady, standalone]);
 
   useEffect(() => {
     const node = glanceRef.current;
@@ -662,7 +676,7 @@ export function App() {
     sathyaSai: () => <SathyaSaiEducationPage values={values} quote={inspirationQuote} faqs={pageFaqs} />,
     jubilee: () => <JubileePage blocks={blocks} motto={managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto} />,
     governance: () => <GovernancePage />,
-    ourPeople: () => <VoicesPage />,
+    ourPeople: () => <VoicesPage extra={sitePage.path === route.path ? sitePage.content : null} />,
     learning: () => <LearningPage blocks={blocks} faqs={pageFaqs} />,
     studentLife: () => <StudentLifePage blocks={blocks} faqs={pageFaqs} entry={route} />,
     join: () => <JoinPage />,
@@ -694,7 +708,7 @@ export function App() {
     ? <span className={className}>{label}</span>
     : href === "visit"
       ? <button type="button" className={className} onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>{label}</button>
-      : <a className={className} href={href} onClick={closeMenus}>{label}</a>;
+      : <a className={className} href={href} onClick={closeMenus} aria-current={href === route.path ? "page" : undefined}>{label}</a>;
   const menuBody = (item) => <>
     {item.groups && <div className="mega-groups">{item.groups.map((group) => <div className="mega-group" key={group.title}>{navLink(group.title, group.href, "mega-group-title")}{group.note && <small>{group.note}</small>}{group.links && <ul>{group.links.map(([label, href]) => <li key={label}>{navLink(label, href)}</li>)}</ul>}</div>)}</div>}
     {item.links && <ul className="mega-links">{item.links.map(([label, href]) => <li key={label}>{navLink(label, href)}</li>)}</ul>}
@@ -775,7 +789,7 @@ export function App() {
       )}
 
       {route.page !== "legal" && <Breadcrumbs entry={route} />}
-      {(pages[route.page] || pages.notFound)()}
+      {!pageReady ? <main id="main" className="site-page" aria-busy="true" /> : standalone ? <ContentPage entry={route} content={sitePage.content} parent={siteEntry(route.parent)} /> : (pages[route.page] || pages.notFound)()}
 
 
       {!isHome && <PreFooter onVisit={() => { setSent(false); setVisitOpen(true); }} />}

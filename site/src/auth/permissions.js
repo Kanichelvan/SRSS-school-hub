@@ -5,6 +5,7 @@
 // Hiding a navigation item is never an access control (PRD §43, AUTH-002).
 
 export const ROLES = {
+  superAdmin: { label: "Super Administrator", hub: "admin" },
   student: { label: "Student", hub: "student" },
   parent: { label: "Parent / Guardian", hub: "parent" },
   teacher: { label: "Teacher", hub: "teacher" },
@@ -24,10 +25,25 @@ export const ROLES = {
   librarian: { label: "Librarian", hub: "admin", future: true },
   auditor: { label: "Auditor / Read-only Reviewer", hub: "admin", future: true },
 };
-// Super Administrator is not a hub role: it is the `accessAdmin` claim, held by 1–2 people (PRD §62).
+// Super Administrator (1–2 people, PRD §62) holds everything School Administrator, Leadership and
+// Technical Administrator hold, and is the only role that can assign staff roles. The server keeps the
+// legacy `accessAdmin` claim in step with it.
 
 export const ROLE_IDS = Object.keys(ROLES);
 export const TEACHING_ROLES = ["teacher", "classTeacher", "specialistTeacher"];
+
+// The six initial roles (user decision, 14 Oct 2026). Every other role is an additional responsibility
+// that can be added to a person, e.g. Teacher + Class Teacher + Portfolio Moderator.
+export const PRIMARY_ROLES = ["superAdmin", "schoolAdmin", "teacher", "parent", "student", "contentEditor"];
+export const ADDITIONAL_ROLES = ROLE_IDS.filter((role) => !PRIMARY_ROLES.includes(role) && !ROLES[role].future);
+
+// The school office may give families and teachers their accounts. Roles that open the Admin hub are
+// "elevated": only a Super Administrator can grant or remove them (enforced in functions/index.js).
+export const OFFICE_ASSIGNABLE_ROLES = ["parent", "student", "teacher", "classTeacher", "specialistTeacher"];
+export const isElevated = (role) => !OFFICE_ASSIGNABLE_ROLES.includes(role);
+export const isSuperAdmin = (roles, claims = {}) => (roles || []).includes("superAdmin") || claims.accessAdmin === true;
+// Roles the signed-in person may grant or remove for someone else.
+export const assignableRoles = (roles, claims) => (isSuperAdmin(roles, claims) ? ROLE_IDS : (roles || []).includes("schoolAdmin") ? OFFICE_ASSIGNABLE_ROLES : []);
 
 // Modules, with the release phase from the PRD's revised priority matrix (1 = Jubilee launch).
 export const MODULES = {
@@ -48,6 +64,7 @@ export const MODULES = {
   humanExcellence: { label: "Human Excellence record", phase: 1 },
   showcase: { label: "Public showcase moderation", phase: 1 },
   achievements: { label: "Achievements", phase: 1 },
+  engagement: { label: "Quest & reading", phase: 1 },
   consent: { label: "Consent centre", phase: 1 },
   admissions: { label: "Admissions", phase: 1 },
   inbox: { label: "Website inbox", phase: 1 },
@@ -74,12 +91,13 @@ export const MODULES = {
 //   actions: V view · C create/submit · U update (implies V) · A approve/publish (implies V) · R restricted (exception only)
 //   scope:   all (default) · own · child · assigned · class · selected · relevant · summary · published
 // A role missing from a row has no access.
-const ALL_STAFF = ["teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
+const ALL_STAFF = ["superAdmin", "teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
 const everyone = (cell) => Object.fromEntries([...ROLE_IDS].map((role) => [role, cell]));
 const staffOnly = (cell) => Object.fromEntries(ALL_STAFF.map((role) => [role, cell]));
 
 const MATRIX = {
   dashboard: everyone("V"),
+  engagement: { ...everyone("V"), student: "C own", parent: "C child", teacher: "C/U class", classTeacher: "C/U class", specialistTeacher: "C/U assigned", contentEditor: "C/U own", schoolAdmin: "C/U/A", leadership: "C/U/A" },
   notifications: everyone("V own"),
   profile: everyone("V own"),
   search: everyone("V relevant"),
@@ -128,7 +146,8 @@ const MATRIX = {
   reports: { academicCoordinator: "V", schoolAdmin: "V", leadership: "V", financeOfficer: "V summary", auditor: "V" },
   governance: { schoolAdmin: "U", leadership: "A", privacySteward: "U", safeguardingLead: "V summary", technicalAdmin: "V", auditor: "V" },
   settings: { schoolAdmin: "U", technicalAdmin: "U", leadership: "V" },
-  accessAdministration: { schoolAdmin: "R", leadership: "R", technicalAdmin: "R" }, // claim-gated (accessAdmin)
+  // Everyone here sees accounts and the role matrix; what each may change is decided by the server.
+  accessAdministration: { superAdmin: "U", schoolAdmin: "U", leadership: "V", technicalAdmin: "V" },
 
   timetable: { student: "V own", parent: "V child", teacher: "V", classTeacher: "V", specialistTeacher: "V", academicCoordinator: "U", schoolAdmin: "U", leadership: "V" },
   teaching: { student: "V own", parent: "V child", teacher: "U", classTeacher: "U", specialistTeacher: "U", academicCoordinator: "A", leadership: "V summary" },
@@ -151,6 +170,7 @@ const MATRIX = {
 };
 
 const IMPLIES = { U: ["V"], A: ["V"], C: [] };
+const SCOPE_WIDTH = ["restricted", "selected", "summary", "published", "own", "child", "relevant", "assigned", "class", "all"];
 
 function parseCell(cell) {
   if (!cell) return null;
@@ -164,13 +184,24 @@ function parseCell(cell) {
   return { restricted: false, actions, scope };
 }
 
+// A Super Administrator holds the widest grant of School Administrator, Leadership and Technical Administrator.
+const SUPER_SOURCES = ["schoolAdmin", "leadership", "technicalAdmin"];
+function superGrant(module) {
+  const own = parseCell(MATRIX[module]?.superAdmin);
+  const grants = [own, ...SUPER_SOURCES.map((role) => parseCell(MATRIX[module]?.[role]))].filter((grant) => grant && !grant.restricted);
+  if (!grants.length) return own;
+  const actions = new Set(grants.flatMap((grant) => [...grant.actions]));
+  const scope = grants.map((grant) => grant.scope).sort((a, b) => SCOPE_WIDTH.indexOf(b) - SCOPE_WIDTH.indexOf(a))[0];
+  return { restricted: false, actions, scope };
+}
+
 export function grantFor(role, module) {
+  if (role === "superAdmin") return superGrant(module);
   return parseCell(MATRIX[module]?.[role]);
 }
 
 // Widest scope any of the user's roles holds for this action, or null when denied.
 // "restricted" means "only with a documented, approved exception".
-const SCOPE_WIDTH = ["restricted", "selected", "summary", "published", "own", "child", "relevant", "assigned", "class", "all"];
 export function can(roles, module, action = "V") {
   let best = null;
   for (const role of roles || []) {

@@ -13,6 +13,7 @@ import { useAuth } from "../../auth/AuthProvider";
 import { list, one, useLoad } from "../data";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, Section, StatusBadge, formatDate } from "../ui";
 import { STORY_CATEGORIES } from "../../data/stories.js";
+import { SITE_PAGE_TEMPLATE, editablePages, pageContent, siteEntry, sitePageId } from "../../data/siteMap.js";
 
 // One School Stories system: the same categories drive Student Life, SRSS25 updates and the homepage.
 const NEWS_CATEGORIES = STORY_CATEGORIES;
@@ -31,7 +32,7 @@ const stampFor = (uid, isNew) => ({ updatedAt: serverTimestamp(), updatedBy: uid
 export function Content() {
   const roles = useContentRoles();
   const [params, setParams] = useSearchParams();
-  const tabs = [["news", "News"], ...(roles.canWriteEvents ? [["events", "Public events"]] : []), ...Object.entries(PAGES), ["images", "Image library"]];
+  const tabs = [["news", "News"], ...(roles.canWriteEvents ? [["events", "Public events"]] : []), ...Object.entries(PAGES), ["pages", "Website pages"], ["images", "Image library"]];
   const tab = tabs.some(([id]) => id === params.get("tab")) ? params.get("tab") : "news";
   return <>
     <PageHeader kicker="Public website" title="Content">Editors draft and send for review; leadership publishes. Changes appear on the public website as soon as they are published.</PageHeader>
@@ -40,6 +41,7 @@ export function Content() {
       {tab === "news" && <NewsManager roles={roles} />}
       {tab === "events" && <EventManager roles={roles} />}
       {PAGES[tab] && <PageEditor key={tab} pageId={tab} roles={roles} />}
+      {tab === "pages" && <SitePagesManager roles={roles} />}
       {tab === "images" && <MediaLibrary roles={roles} />}
     </div>
   </>;
@@ -267,14 +269,15 @@ function EventEditor({ event, roles, onDone, onCancel }) {
 }
 
 // ---------- Page copy (homepage, About, FAQs) ----------
-function PageEditor({ pageId, roles }) {
+function PageEditor({ pageId, roles, title, template, publicPath }) {
   const { data, loading, error, reload } = useLoad(async () => {
     const [live, draft] = await Promise.all([one(`pages/${pageId}`), one(`pageDrafts/${pageId}`)]);
     return { live, draft };
   }, [pageId]);
   const [content, setContent] = useState(null);
   const [state, setState] = useState(null);
-  useEffect(() => { if (data) setContent(structuredClone(data.draft?.content || data.live?.content || {})); }, [data]);
+  // Editable website pages start from the shared template; fields added to it later appear automatically.
+  useEffect(() => { if (data) setContent(structuredClone({ ...(template || {}), ...(data.draft?.content || data.live?.content || {}) })); }, [data, template]);
   if (loading || !content) return error ? <ErrorNote error={error} /> : <Loading />;
   const readOnly = !roles.canWriteCopy;
   const pending = data.draft && data.draft.status !== "published";
@@ -293,11 +296,12 @@ function PageEditor({ pageId, roles }) {
     } catch (reason) { setState(reason); }
   }
   return <>
-    <Section title={PAGES[pageId]} action={<span className="hub-inline-status">{pending ? <StatusBadge status={data.draft.status} label={data.draft.status === "review" ? "Draft waiting for review" : "Unpublished draft"} /> : data.live ? <StatusBadge status="published" label="Live" /> : <StatusBadge status="missing" label="Not yet published" />}</span>}>
+    <Section title={title || PAGES[pageId]} action={<span className="hub-inline-status">{pending ? <StatusBadge status={data.draft.status} label={data.draft.status === "review" ? "Draft waiting for review" : "Unpublished draft"} /> : data.live ? <StatusBadge status="published" label="Live" /> : <StatusBadge status="missing" label="Not yet published" />}</span>}>
       <p className="hub-hint">{data.live?.updatedAt ? <>Live version last published {formatDate(data.live.publishedAt || data.live.updatedAt)}. </> : null}Edits are saved as a draft first; the public page changes only when leadership publishes.</p>
+      {publicPath && <p className="hub-hint">When published, <a href={publicPath} target="_blank" rel="noreferrer">{publicPath}</a> becomes a full page with this content. Leave any field or row empty and it isn’t shown. Write only facts the school has checked.</p>}
       {pageId === "faqs" && <p className="hub-hint">Each answer is a list of paragraphs. The homepage shows the first questions; all appear on the FAQ page.</p>}
       <fieldset disabled={readOnly} className="hub-plain-fieldset">
-        <StructuredField value={content} onChange={setContent} label={PAGES[pageId]} roles={roles} root />
+        <StructuredField value={content} onChange={setContent} label={title || PAGES[pageId]} roles={roles} root />
       </fieldset>
       <ErrorNote error={state instanceof Error ? state : null} />
       {state === "saved" && <p className="hub-note" role="status">Draft saved.</p>}
@@ -307,10 +311,41 @@ function PageEditor({ pageId, roles }) {
         <button type="button" className="hub-button hub-button-quiet" disabled={state === "saving"} onClick={() => saveDraft("draft")}>Save draft</button>
         {roles.leader ? <button type="button" className="hub-button" disabled={state === "saving"} onClick={publish}>Publish to website</button>
           : <button type="button" className="hub-button" disabled={state === "saving"} onClick={() => saveDraft("review")}>Send for review</button>}
-        <button type="button" className="hub-button hub-button-quiet" disabled={state === "saving"} onClick={() => setContent(structuredClone(data.live?.content || {}))}>Discard changes (back to live)</button>
+        <button type="button" className="hub-button hub-button-quiet" disabled={state === "saving"} onClick={() => setContent(structuredClone({ ...(template || {}), ...(data.live?.content || {}) }))}>Discard changes (back to live)</button>
       </div>}
     </Section>
   </>;
+}
+
+// ---------- Website pages written by the school ----------
+// Each page waiting on verified content is listed with its status; publishing it turns the address
+// into a full page (src/data/siteMap.js · editable).
+function SitePagesManager({ roles }) {
+  const [editing, setEditing] = useState(null);
+  const entries = editablePages();
+  const { data, loading, error, reload } = useLoad(async () => {
+    const rows = await Promise.all(entries.map(async (entry) => {
+      const id = sitePageId(entry.path);
+      const [live, draft] = await Promise.all([one(`pages/${id}`), one(`pageDrafts/${id}`)]);
+      return { entry, id, live: Boolean(live && pageContent(live.content)), draft: draft && draft.status !== "published" ? draft.status : null };
+    }));
+    return rows;
+  }, []);
+  if (editing) {
+    return <>
+      <button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => { setEditing(null); reload(); }}>← All website pages</button>
+      <PageEditor key={editing.id} pageId={editing.id} roles={roles} title={editing.entry.label} template={SITE_PAGE_TEMPLATE} publicPath={editing.entry.path} />
+    </>;
+  }
+  return <Section title="Website pages">
+    <p className="hub-hint">These pages are waiting for content the school has checked. Until one is published, its address shows the matching section of its parent page.</p>
+    <ErrorNote error={error} />
+    {loading ? <Loading /> : <ul className="hub-site-pages">{data.map((row) => <li key={row.id}>
+      <div><strong>{row.entry.label}</strong><span>{siteEntry(row.entry.parent)?.label} · <a href={row.entry.path} target="_blank" rel="noreferrer">{row.entry.path}</a>{row.entry.editable === "append" ? " · adds a section to the page" : ""}</span></div>
+      <div className="hub-site-pages-status">{row.draft ? <StatusBadge status={row.draft} label={row.draft === "review" ? "Waiting for review" : "Draft"} /> : null}{row.live ? <StatusBadge status="published" label="Live" /> : !row.draft && <StatusBadge status="archived" label="Not started" />}
+        <button type="button" className="hub-button hub-button-small hub-button-quiet" onClick={() => setEditing(row)}>{roles.canWriteCopy ? "Edit" : "View"}</button></div>
+    </li>)}</ul>}
+  </Section>;
 }
 
 const humanise = (key) => String(key).replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^\w/, (c) => c.toUpperCase());
@@ -341,7 +376,7 @@ function StructuredField({ value, onChange, label, roles, root = false }) {
   if (typeof value === "number") return <label>{label}<input type="number" value={value} onChange={(event) => onChange(Number(event.target.value))} /></label>;
   const text = value ?? "";
   if (/image$/i.test(label)) return <ImageField label={label} value={text} onChange={onChange} roles={roles} />;
-  return <label>{label}{text.length > 80 || text.includes("\n") ? <textarea rows={Math.min(8, Math.ceil(text.length / 90) + 1)} value={text} onChange={(event) => onChange(event.target.value)} /> : <input value={text} onChange={(event) => onChange(event.target.value)} />}</label>;
+  return <label>{label}{text.length > 80 || text.includes("\n") || /^(body|intro|text|description|message)$/i.test(label) ? <textarea rows={Math.min(8, Math.ceil(text.length / 90) + 1)} value={text} onChange={(event) => onChange(event.target.value)} /> : <input value={text} onChange={(event) => onChange(event.target.value)} />}</label>;
 }
 
 // ---------- Website inbox ----------

@@ -167,7 +167,15 @@ Done (13 Oct 2026):
 - **One School Stories system.** The hub news editor offers the categories School News, Achievements, Academic, Sports, Arts & Culture, Service, Leadership, Community and SRSS25 (`src/data/stories.js`). Each Student Life page shows its own category, with chips to switch between them, and SRSS25 stories feed the Jubilee page.
 - **Community sign-ups.** Alumni registration, volunteering, support and SRSS25 memories are real forms. They land in the hub’s website inbox with their own subject, so there are no email links to manage.
 
-Still waiting for verified content from the school before it can be written:
+- **School-written pages.** Every page waiting on school content is listed in the hub under **Content › Website pages**, with its status:
+  - Our Story, School Profile, Campus;
+  - Curriculum, Learning Journey, Enrichment, Reading & Library, Learning Support, Learning Environment;
+  - How to Apply and Downloads;
+  - a staff directory added to Our People.
+
+  Each starts from one template: introduction, hero image, sections, timeline, people and documents. Empty parts aren’t shown. It goes through the usual draft → review → Leadership publishes workflow. Once published, the address becomes a full page automatically; until then it shows the matching section of its parent page. No developer is needed.
+
+Still waiting for verified content from the school, now written in the hub rather than by a developer:
 
 - Our Story timeline and then-and-now photographs: the dates in the codebase are unconfirmed and are not published.
 - Our People staff directory.

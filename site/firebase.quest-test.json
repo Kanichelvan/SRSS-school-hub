@@ -1,0 +1,11 @@
+{
+  "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
+  "storage": { "rules": "storage.rules" },
+  "functions": [{ "source": "functions", "codebase": "default", "runtime": "nodejs22" }],
+  "emulators": {
+    "auth": { "port": 9291 }, "firestore": { "port": 8280, "websocketPort": 9350 },
+    "functions": { "port": 5201 }, "storage": { "port": 9390 },
+    "hub": { "port": 4602 }, "logging": { "port": 4701 }, "eventarc": { "port": 9309 },
+    "ui": { "enabled": false }, "singleProjectMode": false
+  }
+}

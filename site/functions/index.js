@@ -4,8 +4,11 @@ import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { setGlobalOptions } from "firebase-functions/v2";
 import { onDocumentUpdated, onDocumentWritten, onDocumentWrittenWithAuthContext, onDocumentCreated } from "firebase-functions/v2/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { ROLE_IDS } from "./roles.js";
-import { recomputeConsentStatus, recomputeUserScope, refreshCurrentClass, refreshGuardianClasses } from "./scope.js";
+import { onSchedule } from "firebase-functions/v2/scheduler";
+import { OFFICE_ASSIGNABLE_ROLES, ROLE_IDS } from "./roles.js";
+import { recomputeAllScopes, recomputeConsentStatus, recomputeUserScope, refreshCurrentClass, refreshGuardianClasses } from "./scope.js";
+import { handleQuest } from "./quest-service.js";
+import { QuestError } from "./quest-engine.js";
 
 initializeApp();
 setGlobalOptions({ region: "asia-southeast1", maxInstances: 5 });
@@ -13,22 +16,105 @@ const db = getFirestore();
 const audit = (entry) => db.collection("auditLogs").add({ ...entry, at: FieldValue.serverTimestamp() });
 const uids = (...values) => [...new Set(values.flat().filter(Boolean))];
 
-// ---------- Roles (AUTH-001) ----------
-// Only accounts holding the `accessAdmin` claim (the 1–2 Super Administrators) may assign roles.
-export const setUserRoles = onCall(async (request) => {
-  if (request.auth?.token?.accessAdmin !== true) throw new HttpsError("permission-denied", "Only designated access administrators can assign roles.");
-  const { uid, email, roles = [], reason = "" } = request.data || {};
-  if (!Array.isArray(roles) || roles.some((role) => !ROLE_IDS.includes(role))) throw new HttpsError("invalid-argument", `Roles must be drawn from: ${ROLE_IDS.join(", ")}.`);
-  if (!String(reason).trim()) throw new HttpsError("invalid-argument", "Record a reason for the access change.");
-  const auth = getAuth();
-  const target = uid ? await auth.getUser(uid) : await auth.getUserByEmail(String(email || ""));
+// Shared campaign engine; every action derives its identity and SIS scope on the server.
+export const engagement = onCall(async (request) => {
+  try { return await handleQuest(db, request); }
+  catch (error) { if (error instanceof QuestError) throw new HttpsError(error.code, error.message); throw error; }
+});
+
+// ---------- Roles and accounts (AUTH-001) ----------
+// A Super Administrator (the `superAdmin` role, or the legacy `accessAdmin` claim from the bootstrap
+// script) may grant any role. The school office (schoolAdmin) may grant or remove only family and
+// teacher roles, and can never change an elevated role. Nobody changes their own roles.
+const isSuper = (token) => token?.accessAdmin === true || (token?.roles || []).includes("superAdmin");
+const PERSON_TYPES = { guardian: "guardians", student: "students", staff: "staff" };
+
+function checkRoleChange(request, targetUid, before, after) {
+  const token = request.auth?.token;
+  if (!request.auth) throw new HttpsError("unauthenticated", "Sign in first.");
+  if (!Array.isArray(after) || after.some((role) => !ROLE_IDS.includes(role))) throw new HttpsError("invalid-argument", `Roles must be drawn from: ${ROLE_IDS.join(", ")}.`);
+  if (targetUid === request.auth.uid && !isSuper(token)) throw new HttpsError("permission-denied", "You can't change your own roles. Ask a Super Administrator.");
+  if (targetUid === request.auth.uid && before.includes("superAdmin") && !after.includes("superAdmin")) throw new HttpsError("failed-precondition", "A Super Administrator can't remove their own Super Administrator role; ask the other one.");
+  if (isSuper(token)) return;
+  if (!(token?.roles || []).includes("schoolAdmin")) throw new HttpsError("permission-denied", "Only the school office or a Super Administrator can change roles.");
+  const elevated = (roles) => roles.filter((role) => !OFFICE_ASSIGNABLE_ROLES.includes(role)).sort().join(",");
+  if (elevated(before) !== elevated(after)) throw new HttpsError("permission-denied", "Only a Super Administrator can grant or remove staff and administrator roles.");
+}
+
+async function applyRoles(target, roles, request, reason) {
   const before = target.customClaims?.roles || [];
-  await auth.setCustomUserClaims(target.uid, { ...target.customClaims, roles });
-  await db.doc(`users/${target.uid}`).set({ email: target.email, status: "active" }, { merge: true });
+  // The legacy claim follows the role; a bootstrap-granted claim stays until a Super Administrator removes the role.
+  const accessAdmin = roles.includes("superAdmin") || (target.customClaims?.accessAdmin === true && !before.includes("superAdmin"));
+  const claims = { ...target.customClaims, roles };
+  if (accessAdmin) claims.accessAdmin = true; else delete claims.accessAdmin;
+  await getAuth().setCustomUserClaims(target.uid, claims);
+  await db.doc(`users/${target.uid}`).set({ email: target.email, displayName: target.displayName || null, status: target.disabled ? "disabled" : "active", roles }, { merge: true });
   await recomputeUserScope(db, target.uid, roles);
   await db.collection("userRoles").add({ uid: target.uid, before, after: roles, reason, actorUid: request.auth.uid, at: FieldValue.serverTimestamp() });
   await audit({ type: "roles.changed", targetUid: target.uid, before, after: roles, reason, actorUid: request.auth.uid });
-  return { uid: target.uid, roles };
+}
+
+export const setUserRoles = onCall(async (request) => {
+  const { uid, email, roles = [], reason = "" } = request.data || {};
+  if (!String(reason).trim()) throw new HttpsError("invalid-argument", "Record a reason for the access change.");
+  const target = uid ? await getAuth().getUser(uid) : await getAuth().getUserByEmail(String(email || ""));
+  const after = [...new Set(roles)];
+  checkRoleChange(request, target.uid, target.customClaims?.roles || [], after);
+  await applyRoles(target, after, request, String(reason).trim());
+  return { uid: target.uid, roles: after };
+});
+
+// Creates (or reuses) a sign-in account, gives it roles and links it to the person record, in one step.
+// No password is set: the person signs in with Google or a one-time email link at /login.
+export const provisionAccount = onCall(async (request) => {
+  const { email, displayName = "", roles = [], personType, personId, reason = "" } = request.data || {};
+  const address = String(email || "").trim().toLowerCase();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(address)) throw new HttpsError("invalid-argument", "Enter a valid email address.");
+  if (!roles.length) throw new HttpsError("invalid-argument", "Choose at least one role.");
+  const collection = PERSON_TYPES[personType];
+  if (personType && !collection) throw new HttpsError("invalid-argument", "Unknown person type.");
+  const personRef = collection ? db.doc(`${collection}/${personId}`) : null;
+  const person = personRef ? await personRef.get() : null;
+  if (personRef && !person.exists) throw new HttpsError("not-found", "That person record no longer exists.");
+
+  const auth = getAuth();
+  let target;
+  try { target = await auth.getUserByEmail(address); }
+  catch { target = await auth.createUser({ email: address, displayName: String(displayName).trim() || person?.data()?.name || undefined, emailVerified: false }); }
+  if (person?.data()?.uid && person.data().uid !== target.uid) throw new HttpsError("already-exists", "This person is already linked to a different account.");
+  const after = [...new Set([...(target.customClaims?.roles || []), ...roles])];
+  checkRoleChange(request, target.uid, target.customClaims?.roles || [], after);
+  if (personRef) {
+    const other = await db.collection(collection).where("uid", "==", target.uid).limit(1).get();
+    if (!other.empty && other.docs[0].id !== personId) throw new HttpsError("already-exists", `${address} is already linked to another ${personType} record.`);
+    await personRef.set({ uid: target.uid, email: person.data().email || address, updatedAt: FieldValue.serverTimestamp(), updatedBy: request.auth.uid }, { merge: true });
+    // Copy the account onto the guardian's links now, so the parent sees their children on first sign-in.
+    if (personType === "guardian") {
+      const links = await db.collection("studentGuardianLinks").where("guardianId", "==", personId).get();
+      await Promise.all(links.docs.map((link) => link.ref.set({ guardianUid: target.uid }, { merge: true })));
+    }
+  }
+  await db.doc(`users/${target.uid}`).set({ personType: personType || null, personId: personId || null, createdAt: FieldValue.serverTimestamp(), createdBy: request.auth.uid }, { merge: true });
+  await applyRoles(target, after, request, String(reason).trim() || "Account created");
+  return { uid: target.uid, email: address, roles: after };
+});
+
+// Disable or re-enable an account. Disabling signs the person out everywhere; records stay.
+export const setAccountStatus = onCall(async (request) => {
+  const { uid, disabled, reason = "" } = request.data || {};
+  if (!String(reason).trim()) throw new HttpsError("invalid-argument", "Record a reason.");
+  if (uid === request.auth?.uid) throw new HttpsError("failed-precondition", "You can't disable your own account.");
+  const target = await getAuth().getUser(String(uid || ""));
+  const roles = target.customClaims?.roles || [];
+  if (!isSuper(request.auth?.token)) {
+    if (!(request.auth?.token?.roles || []).includes("schoolAdmin")) throw new HttpsError("permission-denied", "Only the school office or a Super Administrator can do this.");
+    if (roles.some((role) => !OFFICE_ASSIGNABLE_ROLES.includes(role))) throw new HttpsError("permission-denied", "Only a Super Administrator can disable staff or administrator accounts.");
+  }
+  await getAuth().updateUser(target.uid, { disabled: Boolean(disabled) });
+  if (disabled) await getAuth().revokeRefreshTokens(target.uid);
+  await db.doc(`users/${target.uid}`).set({ status: disabled ? "disabled" : "active", statusReason: String(reason).trim(), statusChangedAt: FieldValue.serverTimestamp(), statusChangedBy: request.auth.uid }, { merge: true });
+  await audit({ type: disabled ? "account.disabled" : "account.enabled", targetUid: target.uid, reason: String(reason).trim(), actorUid: request.auth.uid });
+  return { uid: target.uid, disabled: Boolean(disabled) };
 });
 
 // ---------- Access scope (AUTH-002) ----------
@@ -57,9 +143,22 @@ export const scopeOnEnrollment = onDocumentWritten("enrollments/{id}", async (ev
   await Promise.all(uids(student.data()?.uid, links.docs.map((doc) => doc.data().guardianUid)).map((uid) => recomputeUserScope(db, uid)));
 });
 // Linking a sign-in account to a person record (the `uid` field) changes that account's scope.
+// The guardian's account id is copied onto their links, which is what grants a parent their children.
 export const scopeOnGuardianAccount = onDocumentUpdated("guardians/{id}", async (event) => {
   const before = event.data.before.data().uid; const after = event.data.after.data().uid;
-  if (before !== after) await Promise.all(uids(before, after).map((uid) => recomputeUserScope(db, uid)));
+  if (before === after) return;
+  const links = await db.collection("studentGuardianLinks").where("guardianId", "==", event.params.id).get();
+  await Promise.all(links.docs.map((link) => link.ref.set({ guardianUid: after ?? null }, { merge: true })));
+  await Promise.all(uids(before, after).map((uid) => recomputeUserScope(db, uid)));
+});
+// A new current academic year changes every teacher's classes and every family's class keys.
+export const scopeOnSchoolYear = onDocumentUpdated("settings/school", async (event) => {
+  if (event.data.before.data().currentAcademicYearId === event.data.after.data().currentAcademicYearId) return;
+  // Each pupil's current class (a cache of the active enrolment for the current year) first, then every account.
+  const students = await db.collection("students").get();
+  for (const student of students.docs) await refreshCurrentClass(db, student.id);
+  const count = await recomputeAllScopes(db);
+  await audit({ type: "settings.academicYearChanged", before: event.data.before.data().currentAcademicYearId || null, after: event.data.after.data().currentAcademicYearId, accountsRefreshed: count });
 });
 export const scopeOnStudentAccount = onDocumentUpdated("students/{id}", async (event) => {
   const before = event.data.before.data().uid; const after = event.data.after.data().uid;
@@ -82,7 +181,7 @@ export const sendConsentReminders = onCall(async (request) => {
   for (const studentId of studentIds) {
     const [student, links] = await Promise.all([db.doc(`students/${studentId}`).get(), db.collection("studentGuardianLinks").where("studentId", "==", studentId).where("hasPortalAccess", "==", true).get()]);
     const name = student.data()?.preferredName || student.data()?.name || "your child";
-    const guardianUids = [...new Set(links.docs.filter((link) => link.data().status !== "inactive").map((link) => link.data().guardianUid).filter(Boolean))];
+    const guardianUids = [...new Set(links.docs.filter((link) => (link.data().status ?? "active") === "active").map((link) => link.data().guardianUid).filter(Boolean))];
     if (!guardianUids.length) { withoutAccount.push(studentId); continue; }
     const batch = db.batch();
     for (const recipientUid of guardianUids) {
@@ -98,6 +197,50 @@ export const sendConsentReminders = onCall(async (request) => {
     notified += guardianUids.length;
   }
   return { notified, withoutAccount };
+});
+
+// ---------- Portfolio public showcase (CON-002) ----------
+// Portfolio entries hold private media references, so they are never public. When a moderator approves
+// an entry for the public showcase — and only while public-showcase consent is granted — a public-safe
+// copy (first name, standard, title, description, values; no media, no surname) goes to showcaseItems.
+export const showcaseOnModeration = onDocumentWritten("portfolioEntries/{id}", async (event) => {
+  const entry = event.data?.after?.data();
+  const ref = db.doc(`showcaseItems/${event.params.id}`);
+  const approved = entry && entry.visibility === "publicShowcase" && entry.moderationStatus === "approved";
+  const consent = approved ? (await db.doc(`studentConsentStatus/${entry.studentId}`).get()).data()?.types?.publicShowcase?.response : null;
+  if (!approved || consent !== "granted") {
+    const existing = await ref.get();
+    if (existing.exists && existing.data().status !== "withdrawn") await ref.set({ status: "withdrawn", withdrawnAt: FieldValue.serverTimestamp() }, { merge: true });
+    return;
+  }
+  const student = (await db.doc(`students/${entry.studentId}`).get()).data() || {};
+  await ref.set({
+    status: "published", entryId: event.params.id, title: entry.title, description: entry.description || "", category: entry.category || null,
+    humanValues: entry.humanValues || (entry.humanValue ? [entry.humanValue] : []), firstName: (student.preferredName || student.name || "").split(" ")[0], standard: student.currentStandard || null,
+    date: entry.date || null, publishedAt: FieldValue.serverTimestamp(),
+  });
+});
+
+// ---------- Announcements: scheduled publication and expiry ----------
+export async function publishDueAnnouncements(now = new Date()) {
+  const [due, live] = await Promise.all([db.collection("announcements").where("status", "==", "scheduled").get(), db.collection("announcements").where("status", "==", "published").get()]);
+  const batch = db.batch(); let published = 0; let expired = 0;
+  for (const item of due.docs) {
+    const at = item.data().publishAt?.toDate?.() ?? (item.data().publishAt ? new Date(item.data().publishAt) : null);
+    if (at && at <= now) { batch.update(item.ref, { status: "published", publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: "scheduler" }); published++; }
+  }
+  for (const item of live.docs) {
+    const until = item.data().expiresAt ? new Date(item.data().expiresAt) : null;
+    if (until && until < now) { batch.update(item.ref, { status: "archived", archivedReason: "expired", archivedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: "scheduler" }); expired++; }
+  }
+  if (published || expired) await batch.commit();
+  return { published, expired };
+}
+export const publishScheduledAnnouncements = onSchedule({ schedule: "every 15 minutes", timeZone: "Asia/Kuala_Lumpur" }, async () => { await publishDueAnnouncements(); });
+// Lets the office publish due notices immediately (also used to exercise scheduling in the emulators).
+export const runAnnouncementSchedule = onCall(async (request) => {
+  if (!(request.auth?.token?.roles || []).some((role) => ["schoolAdmin", "superAdmin", "leadership"].includes(role))) throw new HttpsError("permission-denied", "Only the school office can run this.");
+  return publishDueAnnouncements();
 });
 
 // ---------- Attendance (ATT workflow → parent dashboard → optional notification) ----------
@@ -155,7 +298,8 @@ export const enrolApplication = onCall(async (request) => {
 
 // ---------- Audit trail (PRD §42) ----------
 // Who changed which record and which fields. Restricted records log the event only.
-// Audited collections: "users", "studentGuardianLinks", "students", "enrollments", "attendanceRecords", "studentResults", "reportCards", "consentRecords", "portfolioEntries", "studentIncidents", "payments", "concessions", "assets", "settings", "staff".
+// Audited collections: "users", "studentGuardianLinks", "students", "enrollments", "attendanceRecords", "studentResults", "reportCards", "consentRecords", "portfolioEntries", "studentIncidents", "payments", "concessions", "assets", "settings", "staff",
+// plus the school master data and configuration lists managed in the Admin hub.
 const auditWrite = (collection) => onDocumentWrittenWithAuthContext(`${collection}/{id}`, async (event) => {
   const before = event.data?.before?.data();
   const after = event.data?.after?.data();
@@ -180,3 +324,17 @@ export const auditConcessions = auditWrite("concessions");
 export const auditAssets = auditWrite("assets");
 export const auditSettings = auditWrite("settings");
 export const auditStaff = auditWrite("staff");
+export const auditGuardians = auditWrite("guardians");
+export const auditAcademicYears = auditWrite("academicYears");
+export const auditTerms = auditWrite("terms");
+export const auditStandards = auditWrite("standards");
+export const auditClasses = auditWrite("classes");
+export const auditSubjects = auditWrite("subjects");
+export const auditTeacherAssignments = auditWrite("teacherAssignments");
+export const auditAnnouncements = auditWrite("announcements");
+export const auditEvents = auditWrite("events");
+export const auditConsentDefinitions = auditWrite("consentDefinitions");
+export const auditAnnouncementCategories = auditWrite("announcementCategories");
+export const auditPortfolioCategories = auditWrite("portfolioCategories");
+export const auditPortfolioTags = auditWrite("portfolioTags");
+export const auditDownloadCategories = auditWrite("downloadCategories");

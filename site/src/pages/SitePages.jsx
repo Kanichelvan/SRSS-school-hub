@@ -446,3 +446,53 @@ export function JubileePage({ blocks, motto }) {
     </PageSection>
   </main>;
 }
+
+// ---------- Editable pages (written by the school in the hub) ----------
+const paragraphs = (text) => String(text || "").split(/\n\s*\n/).map((part) => part.trim()).filter(Boolean);
+
+// The written parts of a page: sections, timeline, people and documents, each shown only when filled in.
+export function ContentBody({ content }) {
+  return <>
+    {content.sections.map((section, index) => (
+      <section key={index} className={`page-section${index % 2 ? " page-section-ivory" : ""}`}>
+        <div className={`page-inner${section.image ? " page-split" : ""}`}>
+          <div>
+            {section.heading && <h2 className="content-heading">{section.heading}</h2>}
+            <div className="page-prose">{paragraphs(section.body).map((text) => <p key={text}>{text}</p>)}</div>
+          </div>
+          {section.image && <img className="content-image" src={section.image} alt={section.imageAlt || ""} loading="lazy" />}
+        </div>
+      </section>
+    ))}
+    {content.timeline.length > 0 && <section className="page-section page-section-ivory"><div className="page-inner">
+      <h2 className="content-heading">Timeline</h2>
+      <ol className="content-timeline">{content.timeline.map((item, index) => <li key={index}><span>{item.year}</span><div><strong>{item.title}</strong>{item.text && <p>{item.text}</p>}</div></li>)}</ol>
+    </div></section>}
+    {content.people.length > 0 && <section className="page-section"><div className="page-inner">
+      <ul className="content-people">{content.people.map((person, index) => <li key={index}>{person.image ? <img src={person.image} alt={person.imageAlt || ""} loading="lazy" /> : <span className="content-people-initial" aria-hidden="true">{person.name.trim()[0]}</span>}<strong>{person.name}</strong>{person.role && <span>{person.role}</span>}</li>)}</ul>
+    </div></section>}
+    {content.documents.length > 0 && <section className="page-section page-section-ivory"><div className="page-inner">
+      <h2 className="content-heading">Documents</h2>
+      <ul className="resource-list">{content.documents.map((item, index) => <li key={index}><a href={item.link} target={/^https?:/.test(item.link) ? "_blank" : undefined} rel="noreferrer"><strong>{item.title}</strong>{item.description && <span>{item.description}</span>}<ArrowRight size={16} aria-hidden="true" /></a></li>)}</ul>
+    </div></section>}
+  </>;
+}
+
+// A full page for an editable address once the school has published its content.
+export function ContentPage({ entry, content, parent }) {
+  const siblings = childrenOf(entry.parent).filter((item) => item.path !== entry.path).slice(0, 6);
+  return <main id="main" className="site-page">
+    <PageHero eyebrow={parent?.label || "SRSS"} title={content.title?.trim() || entry.label} image={content.heroImage || undefined} alt={content.heroImageAlt || ""}>
+      {paragraphs(content.intro).map((text) => <p key={text}>{text}</p>)}
+    </PageHero>
+    <ContentBody content={content} />
+    {siblings.length > 0 && <section className="page-section"><div className="page-inner">
+      <p className="eyebrow content-related-label">More in {parent?.label}</p>
+      <nav className="page-directory content-related" aria-label={`More in ${parent?.label}`}>{siblings.map((item) => <a key={item.path} href={item.path}><strong>{item.label}</strong><span>{item.summary}</span><ArrowRight size={16} aria-hidden="true" /></a>)}</nav>
+    </div></section>}
+    <Closing title="Come and discover SRSS for yourself.">
+      <a className="primary-button" href="/join/admissions">Admissions <ArrowRight size={18} /></a>
+      {parent && <a className="text-button" href={parent.path}>Back to {parent.label} <ArrowRight size={18} /></a>}
+    </Closing>
+  </main>;
+}

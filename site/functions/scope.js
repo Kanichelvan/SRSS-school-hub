@@ -4,6 +4,8 @@
 // Takes the Admin SDK Firestore instance as a parameter so triggers and the seed script share it.
 
 const TEACHING_ROLES = ["teacher", "classTeacher", "specialistTeacher"];
+// Archived or ended assignments, classes and links keep their history but grant nothing.
+const isActive = (doc) => (doc.data().status ?? "active") === "active";
 const ROLE_GROUP_KEYS = { student: "role:students", parent: "role:parents" };
 const unique = (values) => [...new Set(values.filter(Boolean))];
 const chunk = (values, size = 30) => Array.from({ length: Math.ceil(values.length / size) }, (_, i) => values.slice(i * size, i * size + size));
@@ -39,9 +41,10 @@ export async function computeUserScope(db, uid, roles = []) {
     db.collection("studentSupportPlans").where("assignedStaffUids", "array-contains", uid).where("status", "==", "active").get(),
   ]);
 
+  const activeAssignments = assignments.docs.filter(isActive);
   const childIds = unique(links.docs.map((doc) => doc.data().studentId));
-  const teachingClassIds = unique(assignments.docs.map((doc) => doc.data().classId));
-  const homeroomClassIds = homerooms.docs.map((doc) => doc.id);
+  const teachingClassIds = unique(activeAssignments.map((doc) => doc.data().classId));
+  const homeroomClassIds = homerooms.docs.filter(isActive).map((doc) => doc.id);
   const classIds = unique([...teachingClassIds, ...homeroomClassIds]);
   const assignedStudentIds = unique(supportPlans.docs.map((doc) => doc.data().studentId));
 
@@ -71,6 +74,9 @@ export async function computeUserScope(db, uid, roles = []) {
     classIds,
     assignedStudentIds,
     familyClassIds,
+    // "classId:subjectId" for each active teaching assignment: subject-level permission (e.g. portfolio entries).
+    assignmentKeys: unique(activeAssignments.map((doc) => `${doc.data().classId}:${doc.data().subjectId}`)),
+    academicYearId: yearId,
     audienceKeys,
     publishKeys: classIds.map((classId) => `class:${classId}`),
     scopeUpdatedAt: new Date(),
@@ -85,6 +91,18 @@ export async function recomputeUserScope(db, uid, roles) {
   await userRef.set(scope, { merge: true });
   if (scope.guardianId) await db.doc(`guardians/${scope.guardianId}`).set({ classIds: scope.familyClassIds }, { merge: true });
   return scope;
+}
+
+// Every account with a role, e.g. after the current academic year changes.
+export async function recomputeAllScopes(db) {
+  const users = await db.collection("users").get();
+  let count = 0;
+  for (const user of users.docs) {
+    if (!(user.data().roles || []).length) continue;
+    await recomputeUserScope(db, user.id, user.data().roles);
+    count++;
+  }
+  return count;
 }
 
 // Guardian records carry their children's current class ids so class teachers can read family contacts.

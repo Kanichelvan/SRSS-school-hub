@@ -8,9 +8,10 @@ import { db } from "../../lib/firebase-firestore";
 import { functions } from "../../lib/firebase-functions";
 import { useAuth } from "../../auth/AuthProvider";
 import { can } from "../../auth/permissions";
-import { getMany, list, useLoad } from "../data";
+import { consentItems, currentYearId, getMany, list, useLoad } from "../data";
+import { humanValuesOf } from "../portfolio";
 import { HUMAN_VALUES } from "../logic/dashboard";
-import { CONSENT_ITEMS, isCurrent, missingItems } from "../consentForm";
+import { isCurrent, missingItems } from "../consentForm";
 import { ChildConsent } from "./consent";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, formatDate } from "../ui";
 
@@ -21,7 +22,8 @@ export function Admissions() {
   const canEnrol = can(auth.roles, "admissions", "U") === "all";
   const [message, setMessage] = useState(null);
   const { data, loading, error, reload } = useLoad(async () => {
-    const [enquiries, applications, classes] = await Promise.all([list("admissionEnquiries"), list("applications"), list("classes", where("academicYearId", "==", "ay2026"))]);
+    const yearId = await currentYearId();
+    const [enquiries, applications, classes] = await Promise.all([list("admissionEnquiries"), list("applications"), list("classes", where("academicYearId", "==", yearId || ""))]);
     return { enquiries, applications, classes: classes.sort((a, b) => a.standard - b.standard) };
   }, []);
   async function enrol(application, classId) {
@@ -63,10 +65,10 @@ export function ConsentOverview() {
   const [paperFor, setPaperFor] = useState(null);
   const [entered, setEntered] = useState([]); // paper answers saved this visit; the server updates the totals moments later
   const { data, loading, error, reload } = useLoad(async () => {
-    const [statuses, students, reminders] = await Promise.all([list("studentConsentStatus"), list("students", where("status", "==", "active")), list("consentReminders")]);
-    return { statuses: Object.fromEntries(statuses.map((status) => [status.id, status.types || {}])), students, reminders: Object.fromEntries(reminders.map((item) => [item.id, item])) };
+    const [statuses, students, reminders, items] = await Promise.all([list("studentConsentStatus"), list("students", where("status", "==", "active")), list("consentReminders"), consentItems()]);
+    return { items, statuses: Object.fromEntries(statuses.map((status) => [status.id, status.types || {}])), students, reminders: Object.fromEntries(reminders.map((item) => [item.id, item])) };
   }, []);
-  const waiting = (data?.students || []).map((student) => ({ ...student, missing: missingItems(data.statuses[student.id]) })).filter((student) => student.missing.length && !entered.includes(student.id))
+  const waiting = (data?.students || []).map((student) => ({ ...student, missing: missingItems(data.statuses[student.id], data.items) })).filter((student) => student.missing.length && !entered.includes(student.id))
     .sort((a, b) => (a.currentStandard || 0) - (b.currentStandard || 0) || String(a.name).localeCompare(String(b.name)));
 
   async function remind(studentIds) {
@@ -84,8 +86,8 @@ export function ConsentOverview() {
     <PageHeader kicker="SRSS Govern" title="Consent">Families answer a few yes or no questions for each child in the Parents Hub. Their answers apply straight away; nothing here needs approval.</PageHeader>
     <ErrorNote error={error} />
     {loading ? <Loading /> : <>
-      <div className="hub-consent-grid">{CONSENT_ITEMS.map((item) => {
-        const responses = data.students.map((student) => { const entry = data.statuses[student.id]?.[item.type]; return isCurrent(entry) ? entry.response : null; });
+      <div className="hub-consent-grid">{data.items.map((item) => {
+        const responses = data.students.map((student) => { const entry = data.statuses[student.id]?.[item.type]; return isCurrent(entry, item) ? entry.response : null; });
         const granted = responses.filter((r) => r === "granted").length; const declined = responses.filter((r) => r === "declined" || r === "withdrawn").length; const awaiting = responses.filter((r) => !r).length;
         return <article key={item.type} className="hub-card"><strong>{item.title}</strong>
           <div className="hub-consent-bars"><span className="granted" style={{ flexGrow: granted }} /><span className="declined" style={{ flexGrow: declined }} /><span className="missing" style={{ flexGrow: awaiting }} /></div>
@@ -96,9 +98,9 @@ export function ConsentOverview() {
         {!waiting.length ? <EmptyState title="Every family has answered.">New pupils appear here until their parents answer.</EmptyState> : <ul className="hub-waiting">{waiting.map((student) => {
           const reminder = data.reminders[student.id];
           return <li key={student.id}>
-            <div><strong>{student.name}</strong><span>{student.currentStandard ? `Standard ${student.currentStandard}` : "—"} · {student.missing.length === CONSENT_ITEMS.length ? "Not started" : `${student.missing.length} of ${CONSENT_ITEMS.length} left`}{reminder?.lastSentAt ? ` · reminded ${formatDate(reminder.lastSentAt)}` : ""}</span></div>
+            <div><strong>{student.name}</strong><span>{student.currentStandard ? `Standard ${student.currentStandard}` : "—"} · {student.missing.length === data.items.length ? "Not started" : `${student.missing.length} of ${data.items.length} left`}{reminder?.lastSentAt ? ` · reminded ${formatDate(reminder.lastSentAt)}` : ""}</span></div>
             {canRemind && <div className="hub-waiting-actions"><button type="button" className="hub-button hub-button-small hub-button-quiet" disabled={busy !== null} onClick={() => remind([student.id])}>{busy === student.id ? "Sending…" : "Send reminder"}</button><button type="button" className="hub-button hub-button-small hub-button-quiet" aria-expanded={paperFor === student.id} onClick={() => setPaperFor(paperFor === student.id ? null : student.id)}>Paper form</button></div>}
-            {paperFor === student.id && <div className="hub-paper-panel"><p className="hub-hint"><Link to={`/hub/consent/print/${student.id}`}>Print {student.preferredName || student.name}’s form</Link> for the family to sign, then enter their answers here.</p><ChildConsent office child={student} status={data.statuses[student.id]} onSaved={() => { setPaperFor(null); setEntered((ids) => [...ids, student.id]); setMessage(`Paper answers saved for ${student.name}.`); window.setTimeout(reload, 4000); }} /></div>}
+            {paperFor === student.id && <div className="hub-paper-panel"><p className="hub-hint"><Link to={`/hub/consent/print/${student.id}`}>Print {student.preferredName || student.name}’s form</Link> for the family to sign, then enter their answers here.</p><ChildConsent office child={student} items={data.items} status={data.statuses[student.id]} onSaved={() => { setPaperFor(null); setEntered((ids) => [...ids, student.id]); setMessage(`Paper answers saved for ${student.name}.`); window.setTimeout(reload, 4000); }} /></div>}
           </li>;
         })}</ul>}
       </Section>
@@ -123,13 +125,13 @@ export function Showcase() {
     } catch (reason) { setMessage(reason.code === "permission-denied" ? "Blocked: public-showcase consent has not been granted for this pupil." : reason.message); }
   }
   return <>
-    <PageHeader kicker="SRSS Grow" title="Showcase moderation">Teacher-nominated work. Public visibility needs moderation and recorded consent.</PageHeader>
+    <PageHeader kicker="Content & communication" title="Portfolio moderation">Work teachers have nominated for the public showcase. Approving needs the family's public-showcase consent; the public website then shows a copy with the pupil's first name, the title and description only — never their media or surname.</PageHeader>
     <ErrorNote error={error} />
     {message && <p className="hub-status" role="status">{message}</p>}
     {loading ? <Loading /> : !data.entries.length ? <EmptyState title="No showcase candidates." /> : <ul className="hub-cards">{data.entries.map((entry) => {
       const student = data.students.find((item) => item.id === entry.studentId);
       const consent = data.statuses.find((item) => item.id === entry.studentId)?.types?.publicShowcase?.response;
-      return <li key={entry.id} className="hub-card"><div className="hub-card-top"><strong>{entry.title}</strong><StatusBadge status={entry.visibility} /></div><p>{entry.description}</p><small>{student?.name} · {HUMAN_VALUES[entry.humanValue] || ""}</small>
+      return <li key={entry.id} className="hub-card"><div className="hub-card-top"><strong>{entry.title}</strong><StatusBadge status={entry.visibility} /></div><p>{entry.description}</p><small>{student?.name} · {humanValuesOf(entry).map((value) => HUMAN_VALUES[value]).join(" · ")}</small>
         <p>{consent === "granted" ? <StatusBadge status="granted" label="Public-showcase consent granted" /> : <StatusBadge status="declined" label={consent ? `Consent ${consent}` : "No public-showcase consent"} />}</p>
         {entry.visibility === "showcaseCandidate" && <div className="hub-form-actions"><button type="button" className="hub-button hub-button-small" disabled={consent !== "granted"} onClick={() => decide(entry, true)}>Approve for public showcase</button><button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => decide(entry, false)}>Return</button></div>}
         {consent !== "granted" && entry.visibility === "showcaseCandidate" && <p className="hub-error">Publishing is blocked until a guardian grants public-showcase consent.</p>}

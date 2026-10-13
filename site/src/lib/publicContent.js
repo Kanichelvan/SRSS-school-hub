@@ -50,6 +50,12 @@ async function getPage(id) {
   return page.status === "published" ? page.content || null : null;
 }
 
+// Published content for one editable website page (null until Leadership publishes it).
+export async function loadSitePage(id) {
+  if (typeof window !== "undefined" && window.__SRSS_EXPORTED_CONTENT__) return window.__SRSS_EXPORTED_CONTENT__.sitePages?.[id] || null;
+  return getPage(id);
+}
+
 // Returns only the parts that loaded, so the caller keeps its built-in defaults for anything missing.
 export async function loadPublicContent() {
   if (typeof window !== "undefined" && window.__SRSS_EXPORTED_CONTENT__) return window.__SRSS_EXPORTED_CONTENT__;
