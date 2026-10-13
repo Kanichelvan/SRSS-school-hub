@@ -69,7 +69,7 @@ export function ChildConsent({ child, status, guardian, office = false, onSaved 
       {office && <label className="hub-paper-name">Parent or guardian who signed the paper form<input required value={paperName} onChange={(event) => setPaperName(event.target.value)} autoComplete="off" /></label>}
       <label className="hub-check hub-consent-ack"><input type="checkbox" checked={acknowledged} onChange={(event) => setAcknowledged(event.target.checked)} />{office
         ? <span>I have the paper form signed by {name}’s parent or legal guardian, and the answers above match it.</span>
-        : <span>I am {name}’s parent or legal guardian, and I have read the <a href="/legal/terms-of-use" target="_blank" rel="noreferrer">Terms of Use</a> and <a href="/legal/privacy-policy" target="_blank" rel="noreferrer">Privacy Policy</a>.</span>}</label>
+        : <span>I am {name}’s parent or legal guardian, and I have read the <a href="/legal/terms" target="_blank" rel="noreferrer">Terms of Use</a> and <a href="/legal/privacy" target="_blank" rel="noreferrer">Privacy Policy</a>.</span>}</label>
       <div className="hub-form-actions">
         <button type="submit" className="hub-button" disabled={state.busy || unanswered.length > 0 || !acknowledged || (office && !paperName.trim())}>{state.busy ? "Saving…" : office ? "Save paper answers" : `Save ${name}’s choices`}</button>
         {unanswered.length > 0 && <span className="hub-hint">{unanswered.length === 1 ? "1 choice left to answer." : `${unanswered.length} choices left to answer.`}</span>}
@@ -132,7 +132,7 @@ export function StaffAcknowledgement() {
         <li>I will use approved school channels to communicate with pupils and families, and keep professional boundaries.</li>
         <li>I will report any safeguarding concern to the Designated Safeguarding Lead without delay.</li>
       </ul>
-      <p>See the <a href="/legal/terms-of-use" target="_blank" rel="noreferrer">Terms of Use</a>, <a href="/legal/data-protection-retention" target="_blank" rel="noreferrer">Data Protection Policy</a> and <a href="/legal/child-protection" target="_blank" rel="noreferrer">Child Protection & Safeguarding Policy</a>.</p>
+      <p>See the <a href="/legal/terms" target="_blank" rel="noreferrer">Terms of Use</a>, <a href="/legal/data-protection-retention" target="_blank" rel="noreferrer">Data Protection Policy</a> and <a href="/legal/child-safeguarding" target="_blank" rel="noreferrer">Child Protection & Safeguarding Policy</a>.</p>
       <button type="button" className="hub-button" disabled={state === "saving"} onClick={confirm}>{state === "saving" ? "Saving…" : "I agree"}</button>
       {state === "error" && <p className="hub-error" role="alert">That didn’t save. Please try again.</p>}
     </section>

@@ -8,7 +8,7 @@ This Cookies, Analytics & Digital Technologies Policy (“Policy”) explains ho
 
 SRSS recognises that digital technologies must be implemented responsibly, particularly where their use involves children and educational records. Accordingly, the School shall endeavour to adopt technologies that are appropriate to its educational objectives, proportionate to its operational needs, and consistent with applicable Malaysian privacy and data protection requirements.
 
-This Policy should be read together with the [Terms of Use](/legal/terms-of-use), the [Privacy Policy](/legal/privacy-policy), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), and other applicable SRSS Digital Hub policies.
+This Policy should be read together with the [Terms of Use](/legal/terms), the [Privacy Policy](/legal/privacy), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), and other applicable SRSS Digital Hub policies.
 
 :::box About SSIOM
 The Sathya Sai International Organisation of Malaysia (SSIOM) is a Malaysian non-profit organisation registered under the Societies Act 1966 with the Registrar of Societies Malaysia, bearing registration number PPM-001-14-10081983.
@@ -184,7 +184,7 @@ Depending on the functions implemented, the Platform may process technical infor
 - Security events.
 - General usage information.
 
-Where such information constitutes personal data, it shall be processed in accordance with the [Privacy Policy](/legal/privacy-policy) and applicable law. Technical information must not be retained indefinitely without a legitimate purpose.
+Where such information constitutes personal data, it shall be processed in accordance with the [Privacy Policy](/legal/privacy) and applicable law. Technical information must not be retained indefinitely without a legitimate purpose.
 
 ## 11. Use of Analytics Information
 
@@ -295,7 +295,7 @@ Links to Facebook and Google Maps open those websites in a new tab. No Facebook 
 
 ### A.3 Where information is processed
 
-The Platform’s databases, file storage and server functions are configured for Google Cloud’s asia-southeast1 region in Singapore, which is outside Malaysia. Google’s sign-in, fonts, maps and video services may process information in other countries. The safeguards for these transfers are described in the [Privacy Policy](/legal/privacy-policy) and the [Data Protection, Information Security & Records Retention Policy](/legal/data-protection-retention).
+The Platform’s databases, file storage and server functions are configured for Google Cloud’s asia-southeast1 region in Singapore, which is outside Malaysia. Google’s sign-in, fonts, maps and video services may process information in other countries. The safeguards for these transfers are described in the [Privacy Policy](/legal/privacy) and the [Data Protection, Information Security & Records Retention Policy](/legal/data-protection-retention).
 
 :::contact 20. Contact Information
 For enquiries concerning cookies, analytics, or digital technologies, please contact the School.

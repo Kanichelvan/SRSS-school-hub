@@ -1,47 +1,59 @@
-// Public site navigation (user-supplied information architecture, 10 Oct 2026).
-// Items without a dedicated page yet link to the closest existing section; `soon: true` marks
-// planned pages with no suitable destination today (shown, but not clickable). See SITEMAP.md.
+// Public site navigation — Website Architecture v2.0 (user decision, 13 Oct 2026).
+// About SRSS · Learning · Student Life · Join SRSS · Resources · Sign In, plus search and the
+// Admissions & Visits action. The label goes to the landing page; the chevron opens the menu.
+// Every href is a canonical path from src/data/siteMap.js.
 export const siteNav = [
   {
-    label: "About",
-    href: "/about#top",
-    intro: "Who we are, where we come from and the community behind every child.",
+    label: "About SRSS",
+    href: "/about",
+    intro: "Who we are, what we believe and the people behind every child’s journey.",
     groups: [
-      { title: "Welcome", href: "/about/voices#principal", note: "Principal’s message" },
-      { title: "Our history", href: "/about#who-we-are", links: [["Sathya Sai Baba", "/about/inspiration"], ["SSIOM", "/about/inspiration#organisation"]] },
-      { title: "Our vision & mission", href: "/about#vision-mission", links: [["Human Excellence", "/about#vision-mission"], ["Character development", "/about#educare"], ["Values integration & academics", "/#learning"]] },
-      { title: "Our community", href: "/about#our-people", links: [["Management & governance", "/about#our-people"], ["Staff", "/about#our-people"], ["Parent–Teacher Association", null], ["Alumni", "/about/voices#alumni"]] },
-      { title: "Facilities", href: "/about#campus", links: [["SRSS spaces", "/about#campus"], ["Address & contact", "/#contact"], ["A day at SRSS", "/resources/prayer-pledge-anthem"], ["Uniform, transport & meals", "/faq"]] },
+      { title: "Our School", links: [["Our Story", "/about/our-story"], ["School Profile", "/about/school-profile"], ["Campus", "/about/campus"]] },
+      { title: "Our Philosophy", links: [["Vision & Mission", "/about/vision-mission"], ["Sathya Sai Education", "/about/sathya-sai-education"]] },
+      { title: "Our Community", links: [["Leadership & Governance", "/about/leadership-governance"], ["Our People", "/about/our-people"]] },
+      { title: "Our Legacy", links: [["Silver Jubilee", "/about/silver-jubilee"]] },
     ],
   },
   {
-    label: "Academics",
-    href: "/#learning",
-    intro: "Malaysia’s national curriculum, taught with Sathya Sai Educare at its heart.",
-    links: [["Curriculum & academic pathway", "/#learning"], ["Assessment structure", "/faq"], ["Learning labs", "/#learning"], ["Co-curricular activities", "/#school-life"], ["Enrichment activities", "/#school-life"]],
-  },
-  {
-    label: "Admissions",
-    href: "/#admissions",
-    intro: "Everything families need to join SRSS, from first enquiry to the first day.",
-    links: [["Apply now", "/#enquiry"], ["Admission process", "/#admissions"], ["Entry requirements", "/faq"], ["Registration", "/#enquiry"], ["Fee structure", "/faq"], ["Refund policy", null], ["Open house", "/#events-title"], ["Contact details", "/#contact"], ["Visit SRSS", "visit"]],
+    label: "Learning",
+    href: "/learning",
+    intro: "How our beliefs become teaching: Malaysia’s national curriculum with Sathya Sai Educare at its heart.",
+    groups: [
+      { title: "Learning Foundations", links: [["Curriculum", "/learning/curriculum"], ["Learning Journey", "/learning/learning-journey"]] },
+      { title: "Our Programmes", links: [["Human Values", "/learning/human-values"], ["Enrichment", "/learning/enrichment"], ["Learning Environment", "/learning/learning-environment"]] },
+      { title: "Supporting Every Child", links: [["Learning Support", "/learning/learning-support"], ["Reading & Library", "/learning/reading-library"]] },
+    ],
   },
   {
     label: "Student Life",
-    href: "/#school-life",
-    intro: "The rhythm of an SRSS day: assembly, friendship, leadership and care.",
-    links: [["Morning assembly", "/resources/prayer-pledge-anthem#silent-sitting"], ["Prayer & pledge", "/resources/prayer-pledge-anthem#prayers"], ["Dress code", null], ["Leadership", null], ["Achievements", "/#news"], ["Well-being", "/resources/prayer-pledge-anthem#silent-sitting"], ["Facilities usage", "/about#campus"]],
+    href: "/student-life",
+    intro: "What children experience at SRSS: friendship, talent, service and celebration.",
+    groups: [
+      { title: "Experiences", links: [["Events", "/student-life/events"], ["Sports", "/student-life/sports"], ["Arts & Culture", "/student-life/arts-culture"]] },
+      { title: "Growth & Achievement", links: [["Student Leadership", "/student-life/leadership"], ["Achievements", "/student-life/achievements"], ["Service", "/student-life/service"]] },
+      { title: "Explore", links: [["Stories", "/student-life/stories"], ["Gallery", "/student-life/gallery"]] },
+    ],
+  },
+  {
+    label: "Join SRSS",
+    href: "/join",
+    intro: "Choosing a school for your child, reconnecting as an alumnus or offering your time — there is a place for you.",
+    groups: [
+      { title: "Admissions", href: "/join/admissions", links: [["Why SRSS?", "/join/why-srss"], ["How to Apply", "/join/how-to-apply"], ["Fees", "/join/fees"], ["Book a Visit", "/join/book-a-visit"], ["Admissions FAQs", "/join/admissions-faq"]] },
+      { title: "Get Involved", href: "/join/get-involved", links: [["Alumni", "/join/alumni"], ["Volunteer", "/join/volunteer"], ["Support SRSS", "/join/support-srss"], ["Parents & Community", "/join/parents-community"]] },
+    ],
   },
   {
     label: "Resources",
-    href: "/#news",
-    intro: "Forms, dates, news and the documents families use most.",
-    links: [["Forms", "/hub/forms"], ["Useful links", null], ["Parents’ handbook", null], ["Calendar", "/#events-title"], ["News", "/#news"], ["Monthly events", "/#events-title"], ["Legal & policies", "/legal"]],
-  },
-  {
-    label: "Hubs",
-    href: "/sign-in",
-    intro: "Secure spaces for our school community. You will be asked to sign in.",
-    hubs: [["Student Hub", "/hub/student", "Learning, timetable and achievements"], ["Teachers Hub", "/hub/teacher", "Classes, attendance and resources"], ["Parents Hub", "/hub/parent", "Notices, forms and your child’s progress"], ["Admin Hub", "/hub/admin", "School operations and publishing"]],
+    href: "/resources",
+    intro: "Everything you need, in one place.",
+    groups: [
+      { title: "Information", links: [["Calendar", "/resources/calendar"], ["News & Updates", "/resources/news"], ["Notices", "/resources/notices"]] },
+      { title: "Documents", links: [["Downloads", "/resources/downloads"], ["Policies", "/resources/policies"]] },
+      { title: "Assistance", links: [["FAQs", "/resources/faq"], ["Contact", "/resources/contact"]] },
+    ],
   },
 ];
+
+// Not a menu: a direct link to the secure sign-in gateway. The individual hubs appear after sign-in.
+export const signInLink = { label: "Sign In", href: "/login" };

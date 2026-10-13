@@ -55,7 +55,7 @@ export function SignIn() {
             <p className="hub-signin-links"><button type="button" onClick={() => setMode("password")}>Back to sign in</button></p>
           </form>}
         </div>
-        <p className="hub-signin-legal">Use of the SRSS Digital Hub is covered by our <a href="/legal/terms-of-use">Terms of Use</a> and <a href="/legal/privacy-policy">Privacy Policy</a>. Worried about a child? <a href="/legal/child-protection#s-4">Safeguarding contacts</a>.</p>
+        <p className="hub-signin-legal">Use of the SRSS Digital Hub is covered by our <a href="/legal/terms">Terms of Use</a> and <a href="/legal/privacy">Privacy Policy</a>. Worried about a child? <a href="/legal/child-safeguarding#s-4">Safeguarding contacts</a>.</p>
         {notice && <p className="hub-status" role="status">{notice}</p>}
         {error && <p className="hub-error" role="alert">{error}</p>}
         {usingEmulators && <details className="hub-demo"><summary>Local demo accounts (emulator only)</summary><div>{DEMO_ACCOUNTS.map(([key, label]) => <button key={key} type="button" disabled={busy} onClick={() => run(() => auth.signInWithPassword(`${key}@demo.srss.test`, DEMO_PASSWORD))}>{label}</button>)}</div></details>}

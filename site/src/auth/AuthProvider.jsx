@@ -57,9 +57,9 @@ export function AuthProvider({ children }) {
       return signInWithPopup(auth, provider);
     },
     signInWithPassword: (email, password) => signInWithEmailAndPassword(auth, email.trim(), password),
-    resetPassword: (email) => sendPasswordResetEmail(auth, email.trim(), { url: `${window.location.origin}/sign-in` }),
+    resetPassword: (email) => sendPasswordResetEmail(auth, email.trim(), { url: `${window.location.origin}/login` }),
     async sendSignInLink(email) {
-      await sendSignInLinkToEmail(auth, email.trim(), { url: `${window.location.origin}/sign-in`, handleCodeInApp: true });
+      await sendSignInLinkToEmail(auth, email.trim(), { url: `${window.location.origin}/login`, handleCodeInApp: true });
       store.set(EMAIL_KEY, email.trim());
     },
     async completeEmailLink(promptForEmail) {

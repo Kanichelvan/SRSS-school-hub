@@ -12,7 +12,7 @@ This Photography, Video, Student Work & Media Consent Policy (“Policy”) esta
 
 The Policy applies to school personnel, parents, guardians, pupils, volunteers, event organisers, photographers, media contributors, and other authorised persons involved in the creation or use of school-related media.
 
-It shall be read together with the SRSS Digital Hub [Privacy Policy](/legal/privacy-policy), the [Parental Consent, Guardian Authority & Children’s Digital Participation Policy](/legal/parental-consent), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), and the [Intellectual Property, Educational Content & Acceptable Use Policy](/legal/intellectual-property).
+It shall be read together with the SRSS Digital Hub [Privacy Policy](/legal/privacy), the [Parental Consent, Guardian Authority & Children’s Digital Participation Policy](/legal/parental-consent), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), and the [Intellectual Property, Educational Content & Acceptable Use Policy](/legal/acceptable-use).
 
 :::box Institutional Responsibility
 The SRSS Digital Hub is developed under the auspices of the Sathya Sai International Organisation of Malaysia (SSIOM), which is the designated owner of the Platform’s original software and associated proprietary digital infrastructure, subject to applicable rights and agreements.

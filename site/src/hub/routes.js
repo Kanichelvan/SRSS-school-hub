@@ -76,7 +76,7 @@ export const hubIndex = (hub) => hubRoutes.find((route) => route.hub === hub && 
 // Aliases for addresses used in the Developer PRD (PUB-001 AC2).
 const ROLE_HUBS = ["admin", "teacher", "parent", "student"];
 export const ROUTE_ALIASES = [
-  ["/login", "/sign-in"],
+  ["/sign-in", "/login"],
   // Developer PRD (/dashboard/{role}) and Dual-Plane brief (/portal/{role}) addresses.
   ...["/dashboard", "/portal"].flatMap((prefix) => [[prefix, "/hub"], ...ROLE_HUBS.map((hub) => [`${prefix}/${hub}`, `/hub/${hub}`])]),
   // Retired prototype addresses (pre-Firebase Parent Hub and /admin CMS).

@@ -6,7 +6,7 @@ The Platform is developed to progressively facilitate school communications, edu
 
 This Disclaimer & Limitation of Liability (“Disclaimer”) explains the nature and limitations of information and services provided through the Platform. It also clarifies the responsibilities of users, the role of third-party services, the status of digital information, and the extent to which liability may be limited under applicable Malaysian law.
 
-This Disclaimer shall be read together with the [Terms of Use](/legal/terms-of-use), the [Privacy Policy](/legal/privacy-policy), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), and other applicable SRSS Digital Hub policies.
+This Disclaimer shall be read together with the [Terms of Use](/legal/terms), the [Privacy Policy](/legal/privacy), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), and other applicable SRSS Digital Hub policies.
 
 Nothing in this Disclaimer shall be interpreted as excluding or restricting any statutory obligation, legal right, or liability that cannot lawfully be excluded or restricted.
 
@@ -192,7 +192,7 @@ The Platform may contain content owned by SSIOM, Sekolah Rendah Sathya Berhad, S
 
 The availability of content through the Platform does not necessarily confer ownership or unrestricted reproduction rights upon users. Users must comply with applicable intellectual property requirements.
 
-Further details are provided in the [Intellectual Property, Educational Content & Acceptable Use Policy](/legal/intellectual-property).
+Further details are provided in the [Intellectual Property, Educational Content & Acceptable Use Policy](/legal/acceptable-use).
 
 ## 18. External Contributions and Alumni Materials
 

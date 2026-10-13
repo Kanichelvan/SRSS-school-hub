@@ -40,7 +40,7 @@ function RequireSignIn() {
   const auth = useAuth();
   const location = useLocation();
   if (auth.status === "loading") return <div className="hub-loading" role="status">Loading your hub…</div>;
-  if (auth.status === "signedOut") return <Navigate to="/sign-in" replace state={auth.userSignedOut ? null : { from: location.pathname + location.search }} />;
+  if (auth.status === "signedOut") return <Navigate to="/login" replace state={auth.userSignedOut ? null : { from: location.pathname + location.search }} />;
   if (!auth.roles.length) return <AccountPending />;
   return <Outlet />;
 }
@@ -129,7 +129,7 @@ export function HubApp() {
   return <AuthProvider>
     <BrowserRouter>
       <Routes>
-        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/login" element={<SignIn />} />
         {ROUTE_ALIASES.map(([from, to]) => <Route key={from} path={from} element={<Navigate to={to} replace />} />)}
         <Route path="/hub" element={<RequireSignIn />}>
           <Route element={<Shell />}>
@@ -147,7 +147,7 @@ export function HubApp() {
 export function HubFooter() {
   return <footer className="hub-footer">
     <div><strong>Sekolah Rendah Sathya Sai</strong><span>6, Jalan Puchong, Taman Tan Yew Lai, 58200 Kuala Lumpur · <a href="tel:+60126001926">+60 12-600 1926</a> · <a href="mailto:saischoolpuchong@gmail.com">saischoolpuchong@gmail.com</a></span></div>
-    <nav aria-label="Hub footer"><a href="/">School website</a><a href="/faq">FAQ</a><a href="/#contact">Contact the school</a><a href="/legal/privacy-policy">Privacy Policy</a><a href="/legal/terms-of-use">Terms of Use</a><a href="/legal/child-protection#s-4">Child Safeguarding</a><a href="/legal">All Policies →</a></nav>
+    <nav aria-label="Hub footer"><a href="/">School website</a><a href="/resources/faq">FAQ</a><a href="/resources/contact">Contact the school</a><a href="/legal/privacy">Privacy Policy</a><a href="/legal/terms">Terms of Use</a><a href="/legal/child-safeguarding#s-4">Child Safeguarding</a><a href="/legal">All Policies →</a></nav>
     <small>© {new Date().getFullYear()} Sekolah Rendah Sathya Sai. All rights reserved. · SRSS Digital Hub — an SSIOM Digital Initiative. Platform software © SSIOM.</small>
   </footer>;
 }

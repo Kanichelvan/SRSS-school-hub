@@ -10,11 +10,11 @@ export const EFFECTIVE_DATE = "23rd November 2026";
 export const COPYRIGHT_YEAR = 2026;
 
 export const policies = [
-  { slug: "terms-of-use", title: "Terms of Use", summary: "The conditions for using SRSS Digital Hub, who may use it, and what each user is responsible for." },
-  { slug: "privacy-policy", title: "Privacy Policy", summary: "What personal information the School collects, why, who can see it, how long it is kept and your rights." },
-  { slug: "child-protection", title: "Child Protection & Safeguarding Policy", short: "Child Protection & Safeguarding", summary: "The School-wide policy: who the safeguarding leads are, how abuse is recognised and reported, and how allegations are handled." },
+  { slug: "terms", title: "Terms of Use", summary: "The conditions for using SRSS Digital Hub, who may use it, and what each user is responsible for." },
+  { slug: "privacy", title: "Privacy Policy", summary: "What personal information the School collects, why, who can see it, how long it is kept and your rights." },
+  { slug: "child-safeguarding", title: "Child Protection & Safeguarding Policy", short: "Child Protection & Safeguarding", summary: "The School-wide policy: who the safeguarding leads are, how abuse is recognised and reported, and how allegations are handled." },
   { slug: "online-safeguarding", title: "Child Protection & Online Safeguarding Policy", short: "Online Safeguarding", summary: "How the School keeps children safe online, what conduct is prohibited and how to report a concern." },
-  { slug: "intellectual-property", title: "Intellectual Property, Educational Content & Acceptable Use Policy", short: "Intellectual Property & Acceptable Use", summary: "Who owns the platform, school materials and pupils’ work, and how they may be used." },
+  { slug: "acceptable-use", title: "Intellectual Property, Educational Content & Acceptable Use Policy", short: "Intellectual Property & Acceptable Use", summary: "Who owns the platform, school materials and pupils’ work, and how they may be used." },
   { slug: "media-consent", title: "Photography, Video, Student Work & Media Consent Policy", short: "Photography, Video & Media Consent", summary: "When pupils’ photos, recordings and work may be used, with separate consent for each kind of publication." },
   { slug: "disclaimer", title: "Disclaimer & Limitation of Liability", short: "Disclaimer", summary: "The limits of online information and services, without excluding duties the law does not allow us to exclude." },
   { slug: "cookies", title: "Cookies, Analytics & Digital Technologies Policy", short: "Cookies & Digital Technologies", summary: "The cookies, browser storage and outside services the platform uses, with a list of what is in use today." },
@@ -30,12 +30,12 @@ export const policyHref = (slug) => `/legal/${slug}`;
 
 // Footer grouping (framework Part VII).
 export const legalGroups = [
-  { title: "Legal & policies", slugs: ["terms-of-use", "privacy-policy", "parental-consent", "disclaimer", "cookies"] },
-  { title: "Safety & digital responsibility", slugs: ["child-protection", "online-safeguarding", "media-consent", "intellectual-property", "data-protection-retention"] },
-  { title: "Governance & support", slugs: ["accessibility-complaints"], extra: [["Contact the school", "/#contact"]] },
+  { title: "Legal & policies", slugs: ["terms", "privacy", "parental-consent", "disclaimer", "cookies"] },
+  { title: "Safety & digital responsibility", slugs: ["child-safeguarding", "online-safeguarding", "media-consent", "acceptable-use", "data-protection-retention"] },
+  { title: "Governance & support", slugs: ["accessibility-complaints"], extra: [["Contact the school", "/resources/contact"]] },
 ];
 
-export const SAFEGUARDING_HREF = "/legal/child-protection#s-4";
+export const SAFEGUARDING_HREF = "/legal/child-safeguarding#s-4";
 
 export const contact = {
   person: "The Principal",

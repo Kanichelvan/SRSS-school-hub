@@ -203,7 +203,7 @@ function LegalIndex() {
           <h2 id="urgent-title">Worried about a child’s safety?</h2>
           <p>Contact the {safeguardingLead.title}, {safeguardingLead.name} ({safeguardingLead.post}), on <a href={safeguardingLead.phoneHref}>{safeguardingLead.phone}</a> or <a href={`mailto:${safeguardingLead.email}`}>{safeguardingLead.email}</a>, or the School on <a href={contact.phoneHref}>{contact.phone}</a>. If a child is in immediate danger, do not wait for the School: call 999.</p>
           <EmergencyLines />
-          <a className="legal-urgent-link" href="/legal/child-protection#s-7">How the School handles a concern</a>
+          <a className="legal-urgent-link" href="/legal/child-safeguarding#s-7">How the School handles a concern</a>
         </section>
         {legalGroups.map((group) => (
           <section className="legal-group" key={group.title} aria-labelledby={`group-${group.slugs[0]}`}>

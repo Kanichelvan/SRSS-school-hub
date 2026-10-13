@@ -322,7 +322,7 @@ export function PrayerPledgeAnthemPage() {
     <section className="ppa-page-hero">
       <img src={`${ASSET_ROOT}/seated-rows.png`} alt="SRSS pupils seated together during morning assembly" />
       <div className="ppa-page-hero-scrim" />
-      <div className="ppa-wrap ppa-page-hero-inner"><nav aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/#learning">Resources</a><span>›</span><strong>Prayer, Pledge &amp; Anthem</strong></nav><p className="eyebrow">Silence · Prayer · Anthem · Pledge</p><h1>Before the<br/><em>First Bell</em></h1><p>Silence. Prayer. Anthem. Pledge. This is how an SRSS morning begins — and why it stays with a child for life. Learn the words, practise them at home and carry their meaning into the day.</p></div>
+      <div className="ppa-wrap ppa-page-hero-inner"><p className="eyebrow">Silence · Prayer · Anthem · Pledge</p><h1>Before the<br/><em>First Bell</em></h1><p>Silence. Prayer. Anthem. Pledge. This is how an SRSS morning begins — and why it stays with a child for life. Learn the words, practise them at home and carry their meaning into the day.</p></div>
     </section>
 
     <section className="ppa-order-section" aria-label="Assembly order"><div className="ppa-wrap ppa-order" role="tablist" aria-label="Choose an assembly practice">{ORDER.map(({ id, label, note, Icon }, index) => <button type="button" role="tab" aria-selected={active === id} aria-controls={`ppa-panel-${id}`} key={id} onClick={() => selectPanel(id)}><span><Icon size={18} /><b>{String(index + 1).padStart(2, "0")}</b></span><strong>{label}</strong><small>{note}</small></button>)}</div></section>
@@ -330,7 +330,7 @@ export function PrayerPledgeAnthemPage() {
 
     <div className="ppa-active-panel" id={`ppa-panel-${active}`} role="tabpanel"><ActivePanel /></div>
 
-    <section className="ppa-print-section"><div className="ppa-wrap"><div><p className="eyebrow">For parents and teachers</p><h2>Keep the words close.</h2><p>Print this page for practice at home or in class. The printable version includes all six parts of the assembly sequence.</p></div><div><button type="button" className="primary-button" onClick={() => window.print()}><Printer size={18} /> Print this page</button><a className="ppa-text-link" href="/#values">Explore the five values <ArrowRight size={17} /></a></div></div></section>
+    <section className="ppa-print-section"><div className="ppa-wrap"><div><p className="eyebrow">For parents and teachers</p><h2>Keep the words close.</h2><p>Print this page for practice at home or in class. The printable version includes all six parts of the assembly sequence.</p></div><div><button type="button" className="primary-button" onClick={() => window.print()}><Printer size={18} /> Print this page</button><a className="ppa-text-link" href="/learning/human-values">Explore the five values <ArrowRight size={17} /></a></div></div></section>
 
     <div className="ppa-print-all" aria-hidden="true">{ORDER.filter((item) => item.id !== active).map((item) => { const Panel = PANELS[item.id]; return <div key={item.id}><Panel /></div>; })}</div>
   </main>;

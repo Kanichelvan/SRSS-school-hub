@@ -16,9 +16,9 @@ const MAP_HREF = "https://maps.google.com/?q=6+Jalan+Puchong+Taman+Tan+Yew+Lai+5
 const PHONE = ["+60 12-600 1926", "tel:+60126001926"];
 const EMAIL = "saischoolpuchong@gmail.com";
 
-const explore = [["About SRSS", "/about#top"], ["Our Learning", "/#learning"], ["Student Life", "/#school-life"], ["News & Events", "/#news"], ["SRSS25", "/#jubilee-title"]];
+const explore = [["About SRSS", "/about"], ["Learning", "/learning"], ["Student Life", "/student-life"], ["News & Events", "/resources/news"], ["SRSS25", "/about/silver-jubilee"]];
 const hubs = [["Parent Hub", "/hub/parent", UsersThree], ["Student Hub", "/hub/student", Student], ["Teacher Hub", "/hub/teacher", ChalkboardTeacher], ["Administration Hub", "/hub/admin", Buildings]];
-const policies = [["Privacy Policy", "/legal/privacy-policy"], ["Terms of Use", "/legal/terms-of-use"], ["Child Safeguarding", SAFEGUARDING_HREF]];
+const policies = [["Privacy Policy", "/legal/privacy"], ["Terms of Use", "/legal/terms"], ["Child Safeguarding", SAFEGUARDING_HREF]];
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 
@@ -48,7 +48,7 @@ export function PreFooter({ onVisit }) {
           <p>Discover an education that nurtures academic excellence, character and human values.</p>
         </div>
         <div className="prefooter-actions">
-          <a className="prefooter-primary" href="/about#top">Discover SRSS <ArrowRight size={17} weight="bold" aria-hidden="true" /></a>
+          <a className="prefooter-primary" href="/about">Discover SRSS <ArrowRight size={17} weight="bold" aria-hidden="true" /></a>
           <button type="button" className="prefooter-secondary" onClick={onVisit}>Arrange a School Visit</button>
         </div>
       </div>
@@ -60,11 +60,11 @@ export function SiteFooter({ onVisit }) {
   const narrow = useNarrow("(max-width: 720px)");
   const year = new Date().getFullYear();
   const support = <>
-    <a href="/#admissions">Admissions</a>
+    <a href="/join/admissions">Admissions</a>
     <button type="button" onClick={onVisit}>Visit SRSS</button>
-    <a href="/faq">FAQ</a>
-    <a href="/resources/prayer-pledge-anthem">Resources &amp; Downloads</a>
-    <a href="/#contact">Contact the School</a>
+    <a href="/resources/faq">FAQ</a>
+    <a href="/resources">Resources &amp; Downloads</a>
+    <a href="/resources/contact">Contact the School</a>
   </>;
 
   return (
@@ -104,7 +104,7 @@ export function SiteFooter({ onVisit }) {
       <div className="site-footer-base">
         <p>© {year} Sekolah Rendah Sathya Sai. All rights reserved.</p>
         <p>An educational initiative of the Sathya Sai International Organisation of Malaysia.</p>
-        <p className="site-footer-utility"><a href="/legal/accessibility-complaints">Accessibility</a><span aria-hidden="true">·</span><a href="/legal/privacy-policy">Privacy</a><span aria-hidden="true">·</span><button type="button" onClick={scrollToTop}>Back to Top <ArrowUp size={13} weight="bold" aria-hidden="true" /></button></p>
+        <p className="site-footer-utility"><a href="/legal/accessibility-complaints">Accessibility</a><span aria-hidden="true">·</span><a href="/legal/privacy">Privacy</a><span aria-hidden="true">·</span><button type="button" onClick={scrollToTop}>Back to Top <ArrowUp size={13} weight="bold" aria-hidden="true" /></button></p>
         <p className="site-footer-jubilee"><strong>SRSS25</strong> | 25 years of Shaping Minds. Nurturing Hearts. Inspiring Lives.</p>
         <p className="site-footer-platform">SRSS Digital Hub — an SSIOM Digital Initiative for Sekolah Rendah Sathya Sai. Platform software © {year} SSIOM.</p>
       </div>

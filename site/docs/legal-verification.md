@@ -24,7 +24,7 @@ Last updated 13 October 2026. **Status: draft.** Every policy shows a “Draft f
   - **Deputy DPO:** the School Data Teacher.
 - **Concerns about the Principal:** the Chair of the Board of Governors, Dr Maniam, or Board member Santosh Govind (National Treasurer of SSIOM). They appear in the Child Protection, Online Safeguarding, Complaints and Parental Consent policies.
 - **Records retention:** the School’s periods are published as Schedule A of the Data Protection policy, and the safeguarding periods are repeated in Child Protection §21.
-- **New policy:** the School-wide **Child Protection & Safeguarding Policy** (`/legal/child-protection`), built from the School’s text. The digital policy is now titled “Child Protection & Online Safeguarding Policy” (`/legal/online-safeguarding`) and defers to it. There are now eleven policies.
+- **New policy:** the School-wide **Child Protection & Safeguarding Policy** (`/legal/child-safeguarding`), built from the School’s text. The digital policy is now titled “Child Protection & Online Safeguarding Policy” (`/legal/online-safeguarding`) and defers to it. There are now eleven policies.
 
 ## 2. Child protection text: UK references changed for Malaysia
 

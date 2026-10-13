@@ -42,7 +42,7 @@ This Policy is intended to operate consistently with applicable Malaysian laws a
 
 The School shall also consider applicable guidance concerning child welfare, educational supervision, and the responsible use of digital technologies.
 
-Nothing in this Policy limits statutory duties to report suspected abuse or other matters to the appropriate authorities. This Policy applies the School-wide [Child Protection & Safeguarding Policy](/legal/child-protection) to digital services; where the two overlap, the School-wide policy’s procedures apply.
+Nothing in this Policy limits statutory duties to report suspected abuse or other matters to the appropriate authorities. This Policy applies the School-wide [Child Protection & Safeguarding Policy](/legal/child-safeguarding) to digital services; where the two overlap, the School-wide policy’s procedures apply.
 
 ## 4. Scope of the Policy
 
@@ -85,7 +85,7 @@ The Principal may delegate specific operational responsibilities to suitably aut
 
 The School’s Designated Safeguarding Lead (DSL) is its Senior Assistant for Administration / Academic, supported by two Deputy Designated Safeguarding Leads: the School Counsellor and the Senior Assistant for Co-curriculum.
 
-The Designated Safeguarding Lead coordinates reports, maintains appropriate records, and ensures that concerns are addressed through established procedures. Their full responsibilities, and the names and contact details of the current post-holders, are set out in the [Child Protection & Safeguarding Policy](/legal/child-protection#s-4).
+The Designated Safeguarding Lead coordinates reports, maintains appropriate records, and ensures that concerns are addressed through established procedures. Their full responsibilities, and the names and contact details of the current post-holders, are set out in the [Child Protection & Safeguarding Policy](/legal/child-safeguarding#s-4).
 
 ### 5.3 Teachers and School Staff
 
@@ -294,7 +294,7 @@ Any individual who becomes aware of a potential safeguarding concern should repo
 - Disclosure of sensitive information.
 - Other conduct potentially endangering a child.
 
-Reports may be made to the Designated Safeguarding Lead, Mr Ravi Balan, on +60 16-290 3300 or ravi.srss@ssiomya.com, or to the Principal on +60 12-600 1926 or saischoolpuchong@gmail.com. The School-wide procedure for responding to a concern is set out in the [Child Protection & Safeguarding Policy](/legal/child-protection#s-7).
+Reports may be made to the Designated Safeguarding Lead, Mr Ravi Balan, on +60 16-290 3300 or ravi.srss@ssiomya.com, or to the Principal on +60 12-600 1926 or saischoolpuchong@gmail.com. The School-wide procedure for responding to a concern is set out in the [Child Protection & Safeguarding Policy](/legal/child-safeguarding#s-7).
 
 ### 13.1 Immediate Danger
 

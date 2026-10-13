@@ -211,7 +211,7 @@ This process does not replace statutory complaint mechanisms or mandatory report
 
 ## 12. Urgent Safeguarding Complaints
 
-Concerns involving suspected abuse, exploitation, grooming, serious harassment, or immediate threats to a child’s safety must not be treated as ordinary technical complaints. Such matters should be referred promptly to the Principal or the Designated Safeguarding Lead, as set out in the [Child Protection & Safeguarding Policy](/legal/child-protection#s-4).
+Concerns involving suspected abuse, exploitation, grooming, serious harassment, or immediate threats to a child’s safety must not be treated as ordinary technical complaints. Such matters should be referred promptly to the Principal or the Designated Safeguarding Lead, as set out in the [Child Protection & Safeguarding Policy](/legal/child-safeguarding#s-4).
 
 Where immediate danger exists, emergency services or appropriate authorities should be contacted without delay. The School shall follow applicable safeguarding and reporting requirements.
 

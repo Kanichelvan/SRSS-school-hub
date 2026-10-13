@@ -12,7 +12,7 @@ These Terms of Use (“Terms”) govern access to and use of the Platform by vis
 
 Where a user is below the age of eighteen (18), acceptance of these Terms must be undertaken by the user’s parent or legal guardian where legally required. A child’s use of the Platform does not, by itself, establish that the child has entered into a legally binding contract.
 
-These Terms should be read together with the [Privacy Policy](/legal/privacy-policy), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), the [Intellectual Property, Educational Content & Acceptable Use Policy](/legal/intellectual-property), the [Parental Consent, Guardian Authority & Children’s Digital Participation Policy](/legal/parental-consent), and other applicable policies published by SRSS.
+These Terms should be read together with the [Privacy Policy](/legal/privacy), the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), the [Intellectual Property, Educational Content & Acceptable Use Policy](/legal/acceptable-use), the [Parental Consent, Guardian Authority & Children’s Digital Participation Policy](/legal/parental-consent), and other applicable policies published by SRSS.
 
 :::box About SSIOM
 The Sathya Sai International Organisation of Malaysia (SSIOM) is a Malaysian non-profit organisation registered under the Societies Act 1966 with the Registrar of Societies Malaysia (ROS), bearing registration number PPM-001-14-10081983.
@@ -173,7 +173,7 @@ The School may restrict pupil messaging, public posting, external sharing, or ot
 
 Suspected safeguarding concerns should be reported promptly to the Principal or designated safeguarding personnel. Where immediate danger exists, emergency services or appropriate authorities should be contacted without delay.
 
-Further requirements are established in the [Child Protection & Safeguarding Policy](/legal/child-protection) and the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding).
+Further requirements are established in the [Child Protection & Safeguarding Policy](/legal/child-safeguarding) and the [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding).
 
 ## 8. Educational Records and Academic Information
 
@@ -284,7 +284,7 @@ The Platform may collect and process personal information necessary for legitima
 
 Personal information must be handled in accordance with applicable Malaysian laws, including the Personal Data Protection Act 2010 (Act 709), as amended, to the extent applicable. Additional safeguards apply to children’s information and other sensitive or confidential records.
 
-Users should refer to the [Privacy Policy](/legal/privacy-policy) for details concerning data collection, processing, disclosure, retention, security, and applicable rights.
+Users should refer to the [Privacy Policy](/legal/privacy) for details concerning data collection, processing, disclosure, retention, security, and applicable rights.
 
 ## 14. Platform Availability and Development
 

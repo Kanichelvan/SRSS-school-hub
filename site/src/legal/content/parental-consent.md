@@ -12,7 +12,7 @@ The Policy also explains how the School may verify parental or guardianship auth
 
 The Policy applies to parents, legal guardians, pupils, teachers, school administrators, authorised service providers, and other persons participating in or administering the Platform.
 
-It shall be read together with the SRSS Digital Hub [Terms of Use](/legal/terms-of-use), [Privacy Policy](/legal/privacy-policy), [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), [Photography, Video, Student Work & Media Consent Policy](/legal/media-consent), [Data Protection, Information Security & Records Retention Policy](/legal/data-protection-retention), and other applicable institutional policies.
+It shall be read together with the SRSS Digital Hub [Terms of Use](/legal/terms), [Privacy Policy](/legal/privacy), [Child Protection & Online Safeguarding Policy](/legal/online-safeguarding), [Photography, Video, Student Work & Media Consent Policy](/legal/media-consent), [Data Protection, Information Security & Records Retention Policy](/legal/data-protection-retention), and other applicable institutional policies.
 
 The School recognises that parental consent is an important safeguard but does not, by itself, remove the School’s independent responsibilities concerning the safety, dignity, education, privacy, and welfare of children.
 

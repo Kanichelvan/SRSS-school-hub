@@ -34,12 +34,24 @@ import { loadPublicContent, submitPublicForm } from "./lib/publicContent.js";
 import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
-import { siteNav } from "./data/navigation.js";
+import { signInLink, siteNav } from "./data/navigation.js";
+import { resolvePath } from "./data/siteMap.js";
+import { FaqAccordion, FaqList, FAQ_TOPICS } from "./components/Faq.jsx";
+import { AdmissionsPage, Breadcrumbs, GovernancePage, JoinPage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SiteSearch, StudentLifePage } from "./pages/SitePages.jsx";
 import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
 
 // Policy pages load on demand so their text never weighs on the homepage.
 const LegalPage = lazy(() => import("./legal/LegalPage.jsx"));
-const legalSlugFrom = (path) => (path === "/legal" || path === "/legal/" ? "" : path.startsWith("/legal/") ? path.slice(7).replace(/\/$/, "") : null);
+// Current route from the address bar; old addresses are swapped for their canonical URL in place.
+function currentRoute() {
+  const { pathname, hash } = window.location;
+  const resolved = resolvePath(pathname);
+  if (resolved.redirect) {
+    window.history.replaceState({}, "", `${resolved.redirect}${hash}`);
+    return resolvePath(resolved.redirect).entry;
+  }
+  return resolved.entry;
+}
 
 const values = [
   {
@@ -101,8 +113,8 @@ const roleRoutes = [
   ["Parent", "Notices, forms, dates and class updates.", "/hub/parent", UsersThree, "Go to the Parent Hub"],
   ["Student", "Learning links, reading and values challenges.", "/hub/student", GraduationCap, "Go to the Student Hub"],
   ["Teacher", "Timetables, resources and staff essentials.", "/hub/teacher", ChalkboardTeacher, "Go to the Teacher Hub"],
-  ["Exploring the school", "Visitors, guests and prospective families.", "/about#top", Compass, "Discover About SRSS"],
-  ["Admin", "School operations, records and publishing.", "/hub/admin", LockKey, "Go to the Admin Hub"],
+  ["Prospective family", "Visitors, guests and families exploring SRSS.", "/join/admissions", Compass, "Admissions"],
+  ["Staff", "School operations, records and publishing.", "/hub/admin", LockKey, "Sign in to the Admin Hub"],
 ];
 
 const whySrss = [
@@ -121,10 +133,9 @@ const inspirationQuote = "Education is not for mere living; it is for life, a fu
 
 function InspirationPage() {
   return <main id="main" className="inspiration-page">
-    <section className="inspiration-hero"><div className="about-inner inspiration-hero-grid"><div><p className="eyebrow">Our inspiration · Founder</p><h1>Education for life,<br/><em>inspired by character.</em></h1><p>SRSS is guided by the educational vision of Bhagawan Sri Sathya Sai Baba: to draw out the human values already present in every child and help them live with purpose.</p><a className="primary-button" href="#organisation">Meet the SRSS community <ArrowRight size={18}/></a></div><figure><img src="/assets/sathya-sai-baba-portrait.jpg" alt="Illustrated portrait of Bhagawan Sri Sathya Sai Baba in an orange robe" /></figure></div></section>
+    <section className="inspiration-hero"><div className="about-inner inspiration-hero-grid"><div><p className="eyebrow">Our inspiration · Founder</p><h1>Education for life,<br/><em>inspired by character.</em></h1><p>SRSS is guided by the educational vision of Bhagawan Sri Sathya Sai Baba: to draw out the human values already present in every child and help them live with purpose.</p><a className="primary-button" href="/about/our-people">Meet the SRSS community <ArrowRight size={18}/></a></div><figure><img src="/assets/sathya-sai-baba-portrait.jpg" alt="Illustrated portrait of Bhagawan Sri Sathya Sai Baba in an orange robe" /></figure></div></section>
     <section className="inspiration-quote about-inner"><p className="eyebrow">A life-giving education</p><blockquote>“{inspirationQuote}”</blockquote><p className="quote-source">— Sathya Sai Baba, Maharani’s Women’s College in Mysore, September 1963</p><p>At SRSS, this vision is lived through the Head, Heart and Hands: strong learning, steady character, practical capability and compassionate service.</p></section>
-    <section className="organisation-section" id="organisation"><div className="about-inner"><p className="eyebrow">Leadership &amp; governance</p><h2>One school community,<br/><em>many hands in service.</em></h2><p className="organisation-intro">The school’s work is held by a connected community of governance, leadership, teachers, families and volunteers. This overview will grow with the full organisation chart and role details.</p><div className="organisation-chart" aria-label="SRSS organisation chart"><div className="org-node org-board"><span>01</span><strong>Board of Directors</strong><small>Stewardship &amp; governance</small></div><div className="org-line" aria-hidden="true"/><div className="org-row"><div className="org-node"><span>02</span><strong>School Leadership</strong><small>Principal &amp; administration</small></div><div className="org-node"><span>03</span><strong>Teaching Team</strong><small>Learning &amp; pupil wellbeing</small></div><div className="org-node"><span>04</span><strong>School Community</strong><small>Families, volunteers &amp; partners</small></div></div></div></div></section>
-    <section className="inspiration-closing"><div className="about-inner"><p className="eyebrow">Rooted in Educare</p><h2>Human excellence is the<br/><em>journey we share.</em></h2><a className="text-link" href="/about#educare">Explore Sathya Sai Educare <ArrowRight size={17}/></a></div></section>
+    <section className="inspiration-closing"><div className="about-inner"><p className="eyebrow">Rooted in Educare</p><h2>Human excellence is the<br/><em>journey we share.</em></h2><a className="text-link" href="/learning/human-values">See how we integrate human values <ArrowRight size={17}/></a></div></section>
   </main>;
 }
 
@@ -154,22 +165,22 @@ const defaultAboutContent = {
 };
 
 const missionPillars = [["Academic Excellence", "Developing knowledgeable, confident and capable lifelong learners."], ["Character Excellence", "Nurturing integrity, self-awareness, compassion, responsibility and strength of character."], ["Civic Stewardship", "Developing responsible Malaysians who respect their nation, its diversity and the wider human family."], ["Altruistic Responsibility", "Inspiring children to recognise their responsibility to serve society and care for the world around them."]];
-const aboutLinks = [["Our Story", "/about/our-story"], ["Vision & Mission", "/about/vision-mission"], ["Sathya Sai Education & Educare", "#educare"], ["Leadership & Governance", "/about/governance"], ["Voices of SRSS", "/about/voices"], ["School Profile", "#school-profile"], ["Campus & Contact", "#campus"], ["25 Years of SRSS", "#srss25"]];
+const aboutLinks = [["Our Story", "/about/our-story"], ["Vision & Mission", "/about/vision-mission"], ["Sathya Sai Education", "/about/sathya-sai-education"], ["Leadership & Governance", "/about/leadership-governance"], ["Our People", "/about/our-people"], ["School Profile", "/about/school-profile"], ["Campus", "/about/campus"], ["Silver Jubilee", "/about/silver-jubilee"]];
 
-function AboutPage({ onVisit, content }) {
+function AboutPage({ onVisit, content, faqs }) {
   const about = { ...defaultAboutContent, ...content };
   return <main id="main" className="about-page about-refresh">
-    <section className="about-hero" id="top"><div className="about-inner about-hero-grid"><div><p className="eyebrow">ABOUT SRSS · EDUCATION FOR LIFE</p><h1>Education for Life,<br/>Not Mere Living.</h1><p>Sekolah Rendah Sathya Sai is a Malaysian primary school dedicated to helping every child grow into the fullest and finest expression of who they can become.</p><a className="primary-button" href="#who-we-are">Discover who we are <ArrowRight size={18}/></a></div><figure className="about-hero-photo"><img src={about.heroImage} alt={about.heroAlt}/></figure></div></section>
+    <section className="about-hero" id="top"><div className="about-inner about-hero-grid"><div><p className="eyebrow">ABOUT SRSS · EDUCATION FOR LIFE</p><h1>Education for Life,<br/>Not Mere Living.</h1><p>Sekolah Rendah Sathya Sai is a Malaysian primary school dedicated to helping every child grow into the fullest and finest expression of who they can become.</p><a className="primary-button" href="/about/our-story">Discover Our Story <ArrowRight size={18}/></a></div><figure className="about-hero-photo"><img src={about.heroImage} alt={about.heroAlt}/></figure></div></section>
     <nav className="about-directory about-inner" aria-label="About SRSS sections">{aboutLinks.map(([label, href]) => <a key={label} href={href}>{label}<ArrowRight size={15}/></a>)}</nav>
     <section className="about-intro about-inner" id="who-we-are"><div><p className="eyebrow">Who we are</p><h2>A school for the mind, heart and character.</h2></div><div className="about-rich-copy"><p>At SRSS, education is more than the acquisition of knowledge or preparation for examinations. We believe a truly educated child develops an intelligent mind, a strong character, a compassionate heart, practical abilities and responsibility towards others.</p><p>Inspired by the educational philosophy of Sri Sathya Sai Baba, we combine the Malaysian National Curriculum with an integral approach that nurtures body, mind, heart and spirit.</p><a className="text-link" href="/about/our-story">Explore Our Story <ArrowRight size={17}/></a></div></section>
+    <section className="about-profile about-inner" id="school-profile"><div><p className="eyebrow">School profile</p><h2>SRSS at a glance.</h2><p>Key facts about the school. Families can find more in the <a className="text-link" href="/resources/faq">FAQs</a>.</p></div><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="profile" firstOpen /></section>
     <section className="purpose-refresh" id="vision-mission"><div className="about-inner"><div className="purpose-refresh-heading"><p className="eyebrow">Our purpose</p><h2>Human Excellence, lived with purpose.</h2><p><strong>Vision</strong> — to nurture young people of character, confidence and compassion who contribute to a more peaceful world.</p><p><strong>Mission</strong> — to integrate Malaysia’s national curriculum with an education that develops intellect, integrity, wellbeing and service.</p></div><div className="mission-pillars">{missionPillars.map(([title, copy], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div><a className="text-link" href="/about/vision-mission">Discover Our Vision &amp; Mission <ArrowRight size={17}/></a></div></section>
-    <section className="educare-refresh" id="educare"><div className="about-inner educare-grid"><div><p className="eyebrow">Sathya Sai Education &amp; Educare</p><h2>Drawing out what is already within.</h2><p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p><p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p></div><div className="integral-model" role="img" aria-label="Body plus mind plus heart plus spirit leads to human excellence"><span>BODY</span><b>+</b><span>MIND</span><b>+</b><span>HEART</span><b>+</b><span>SPIRIT</span><i>↓</i><strong>HUMAN EXCELLENCE</strong></div></div><div className="about-inner global-line"><p><strong>A global educational movement.</strong> Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p></div></section>
-    <section className="learning-refresh about-inner"><div><p className="eyebrow">Learning at SRSS</p><h2>More Than Schooling, <em>Educating the Whole Child.</em></h2><p>Children do not all learn in the same way, develop at the same pace or reveal their strengths through examinations alone. Our educational model creates space to know, become, think, live, do and serve.</p></div><div className="excellence-framework"><strong>HUMAN EXCELLENCE</strong><div><span><b>KNOWING</b>Academics</span><span><b>BECOMING</b>Character</span><span><b>THINKING</b>Critical thinking</span><span><b>LIVING</b>Human Values</span><span><b>DOING</b>Practical skills</span><span><b>SERVING</b>Social responsibility</span></div></div></section>
-    <section className="spaces-refresh" id="school-profile"><div className="about-inner"><p className="eyebrow">Spaces designed for learning</p><h2>Opportunity to enquire, create and grow.</h2><div>{[["Science & Discovery", "Hands-on experimentation, scientific inquiry, observation and problem-solving.", "science-microscope-1600.jpg"], ["Digital Learning", "Digital literacy, research, creativity and responsible use of technology.", "classroom-art-1280.jpg"], ["Library & Reading", "Reading culture, literacy development and independent discovery.", "chess-competition-1280.jpg"], ["Learning Support", "Targeted intervention and personalised support for every learner.", "student-speaker-960.jpg"]].map(([title, copy, image]) => <article key={title}><img src={`/assets/photos/processed/${image}`} alt=""/><h3>{title}</h3><p>{copy}</p></article>)}</div></div></section>
-    <section className="community-refresh" id="our-people"><div className="about-inner"><p className="eyebrow">It takes a community to educate a child</p><h2>Every day is an opportunity to grow.</h2><div className="partnership"><strong>CHILD</strong><span>TEACHERS</span><span>PARENTS</span><span>VOLUNTEERS</span></div><p>Teachers, parents and volunteers each bring something essential to the child’s learning. Together, they create the conditions in which confidence, character and capability can flourish.</p><a className="text-link" href="/#contact">Discover how you can be part of SRSS <ArrowRight size={17}/></a></div></section>
-    <section className="people-refresh about-inner"><figure><img src={about.principal?.image || defaultAboutContent.principal.image} alt={about.principal?.alt || defaultAboutContent.principal.alt}/></figure><div><p className="eyebrow">Our people</p><h2>Leadership, teachers and family partnership.</h2><p>Our people include the Board of Directors, school leadership, teachers, administrators, support staff and Teacher-Parent Association — each contributing to a school community in which every child is known and encouraged.</p><a className="text-link" href="/about/voices">Read the voices of SRSS <ArrowRight size={17}/></a></div></section>
-    <section className="anniversary-refresh" id="srss25"><div className="about-inner"><p className="eyebrow">SRSS25 · 25 years of educating the heart</p><h2>2002 <span>—</span> 2027</h2><div>{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((item) => <article key={item}><i>↓</i><strong>{item}</strong></article>)}</div><p>Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS.</p><a className="primary-button" href="/#contact">Join the SRSS Alumni Network <ArrowRight size={18}/></a></div></section>
-    <section className="about-closing" id="campus"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">About SRSS</p><h2>Discover who we are and what shapes our approach to education.</h2><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit <ArrowRight size={18}/></button></div></section>
+    <section className="educare-refresh" id="educare"><div className="about-inner educare-grid"><div><p className="eyebrow">Sathya Sai Education &amp; Educare</p><h2>Drawing out what is already within.</h2><p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p><p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p></div><div className="integral-model" role="img" aria-label="Body plus mind plus heart plus spirit leads to human excellence"><span>BODY</span><b>+</b><span>MIND</span><b>+</b><span>HEART</span><b>+</b><span>SPIRIT</span><i>↓</i><strong>HUMAN EXCELLENCE</strong></div></div><div className="about-inner global-line"><p><strong>A global educational movement.</strong> Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p><a className="text-link" href="/about/sathya-sai-education">Discover Sathya Sai Education <ArrowRight size={17}/></a></div></section>
+    <section className="community-refresh" id="our-people"><div className="about-inner"><p className="eyebrow">It takes a community to educate a child</p><h2>Every day is an opportunity to grow.</h2><div className="partnership"><strong>CHILD</strong><span>TEACHERS</span><span>PARENTS</span><span>VOLUNTEERS</span></div><p>Teachers, parents and volunteers each bring something essential to the child’s learning. Together, they create the conditions in which confidence, character and capability can flourish.</p><a className="text-link" href="/join/get-involved">Discover how you can be part of SRSS <ArrowRight size={17}/></a></div></section>
+    <section className="people-refresh about-inner"><figure><img src={about.principal?.image || defaultAboutContent.principal.image} alt={about.principal?.alt || defaultAboutContent.principal.alt}/></figure><div><p className="eyebrow">Our people</p><h2>Leadership, teachers and family partnership.</h2><p>Our people include the Board of Directors, school leadership, teachers, administrators, support staff and Teacher-Parent Association — each contributing to a school community in which every child is known and encouraged.</p><a className="text-link" href="/about/our-people">Read the voices of SRSS <ArrowRight size={17}/></a></div></section>
+    <LearningSpaces id="campus" eyebrow="Our campus" />
+    <section className="anniversary-refresh" id="srss25"><div className="about-inner"><p className="eyebrow">SRSS25 · 25 years of educating the heart</p><h2>2002 <span>—</span> 2027</h2><div>{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((item) => <article key={item}><i>↓</i><strong>{item}</strong></article>)}</div><p>Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS.</p><a className="primary-button" href="/join/alumni">Join the SRSS Alumni Network <ArrowRight size={18}/></a></div></section>
+    <section className="about-closing" id="about-closing"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">About SRSS</p><h2>Discover who we are and what shapes our approach to education.</h2><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit <ArrowRight size={18}/></button></div></section>
   </main>;
 }
 
@@ -235,9 +246,8 @@ function VoicesPage() {
     </div>
 
     <section className="voices-closing">
-      <div className="voices-shell"><p className="eyebrow">25 years of human excellence</p><h2>The story continues with every child.</h2><p>Discover the educational philosophy and community that connect these reflections.</p><a className="primary-button" href="/about#top">Explore About SRSS <ArrowRight size={18}/></a></div>
+      <div className="voices-shell"><p className="eyebrow">25 years of human excellence</p><h2>The story continues with every child.</h2><p>Discover the educational philosophy and community that connect these reflections.</p><a className="primary-button" href="/about">Explore About SRSS <ArrowRight size={18}/></a></div>
     </section>
-    <section className="organisation-section" id="organisation"><div className="about-inner"><p className="eyebrow">Leadership &amp; governance</p><h2>One school community,<br/><em>many hands in service.</em></h2><p className="organisation-intro">The school’s work is held by a connected community of governance, leadership, teachers, families and volunteers. This overview will grow with the full organisation chart and role details.</p><div className="organisation-chart" aria-label="SRSS organisation chart"><div className="org-node org-board"><span>01</span><strong>Board of Directors</strong><small>Stewardship &amp; governance</small></div><div className="org-line" aria-hidden="true"/><div className="org-row"><div className="org-node"><span>02</span><strong>School Leadership</strong><small>Principal &amp; administration</small></div><div className="org-node"><span>03</span><strong>Teaching Team</strong><small>Learning &amp; pupil wellbeing</small></div><div className="org-node"><span>04</span><strong>School Community</strong><small>Families, volunteers &amp; partners</small></div></div></div></div></section>
   </main>;
 }
 
@@ -260,23 +270,6 @@ const events = [
   ["08 AUG", "National Day cultural celebration", "Cultural", "8.00 am–12.00 pm"],
 ];
 
-function FaqAnswer({ item }) {
-  return <div className="faq-answer">
-    {item.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-    {item.bullets?.length ? <ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}
-    {item.sections?.map((section) => <section key={section.heading}><h4>{section.heading}</h4>{section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}{section.bullets?.length ? <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}</section>)}
-    {item.closing ? <p>{item.closing}</p> : null}
-  </div>;
-}
-
-function FaqAccordion({ items, openIndex, onToggle, idPrefix }) {
-  return <div className="faq-list">{items.map((item, index) => {
-    const answerId = `${idPrefix}-answer-${index}`;
-    const isOpen = openIndex === index;
-    return <article key={item.question}><button type="button" onClick={() => onToggle(isOpen ? null : index)} aria-expanded={isOpen} aria-controls={answerId}>{item.question}<Plus size={19} className={isOpen ? "turned" : ""} /></button>{isOpen ? <div id={answerId}><FaqAnswer item={item} /></div> : null}</article>;
-  })}</div>;
-}
-
 function FaqPage({ items }) {
   const [query, setQuery] = useState("");
   const [openIndex, setOpenIndex] = useState(0);
@@ -285,7 +278,7 @@ function FaqPage({ items }) {
     if (!normalized) return items;
     return items.filter((item) => `${item.question} ${item.paragraphs?.join(" ") || ""} ${item.sections?.map((section) => `${section.heading} ${section.paragraphs?.join(" ") || ""}`).join(" ") || ""}`.toLowerCase().includes(normalized));
   }, [items, query]);
-  return <main id="main" className="faq-page"><section className="faq-page-hero"><div><p className="eyebrow">SRSS information</p><h1>Frequently Asked <em>Questions.</em></h1><p>Clear answers about learning, admissions, school life and the values-led education offered at SRSS.</p></div><form role="search" onSubmit={(event) => event.preventDefault()}><MagnifyingGlass size={20} aria-hidden="true" /><label htmlFor="faq-search">Search questions</label><input id="faq-search" type="search" value={query} onChange={(event) => { setQuery(event.target.value); setOpenIndex(null); }} placeholder="Try “curriculum”, “fees” or “transport”" /></form></section><section className="faq-page-content" aria-labelledby="all-faq-title"><aside><p className="eyebrow">Helpful answers</p><h2 id="all-faq-title">Everything families ask most often.</h2><p>{filteredItems.length} {filteredItems.length === 1 ? "answer" : "answers"}</p><a href="/#admissions">Admissions &amp; visits <ArrowRight size={16} /></a></aside>{filteredItems.length ? <FaqAccordion items={filteredItems} openIndex={openIndex} onToggle={setOpenIndex} idPrefix="full-faq" /> : <div className="faq-empty"><h3>No matching question yet.</h3><p>Try a broader word or contact the school and we will help.</p><a href="/#contact">Contact SRSS <ArrowRight size={16} /></a></div>}</section></main>;
+  return <main id="main" className="faq-page"><section className="faq-page-hero"><div><p className="eyebrow">SRSS information</p><h1>Frequently Asked <em>Questions.</em></h1><p>Clear answers about learning, admissions, school life and the values-led education offered at SRSS.</p></div><form role="search" onSubmit={(event) => event.preventDefault()}><MagnifyingGlass size={20} aria-hidden="true" /><label htmlFor="faq-search">Search questions</label><input id="faq-search" type="search" value={query} onChange={(event) => { setQuery(event.target.value); setOpenIndex(null); }} placeholder="Try “curriculum”, “fees” or “transport”" /></form></section><section className="faq-page-content" aria-labelledby="all-faq-title"><aside><p className="eyebrow">Helpful answers</p><h2 id="all-faq-title">Everything families ask most often.</h2><p>{filteredItems.length} {filteredItems.length === 1 ? "answer" : "answers"}</p><a href="/join/admissions">Admissions &amp; visits <ArrowRight size={16} /></a></aside>{filteredItems.length ? <FaqAccordion items={filteredItems} openIndex={openIndex} onToggle={setOpenIndex} idPrefix="full-faq" /> : <div className="faq-empty"><h3>No matching question yet.</h3><p>Try a broader word or contact the school and we will help.</p><a href="/resources/contact">Contact SRSS <ArrowRight size={16} /></a></div>}</section></main>;
 }
 
 function SchoolCalendar({ items, onAdd }) {
@@ -310,12 +303,7 @@ function SchoolCalendar({ items, onAdd }) {
 }
 
 export function App() {
-  const [isAbout, setIsAbout] = useState(() => window.location.pathname.startsWith("/about"));
-  const [isVoices, setIsVoices] = useState(() => window.location.pathname === "/about/voices");
-  const [isInspiration, setIsInspiration] = useState(() => window.location.pathname === "/about/inspiration");
-  const [isFaq, setIsFaq] = useState(() => window.location.pathname === "/faq");
-  const [isPrayerPage, setIsPrayerPage] = useState(() => window.location.pathname === "/resources/prayer-pledge-anthem");
-  const [legalSlug, setLegalSlug] = useState(() => legalSlugFrom(window.location.pathname));
+  const [route, setRoute] = useState(currentRoute);
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(null);
@@ -327,7 +315,6 @@ export function App() {
   const galleryIndex = gallery.index;
   const [galleryPaused, setGalleryPaused] = useState(false);
   const [galleryStopped, setGalleryStopped] = useState(false);
-  const [faqExpanded, setFaqExpanded] = useState(false);
   const [storiesExpanded, setStoriesExpanded] = useState(false);
   const [tickerPaused, setTickerPaused] = useState(false);
   const [fabOpen, setFabOpen] = useState(false);
@@ -364,28 +351,14 @@ export function App() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
+  // One route map (src/data/siteMap.js): old addresses are replaced with their canonical URL, "section"
+  // URLs scroll to their anchor on the parent page, and Book a Visit opens the visit form.
   useEffect(() => {
-    const legacyHomepageSections = new Set(["/learning", "/admissions", "/news", "/contact"]);
     const handleRouteChange = () => {
-      if (legacyHomepageSections.has(window.location.pathname)) {
-        const fallbackSection = window.location.pathname.slice(1);
-        const targetHash = window.location.hash || `#${fallbackSection}`;
-        window.history.replaceState({}, "", `/${targetHash}`);
-      }
-      const aboutRoute = window.location.pathname.startsWith("/about");
-      const voicesRoute = window.location.pathname === "/about/voices";
-      const inspirationRoute = window.location.pathname === "/about/inspiration";
-      const faqRoute = window.location.pathname === "/faq";
-      const prayerPageRoute = window.location.pathname === "/resources/prayer-pledge-anthem";
-      setIsAbout(aboutRoute);
-      setIsVoices(voicesRoute);
-      setIsInspiration(inspirationRoute);
-      setIsFaq(faqRoute);
-      setIsPrayerPage(prayerPageRoute);
-      const legalRoute = legalSlugFrom(window.location.pathname);
-      setLegalSlug(legalRoute);
-      if (legalRoute !== null) return; // LegalPage sets its own title.
-      document.title = voicesRoute ? "Voices of SRSS | Sekolah Rendah Sathya Sai" : inspirationRoute ? "Our Inspiration | Sekolah Rendah Sathya Sai" : prayerPageRoute ? "Prayer, Pledge & Anthem | SRSS" : aboutRoute ? "About SRSS | Sekolah Rendah Sathya Sai" : faqRoute ? "Frequently Asked Questions | SRSS" : "Sekolah Rendah Sathya Sai | Human Excellence";
+      const next = currentRoute();
+      setRoute(next);
+      if (next.page !== "legal") document.title = next.path === "/" ? "Sekolah Rendah Sathya Sai | Human Excellence" : `${next.label} | Sekolah Rendah Sathya Sai`;
+      if (next.openVisit) { setSent(false); setVisitOpen(true); }
     };
     handleRouteChange();
     window.addEventListener("hashchange", handleRouteChange); window.addEventListener("popstate", handleRouteChange);
@@ -394,7 +367,11 @@ export function App() {
 
   useEffect(() => { loadPublicContent().then((data) => setManagedContent((current) => ({ ...current, ...data, homepage: { ...current.homepage, ...(data.homepage || {}) } }))).catch(() => {}); }, []);
 
-  useEffect(() => { const target = window.location.hash.slice(1); if (target && target !== "about") window.setTimeout(() => document.getElementById(target)?.scrollIntoView(), 0); }, [isAbout, isVoices, isFaq, isPrayerPage]);
+  useEffect(() => {
+    const target = window.location.hash.slice(1) || route.anchor;
+    if (target) window.setTimeout(() => document.getElementById(target)?.scrollIntoView(), 0);
+    else window.scrollTo(0, 0);
+  }, [route]);
 
   useEffect(() => {
     const node = glanceRef.current;
@@ -428,7 +405,7 @@ export function App() {
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0.08 });
     document.querySelectorAll("[data-reveal]:not(.is-revealed), [data-reveal-stagger]:not(.is-revealed)").forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [isAbout, isVoices, isInspiration, isFaq, isPrayerPage]);
+  }, [route]);
 
   useEffect(() => {
     if (!statsVisible) return undefined;
@@ -440,12 +417,16 @@ export function App() {
   }, [statsVisible]);
 
   // Photo carousel: one slide at a time; the outgoing slide slides left and fades (right when going back).
-  const goToSlide = (target, dir = "next") => setGallery((current) => ({ index: (target + galleryItems.length) % galleryItems.length, prev: current.index, dir }));
+  // The homepage shows six chosen photos; the full collection lives in Student Life › Gallery.
+  const showFullGallery = route.page === "studentLife";
+  const galleryList = showFullGallery ? galleryItems : galleryItems.slice(0, 6);
+  useEffect(() => { setGallery({ index: 0, prev: null, dir: "next" }); }, [showFullGallery]);
+  const goToSlide = (target, dir = "next") => setGallery((current) => ({ index: (target + galleryList.length) % galleryList.length, prev: current.index, dir }));
   useEffect(() => {
     if (galleryPaused || galleryStopped || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
-    const timer = window.setInterval(() => setGallery((current) => ({ index: (current.index + 1) % galleryItems.length, prev: current.index, dir: "next" })), 5600);
+    const timer = window.setInterval(() => setGallery((current) => ({ index: (current.index + 1) % galleryList.length, prev: current.index, dir: "next" })), 5600);
     return () => window.clearInterval(timer);
-  }, [galleryPaused, galleryStopped]);
+  }, [galleryPaused, galleryStopped, galleryList.length]);
   // Stories & Happenings gallery: published news and public events, newest first.
   const storyItems = useMemo(() => [
     ...(managedContent.news || []).map((item) => ({ ...item, type: item.category || "School news", Icon: Newspaper })),
@@ -454,7 +435,7 @@ export function App() {
   const tickerItems = useMemo(() => storyItems.slice(0, 6).map((item) => ({ id: `${item.type}-${item.id}`, date: item.date, title: item.title })), [storyItems]);
 
   // The homepage already ends with Contact & visit, so the pre-footer invitation shows on other public pages.
-  const isHome = legalSlug === null && !isAbout && !isFaq && !isPrayerPage;
+  const isHome = route.page === "home";
   const handleVisitSubmit = (event) => {
     event.preventDefault();
     setSent(true);
@@ -470,17 +451,253 @@ export function App() {
   };
 
 
+  // Homepage sections as reusable blocks: landing pages show the same content instead of copies.
+  const blocks = {
+    openVisit: () => { setSent(false); setVisitOpen(true); },
+    hero: () => (
+          <section className="hero" id="top" aria-labelledby="hero-title">
+            <div className="hero-copy">
+              <p className="eyebrow">Sekolah Rendah Sathya Sai&nbsp;&nbsp;·&nbsp;&nbsp;Since 2002</p>
+              <h1 id="hero-title">The End of<br />Education is <span>Character</span></h1>
+              <p className="hero-description">At <strong>Sekolah Rendah Sathya Sai</strong>, education is the journey of drawing out the best within every child. By harmonising the Head, Heart, and Hands, we cultivate learners who excel academically, live by universal human values, and become thoughtful leaders committed to making the world a better place.</p>
+              <div className="hero-actions">
+                <a className="primary-button" href="/about">Explore SRSS <ArrowRight size={18} weight="bold" /></a>
+                <button className="text-button" type="button" onClick={() => { setSent(false); setVisitOpen(true); }}>Arrange a visit <ArrowRight size={18} /></button>
+              </div>
+            </div>
+            <img className="hero-image" src="/assets/srss-hero-learning.png" alt="Teacher and pupils reading together in SRSS uniform" />
+          </section>
+    ),
+    welcome: () => (
+          <section className="home-welcome" id="purpose" aria-labelledby="welcome-title">
+            <div className="home-welcome-intro">
+              <div><h2 id="welcome-title">Welcome to Sekolah Rendah Sathya Sai</h2><p className="home-welcome-sub">Learning for Life. Growing in Human Excellence.</p></div>
+              <p>Sekolah Rendah Sathya Sai by the Sathya Sai International Organisation of Malaysia is a human values-centered learning community where academic excellence meets character development. Rooted in Truth, Right Conduct, Peace, Love and Nonviolence, we help every child realise their potential and empower them to contribute positively to their communities, the nation and the wider world.</p>
+            </div>
+            <div className="home-promise" data-reveal>
+              <div className="home-promise-head"><p className="eyebrow">Our Educational Promise</p><a className="text-link" href="/about/vision-mission">Discover Our Mission <ArrowRight size={16} /></a></div>
+              <ul className="home-pillars" id="about-preview" data-reveal-stagger>{missionPillars.map(([title, copy]) => <li key={title}><div><h3>{title}</h3><p>{copy}</p></div></li>)}</ul>
+            </div>
+          </section>
+    ),
+    router: () => (
+          <section className="role-router" aria-labelledby="role-router-title">
+            <div className="role-router-heading"><div><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div><p>Choose your role for school information and secure hub access.</p></div>
+            <div className="role-router-grid">{roleRoutes.map(([label, copy, target, Icon]) => <a key={label} className="role-card" href={target}><Icon size={25} weight="duotone" /><span><strong>{label}</strong><small>{copy}</small>{target.startsWith("/hub") && <em className="role-signin"><LockKey size={12} aria-hidden="true" /> Sign in</em>}</span><ArrowRight size={17} /></a>)}</div>
+          </section>
+    ),
+    jubilee: () => (
+          <section className="home-jubilee" aria-labelledby="jubilee-title">
+            <figure className="home-jubilee-mark" data-reveal><img src="/assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><figcaption>{managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto}</figcaption></figure>
+            <div data-reveal>
+              <p className="eyebrow">2002–2027 · Silver Jubilee</p>
+              <h2 id="jubilee-title">{managedContent.homepage?.anniversary?.title || defaultHomepageContent.anniversary.title}</h2>
+              <p className="home-jubilee-lede">{managedContent.homepage?.anniversary?.description || defaultHomepageContent.anniversary.description}</p>
+              <ul className="home-jubilee-facts" ref={glanceRef} data-reveal-stagger>
+                <li><strong>Since 2002</strong><a href="/learning">Sai Educare in action <ArrowRight size={15} /></a></li>
+                <li><strong>Year 1–6</strong><span>KSSR infused with 5 human values</span></li>
+                <li><strong>{statCounts.years} years</strong><a href="/about/silver-jubilee">Explore SRSS25 <ArrowRight size={15} /></a></li>
+              </ul>
+            </div>
+          </section>
+    ),
+    gallery: () => (
+          <section className="life-section news-life-section" id="school-life" aria-labelledby="life-title" aria-roledescription="carousel" onMouseEnter={() => setGalleryPaused(true)} onMouseLeave={() => setGalleryPaused(false)} onFocusCapture={() => setGalleryPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setGalleryPaused(false); }} onKeyDown={(event) => { if (event.key === "ArrowRight") goToSlide(galleryIndex + 1); if (event.key === "ArrowLeft") goToSlide(galleryIndex - 1, "back"); }}>
+            <div className="section-head-row" data-reveal>
+              <div><p className="eyebrow">School life in motion</p><h2 id="life-title">Small moments. <em>Lasting roots.</em></h2></div>
+              <div className="carousel-controls" aria-label="Gallery controls">
+                <button type="button" onClick={() => goToSlide(galleryIndex - 1, "back")} aria-label="Previous photo"><CaretLeft size={21} /></button>
+                <span aria-live="polite">{String(galleryIndex + 1).padStart(2, "0")} / {String(galleryList.length).padStart(2, "0")}</span>
+                <button type="button" onClick={() => goToSlide(galleryIndex + 1)} aria-label="Next photo"><CaretRight size={21} /></button>
+                <button type="button" className="carousel-play" onClick={() => setGalleryStopped(!galleryStopped)} aria-pressed={galleryStopped} aria-label={galleryStopped ? "Play slideshow" : "Pause slideshow"}>{galleryStopped ? <Play size={16} weight="fill" /> : <Pause size={16} weight="fill" />}</button>
+              </div>
+            </div>
+            <div className={`photo-carousel is-${gallery.dir}`} data-reveal>
+              {galleryList.map(([src, title, alt], index) => <figure key={src} className={`photo-slide${index === galleryIndex ? " is-active" : index === gallery.prev ? " is-leaving" : ""}`} aria-hidden={index !== galleryIndex} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${galleryList.length}: ${title}`} style={{ "--slide-bg": `url(${src})` }}>
+                <img src={src} alt={alt} loading={index < 2 ? "eager" : "lazy"} />
+                <figcaption><span>{title}</span><small>{alt}</small></figcaption>
+              </figure>)}
+            </div>
+            <div className="photo-dots" role="group" aria-label="Choose a photo">{galleryList.map(([, title], index) => <button key={title} type="button" className={index === galleryIndex ? "is-active" : ""} aria-label={`Show photo ${index + 1}: ${title}`} aria-current={index === galleryIndex} onClick={() => goToSlide(index, index < galleryIndex ? "back" : "next")} />)}</div>
+            {!showFullGallery && <a className="source-link" href="/student-life/gallery">Explore Student Life <ArrowRight size={17} /></a>}
+            <a className="source-link" href="https://www.facebook.com/SSPSM/" target="_blank" rel="noreferrer">See more school moments on Facebook <ArrowRight size={17} /></a>
+          </section>
+    ),
+    learning: () => (
+          <section className={`learning-experience${learningTabs[activeLearning][0] === "Human Values" ? " is-values" : ""}`} id="learning" aria-labelledby="learning-title">
+            <div className="learning-visual" data-reveal="image">
+              {learningTabs[activeLearning][0] === "Human Values" ? <div className="learning-garden" id="values">
+            <div className="values-flower" role="group" aria-label="The five human values" onMouseLeave={() => setActiveValue(null)}>
+              <div className="values-art">
+                <img src="/assets/values-flower-2026.svg" alt="" aria-hidden="true" />
+                <img className="values-crest-watermark" src="/assets/srss-logo.png" alt="" aria-hidden="true" />
+                {values.map((value, index) => (
+                  <button
+                    key={value.name}
+                    type="button"
+                    className={`value-petal petal-${index + 1} ${value.className} ${activeValue === index ? "active" : ""}`}
+                    aria-label={`Explore ${value.name}`}
+                    title={`Explore ${value.name}`}
+                    aria-pressed={activeValue === index}
+                    aria-controls="learning-panel"
+                    onMouseEnter={() => setActiveValue(index)}
+                    onFocus={() => setActiveValue(index)}
+                    onClick={() => setActiveValue(index)}
+                  >
+                    <span className="petal-label">{value.petalLabel.map((line) => <span key={line}>{line}</span>)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+              </div> : <img key={activeLearning} src={learningImages[learningTabs[activeLearning][0]][0]} alt={learningImages[learningTabs[activeLearning][0]][1]} />}
+            </div>
+            <div className="learning-content" data-reveal>
+              <p className="eyebrow">Learning experience</p>
+              <h2 id="learning-title">Strong foundations. Open hearts.</h2>
+              <p className="learning-summary">SRSS integrates Malaysia’s national curriculum with the philosophy of Sathya Sai Educare, so intellect and character grow together.</p>
+              <div className="learning-tabs" role="tablist" aria-label="Learning experience themes">
+                {learningTabs.map(([label], index) => (
+                  <button key={label} type="button" role="tab" aria-selected={activeLearning === index} aria-controls="learning-panel" onClick={() => { setActiveLearning(index); setActiveValue(null); }}>{label}</button>
+                ))}
+              </div>
+              <div className="learning-panel" id="learning-panel" role="tabpanel" aria-live="polite" key={`${activeLearning}-${activeValue}`}>
+                {learningTabs[activeLearning][0] === "Human Values" && activeValue !== null ? <div className={`learning-value ${values[activeValue].className}`}>
+                  <span>Human value</span><h3>{values[activeValue].name}</h3><p>{values[activeValue].description}</p><p className="value-practice">{values[activeValue].practice}</p>
+                </div> : <>
+                  <h3>{learningTabs[activeLearning][0]}</h3>
+                  <p>{learningTabs[activeLearning][1]}</p>
+                  {learningTabs[activeLearning][0] === "Human Values" && <p className="values-interaction-cue"><CursorClick size={17} weight="duotone" aria-hidden="true" /> Choose a petal in the Values Garden to explore each value</p>}
+                </>}
+              </div>
+              {route.page === "home" && <a className="text-link learning-more" href="/learning">Explore Learning <ArrowRight size={16} /></a>}
+            </div>
+          </section>
+    ),
+    voices: () => (
+          <section className="home-voices" aria-labelledby="voices-title">
+            <div className="home-section-head" data-reveal><p className="eyebrow">Voices that guide us</p><h2 id="voices-title">Led by example, inspired by service.</h2></div>
+            <div className="home-voices-grid" data-reveal-stagger>
+              <article className="voice-principal">
+                <figure><img src={managedContent.homepage?.principal?.image || defaultHomepageContent.principal.image} alt={managedContent.homepage?.principal?.alt || defaultHomepageContent.principal.alt} /></figure>
+                <div><p className="eyebrow">A welcome from our Principal</p><blockquote>“{managedContent.homepage?.principal?.quote || defaultHomepageContent.principal.quote}”</blockquote><p>{managedContent.homepage?.principal?.message || defaultHomepageContent.principal.message}</p><p className="quote-source">Uma Devi Jenes Nayagam · Principal</p><a className="text-link" href="/about/our-people#principal">Meet Our People <ArrowRight size={16} /></a></div>
+              </article>
+              <article className="voice-inspiration" aria-labelledby="inspiration-feature-title">
+                <figure><img src="/assets/sathya-sai-baba-portrait.jpg" alt="Illustrated portrait of Bhagawan Sri Sathya Sai Baba in an orange robe" /></figure>
+                <p className="eyebrow">Our inspiration</p>
+                <h3 id="inspiration-feature-title">Education for life, not mere living.</h3>
+                <blockquote>“{inspirationQuote}”</blockquote>
+                <p className="quote-source">Sathya Sai Baba · September 1963</p>
+                <a className="text-link" href="/about/sathya-sai-education">Our founder &amp; school community <ArrowRight size={16} /></a>
+              </article>
+            </div>
+          </section>
+    ),
+    faq: () => (
+          <section className="faq-section home-faq-section" id="faq" aria-labelledby="faq-title"><div data-reveal><p className="eyebrow">Helpful answers</p><h2 id="faq-title">Questions, welcomed.</h2><p>Start with the questions families ask most often, or open the complete FAQ for detailed school information.</p><a className="text-link" href="/resources/faq">View all frequently asked questions <ArrowRight size={16} /></a></div><div><FaqAccordion items={(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, 5)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /></div></section>
+    ),
+    news: () => (
+          <section className="news-section" id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">Stories &amp; <em>Happenings.</em></h2></div><a href={route.page === "home" ? "/resources/news" : "#events-title"}>{route.page === "home" ? "View all news" : "See the calendar"} <ArrowRight size={16} /></a></div>
+            {storyItems.length ? <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`} data-reveal-stagger>{storyItems.map((item) => <li key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" /><div><span><item.Icon size={14} aria-hidden="true" />{item.type}</span><time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time><h3>{item.title}</h3>{item.excerpt && <p>{item.excerpt}</p>}</div></li>)}</ul> : <p className="calendar-empty">News and events will appear here once they are published.</p>}
+            {storyItems.length > 4 && <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>{storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} /></button>}
+          </section>
+    ),
+    calendar: () => (
+          <SchoolCalendar items={managedContent.events || []} onAdd={addToCalendar} />
+    ),
+    admissions: () => (
+          <section className="home-join" id="admissions" aria-labelledby="admissions-title">
+            <div className="home-join-intro" data-reveal>
+              <p className="eyebrow">Admissions</p>
+              <h2 id="admissions-title">Begin the <em>journey.</em></h2>
+              <p>SRSS welcomes primary-age children, Year 1 to Year 6, from families of every background who share a values-based approach to education. Admission is a warm conversation about readiness, learning needs and the values that matter to your family.</p>
+              <ol className="home-pathway" aria-label="Admissions pathway">{admissionSteps.map(([step, detail], index) => <li key={step}><span aria-hidden="true">{index + 1}</span><div><strong>{step}</strong><small>{detail}</small></div></li>)}</ol>
+              <div className="home-links"><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Fee%20enquiry">Request fee information <ArrowRight size={16} /></a><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Prospectus%20request">Request the prospectus <ArrowRight size={16} /></a></div>
+            </div>
+            <div className="home-join-card" id="enquiry" data-reveal>
+              {!formMode ? <div className="home-form-choice">
+                <p className="eyebrow">How can we help?</p>
+                <button type="button" onClick={() => { setFormMode("enquiry"); setFormError(""); }}><GraduationCap size={26} weight="duotone" aria-hidden="true" /><span><strong>Make an admissions enquiry</strong><small>Tell us about your child and we will plan a next step with you.</small></span><ArrowRight size={18} /></button>
+                <button type="button" onClick={() => { setFormMode("question"); setFormError(""); }}><EnvelopeSimple size={26} weight="duotone" aria-hidden="true" /><span><strong>Ask a general question</strong><small>Reach the school office about anything else.</small></span><ArrowRight size={18} /></button>
+              </div> : <div className="home-form-switch" role="tablist" aria-label="What would you like to send?">
+                <button type="button" role="tab" aria-selected={formMode === "enquiry"} onClick={() => { setFormMode("enquiry"); setFormError(""); }}>Admissions enquiry</button>
+                <button type="button" role="tab" aria-selected={formMode === "question"} onClick={() => { setFormMode("question"); setFormError(""); }}>General question</button>
+              </div>}
+              {!formMode ? null : formMode === "enquiry" ? (enquirySent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Your enquiry is on its way.</h3><p>The admissions team will contact you with a next step, usually within two school days.</p></div> : <form className="school-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); const { questions, ...payload } = Object.fromEntries(new FormData(event.currentTarget)); try { await submitPublicForm("admissionEnquiries", { ...payload, message: questions, source: "website" }); setEnquirySent(true); } catch (reason) { setFormError(reason.message || "Your enquiry could not be sent. Please try again."); } }}>
+                <label>Parent / guardian name<input required name="parentName" autoComplete="name" /></label><label>Email address<input required name="email" type="email" autoComplete="email" /></label>
+                <label>Child’s name<input required name="childName" /></label><label>Child’s age<select required name="childAge" defaultValue=""><option value="" disabled>Select age</option>{[5,6,7,8,9,10,11,12].map(age => <option key={age}>{age}</option>)}</select></label>
+                <label>Current school<input name="currentSchool" /></label><label>How did you hear about SRSS?<select name="referralSource" defaultValue=""><option value="" disabled>Select one</option><option>Family or friend</option><option>Social media</option><option>School event</option><option>Online search</option><option>Other</option></select></label>
+                <label className="wide-label">Questions or anything you would like us to know<textarea name="questions" rows="3" /></label><p className="form-privacy wide-label">The School uses these details to reply to you, as described in our <a href="/legal/privacy">Privacy Policy</a>.</p>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send enquiry <ArrowRight size={18} weight="bold" /></button>
+              </form>) : (contactSent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Thank you for writing.</h3><p>We will pass your message to the right person at school.</p></div> : <form className="school-form contact-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); try { await submitPublicForm("contactMessages", Object.fromEntries(new FormData(event.currentTarget))); setContactSent(true); } catch (reason) { setFormError(reason.message || "Your message could not be sent. Please try again."); } }}><label>Name<input required name="name" autoComplete="name" /></label><label>Email<input required name="email" type="email" autoComplete="email" /></label><label className="wide-label">Subject<select required name="subject" defaultValue=""><option value="" disabled>Select a subject</option><option>General</option><option>Admissions</option><option>Feedback</option><option>Other</option></select></label><label className="wide-label">Message<textarea required name="message" rows="5" /></label><p className="form-privacy wide-label">The School uses these details to reply to you, as described in our <a href="/legal/privacy">Privacy Policy</a>.</p>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send message <ArrowRight size={18} weight="bold" /></button></form>)}
+            </div>
+          </section>
+    ),
+    contact: () => (
+          <section className="home-visit" id="contact" aria-labelledby="contact-title">
+            <div className="home-visit-details" data-reveal>
+              <p className="eyebrow">Contact &amp; visit</p>
+              <h2 id="contact-title">Find your way here.</h2>
+              <address><MapPin size={19} aria-hidden="true" /><span>6, Jalan Puchong, Taman Tan Yew Lai,<br />58200 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur</span></address>
+              <dl className="home-contacts">
+                <div><dt>School office</dt><dd><a href="tel:+60126001926"><Phone size={15} aria-hidden="true" /> +60 12-600 1926</a><a href="mailto:saischoolpuchong@gmail.com"><EnvelopeSimple size={15} aria-hidden="true" /> saischoolpuchong@gmail.com</a></dd></div>
+                <div><dt>Office hours</dt><dd>Monday–Friday · 8.00 am–4.00 pm<br />School hours · 7.30 am–1.30 pm</dd></div>
+              </dl>
+              <p className="home-visit-note">Visitor parking is available by arrangement. Please contact the office before your visit.</p>
+              <div className="home-links"><a className="text-link" href="https://maps.google.com/?q=6+Jalan+Puchong+Taman+Tan+Yew+Lai+58200+Kuala+Lumpur" target="_blank" rel="noreferrer">Get directions <ArrowRight size={16} /></a><a className="text-link" href="https://www.facebook.com/SSPSM/" target="_blank" rel="noreferrer"><FacebookLogo size={17} aria-hidden="true" /> School life on Facebook</a></div>
+            </div>
+            <div className="home-visit-map" data-reveal="image"><iframe title="Map showing Sekolah Rendah Sathya Sai" src="https://www.google.com/maps?q=6%20Jalan%20Puchong%20Taman%20Tan%20Yew%20Lai%2058200%20Kuala%20Lumpur&output=embed" loading="lazy" /></div>
+          </section>
+    ),
+    admissionsCta: () => (
+      <section className="home-admissions-cta" aria-labelledby="admissions-cta-title">
+        <div className="home-admissions-inner" data-reveal>
+          <div><p className="eyebrow">Admissions</p><h2 id="admissions-cta-title">Begin the <em>journey.</em></h2><p>SRSS welcomes primary-age children, Standard 1 to Standard 6, from families of every background who share a values-based approach to education.</p></div>
+          <div className="landing-hero-actions"><a className="primary-button" href="/join/admissions#enquiry">Make an enquiry <ArrowRight size={18} /></a><button type="button" className="text-button" onClick={() => { setSent(false); setVisitOpen(true); }}>Book a visit <ArrowRight size={18} /></button></div>
+        </div>
+      </section>
+    ),
+  };
+  const pageFaqs = managedContent.faqs?.length ? managedContent.faqs : defaultFaqs;
+  const pages = {
+    legal: () => <Suspense fallback={<main id="main" className="legal-page" />}><LegalPage slug={route.slug || ""} /></Suspense>,
+    about: () => <AboutPage content={managedContent.about} faqs={pageFaqs} onVisit={blocks.openVisit} />,
+    sathyaSai: () => <InspirationPage />,
+    governance: () => <GovernancePage />,
+    ourPeople: () => <VoicesPage />,
+    learning: () => <LearningPage blocks={blocks} faqs={pageFaqs} />,
+    studentLife: () => <StudentLifePage blocks={blocks} faqs={pageFaqs} />,
+    join: () => <JoinPage />,
+    admissions: () => <AdmissionsPage blocks={blocks} faqs={pageFaqs} pillars={whySrss} />,
+    resources: () => <ResourcesPage blocks={blocks} />,
+    faq: () => <FaqPage items={pageFaqs} />,
+    prayer: () => <PrayerPledgeAnthemPage />,
+    notFound: () => <NotFoundPage />,
+    // Homepage order (Architecture v2.0): hero → welcome & promise → learning → find your way → life at SRSS
+    // → our people → Silver Jubilee → news & events → FAQs → admissions → contact.
+    home: () => <main id="main">
+      {blocks.hero()}
+      {blocks.welcome()}
+      {blocks.learning()}
+      {blocks.router()}
+      {blocks.gallery()}
+      {blocks.voices()}
+      {blocks.jubilee()}
+      {blocks.news()}
+      {blocks.calendar()}
+      {blocks.faq()}
+      {blocks.admissionsCta()}
+      {blocks.contact()}
+    </main>,
+  };
+
   const closeMenus = () => { setNavOpen(null); setMenuOpen(false); };
-  const navLink = (label, href, className = "") => href === null
-    ? <span className={`nav-soon ${className}`} aria-disabled="true">{label}<em>Soon</em></span>
+  const navLink = (label, href, className = "") => href === undefined
+    ? <span className={className}>{label}</span>
     : href === "visit"
       ? <button type="button" className={className} onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>{label}</button>
       : <a className={className} href={href} onClick={closeMenus}>{label}</a>;
-  const hubIcons = [GraduationCap, ChalkboardTeacher, UsersThree, LockKey];
   const menuBody = (item) => <>
     {item.groups && <div className="mega-groups">{item.groups.map((group) => <div className="mega-group" key={group.title}>{navLink(group.title, group.href, "mega-group-title")}{group.note && <small>{group.note}</small>}{group.links && <ul>{group.links.map(([label, href]) => <li key={label}>{navLink(label, href)}</li>)}</ul>}</div>)}</div>}
     {item.links && <ul className="mega-links">{item.links.map(([label, href]) => <li key={label}>{navLink(label, href)}</li>)}</ul>}
-    {item.hubs && <ul className="mega-hubs">{item.hubs.map(([label, href, note], index) => { const Icon = hubIcons[index]; return <li key={label}><a href={href} onClick={closeMenus}><Icon size={24} weight="duotone" aria-hidden="true" /><span><strong>{label}</strong><small>{note}</small></span><ArrowRight size={16} aria-hidden="true" /></a></li>; })}</ul>}
   </>;
   const activeNav = siteNav.find((item) => item.label === navOpen);
 
@@ -494,7 +711,7 @@ export function App() {
             <span className="updates-label">Updates</span>
             <button type="button" className="updates-toggle" onClick={() => setTickerPaused(!tickerPaused)} aria-pressed={tickerPaused} aria-label={tickerPaused ? "Play announcements" : "Pause announcements"}>{tickerPaused ? <Play size={13} weight="fill" /> : <Pause size={13} weight="fill" />}</button>
             <div className="updates-ticker"><div className="updates-track">{[0, 1].map((copy) => <ul key={copy} aria-hidden={copy === 1}>{(tickerItems.length ? tickerItems : [{ id: "welcome", title: "Discover school life, upcoming dates and the latest news from the SRSS community." }]).map((item) => <li key={`${copy}-${item.id}`}>{item.date && <time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short" })}</time>}<span>{item.title}</span></li>)}</ul>)}</div></div>
-            <a href="/#news">View all updates <ArrowRight size={15} weight="bold" /></a>
+            <a href="/resources/news">View all updates <ArrowRight size={15} weight="bold" /></a>
           </div>
         </div>
 
@@ -510,19 +727,26 @@ export function App() {
             </a>
 
             <nav className="desktop-nav" aria-label="Primary navigation">
-              {siteNav.map((item) => <button key={item.label} type="button" className={navOpen === item.label ? "is-open" : ""} aria-expanded={navOpen === item.label} aria-controls="site-mega-menu" onMouseEnter={() => setNavOpen(item.label)} onFocus={() => setNavOpen(item.label)} onClick={() => setNavOpen(navOpen === item.label ? null : item.label)}>{item.label}<CaretDown size={12} weight="bold" aria-hidden="true" /></button>)}
+              {siteNav.map((item) => {
+                const current = route.path === item.href || route.path.startsWith(`${item.href}/`);
+                return <div key={item.label} className={`nav-item${navOpen === item.label ? " is-open" : ""}${current ? " is-current" : ""}`} onMouseEnter={() => setNavOpen(item.label)}>
+                  <a href={item.href} aria-current={current ? "page" : undefined} onClick={closeMenus}>{item.label}</a>
+                  <button type="button" className="nav-chevron" aria-expanded={navOpen === item.label} aria-controls="site-mega-menu" aria-label={`Show the ${item.label} menu`} onClick={() => setNavOpen(navOpen === item.label ? null : item.label)}><CaretDown size={12} weight="bold" aria-hidden="true" /></button>
+                </div>;
+              })}
+              <a className={`nav-signin${route.path === signInLink.href ? " is-current" : ""}`} href={signInLink.href}><SignIn size={15} weight="bold" aria-hidden="true" />{signInLink.label}</a>
             </nav>
 
             <div className="nav-actions">
               <button className="icon-action" type="button" onClick={() => setSearchOpen(true)} aria-label="Search SRSS"><MagnifyingGlass size={22} /></button>
-              <a className="admissions-button" href="/#admissions">Admissions &amp; Visits</a>
+              <a className="admissions-button" href="/join/admissions">Admissions &amp; Visits</a>
               <button className="mobile-menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">{menuOpen ? <X size={25} /> : <List size={25} />}</button>
             </div>
           </div>
 
           {activeNav && <div className="mega-panel" id="site-mega-menu" role="region" aria-label={`${activeNav.label} menu`} key={activeNav.label}>
             <div className="header-wrap mega-inner">
-              <div className="mega-intro"><p className="eyebrow">{activeNav.label}</p><p>{activeNav.intro}</p>{!activeNav.hubs && <a className="text-link" href={activeNav.href} onClick={closeMenus}>{activeNav.label} overview <ArrowRight size={15} /></a>}</div>
+              <div className="mega-intro"><p className="eyebrow">{activeNav.label}</p><p>{activeNav.intro}</p><a className="text-link" href={activeNav.href} onClick={closeMenus}>Explore {activeNav.label} <ArrowRight size={15} /></a></div>
               <div className="mega-content">{menuBody(activeNav)}</div>
             </div>
           </div>}
@@ -533,9 +757,9 @@ export function App() {
               <div className="nav-drawer-head"><strong>Menu</strong><button type="button" onClick={() => setMenuOpen(false)} aria-label="Close menu"><X size={22} /></button></div>
               <div className="nav-drawer-body">{siteNav.map((item) => <section key={item.label}>
                 <button type="button" className="nav-acc" aria-expanded={mobileSection === item.label} onClick={() => setMobileSection(mobileSection === item.label ? null : item.label)}>{item.label}<CaretDown size={16} weight="bold" aria-hidden="true" /></button>
-                {mobileSection === item.label && <div className="nav-acc-panel">{!item.hubs && <a className="nav-acc-overview" href={item.href} onClick={closeMenus}>{item.label} overview <ArrowRight size={14} /></a>}{menuBody(item)}</div>}
+                {mobileSection === item.label && <div className="nav-acc-panel"><a className="nav-acc-overview" href={item.href} onClick={closeMenus}>Explore {item.label} <ArrowRight size={14} /></a>{menuBody(item)}</div>}
               </section>)}</div>
-              <div className="nav-drawer-foot"><button type="button" className="primary-button" onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>Arrange a visit <ArrowRight size={17} /></button><a href="/#enquiry" onClick={closeMenus}>Make an enquiry</a></div>
+              <div className="nav-drawer-foot"><button type="button" className="primary-button" onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>Arrange a visit <ArrowRight size={17} /></button><a href="/join/admissions#enquiry" onClick={closeMenus}>Make an enquiry</a><a className="nav-drawer-signin" href={signInLink.href} onClick={closeMenus}><SignIn size={16} aria-hidden="true" /> {signInLink.label}</a></div>
             </nav>
           )}
         </div>
@@ -543,192 +767,15 @@ export function App() {
 
       {searchOpen && (
         <div className="search-layer" role="dialog" aria-modal="true" aria-label="Search SRSS">
-          <form className="search-panel" onSubmit={(event) => event.preventDefault()}>
-            <MagnifyingGlass size={25} />
-            <label htmlFor="site-search">Search the SRSS website</label>
-            <input id="site-search" autoFocus type="search" placeholder="Try “admissions”, “calendar” or “values”" />
+          <div className="search-panel">
+            <SiteSearch autoFocus id="site-search" />
             <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={24} /></button>
-          </form>
+          </div>
         </div>
       )}
 
-      {legalSlug !== null ? <Suspense fallback={<main id="main" className="legal-page" />}><LegalPage slug={legalSlug} /></Suspense> : isVoices ? <VoicesPage /> : isInspiration ? <InspirationPage /> : isPrayerPage ? <PrayerPledgeAnthemPage /> : isAbout ? <AboutPage content={managedContent.about} onVisit={() => { setSent(false); setVisitOpen(true); }} /> : isFaq ? <FaqPage items={managedContent.faqs?.length ? managedContent.faqs : defaultFaqs} /> : <main id="main">
-        <section className="hero" id="top" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <p className="eyebrow">Sekolah Rendah Sathya Sai&nbsp;&nbsp;·&nbsp;&nbsp;Since 2002</p>
-            <h1 id="hero-title">The End of<br />Education is <span>Character</span></h1>
-            <p className="hero-description">At <strong>Sekolah Rendah Sathya Sai</strong>, education is the journey of drawing out the best within every child. By harmonising the Head, Heart, and Hands, we cultivate learners who excel academically, live by universal human values, and become thoughtful leaders committed to making the world a better place.</p>
-            <div className="hero-actions">
-              <a className="primary-button" href="#purpose">Explore SRSS <ArrowRight size={18} weight="bold" /></a>
-              <button className="text-button" type="button" onClick={() => { setSent(false); setVisitOpen(true); }}>Arrange a visit <ArrowRight size={18} /></button>
-            </div>
-          </div>
-          <img className="hero-image" src="/assets/srss-hero-learning.png" alt="Teacher and pupils reading together in SRSS uniform" />
-        </section>
-
-        <section className="home-welcome" id="purpose" aria-labelledby="welcome-title">
-          <div className="home-welcome-intro">
-            <div><h2 id="welcome-title">Welcome to SRSS Digital Hub</h2><p className="home-welcome-sub">Learning beyond classroom.</p></div>
-            <p>Sekolah Rendah Sathya Sai by the Sathya Sai International Organisation of Malaysia is a human values-centered learning community where academic excellence meets character development. Rooted in Truth, Right Conduct, Peace, Love and Nonviolence, we help every child realise their potential and empower them to contribute positively to their communities, the nation and the wider world.</p>
-          </div>
-          <ul className="home-pillars" id="about-preview" data-reveal-stagger>{whySrss.map(([Icon, title, copy]) => <li key={title}><Icon size={26} weight="duotone" aria-hidden="true" /><div><h3>{title}</h3><p>{copy}</p></div></li>)}</ul>
-        </section>
-
-        <section className="role-router" aria-labelledby="role-router-title">
-          <div className="role-router-heading"><div><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div><p>Choose your role for school information and secure hub access.</p></div>
-          <div className="role-router-grid">{roleRoutes.map(([label, copy, target, Icon]) => <a key={label} className="role-card" href={target}><Icon size={25} weight="duotone" /><span><strong>{label}</strong><small>{copy}</small></span><ArrowRight size={17} /></a>)}</div>
-        </section>
-
-        <section className="home-jubilee" aria-labelledby="jubilee-title">
-          <figure className="home-jubilee-mark" data-reveal><img src="/assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><figcaption>{managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto}</figcaption></figure>
-          <div data-reveal>
-            <p className="eyebrow">2002–2027 · Silver Jubilee</p>
-            <h2 id="jubilee-title">{managedContent.homepage?.anniversary?.title || defaultHomepageContent.anniversary.title}</h2>
-            <p className="home-jubilee-lede">{managedContent.homepage?.anniversary?.description || defaultHomepageContent.anniversary.description}</p>
-            <ul className="home-jubilee-facts" ref={glanceRef} data-reveal-stagger>
-              <li><strong>Since 2002</strong><a href="#learning" onClick={() => setActiveLearning(0)}>Sai Educare in action <ArrowRight size={15} /></a></li>
-              <li><strong>Year 1–6</strong><span>KSSR infused with 5 human values</span></li>
-              <li><strong>{statCounts.years} years</strong><a href="/about#srss25">Explore our journey <ArrowRight size={15} /></a></li>
-            </ul>
-          </div>
-        </section>
-
-        <section className="life-section news-life-section" id="school-life" aria-labelledby="life-title" aria-roledescription="carousel" onMouseEnter={() => setGalleryPaused(true)} onMouseLeave={() => setGalleryPaused(false)} onFocusCapture={() => setGalleryPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setGalleryPaused(false); }} onKeyDown={(event) => { if (event.key === "ArrowRight") goToSlide(galleryIndex + 1); if (event.key === "ArrowLeft") goToSlide(galleryIndex - 1, "back"); }}>
-          <div className="section-head-row" data-reveal>
-            <div><p className="eyebrow">School life in motion</p><h2 id="life-title">Small moments. <em>Lasting roots.</em></h2></div>
-            <div className="carousel-controls" aria-label="Gallery controls">
-              <button type="button" onClick={() => goToSlide(galleryIndex - 1, "back")} aria-label="Previous photo"><CaretLeft size={21} /></button>
-              <span aria-live="polite">{String(galleryIndex + 1).padStart(2, "0")} / {String(galleryItems.length).padStart(2, "0")}</span>
-              <button type="button" onClick={() => goToSlide(galleryIndex + 1)} aria-label="Next photo"><CaretRight size={21} /></button>
-              <button type="button" className="carousel-play" onClick={() => setGalleryStopped(!galleryStopped)} aria-pressed={galleryStopped} aria-label={galleryStopped ? "Play slideshow" : "Pause slideshow"}>{galleryStopped ? <Play size={16} weight="fill" /> : <Pause size={16} weight="fill" />}</button>
-            </div>
-          </div>
-          <div className={`photo-carousel is-${gallery.dir}`} data-reveal>
-            {galleryItems.map(([src, title, alt], index) => <figure key={src} className={`photo-slide${index === galleryIndex ? " is-active" : index === gallery.prev ? " is-leaving" : ""}`} aria-hidden={index !== galleryIndex} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${galleryItems.length}: ${title}`} style={{ "--slide-bg": `url(${src})` }}>
-              <img src={src} alt={alt} loading={index < 2 ? "eager" : "lazy"} />
-              <figcaption><span>{title}</span><small>{alt}</small></figcaption>
-            </figure>)}
-          </div>
-          <div className="photo-dots" role="group" aria-label="Choose a photo">{galleryItems.map(([, title], index) => <button key={title} type="button" className={index === galleryIndex ? "is-active" : ""} aria-label={`Show photo ${index + 1}: ${title}`} aria-current={index === galleryIndex} onClick={() => goToSlide(index, index < galleryIndex ? "back" : "next")} />)}</div>
-          <a className="source-link" href="https://www.facebook.com/SSPSM/" target="_blank" rel="noreferrer">See more school moments on Facebook <ArrowRight size={17} /></a>
-        </section>
-
-        <section className={`learning-experience${learningTabs[activeLearning][0] === "Human Values" ? " is-values" : ""}`} id="learning" aria-labelledby="learning-title">
-          <div className="learning-visual" data-reveal="image">
-            {learningTabs[activeLearning][0] === "Human Values" ? <div className="learning-garden" id="values">
-          <div className="values-flower" role="group" aria-label="The five human values" onMouseLeave={() => setActiveValue(null)}>
-            <div className="values-art">
-              <img src="/assets/values-flower-2026.svg" alt="" aria-hidden="true" />
-              <img className="values-crest-watermark" src="/assets/srss-logo.png" alt="" aria-hidden="true" />
-              {values.map((value, index) => (
-                <button
-                  key={value.name}
-                  type="button"
-                  className={`value-petal petal-${index + 1} ${value.className} ${activeValue === index ? "active" : ""}`}
-                  aria-label={`Explore ${value.name}`}
-                  title={`Explore ${value.name}`}
-                  aria-pressed={activeValue === index}
-                  aria-controls="learning-panel"
-                  onMouseEnter={() => setActiveValue(index)}
-                  onFocus={() => setActiveValue(index)}
-                  onClick={() => setActiveValue(index)}
-                >
-                  <span className="petal-label">{value.petalLabel.map((line) => <span key={line}>{line}</span>)}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-            </div> : <img key={activeLearning} src={learningImages[learningTabs[activeLearning][0]][0]} alt={learningImages[learningTabs[activeLearning][0]][1]} />}
-          </div>
-          <div className="learning-content" data-reveal>
-            <p className="eyebrow">Learning experience</p>
-            <h2 id="learning-title">Strong foundations. Open hearts.</h2>
-            <p className="learning-summary">SRSS integrates Malaysia’s national curriculum with the philosophy of Sathya Sai Educare, so intellect and character grow together.</p>
-            <div className="learning-tabs" role="tablist" aria-label="Learning experience themes">
-              {learningTabs.map(([label], index) => (
-                <button key={label} type="button" role="tab" aria-selected={activeLearning === index} aria-controls="learning-panel" onClick={() => { setActiveLearning(index); setActiveValue(null); }}>{label}</button>
-              ))}
-            </div>
-            <div className="learning-panel" id="learning-panel" role="tabpanel" aria-live="polite" key={`${activeLearning}-${activeValue}`}>
-              {learningTabs[activeLearning][0] === "Human Values" && activeValue !== null ? <div className={`learning-value ${values[activeValue].className}`}>
-                <span>Human value</span><h3>{values[activeValue].name}</h3><p>{values[activeValue].description}</p><p className="value-practice">{values[activeValue].practice}</p>
-              </div> : <>
-                <h3>{learningTabs[activeLearning][0]}</h3>
-                <p>{learningTabs[activeLearning][1]}</p>
-                {learningTabs[activeLearning][0] === "Human Values" && <p className="values-interaction-cue"><CursorClick size={17} weight="duotone" aria-hidden="true" /> Choose a petal in the Values Garden to explore each value</p>}
-              </>}
-            </div>
-          </div>
-        </section>
-
-        <section className="home-voices" aria-labelledby="voices-title">
-          <div className="home-section-head" data-reveal><p className="eyebrow">Voices that guide us</p><h2 id="voices-title">Led by example, inspired by service.</h2></div>
-          <div className="home-voices-grid" data-reveal-stagger>
-            <article className="voice-principal">
-              <figure><img src={managedContent.homepage?.principal?.image || defaultHomepageContent.principal.image} alt={managedContent.homepage?.principal?.alt || defaultHomepageContent.principal.alt} /></figure>
-              <div><p className="eyebrow">A welcome from our Principal</p><blockquote>“{managedContent.homepage?.principal?.quote || defaultHomepageContent.principal.quote}”</blockquote><p>{managedContent.homepage?.principal?.message || defaultHomepageContent.principal.message}</p><p className="quote-source">Uma Devi Jenes Nayagam · Principal</p><a className="text-link" href="/about/voices#principal">Read the Principal’s address <ArrowRight size={16} /></a></div>
-            </article>
-            <article className="voice-inspiration" aria-labelledby="inspiration-feature-title">
-              <figure><img src="/assets/sathya-sai-baba-portrait.jpg" alt="Illustrated portrait of Bhagawan Sri Sathya Sai Baba in an orange robe" /></figure>
-              <p className="eyebrow">Our inspiration</p>
-              <h3 id="inspiration-feature-title">Education for life, not mere living.</h3>
-              <blockquote>“{inspirationQuote}”</blockquote>
-              <p className="quote-source">Sathya Sai Baba · September 1963</p>
-              <a className="text-link" href="/about/inspiration">Our founder &amp; school community <ArrowRight size={16} /></a>
-            </article>
-          </div>
-        </section>
-
-        <section className="faq-section home-faq-section" id="faq" aria-labelledby="faq-title"><div data-reveal><p className="eyebrow">Helpful answers</p><h2 id="faq-title">Questions, welcomed.</h2><p>Start with the questions families ask most often, or open the complete FAQ for detailed school information.</p><a className="text-link" href="/faq">View all frequently asked questions <ArrowRight size={16} /></a></div><div><FaqAccordion items={(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, faqExpanded ? 8 : 4)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /><button type="button" className="reveal-toggle" aria-expanded={faqExpanded} onClick={() => { setFaqExpanded(!faqExpanded); if (faqExpanded && openFaq > 3) setOpenFaq(null); }}>{faqExpanded ? "Show fewer questions" : "Show more questions"} <CaretRight size={15} className={faqExpanded ? "turned-up" : "turned-down"} /></button></div></section>
-
-        <section className="news-section" id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">Stories &amp; <em>Happenings.</em></h2></div><a href="#events-title">See the calendar <ArrowRight size={16} /></a></div>
-          {storyItems.length ? <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`} data-reveal-stagger>{storyItems.map((item) => <li key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" /><div><span><item.Icon size={14} aria-hidden="true" />{item.type}</span><time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time><h3>{item.title}</h3>{item.excerpt && <p>{item.excerpt}</p>}</div></li>)}</ul> : <p className="calendar-empty">News and events will appear here once they are published.</p>}
-          {storyItems.length > 4 && <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>{storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} /></button>}
-        </section>
-        <SchoolCalendar items={managedContent.events || []} onAdd={addToCalendar} />
-
-
-        <section className="home-join" id="admissions" aria-labelledby="admissions-title">
-          <div className="home-join-intro" data-reveal>
-            <p className="eyebrow">Admissions</p>
-            <h2 id="admissions-title">Begin the <em>journey.</em></h2>
-            <p>SRSS welcomes primary-age children, Year 1 to Year 6, from families of every background who share a values-based approach to education. Admission is a warm conversation about readiness, learning needs and the values that matter to your family.</p>
-            <ol className="home-pathway" aria-label="Admissions pathway">{admissionSteps.map(([step, detail], index) => <li key={step}><span aria-hidden="true">{index + 1}</span><div><strong>{step}</strong><small>{detail}</small></div></li>)}</ol>
-            <div className="home-links"><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Fee%20enquiry">Request fee information <ArrowRight size={16} /></a><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Prospectus%20request">Request the prospectus <ArrowRight size={16} /></a></div>
-          </div>
-          <div className="home-join-card" id="enquiry" data-reveal>
-            {!formMode ? <div className="home-form-choice">
-              <p className="eyebrow">How can we help?</p>
-              <button type="button" onClick={() => { setFormMode("enquiry"); setFormError(""); }}><GraduationCap size={26} weight="duotone" aria-hidden="true" /><span><strong>Make an admissions enquiry</strong><small>Tell us about your child and we will plan a next step with you.</small></span><ArrowRight size={18} /></button>
-              <button type="button" onClick={() => { setFormMode("question"); setFormError(""); }}><EnvelopeSimple size={26} weight="duotone" aria-hidden="true" /><span><strong>Ask a general question</strong><small>Reach the school office about anything else.</small></span><ArrowRight size={18} /></button>
-            </div> : <div className="home-form-switch" role="tablist" aria-label="What would you like to send?">
-              <button type="button" role="tab" aria-selected={formMode === "enquiry"} onClick={() => { setFormMode("enquiry"); setFormError(""); }}>Admissions enquiry</button>
-              <button type="button" role="tab" aria-selected={formMode === "question"} onClick={() => { setFormMode("question"); setFormError(""); }}>General question</button>
-            </div>}
-            {!formMode ? null : formMode === "enquiry" ? (enquirySent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Your enquiry is on its way.</h3><p>The admissions team will contact you with a next step, usually within two school days.</p></div> : <form className="school-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); const { questions, ...payload } = Object.fromEntries(new FormData(event.currentTarget)); try { await submitPublicForm("admissionEnquiries", { ...payload, message: questions, source: "website" }); setEnquirySent(true); } catch (reason) { setFormError(reason.message || "Your enquiry could not be sent. Please try again."); } }}>
-              <label>Parent / guardian name<input required name="parentName" autoComplete="name" /></label><label>Email address<input required name="email" type="email" autoComplete="email" /></label>
-              <label>Child’s name<input required name="childName" /></label><label>Child’s age<select required name="childAge" defaultValue=""><option value="" disabled>Select age</option>{[5,6,7,8,9,10,11,12].map(age => <option key={age}>{age}</option>)}</select></label>
-              <label>Current school<input name="currentSchool" /></label><label>How did you hear about SRSS?<select name="referralSource" defaultValue=""><option value="" disabled>Select one</option><option>Family or friend</option><option>Social media</option><option>School event</option><option>Online search</option><option>Other</option></select></label>
-              <label className="wide-label">Questions or anything you would like us to know<textarea name="questions" rows="3" /></label><p className="form-privacy wide-label">The School uses these details to reply to you, as described in our <a href="/legal/privacy-policy">Privacy Policy</a>.</p>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send enquiry <ArrowRight size={18} weight="bold" /></button>
-            </form>) : (contactSent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Thank you for writing.</h3><p>We will pass your message to the right person at school.</p></div> : <form className="school-form contact-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); try { await submitPublicForm("contactMessages", Object.fromEntries(new FormData(event.currentTarget))); setContactSent(true); } catch (reason) { setFormError(reason.message || "Your message could not be sent. Please try again."); } }}><label>Name<input required name="name" autoComplete="name" /></label><label>Email<input required name="email" type="email" autoComplete="email" /></label><label className="wide-label">Subject<select required name="subject" defaultValue=""><option value="" disabled>Select a subject</option><option>General</option><option>Admissions</option><option>Feedback</option><option>Other</option></select></label><label className="wide-label">Message<textarea required name="message" rows="5" /></label><p className="form-privacy wide-label">The School uses these details to reply to you, as described in our <a href="/legal/privacy-policy">Privacy Policy</a>.</p>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send message <ArrowRight size={18} weight="bold" /></button></form>)}
-          </div>
-        </section>
-
-        <section className="home-visit" id="contact" aria-labelledby="contact-title">
-          <div className="home-visit-details" data-reveal>
-            <p className="eyebrow">Contact &amp; visit</p>
-            <h2 id="contact-title">Find your way here.</h2>
-            <address><MapPin size={19} aria-hidden="true" /><span>6, Jalan Puchong, Taman Tan Yew Lai,<br />58200 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur</span></address>
-            <dl className="home-contacts">
-              <div><dt>School office</dt><dd><a href="tel:+60126001926"><Phone size={15} aria-hidden="true" /> +60 12-600 1926</a><a href="mailto:saischoolpuchong@gmail.com"><EnvelopeSimple size={15} aria-hidden="true" /> saischoolpuchong@gmail.com</a></dd></div>
-              <div><dt>Office hours</dt><dd>Monday–Friday · 8.00 am–4.00 pm<br />School hours · 7.30 am–1.30 pm</dd></div>
-            </dl>
-            <p className="home-visit-note">Visitor parking is available by arrangement. Please contact the office before your visit.</p>
-            <div className="home-links"><a className="text-link" href="https://maps.google.com/?q=6+Jalan+Puchong+Taman+Tan+Yew+Lai+58200+Kuala+Lumpur" target="_blank" rel="noreferrer">Get directions <ArrowRight size={16} /></a><a className="text-link" href="https://www.facebook.com/SSPSM/" target="_blank" rel="noreferrer"><FacebookLogo size={17} aria-hidden="true" /> School life on Facebook</a></div>
-          </div>
-          <div className="home-visit-map" data-reveal="image"><iframe title="Map showing Sekolah Rendah Sathya Sai" src="https://www.google.com/maps?q=6%20Jalan%20Puchong%20Taman%20Tan%20Yew%20Lai%2058200%20Kuala%20Lumpur&output=embed" loading="lazy" /></div>
-        </section>
-      </main>}
+      {route.page !== "legal" && <Breadcrumbs entry={route} />}
+      {(pages[route.page] || pages.notFound)()}
 
 
       {!isHome && <PreFooter onVisit={() => { setSent(false); setVisitOpen(true); }} />}
@@ -738,9 +785,9 @@ export function App() {
         <button type="button" className={`to-top${showTop ? " is-visible" : ""}`} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })} aria-label="Back to top" tabIndex={showTop ? 0 : -1} aria-hidden={!showTop}><ArrowUp size={20} weight="bold" /></button>
         {fabOpen && <div className="fab-menu" id="fab-menu" role="menu" aria-label="Quick actions">
           <button type="button" role="menuitem" onClick={() => { setFabOpen(false); setSent(false); setVisitOpen(true); }}><CalendarBlank size={19} aria-hidden="true" /> Arrange a visit</button>
-          <a role="menuitem" href="/#enquiry" onClick={() => { setFabOpen(false); setFormMode("enquiry"); }}><GraduationCap size={19} aria-hidden="true" /> Admissions enquiry</a>
-          <a role="menuitem" href="/#contact" onClick={() => setFabOpen(false)}><Phone size={19} aria-hidden="true" /> Contact the school</a>
-          <a role="menuitem" href="/sign-in" onClick={() => setFabOpen(false)}><SignIn size={19} aria-hidden="true" /> Sign in to the hub</a>
+          <a role="menuitem" href="/join/admissions#enquiry" onClick={() => { setFabOpen(false); setFormMode("enquiry"); }}><GraduationCap size={19} aria-hidden="true" /> Admissions enquiry</a>
+          <a role="menuitem" href="/resources/contact" onClick={() => setFabOpen(false)}><Phone size={19} aria-hidden="true" /> Contact the school</a>
+          <a role="menuitem" href="/login" onClick={() => setFabOpen(false)}><SignIn size={19} aria-hidden="true" /> Sign in to the hub</a>
         </div>}
         <button type="button" className="fab" onClick={() => setFabOpen(!fabOpen)} aria-expanded={fabOpen} aria-controls="fab-menu" aria-label={fabOpen ? "Close quick actions" : "Open quick actions"}><Plus size={24} weight="bold" /></button>
       </div>
@@ -758,7 +805,7 @@ export function App() {
                   <label>Parent or guardian name<input required name="name" autoComplete="name" /></label>
                   <label>Email address<input required type="email" name="email" autoComplete="email" /></label>
                   <label>Child’s current year<select required defaultValue=""><option value="" disabled>Select a year</option><option>Preschool</option><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option><option>Year 5</option><option>Year 6</option></select></label>
-                  <p className="form-privacy">The School uses these details to arrange your visit, as described in our <a href="/legal/privacy-policy">Privacy Policy</a>.</p><button className="primary-button" type="submit">Request a visit <ArrowRight size={18} weight="bold" /></button>
+                  <p className="form-privacy">The School uses these details to arrange your visit, as described in our <a href="/legal/privacy">Privacy Policy</a>.</p><button className="primary-button" type="submit">Request a visit <ArrowRight size={18} weight="bold" /></button>
                 </form>
               </>
             ) : (
