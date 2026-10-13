@@ -44,3 +44,14 @@ ui-debug.log
 .venv/
 __pycache__/
 *.pyc
+
+# Firebase emulator exports
+.emulator-data/
+
+# Old node_modules copies left by the iCloud offloading issue (safe to delete)
+node_modules.icloud-old/
+node_modules.corrupted/
+node_modules.incomplete/
+
+# Design-hook cache (the shared .impeccable/config.json is committed)
+**/.impeccable/hook.cache.json

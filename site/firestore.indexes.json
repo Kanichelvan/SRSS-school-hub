@@ -1,0 +1,17 @@
+{
+  "indexes": [
+    { "collectionGroup": "events", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "audienceKeys", "arrayConfig": "CONTAINS" }, { "fieldPath": "date", "order": "ASCENDING" } ] },
+    { "collectionGroup": "announcements", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "audienceKeys", "arrayConfig": "CONTAINS" } ] },
+    { "collectionGroup": "notificationRecords", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "recipientUid", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "attendanceRecords", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "studentId", "order": "ASCENDING" }, { "fieldPath": "date", "order": "ASCENDING" } ] },
+    { "collectionGroup": "attendanceRecords", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "classId", "order": "ASCENDING" }, { "fieldPath": "date", "order": "ASCENDING" } ] },
+    { "collectionGroup": "formSubmissions", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "requestedFromUid", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "dueDate", "order": "ASCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}

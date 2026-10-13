@@ -1,0 +1,202 @@
+// SRSS Digital Hub permission model — single source of truth for hub roles, modules and access levels.
+// Sources: "SRSS Full Permission Matrix" (original nine role columns) and the "SRSS Digital Hub PRD"
+// (user groups §6, authorisation model §44, priority matrix). Where the two differ, the PRD wins and the
+// cell is commented. The UI reads this to build navigation; firestore.rules enforces the same boundaries.
+// Hiding a navigation item is never an access control (PRD §43, AUTH-002).
+
+export const ROLES = {
+  student: { label: "Student", hub: "student" },
+  parent: { label: "Parent / Guardian", hub: "parent" },
+  teacher: { label: "Teacher", hub: "teacher" },
+  classTeacher: { label: "Class Teacher", hub: "teacher" },
+  specialistTeacher: { label: "Specialist / Learning Studio Teacher", hub: "teacher" },
+  academicCoordinator: { label: "Academic Coordinator", hub: "admin" },
+  schoolAdmin: { label: "School Administrator", hub: "admin" },
+  admissionsOfficer: { label: "Admissions Officer", hub: "admin" },
+  financeOfficer: { label: "Finance Officer", hub: "admin" },
+  leadership: { label: "Headmistress / Leadership", hub: "admin" },
+  safeguardingLead: { label: "Safeguarding / Welfare Lead", hub: "admin" },
+  privacySteward: { label: "Privacy / Consent Steward", hub: "admin" },
+  portfolioModerator: { label: "Portfolio Moderator", hub: "admin" },
+  contentEditor: { label: "Content Editor", hub: "admin" },
+  technicalAdmin: { label: "Technical Administrator", hub: "admin" },
+  // Future roles (PRD §6) — defined now so data and rules stay stable when their modules ship.
+  librarian: { label: "Librarian", hub: "admin", future: true },
+  auditor: { label: "Auditor / Read-only Reviewer", hub: "admin", future: true },
+};
+// Super Administrator is not a hub role: it is the `accessAdmin` claim, held by 1–2 people (PRD §62).
+
+export const ROLE_IDS = Object.keys(ROLES);
+export const TEACHING_ROLES = ["teacher", "classTeacher", "specialistTeacher"];
+
+// Modules, with the release phase from the PRD's revised priority matrix (1 = Jubilee launch).
+export const MODULES = {
+  dashboard: { label: "Dashboard", phase: 1 },
+  announcements: { label: "Announcements", phase: 1 },
+  calendar: { label: "Calendar & events", phase: 1 },
+  messages: { label: "Messages", phase: 1 },
+  notifications: { label: "Notifications", phase: 1 },
+  forms: { label: "Forms & Actions", phase: 1 },
+  search: { label: "Search", phase: 1 },
+  profile: { label: "Profile", phase: 1 },
+  students: { label: "Student records (SIS)", phase: 1 },
+  guardians: { label: "Family & guardians", phase: 1 },
+  staff: { label: "Staff directory", phase: 1 },
+  academics: { label: "Academic structure", phase: 1 },
+  attendance: { label: "Attendance", phase: 1 },
+  portfolio: { label: "Portfolio", phase: 1 },
+  humanExcellence: { label: "Human Excellence record", phase: 1 },
+  showcase: { label: "Public showcase moderation", phase: 1 },
+  achievements: { label: "Achievements", phase: 1 },
+  consent: { label: "Consent centre", phase: 1 },
+  admissions: { label: "Admissions", phase: 1 },
+  inbox: { label: "Website inbox", phase: 1 },
+  content: { label: "Website content (CMS)", phase: 1 },
+  documents: { label: "Documents", phase: 1 },
+  reports: { label: "Reports", phase: 1 },
+  governance: { label: "Governance & audit", phase: 1 },
+  settings: { label: "Settings", phase: 1 },
+  accessAdministration: { label: "Roles & access", phase: 1 },
+  timetable: { label: "Timetable", phase: 2 },
+  teaching: { label: "Teaching & planning", phase: 2 },
+  assessments: { label: "Assessments & gradebook", phase: 2 },
+  reportCards: { label: "Report cards", phase: 2 },
+  support: { label: "Learning support", phase: 2 },
+  incidents: { label: "Incidents & behaviour", phase: 2 },
+  meetings: { label: "Parent–teacher meetings", phase: 2 },
+  fees: { label: "Fees-lite", phase: 2 },
+  staffHR: { label: "Staff HR (leave, training, appraisal)", phase: 2 },
+  assets: { label: "Assets", phase: 3 },
+  library: { label: "Library & Resource Centre", phase: 3 },
+};
+
+// Cell notation: "<actions> <scope>"
+//   actions: V view · C create/submit · U update (implies V) · A approve/publish (implies V) · R restricted (exception only)
+//   scope:   all (default) · own · child · assigned · class · selected · relevant · summary · published
+// A role missing from a row has no access.
+const ALL_STAFF = ["teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
+const everyone = (cell) => Object.fromEntries([...ROLE_IDS].map((role) => [role, cell]));
+const staffOnly = (cell) => Object.fromEntries(ALL_STAFF.map((role) => [role, cell]));
+
+const MATRIX = {
+  dashboard: everyone("V"),
+  notifications: everyone("V own"),
+  profile: everyone("V own"),
+  search: everyone("V relevant"),
+  calendar: { ...everyone("V relevant"), schoolAdmin: "U", leadership: "A" },
+  // PRD DASH-002: admins and teachers publish targeted announcements (matrix had admin draft / leadership approve).
+  announcements: { ...everyone("V relevant"), teacher: "A class", classTeacher: "A class", specialistTeacher: "A class", schoolAdmin: "A", leadership: "A" },
+  messages: { ...staffOnly("C/U own"), parent: "C/U own" },
+  forms: { ...everyone("C/U own"), schoolAdmin: "A", privacySteward: "A" },
+
+  students: {
+    student: "V own", parent: "V child", teacher: "V class", classTeacher: "V class", specialistTeacher: "V assigned",
+    academicCoordinator: "V", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", privacySteward: "V",
+    financeOfficer: "V summary", portfolioModerator: "V summary", auditor: "V",
+    admissionsOfficer: "R", // PRD §44: applicants only, enrolled records only if separately authorised
+  },
+  guardians: { parent: "V own", classTeacher: "V class", teacher: "V class", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", privacySteward: "V" },
+  staff: { ...staffOnly("V"), schoolAdmin: "U", parent: "V summary" },
+  academics: { ...staffOnly("V"), academicCoordinator: "U", schoolAdmin: "U" },
+  // PRD ATT-001 overrides the matrix: subject teachers take attendance for their assigned classes.
+  attendance: {
+    student: "V own", parent: "V child", teacher: "U class", classTeacher: "U class", specialistTeacher: "V assigned",
+    academicCoordinator: "V", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", auditor: "V",
+  },
+  portfolio: {
+    student: "C own", parent: "V child", teacher: "U class", classTeacher: "U class", specialistTeacher: "U assigned",
+    academicCoordinator: "V", portfolioModerator: "V relevant", leadership: "R",
+  },
+  humanExcellence: {
+    student: "V own", parent: "V child", teacher: "U class", classTeacher: "U class", specialistTeacher: "U assigned",
+    academicCoordinator: "V", leadership: "V summary",
+  },
+  // PRD CON-002: only the Portfolio Moderator approves public showcase, and only with consent.
+  showcase: { teacher: "C class", classTeacher: "C class", specialistTeacher: "C assigned", portfolioModerator: "A", leadership: "A", contentEditor: "V" },
+  achievements: {
+    student: "V own", parent: "V child", teacher: "U class", classTeacher: "U class", specialistTeacher: "U assigned",
+    academicCoordinator: "A", contentEditor: "V", leadership: "V",
+  },
+  consent: {
+    parent: "C child", teacher: "V relevant", classTeacher: "V class", specialistTeacher: "V relevant", schoolAdmin: "U",
+    privacySteward: "A", leadership: "V", portfolioModerator: "V relevant", contentEditor: "V relevant", auditor: "V",
+  },
+  admissions: { admissionsOfficer: "U", schoolAdmin: "U", leadership: "V" },
+  inbox: { schoolAdmin: "U", leadership: "V", admissionsOfficer: "V" },
+  content: { contentEditor: "C/U", leadership: "A", schoolAdmin: "V" },
+  documents: { ...everyone("V relevant"), schoolAdmin: "U" },
+  reports: { academicCoordinator: "V", schoolAdmin: "V", leadership: "V", financeOfficer: "V summary", auditor: "V" },
+  governance: { schoolAdmin: "U", leadership: "A", privacySteward: "U", safeguardingLead: "V summary", technicalAdmin: "V", auditor: "V" },
+  settings: { schoolAdmin: "U", technicalAdmin: "U", leadership: "V" },
+  accessAdministration: { schoolAdmin: "R", leadership: "R", technicalAdmin: "R" }, // claim-gated (accessAdmin)
+
+  timetable: { student: "V own", parent: "V child", teacher: "V", classTeacher: "V", specialistTeacher: "V", academicCoordinator: "U", schoolAdmin: "U", leadership: "V" },
+  teaching: { student: "V own", parent: "V child", teacher: "U", classTeacher: "U", specialistTeacher: "U", academicCoordinator: "A", leadership: "V summary" },
+  assessments: {
+    student: "V published", parent: "V published", teacher: "U class", classTeacher: "U class", specialistTeacher: "U assigned",
+    academicCoordinator: "A", leadership: "A", schoolAdmin: "V summary",
+  },
+  reportCards: { student: "V published", parent: "V published", teacher: "U class", classTeacher: "U class", academicCoordinator: "A", leadership: "A" },
+  support: { parent: "V selected", classTeacher: "V class", specialistTeacher: "U assigned", academicCoordinator: "V", leadership: "V", safeguardingLead: "V", teacher: "R" },
+  incidents: {
+    parent: "V selected", teacher: "C/U assigned", classTeacher: "C/U class", specialistTeacher: "C/U assigned",
+    schoolAdmin: "U", leadership: "V", safeguardingLead: "U",
+  },
+  meetings: { parent: "C/U own", teacher: "C/U own", classTeacher: "C/U own", specialistTeacher: "C/U own", schoolAdmin: "U", leadership: "V" },
+  // PRD §17/§33: financial permissions are separated from ordinary teacher access.
+  fees: { parent: "V child", financeOfficer: "U", schoolAdmin: "V", leadership: "V", auditor: "V" },
+  staffHR: { schoolAdmin: "U", leadership: "A" },
+  assets: { schoolAdmin: "U", technicalAdmin: "U", leadership: "V" },
+  library: { librarian: "U", student: "V own", parent: "V child", teacher: "V own", classTeacher: "V own" },
+};
+
+const IMPLIES = { U: ["V"], A: ["V"], C: [] };
+
+function parseCell(cell) {
+  if (!cell) return null;
+  const [actionPart, scope = "all"] = cell.split(" ");
+  if (actionPart === "R") return { restricted: true, actions: new Set(), scope: "restricted" };
+  const actions = new Set();
+  for (const action of actionPart.split("/")) {
+    actions.add(action);
+    for (const implied of IMPLIES[action] || []) actions.add(implied);
+  }
+  return { restricted: false, actions, scope };
+}
+
+export function grantFor(role, module) {
+  return parseCell(MATRIX[module]?.[role]);
+}
+
+// Widest scope any of the user's roles holds for this action, or null when denied.
+// "restricted" means "only with a documented, approved exception".
+const SCOPE_WIDTH = ["restricted", "selected", "summary", "published", "own", "child", "relevant", "assigned", "class", "all"];
+export function can(roles, module, action = "V") {
+  let best = null;
+  for (const role of roles || []) {
+    const grant = grantFor(role, module);
+    if (!grant) continue;
+    const scope = grant.restricted ? "restricted" : grant.actions.has(action) ? grant.scope : null;
+    if (scope && (!best || SCOPE_WIDTH.indexOf(scope) > SCOPE_WIDTH.indexOf(best))) best = scope;
+  }
+  return best;
+}
+
+// True when a module should appear in navigation (any non-restricted view or create right).
+export function canOpen(roles, module) {
+  const view = can(roles, module, "V");
+  const create = can(roles, module, "C");
+  return Boolean((view && view !== "restricted") || (create && create !== "restricted"));
+}
+
+// Hubs a person can switch between, highest privilege first (PRD AUTH-001 AC3).
+const HUB_ORDER = ["admin", "teacher", "parent", "student"];
+export function hubsFor(roles) {
+  return HUB_ORDER.filter((hub) => (roles || []).some((role) => ROLES[role]?.hub === hub));
+}
+
+export function primaryHub(roles) {
+  return hubsFor(roles)[0] || null;
+}
+
+export const matrixForTesting = { MATRIX };

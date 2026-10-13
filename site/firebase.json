@@ -1,0 +1,130 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=()"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/about/voices",
+        "destination": "/about/our-people",
+        "type": 301
+      },
+      {
+        "source": "/about/inspiration",
+        "destination": "/about/sathya-sai-education",
+        "type": 301
+      },
+      {
+        "source": "/about/governance",
+        "destination": "/about/leadership-governance",
+        "type": 301
+      },
+      {
+        "source": "/faq",
+        "destination": "/resources/faq",
+        "type": 301
+      },
+      {
+        "source": "/admissions",
+        "destination": "/join/admissions",
+        "type": 301
+      },
+      {
+        "source": "/news",
+        "destination": "/resources/news",
+        "type": 301
+      },
+      {
+        "source": "/contact",
+        "destination": "/resources/contact",
+        "type": 301
+      },
+      {
+        "source": "/legal/privacy-policy",
+        "destination": "/legal/privacy",
+        "type": 301
+      },
+      {
+        "source": "/legal/terms-of-use",
+        "destination": "/legal/terms",
+        "type": 301
+      },
+      {
+        "source": "/legal/intellectual-property",
+        "destination": "/legal/acceptable-use",
+        "type": 301
+      },
+      {
+        "source": "/legal/child-protection",
+        "destination": "/legal/child-safeguarding",
+        "type": 301
+      },
+      {
+        "source": "/sign-in",
+        "destination": "/login",
+        "type": 301
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "runtime": "nodejs22"
+    }
+  ],
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "storage": {
+      "port": 9199
+    },
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    },
+    "singleProjectMode": true
+  }
+}

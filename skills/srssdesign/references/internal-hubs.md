@@ -12,6 +12,21 @@ Keep the global shell recognisably SRSS:
 
 Allow each hub to have a different working personality without becoming a separate brand.
 
+Use `site/SITEMAP.md` as the canonical route, role and integration model. All users enter at `/sign-in`; after authentication, `/hub` resolves to a role-aware dashboard. Shared hub services use stable `/hub/*` routes and filter content and actions by authorization.
+
+Shared areas:
+
+- dashboard;
+- search;
+- announcements;
+- calendar;
+- messages;
+- forms and consent;
+- profile and account settings;
+- help and support.
+
+Hiding a link is not authorization. Enforce role, family, class and capability boundaries in the data/API layer, including direct URL access.
+
 ## Parent Hub
 
 Tone: calm, clear and reassuring.
@@ -24,6 +39,8 @@ Prioritise:
 - attendance/absence guidance;
 - uniform, arrival and dismissal information;
 - class and contact links.
+
+Use `/hub/parent` and its children, including children, progress, forms, meetings and resources. A parent may see only linked children and permitted records.
 
 Use white and ivory cards, Navy 900 headings, limited Purple 700 labels and gold focus states. Avoid playful gradients in core administrative tasks.
 
@@ -40,6 +57,8 @@ Prioritise:
 - journal/reflection;
 - progress and achievements;
 - events and activities.
+
+Use `/hub/student` and its children, including profile, progress, portfolio, assignments, library and events. Keep progress and support information age-appropriate and permission-aware.
 
 This is the primary home for colourful gradients. Use gradient bands as module headers while keeping card bodies white and text legible.
 
@@ -66,7 +85,29 @@ Prioritise:
 - event checklists;
 - protected links and contact routes.
 
+Use `/hub/teacher` and its children, including classes, students, assignments, attendance, communication and bookings. Scope access to assigned classes, responsibilities and time periods.
+
 Use navy structure, white surfaces and restrained category top borders. Purple may identify reflective or professional-development resources. Keep gradients limited to major alerts or featured resource headers.
+
+## Admin and Staff Hub
+
+Tone: precise, accountable and operational.
+
+Prioritise:
+
+- admissions enquiries and follow-up;
+- student records and completeness checks;
+- staff roles and access permissions;
+- forms registry and review cycles;
+- library and resource administration;
+- events, publishing and school communications;
+- governance, consent audits, retention and incident follow-up.
+
+Use `/hub/admin` and capability-based child routes. Do not assume every staff account can access admissions, records, publishing or governance.
+
+## Service integrations
+
+Google Classroom, Calendar, Drive, Docs, Slides, Sheets, Forms, Gmail, Groups, Meet and approved Sites or gallery repositories may support workflows. Keep the SRSS hub responsible for context, authorization, status, confirmation, errors and return navigation. Every integration needs a named owner, audience, review cycle and retention rule.
 
 ## Community Hub
 

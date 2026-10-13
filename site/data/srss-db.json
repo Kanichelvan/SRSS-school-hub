@@ -1,0 +1,35 @@
+{
+  "news": [
+    { "id": "news-1", "category": "School News", "title": "A new term of curious, caring learning", "date": "2026-07-20", "image": "/assets/photos/processed/science-microscope-1600.jpg", "published": true },
+    { "id": "news-2", "category": "Achievements", "title": "Celebrating effort, teamwork and every growing voice", "date": "2026-07-14", "image": "/assets/photos/processed/sports-day-podium-1600.jpg", "published": true },
+    { "id": "news-3", "category": "Values in Action", "title": "Pupils bring care and responsibility into daily life", "date": "2026-07-08", "image": "/assets/photos/processed/classroom-art-1280.jpg", "published": true }
+  ],
+  "events": [
+    { "id": "event-1", "date": "2026-07-25", "title": "Open morning for prospective families", "category": "Parent", "time": "9.30–11.30 am", "published": true },
+    { "id": "event-2", "date": "2026-07-31", "title": "Community seva day", "category": "Seva", "time": "8.30–11.00 am", "published": true },
+    { "id": "event-3", "date": "2026-08-08", "title": "National Day cultural celebration", "category": "Cultural", "time": "8.00 am–12.00 pm", "published": true }
+  ],
+  "about": {
+    "heroEyebrow": "About SRSS · 25th year",
+    "heroTitle": "Our Story",
+    "heroBody": "At SRSS, education begins with a simple belief: every child carries within them the capacity for wisdom, kindness and purposeful action.",
+    "heroImage": "/assets/photos/processed/assembly-achievements-1280.jpg",
+    "heroAlt": "SRSS pupils gathered at a school assembly",
+    "foundingTitle": "A school built on what matters most.",
+    "foundingBody": "Sekolah Rendah Sathya Sai was established to offer an education in which strong learning and strong character belong together. Inspired by the education vision of Sathya Sai Baba, the school seeks to draw out the human values already present in every child.",
+    "foundingSupport": "SRSS is part of a worldwide family of Sathya Sai schools: locally rooted, globally connected, and united by a commitment to academic confidence, compassionate leadership and service to society.",
+    "milestones": [{ "year": "2001", "title": "A shared vision", "copy": "A values-based primary school is envisioned for families in Kuala Lumpur." }, { "year": "2002", "title": "SRSS begins", "copy": "The first cohort begins a learning journey rooted in human excellence." }, { "year": "2007", "title": "Growing together", "copy": "The school community expands its learning spaces and co-curricular life." }, { "year": "2017", "title": "Service in action", "copy": "Seva and community partnerships become an even more visible part of school life." }, { "year": "2026", "title": "Looking forward", "copy": "SRSS celebrates a quarter-century of nurturing minds, hearts and character." }],
+    "valueWeek": { "title": "Love in action", "prompt": "Notice one thoughtful way you can make someone’s day lighter.", "route": "#students" },
+    "principal": { "heading": "Learning with love, leading with character.", "quote": "The real magic of SRSS lies in our teachers and staff, who teach by example every day.", "body": "After twenty-five years, our vision is brighter than ever: to nurture young people who meet challenges with courage, embrace opportunities with wisdom, and become champions of peace, unity and care for our planet.", "image": "/assets/photos/processed/principal-uma-devi-1086x1358.jpg", "alt": "Portrait of Uma Devi Jenes Nayagam, Principal of Sekolah Rendah Sathya Sai" }
+  },
+  "homepage": {
+    "stats": { "years": 25, "students": "Year 1–6", "values": 5, "motto": "Human Excellence | Kecemerlangan Insan" },
+    "principal": { "quote": "The real magic of SRSS lies in our teachers and staff, who teach by example every day.", "message": "After twenty-five years, our vision is brighter than ever. We want to nurture young people who meet challenges with courage, embrace opportunities with wisdom, and become champions of peace, unity and care for our planet.", "image": "/assets/photos/processed/principal-uma-devi-1086x1358.jpg", "alt": "Portrait of Uma Devi Jenes Nayagam, Principal of Sekolah Rendah Sathya Sai" },
+    "anniversary": { "title": "Celebrating 25 Years of SRSS.", "description": "A quarter-century of learning, growing and nurturing human values." }
+  },
+  "faqs": [],
+  "enquiries": [],
+  "messages": [],
+  "assets": [],
+  "parentHub": null
+}

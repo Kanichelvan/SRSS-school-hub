@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "demo-srss",
+    "production": "srssdigitalhub"
+  }
+}
