@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { doc, serverTimestamp, where, writeBatch } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db } from "../../lib/firebase-firestore";
 import { useAuth } from "../../auth/AuthProvider";
 import { daysAgo, getMany, list, listIn, one, today, useLoad } from "../data";
 import { ATTENDANCE_LABELS, attendanceByClass, attendanceSummary } from "../logic/dashboard";

@@ -1,7 +1,7 @@
 // SRSS Connect: announcements with audience targeting (DASH-002), calendar, notifications, profile.
 import { useState } from "react";
 import { addDoc, collection, doc, orderBy, serverTimestamp, updateDoc, where } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db } from "../../lib/firebase-firestore";
 import { useAuth } from "../../auth/AuthProvider";
 import { ROLES, can } from "../../auth/permissions";
 import { announcementsFor, eventsFor, getMany, list, today, useLoad } from "../data";

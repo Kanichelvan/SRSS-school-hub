@@ -11,7 +11,9 @@ import {
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db, workspaceDomain } from "../lib/firebase";
+import { workspaceDomain } from "../lib/firebase";
+import { auth } from "../lib/firebase-auth";
+import { db } from "../lib/firebase-firestore";
 import { ROLE_IDS, hubsFor, primaryHub } from "./permissions";
 
 const AuthContext = createContext(null);

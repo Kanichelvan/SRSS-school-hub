@@ -1,6 +1,12 @@
 # SRSS Online System — Dual-Plane Architecture
 
-Status: alignment baseline, 10 Oct 2026. It reconciles the *Dual-Plane Platform* brief (public web presence + secure role-based hub + Google Workspace backbone) with the Digital Hub PRDs, [`SITEMAP.md`](../SITEMAP.md) and what is already built. Decisions are recorded in the Decisions section below.
+Status: implementation checkpoint, 12 Oct 2026. It reconciles the *Dual-Plane Platform* brief (public web presence + secure role-based hub + Google Workspace backbone) with the Digital Hub PRDs, [`SITEMAP.md`](../SITEMAP.md) and what is already built. Decisions are recorded in the Decisions section below.
+
+## Checkpoint verdict
+
+The dual-plane foundation is in place and tested: the public bundle is separated from the authenticated hub; Firebase Authentication, custom-claim roles, server-derived scope, Firestore/Storage rules, Cloud Functions, canonical hub routes and legacy aliases are implemented. The Google Workspace backbone is not yet an operational integration module: Google sign-in, Drive links and route metadata exist, while Classroom, Calendar, Sheets, Groups, Gmail, Admin SDK and Vault adapters remain planned.
+
+The current front-end stack is **React 19 + Vite + plain CSS + Phosphor Icons**. This is an intentional earlier project decision and is production-capable; it is not the exact **Next.js + Tailwind CSS + Lucide** stack named in the newer brief. Treat a framework/design-utility/icon migration as a separate decision and migration plan rather than describing it as already present. The architecture requirements—route isolation, protected data, code splitting, accessible design and CDN hosting—do not require Next.js, but SSR/SSG and framework-native metadata may justify it if explicitly chosen.
 
 ## The three planes
 
@@ -10,12 +16,26 @@ Status: alignment baseline, 10 Oct 2026. It reconciles the *Dual-Plane Platform*
 | **2. Secure role-based hub** | One profile-centred place for Students, Parents, Teachers and Admin/Staff: records, attendance, notices, communication | React + Vite `/hub`, Firebase Auth, Firestore + Security Rules, Cloud Functions | Identity relationships, SIS, attendance, consent, portfolio metadata, workflow status, permissions, audit |
 | **3. Google Workspace backbone** | Day-to-day productivity with little custom software to maintain | Classroom, Meet, Drive, Calendar, Groups, Gmail, Forms, Sites, Vault | Documents and media, lessons and homework, meetings, mail and groups, legal retention |
 
-### Boundary rules (what makes the planes safe together)
+### Seam rules (what makes the planes safe together)
 
 1. **One identity.** Staff and students sign in with their school Google account; parents with email + password or email link. The hub's role and scope (Firebase custom claims + server-derived `users/{uid}`) decide what each person sees. Google Groups/OUs are derived from the same records, not maintained separately.
 2. **One system of record per fact.** Child, guardian, enrolment, attendance, consent and admissions status live in Firestore. Workspace tools hold files and collaboration, and the hub stores links/IDs to them. A Google Sheet may be a *read-only report* of hub data, never the source of truth.
 3. **Sensitive data never leaves the governed plane.** Medical disclosures, safeguarding notes, pastoral notes, fees and consent records stay in Firestore under restricted rules — not in Forms responses, Sheets or shared Drive folders.
 4. **Public is opt-in.** Nothing crosses from plane 2 to plane 1 without status `published` plus, for pupils, recorded consent and moderation (CON-002).
+5. **Public media stages before publication.** A consent-checked `mediaRegistry` record is created first; Storage accepts only the matching upload and permits anonymous reads only after the registry reaches `approved`.
+
+## Implemented architecture seams
+
+| Seam | Interface | Adapters / enforcement |
+|---|---|---|
+| Public content | `loadPublicContent`, `submitPublicForm` | Firestore REST in production/emulators; built-in copy remains the unavailable-data fallback |
+| Authentication | `AuthProvider` | Google sign-in for school accounts; email/password and email-link for parents |
+| Authorization | `can`, `canOpen`, role claims and derived scope | UI navigation plus Firestore/Storage Rules; rules remain authoritative |
+| Hub navigation | `hubRoutes` metadata | Role-aware shell, route aliases, guarded screens and planned-module placeholders |
+| Operational data | `list`, `one`, `listIn`, `getMany` | One-shot Firestore reads constrained to readable scope |
+| Google Workspace | route `google` metadata only | Real product adapters are not implemented yet |
+
+Do not introduce a generic Workspace interface prematurely. Add a focused seam only when a workflow has both a Google adapter and a local/emulator adapter—for example Calendar publication, Classroom assignments, a read-only Sheets report export or Workspace account provisioning.
 
 ## Brief → current state
 
@@ -74,12 +94,13 @@ Confirmed by the user on 10 Oct 2026 unless marked *proposed*.
 
 | # | Question | Outcome |
 |---|---|---|
-| **D1** | Public navigation: brief vs PRD | **Merged:** About · Learning · Student Life · Admissions · Community · SRSS25, with utility links Calendar · Downloads · News · Contact, and Sign in. `SITEMAP.md` updated. The live header changes only as a separate, approved design change. |
+| **D1** | Public navigation: brief vs PRD | **Current approved header:** About · Academics · Admissions · Student Life · Resources · Hubs, plus search and Admissions & Visits. The content architecture still keeps dedicated `/learning`, `/community` and `/srss25` destinations; the header groups them according to `src/data/navigation.js` and `SITEMAP.md`. |
 | **D2** | Hub URLs `/portal/{role}` vs `/hub/{role}` | **Done:** `/hub/*` kept; `/portal/*` aliases added (user approved 10 Oct 2026). |
 | **D3** | Workspace edition | **Open — confirm with the school.** The plan stays edition-neutral. Google for Nonprofits excludes schools (only a separate philanthropic arm, e.g. a foundation or alumni trust, qualifies); Google Workspace for Education Fundamentals is the usual school edition and includes Classroom and Vault. Features that depend on the edition (Vault, Classroom API, under-18 controls) are flagged in the plan. |
 | **D4** | Forms/Sheets as admissions CRM and consent store | **Hub + Sheets report.** Applications (incl. medical disclosures) and consent are submitted in the hub, tied to a verified guardian and child, append-only and audited. Staff get a scheduled read-only Google Sheets export. Google Forms only for low-risk public intake (tour interest, alumni, volunteer sign-ups). |
 | **D5** | Anniversary badge on the homepage | **Band links to `/srss25`.** The homepage stays restrained with one Silver Jubilee band; badge, 2002–2027 timeline, archival photos and gala registration live on the SRSS25 pages. |
 | **D6** | Emergency broadcast over SMS | *Proposed:* launch with portal banner + email to Groups; add SMS only with a budgeted provider. |
+| **D7** | Next.js/Tailwind/Lucide vs current stack | **Current implementation retained:** React + Vite + plain CSS + Phosphor. Reconfirm before any migration; a Next.js move changes routing, rendering, deployment and content-loading seams and should be handled as a deliberate migration, not a cosmetic dependency swap. |
 
 ## Consolidation the brief implies
 
@@ -93,8 +114,18 @@ Confirmed by the user on 10 Oct 2026 unless marked *proposed*.
 | Largest Contentful Paint (mobile, 4G) | ≤ 2.5 s | Not measured; several public images are multi-MB PNGs |
 | Interaction to Next Paint | ≤ 200 ms | — |
 | Public JS (gzip, first load) | ≤ 150 kB; Firebase never loaded on public pages | Firebase already isolated to hub routes |
-| Hub route chunk (gzip) | ≤ 120 kB per screen group | One 217 kB gzip chunk → split per hub with `React.lazy` |
+| Hub route chunk (gzip) | ≤ 120 kB per screen group | Screen groups are lazy chunks at 1.8–16.0 kB gzip |
+| Shared authenticated core (gzip) | ≤ 200 KiB | Firebase Storage and Functions are route-loaded; the core is 191.5 KiB (196.1 kB) gzip |
 | Images | AVIF/WebP, responsive `srcset`, ≤ 250 kB hero | Processed set exists; originals still referenced in places |
 | Accessibility | WCAG 2.2 AA, 48 px touch targets | Hub components follow this |
 
 Hosting on Firebase Hosting (CDN, HTTP/2/3, immutable hashed assets) with one-shot Firestore reads keeps running costs within free allowances at school scale.
+
+## Verification snapshot — 12 Oct 2026
+
+- `npm test`: 17/17 passed.
+- Firestore and Storage emulator rules: 32/32 passed, including immutable attendance identity/class membership and staged public-media access.
+- `npm run build`: passed.
+- Public JavaScript: 126.9 kB gzip.
+- Hub screen groups: 1.8–16.0 kB gzip; shared hub/Firebase: 196.1 kB gzip.
+- Optimization ledger: separating the Firebase service clients moved Storage and Functions into their consuming routes, reducing the shared core from 207.2 kB to 196.1 kB gzip (5.4%). The build now enforces 150 KiB public and 200 KiB authenticated-core budgets.

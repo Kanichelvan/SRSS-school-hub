@@ -36,12 +36,12 @@ Launch phase (1) unless marked. ✱ = audited by the `audit*` triggers (PRD §42
 | Portfolio / Human Excellence | `portfolioEntries` ✱ · `portfolioMedia` · `humanValuesObservations` · `studentReflections` |
 | Communication | `announcements` · `notificationRecords` · `messageThreads` (+ `messageItems` subcollection) |
 | Calendar | `events` · `registrations` · `appointments` (P2) |
-| Forms & consent | `formDefinitions` · `formSubmissions` · `workflowActions` · `consentDefinitions` · `consentRecords` ✱ (append-only) · `studentConsentStatus` (server-derived latest response per type) |
+| Forms & consent | `formDefinitions` · `formSubmissions` · `workflowActions` · `consentDefinitions` (dated audit copy; the live form is built into `src/hub/consentForm.js`) · `consentRecords` ✱ (append-only; `source` is `parentPortal` or `paperForm`, paper entries carry `guardianName` and `recordedBy`) · `studentConsentStatus` (server-derived latest response and form version per type) · `consentReminders` (server-written: last reminder per pupil) · `policyAcknowledgements` (one per staff member, versioned confidentiality and acceptable-use acknowledgement) |
 | Admissions | `admissionEnquiries` (public create) · `applications` · `applicationDocuments` · `applicationActions` |
 | Finance-lite (P2) | `feeStructures` · `studentFeeAssignments` · `payments` ✱ · `concessions` ✱ (restricted) |
 | Staff operations (P2) | `staffLeave` · `staffTraining` · `staffAppraisals` |
 | Assets (P3) | `assets` ✱ · `assetAssignments` · `assetMaintenance` |
-| Public website | `pages` (live copy) · `pageDrafts` (staff drafts) · `newsPosts` · `publicAchievements` · `mediaRegistry` (image library: `url`, `storagePath`, required `alt`, `containsPupils` + `consentChecked`, size and dimensions; files in Storage `media/public/**`) · `contactMessages` |
+| Public website | `pages` (live copy) · `pageDrafts` (staff drafts) · `newsPosts` · `publicAchievements` · `mediaRegistry` (image library: staged → approved/archived; `url`, `storagePath`, required `alt`, `containsPupils` + `consentChecked`, size and dimensions; Storage reads consult the matching registry record) · `contactMessages` |
 | Governance | `documents` · `auditLogs` (server-only) · `dataReviewTasks` · `settings` ✱ (`settings/school.currentAcademicYearId`) · `certificateVerifications` (public get, no list) |
 
 Library collections are intentionally absent until the Library & Resource Centre module.
@@ -56,7 +56,7 @@ Library collections are intentionally absent until the Library & Resource Centre
 | Portfolio entry | `internal` → `family` → `showcaseCandidate` → `publicShowcase` | Teacher up to candidate; only Portfolio Moderator/Leadership to public, and only with public-showcase consent |
 | CMS content | `draft` → `review` → `approved` → `published` → `archived` | Content Editor drafts/reviews; Leadership approves and publishes |
 | Application | `started` → `submitted` → `documentsPending` → `underReview` → `interview` → `offer` → `accepted` → `enrolled` | Applicant (early stages), Admissions; `enrolled` only via the `enrolApplication` function |
-| Consent | append-only records; latest per type is the status | Guardian creates; nobody overwrites (CON-006) |
+| Consent | append-only records; latest per type is the status | Guardian creates (or the office enters a signed paper form); nobody overwrites (CON-006). No approval step. |
 | Incident (P2) | `reported` → … → `resolved` | Reporter/assigned staff/class teacher; restricted cases safeguarding lead only |
 
 ## Common record standard (PRD §48)

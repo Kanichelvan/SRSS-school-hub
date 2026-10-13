@@ -71,6 +71,35 @@ export const consentStatusOnRecord = onDocumentCreated("consentRecords/{id}", as
   await recomputeConsentStatus(db, event.data.data().studentId);
 });
 
+// One-click reminder from the admin consent page: an in-hub notification to every linked guardian
+// with portal access. Pupils without a parent account are returned so the office can phone instead.
+export const sendConsentReminders = onCall(async (request) => {
+  const roles = request.auth?.token?.roles || [];
+  if (!roles.some((role) => ["schoolAdmin", "privacySteward"].includes(role))) throw new HttpsError("permission-denied", "Only the school office or the privacy steward can send consent reminders.");
+  const studentIds = [...new Set(request.data?.studentIds || [])].filter((id) => typeof id === "string").slice(0, 500);
+  if (!studentIds.length) throw new HttpsError("invalid-argument", "Choose at least one pupil.");
+  let notified = 0; const withoutAccount = [];
+  for (const studentId of studentIds) {
+    const [student, links] = await Promise.all([db.doc(`students/${studentId}`).get(), db.collection("studentGuardianLinks").where("studentId", "==", studentId).where("hasPortalAccess", "==", true).get()]);
+    const name = student.data()?.preferredName || student.data()?.name || "your child";
+    const guardianUids = [...new Set(links.docs.filter((link) => link.data().status !== "inactive").map((link) => link.data().guardianUid).filter(Boolean))];
+    if (!guardianUids.length) { withoutAccount.push(studentId); continue; }
+    const batch = db.batch();
+    for (const recipientUid of guardianUids) {
+      batch.set(db.collection("notificationRecords").doc(), {
+        recipientUid, category: "consent", critical: false,
+        title: `Consent choices for ${name} are waiting`,
+        body: "A few yes or no questions — about two minutes. You can change your answers at any time.",
+        link: `/hub/parent/consent?student=${studentId}`, studentId, createdAt: FieldValue.serverTimestamp(), readAt: null,
+      });
+    }
+    batch.set(db.doc(`consentReminders/${studentId}`), { studentId, lastSentAt: FieldValue.serverTimestamp(), lastSentBy: request.auth.uid, count: FieldValue.increment(1) }, { merge: true });
+    await batch.commit();
+    notified += guardianUids.length;
+  }
+  return { notified, withoutAccount };
+});
+
 // ---------- Attendance (ATT workflow → parent dashboard → optional notification) ----------
 // Fires when a session first becomes "submitted" — whether created submitted or updated to it.
 export const notifyAbsencesOnSubmit = onDocumentWritten("attendanceSessions/{id}", async (event) => {

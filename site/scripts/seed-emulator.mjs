@@ -5,6 +5,7 @@ import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { recomputeConsentStatus, recomputeUserScope, refreshGuardianClasses } from "../functions/scope.js";
+import { CONSENT_FORM_VERSION, CONSENT_ITEMS } from "../src/hub/consentForm.js";
 import { importLegacyContent } from "./import-legacy-content.mjs";
 
 process.env.FIREBASE_AUTH_EMULATOR_HOST ||= "127.0.0.1:9099";
@@ -132,11 +133,11 @@ for (const [i, date] of schoolDays(5).entries()) {
 put(`attendanceSessions/c26-1_${day(0)}_am`, meta({ classId: "c26-1", date: day(0), sessionType: "am", status: "submitted", openedBy: uid.office, submittedBy: uid.office, submittedAt: now }));
 
 // ---------- consent (CON-001) ----------
-const consentTypes = [["photoVideo", "Photo & video"], ["digitalComms", "Digital communications"], ["portfolioSharing", "Portfolio sharing"], ["publicShowcase", "Public showcase"], ["websiteIdentification", "Website identification"], ["eventMedia", "Event media"], ["anniversaryFeature", "SRSS25 anniversary feature"]];
-consentTypes.forEach(([type, title]) => put(`consentDefinitions/${type}`, meta({ type, title, version: 1, policyText: `${title}: how SRSS uses your child's information, who can see it, and how to change your choice.`, visibilityChoices: ["internalOnly", "parentPortal", "publicNoName", "publicFirstName", "specificApproval"], effectiveFrom: "2026-01-01", reviewDate: "2026-12-31", ownerRole: "privacySteward" })));
+// The consent form is built into the hub (src/hub/consentForm.js); these documents keep a dated copy for audit.
+CONSENT_ITEMS.forEach(({ type, title, question, detail }) => put(`consentDefinitions/${type}`, meta({ type, title, version: CONSENT_FORM_VERSION, policyText: `${question} ${detail}`, effectiveFrom: "2026-11-23", status: "active" })));
 const consent = (id, studentName, guardianUid, type, response, choice) => put(`consentRecords/${id}`, { studentId: studentIds[studentName], classId: "c26-4", guardianUid, consentType: type, definitionId: type, definitionVersion: 1, response, choice, effectiveFrom: "2026-01-12", effectiveTo: "2026-12-31", createdAt: now, createdBy: guardianUid });
 consent("cr-aarav-photo", "Aarav Raman", uid.parent, "photoVideo", "granted", "parentPortal");
-consent("cr-aarav-portfolio", "Aarav Raman", uid.parent, "portfolioSharing", "granted", "parentPortal");
+consent("cr-aarav-website", "Aarav Raman", uid.parent, "websiteIdentification", "granted", null);
 consent("cr-aarav-showcase", "Aarav Raman", uid.parent, "publicShowcase", "granted", "publicFirstName");
 consent("cr-meiling-photo", "Mei Ling Tan", "seed-guardian", "photoVideo", "declined", "internalOnly");
 

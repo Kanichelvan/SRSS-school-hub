@@ -36,7 +36,7 @@ export const siteNav = [
     label: "Resources",
     href: "/#news",
     intro: "Forms, dates, news and the documents families use most.",
-    links: [["Forms", "/hub/forms"], ["Useful links", null], ["Parents’ handbook", null], ["Calendar", "/#events-title"], ["News", "/#news"], ["Monthly events", "/#events-title"]],
+    links: [["Forms", "/hub/forms"], ["Useful links", null], ["Parents’ handbook", null], ["Calendar", "/#events-title"], ["News", "/#news"], ["Monthly events", "/#events-title"], ["Legal & policies", "/legal"]],
   },
   {
     label: "Hubs",

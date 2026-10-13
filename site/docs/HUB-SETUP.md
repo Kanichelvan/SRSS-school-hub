@@ -15,7 +15,7 @@ Sources: *SRSS Digital Hub Master PRD & Developer PRD v1.0*, *SRSS25 Digital Hub
 | Files | Google Shared Drives for documents and media (the hub stores metadata and links); Firebase Storage only for narrow cases (`storage.rules`) |
 | Hosting | Firebase Hosting (`firebase.json`) for both the public site and the hub; `server.mjs` only previews a local `dist/` build |
 
-The public site and the hub share one codebase. `src/main.jsx` loads the hub (and Firebase) only on `/sign-in`, `/hub`, `/login` and `/dashboard`.
+The public site and the hub share one codebase. `src/main.jsx` loads the hub (and Firebase) only on `/sign-in`, `/hub`, `/login`, `/dashboard`, `/portal` and retired prototype aliases. Hub screen groups are loaded lazily from `src/hub/HubApp.jsx`.
 
 ### Where things live
 
@@ -46,7 +46,7 @@ No Firebase account is needed; everything runs against the offline `demo-srss` p
 2. Terminal 1: `npm run emulators` (Auth, Firestore, Functions, Storage; UI at http://localhost:4000).
 3. Terminal 2: `npm run seed` — 13 demo accounts (one per role), 36 fictional pupils, a week of attendance, consents, portfolio, admissions.
 4. Terminal 3: `npm run dev`, open `/sign-in` and use **Local demo accounts**.
-5. Tests: `npm test` (unit) and `npm run test:rules` (security rules against the emulator).
+5. Tests: `npm test` (unit) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records).
 
 ### This Mac: iCloud "Optimize Mac Storage"
 
@@ -71,11 +71,13 @@ No Firebase account is needed; everything runs against the offline `demo-srss` p
 
 ### B. Firebase project
 
-1. Create the project in region `asia-southeast1`; Blaze plan (Cloud Functions require it; school-scale usage stays within free allowances — set a budget alert).
+The production project is **SRSSDigitalHub** (project ID `srssdigitalhub`, number 181411841169), created 13 Oct 2026. `.firebaserc` keeps `demo-srss` as the default so local emulators never touch it; production commands add `--project production`.
+
+1. Set the Firestore and Storage location to `asia-southeast1`; Blaze plan (Cloud Functions require it; school-scale usage stays within free allowances — set a budget alert).
 2. Authentication: enable Google, Email/Password and Email link; add the production domain to Authorized domains.
 3. Register a Web app; copy its config into `.env.local` (see `.env.example`), set `VITE_USE_EMULATORS=false` and `VITE_WORKSPACE_DOMAIN`.
-4. Point `.firebaserc` at the project, then deploy: `npx firebase deploy --only firestore,storage,functions,hosting`. Move the existing website content in once: `node scripts/import-legacy-content.mjs --project <id>`.
-5. Bootstrap the first access administrator: `gcloud auth application-default login`, then `node scripts/grant-access-admin.mjs --project <id> --email <office-lead@domain> --roles schoolAdmin`.
+4. Deploy: `npx firebase deploy --project production --only firestore,storage,functions,hosting`. Move the existing website content in once: `node scripts/import-legacy-content.mjs --project srssdigitalhub`.
+5. Bootstrap the first access administrator: `gcloud auth application-default login`, then `node scripts/grant-access-admin.mjs --project srssdigitalhub --email <office-lead@domain> --roles schoolAdmin`.
 6. Create `settings/school` with `currentAcademicYearId`, then academic years, terms, standards, classes, subjects and teacher assignments.
 7. Schedule daily Firestore exports to Cloud Storage and test a restore each term.
 8. Consider App Check for the web app (PRD §46).

@@ -4,11 +4,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, limit, orderBy, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
-import { db, functions } from "../../lib/firebase";
+import { db } from "../../lib/firebase-firestore";
+import { functions } from "../../lib/firebase-functions";
 import { useAuth } from "../../auth/AuthProvider";
 import { can } from "../../auth/permissions";
 import { getMany, list, useLoad } from "../data";
 import { HUMAN_VALUES } from "../logic/dashboard";
+import { CONSENT_ITEMS, isCurrent, missingItems } from "../consentForm";
+import { ChildConsent } from "./consent";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, formatDate } from "../ui";
 
 const PIPELINE = [["new", "Enquiry"], ["visitBooked", "Visit / tour"], ["started", "Application started"], ["submitted", "Submitted"], ["documentsPending", "Documents pending"], ["underReview", "Under review"], ["interview", "Interview / assessment"], ["offer", "Offer"], ["accepted", "Accepted"], ["enrolled", "Enrolled"]];
@@ -53,20 +56,53 @@ function EnrolControl({ application, classes, onEnrol }) {
 }
 
 export function ConsentOverview() {
-  const { data, loading, error } = useLoad(async () => {
-    const [definitions, statuses, students] = await Promise.all([list("consentDefinitions", where("status", "==", "active")), list("studentConsentStatus"), list("students", where("status", "==", "active"))]);
-    return { definitions, statuses, students };
+  const auth = useAuth();
+  const canRemind = auth.roles.some((role) => ["schoolAdmin", "privacySteward"].includes(role));
+  const [busy, setBusy] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [paperFor, setPaperFor] = useState(null);
+  const [entered, setEntered] = useState([]); // paper answers saved this visit; the server updates the totals moments later
+  const { data, loading, error, reload } = useLoad(async () => {
+    const [statuses, students, reminders] = await Promise.all([list("studentConsentStatus"), list("students", where("status", "==", "active")), list("consentReminders")]);
+    return { statuses: Object.fromEntries(statuses.map((status) => [status.id, status.types || {}])), students, reminders: Object.fromEntries(reminders.map((item) => [item.id, item])) };
   }, []);
+  const waiting = (data?.students || []).map((student) => ({ ...student, missing: missingItems(data.statuses[student.id]) })).filter((student) => student.missing.length && !entered.includes(student.id))
+    .sort((a, b) => (a.currentStandard || 0) - (b.currentStandard || 0) || String(a.name).localeCompare(String(b.name)));
+
+  async function remind(studentIds) {
+    setBusy(studentIds.length === 1 ? studentIds[0] : "all"); setMessage(null);
+    try {
+      const { data: result } = await httpsCallable(functions, "sendConsentReminders")({ studentIds });
+      const noAccount = result.withoutAccount.length ? `${result.withoutAccount.length} ${result.withoutAccount.length === 1 ? "pupil has" : "pupils have"} no parent account yet. Use “Paper form” to print a copy, then enter the signed answers.` : "";
+      setMessage(result.notified ? `Reminder sent to ${result.notified} ${result.notified === 1 ? "family account" : "family accounts"}. ${noAccount}`.trim() : `No reminder sent. ${noAccount}`);
+      reload();
+    } catch (reason) { setMessage(reason.message); }
+    setBusy(null);
+  }
+
   return <>
-    <PageHeader kicker="SRSS Govern" title="Consent centre">Granular, versioned consent. Records are append-only; withdrawals never overwrite history.</PageHeader>
+    <PageHeader kicker="SRSS Govern" title="Consent">Families answer a few yes or no questions for each child in the Parents Hub. Their answers apply straight away; nothing here needs approval.</PageHeader>
     <ErrorNote error={error} />
     {loading ? <Loading /> : <>
-      <div className="hub-consent-grid">{data.definitions.map((definition) => {
-        const responses = data.students.map((student) => data.statuses.find((status) => status.id === student.id)?.types?.[definition.type]?.response);
-        return <article key={definition.id} className="hub-card"><strong>{definition.title}</strong><small>Version {definition.version} · review {formatDate(definition.reviewDate, { day: "numeric", month: "short", year: "numeric" })}</small>
-          <div className="hub-consent-bars"><span className="granted" style={{ flexGrow: responses.filter((r) => r === "granted").length }} /><span className="declined" style={{ flexGrow: responses.filter((r) => r === "declined" || r === "withdrawn").length }} /><span className="missing" style={{ flexGrow: responses.filter((r) => !r).length }} /></div>
-          <p>{responses.filter((r) => r === "granted").length} granted · {responses.filter((r) => r === "declined" || r === "withdrawn").length} declined · {responses.filter((r) => !r).length} awaiting</p></article>;
+      <div className="hub-consent-grid">{CONSENT_ITEMS.map((item) => {
+        const responses = data.students.map((student) => { const entry = data.statuses[student.id]?.[item.type]; return isCurrent(entry) ? entry.response : null; });
+        const granted = responses.filter((r) => r === "granted").length; const declined = responses.filter((r) => r === "declined" || r === "withdrawn").length; const awaiting = responses.filter((r) => !r).length;
+        return <article key={item.type} className="hub-card"><strong>{item.title}</strong>
+          <div className="hub-consent-bars"><span className="granted" style={{ flexGrow: granted }} /><span className="declined" style={{ flexGrow: declined }} /><span className="missing" style={{ flexGrow: awaiting }} /></div>
+          <p>{granted} yes · {declined} no · {awaiting} waiting</p></article>;
       })}</div>
+      <Section title={`Waiting for families (${waiting.length})`} action={canRemind && waiting.length > 0 ? <button type="button" className="hub-button hub-button-small" disabled={busy !== null} onClick={() => remind(waiting.map((student) => student.id))}>{busy === "all" ? "Sending…" : "Remind all"}</button> : null}>
+        {message && <p className="hub-status" role="status">{message}</p>}
+        {!waiting.length ? <EmptyState title="Every family has answered.">New pupils appear here until their parents answer.</EmptyState> : <ul className="hub-waiting">{waiting.map((student) => {
+          const reminder = data.reminders[student.id];
+          return <li key={student.id}>
+            <div><strong>{student.name}</strong><span>{student.currentStandard ? `Standard ${student.currentStandard}` : "—"} · {student.missing.length === CONSENT_ITEMS.length ? "Not started" : `${student.missing.length} of ${CONSENT_ITEMS.length} left`}{reminder?.lastSentAt ? ` · reminded ${formatDate(reminder.lastSentAt)}` : ""}</span></div>
+            {canRemind && <div className="hub-waiting-actions"><button type="button" className="hub-button hub-button-small hub-button-quiet" disabled={busy !== null} onClick={() => remind([student.id])}>{busy === student.id ? "Sending…" : "Send reminder"}</button><button type="button" className="hub-button hub-button-small hub-button-quiet" aria-expanded={paperFor === student.id} onClick={() => setPaperFor(paperFor === student.id ? null : student.id)}>Paper form</button></div>}
+            {paperFor === student.id && <div className="hub-paper-panel"><p className="hub-hint"><Link to={`/hub/consent/print/${student.id}`}>Print {student.preferredName || student.name}’s form</Link> for the family to sign, then enter their answers here.</p><ChildConsent office child={student} status={data.statuses[student.id]} onSaved={() => { setPaperFor(null); setEntered((ids) => [...ids, student.id]); setMessage(`Paper answers saved for ${student.name}.`); window.setTimeout(reload, 4000); }} /></div>}
+          </li>;
+        })}</ul>}
+      </Section>
+      <p className="hub-hint"><Link to="/hub/consent/print">Print a blank consent form</Link> for new families. Answers are kept as a permanent history: a change is added as a new record and never overwrites the old one. Reminders appear in the family’s hub notifications.</p>
     </>}
   </>;
 }
@@ -110,4 +146,3 @@ export function Audit() {
     {loading ? <Loading /> : <DataTable rows={data} searchKeys={["type", "path"]} exportName="srss-audit" columns={[{ key: "at", label: "When", sortValue: (row) => row.at?.seconds || 0, render: (row) => formatDate(row.at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) }, { key: "type", label: "Event" }, { key: "path", label: "Record", render: (row) => row.path || row.targetUid || "—" }, { key: "fields", label: "Fields", render: (row) => row.fields?.join(", ") || "—" }]} empty="No audit events yet." />}
   </>;
 }
-

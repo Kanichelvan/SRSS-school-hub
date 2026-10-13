@@ -1,26 +1,33 @@
+import { Suspense, lazy } from "react";
 import { BrowserRouter, Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "../auth/AuthProvider";
 import { MODULES, ROLES, can, canOpen } from "../auth/permissions";
 import { HUB_LABELS, ROUTE_ALIASES, hubIndex, hubRoutes } from "./routes";
 import { SignIn } from "./SignIn";
-import { AdminDashboard, ParentDashboard, StudentDashboard, TeacherDashboard } from "./screens/dashboards";
-import { Academics, StaffDirectory, Student360, StudentRegister } from "./screens/records";
-import { AttendanceHome, AttendanceOverview, ChildAttendance } from "./screens/attendance";
-import { Journey, MyChildren } from "./screens/family";
-import { Announcements, Calendar, Notifications, Profile } from "./screens/comms";
-import { Admissions, Audit, ConsentOverview, Showcase } from "./screens/admin";
-import { Content, Inbox } from "./screens/content";
 import { getMany, useLoad } from "./data";
 import { EmptyState, Loading, PageHeader, Section } from "./ui";
 import "./hub.css";
 
+const lazyNamed = (loader, name) => lazy(() => loader().then((module) => ({ default: module[name] })));
+const dashboards = () => import("./screens/dashboards");
+const records = () => import("./screens/records");
+const attendance = () => import("./screens/attendance");
+const family = () => import("./screens/family");
+const comms = () => import("./screens/comms");
+const admin = () => import("./screens/admin");
+const content = () => import("./screens/content");
+const consent = () => import("./screens/consent");
+
+const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
+
 const SCREENS = {
-  adminDashboard: AdminDashboard, teacherDashboard: TeacherDashboard, parentDashboard: ParentDashboard, studentDashboard: StudentDashboard,
-  studentRegister: StudentRegister, student360: Student360, staffDirectory: StaffDirectory, academics: Academics,
-  attendance: AttendanceHome, attendanceOverview: AttendanceOverview, childAttendance: ChildAttendance,
-  myChildren: MyChildren, journey: Journey, myClasses: MyClasses,
-  announcements: Announcements, calendar: Calendar, notifications: Notifications, profile: Profile,
-  admissions: Admissions, consentOverview: ConsentOverview, showcase: Showcase, content: Content, inbox: Inbox, audit: Audit,
+  adminDashboard: lazyNamed(dashboards, "AdminDashboard"), teacherDashboard: lazyNamed(dashboards, "TeacherDashboard"), parentDashboard: lazyNamed(dashboards, "ParentDashboard"), studentDashboard: lazyNamed(dashboards, "StudentDashboard"),
+  studentRegister: lazyNamed(records, "StudentRegister"), student360: lazyNamed(records, "Student360"), staffDirectory: lazyNamed(records, "StaffDirectory"), academics: lazyNamed(records, "Academics"),
+  attendance: lazyNamed(attendance, "AttendanceHome"), attendanceOverview: lazyNamed(attendance, "AttendanceOverview"), childAttendance: lazyNamed(attendance, "ChildAttendance"),
+  myChildren: lazyNamed(family, "MyChildren"), journey: lazyNamed(family, "Journey"), myClasses: MyClasses,
+  announcements: lazyNamed(comms, "Announcements"), calendar: lazyNamed(comms, "Calendar"), notifications: lazyNamed(comms, "Notifications"), profile: lazyNamed(comms, "Profile"),
+  admissions: lazyNamed(admin, "Admissions"), consentOverview: lazyNamed(admin, "ConsentOverview"), showcase: lazyNamed(admin, "Showcase"), audit: lazyNamed(admin, "Audit"),
+  content: lazyNamed(content, "Content"), inbox: lazyNamed(content, "Inbox"), parentConsent: lazyNamed(consent, "ParentConsent"), consentPrint: lazyNamed(consent, "ConsentPrint"),
 };
 
 function routeAllowed(route, auth) {
@@ -72,7 +79,7 @@ function Shell() {
     </header>
     <div className="hub-body">
       <nav aria-label="Hub navigation" className="hub-nav">{nav.map(({ hub, routes }) => <div key={hub}>{hub !== "dashboard" && <p>{HUB_LABELS[hub]}</p>}<ul>{routes.map((route) => <li key={route.path}><NavLink to={route.path} end>{route.index ? "Dashboard" : route.label}{MODULES[route.module]?.phase > 1 && <span className="hub-phase" title={`Planned for phase ${MODULES[route.module].phase}`}>P{MODULES[route.module].phase}</span>}</NavLink></li>)}</ul></div>)}</nav>
-      <main className="hub-main" id="hub-main"><Outlet /></main>
+      <main className="hub-main" id="hub-main"><Suspense fallback={null}><StaffAcknowledgementCard /></Suspense><Outlet /></main>
     </div>
     <HubFooter />
   </div>;
@@ -82,7 +89,7 @@ function Guarded({ route }) {
   const auth = useAuth();
   if (!routeAllowed(route, auth)) return <Unauthorized />;
   const Screen = route.screen && SCREENS[route.screen];
-  return Screen ? <Screen /> : <ModulePlaceholder route={route} />;
+  return Screen ? <Suspense fallback={<Loading />}><Screen /></Suspense> : <ModulePlaceholder route={route} />;
 }
 
 // Modules scheduled for later phases: route, navigation and access boundary exist; the workflow follows.
@@ -140,7 +147,7 @@ export function HubApp() {
 export function HubFooter() {
   return <footer className="hub-footer">
     <div><strong>Sekolah Rendah Sathya Sai</strong><span>6, Jalan Puchong, Taman Tan Yew Lai, 58200 Kuala Lumpur · <a href="tel:+60126001926">+60 12-600 1926</a> · <a href="mailto:saischoolpuchong@gmail.com">saischoolpuchong@gmail.com</a></span></div>
-    <nav aria-label="Hub footer"><a href="/">School website</a><a href="/about#top">About us</a><a href="/faq">FAQ</a><a href="/#contact">Contact the school</a></nav>
-    <small>© 2026 Sekolah Rendah Sathya Sai</small>
+    <nav aria-label="Hub footer"><a href="/">School website</a><a href="/faq">FAQ</a><a href="/#contact">Contact the school</a><a href="/legal/privacy-policy">Privacy Policy</a><a href="/legal/terms-of-use">Terms of Use</a><a href="/legal/child-protection#s-4">Child Safeguarding</a><a href="/legal">All Policies →</a></nav>
+    <small>© {new Date().getFullYear()} Sekolah Rendah Sathya Sai. All rights reserved. · SRSS Digital Hub — an SSIOM Digital Initiative. Platform software © SSIOM.</small>
   </footer>;
 }

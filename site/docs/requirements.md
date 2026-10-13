@@ -27,5 +27,5 @@ Additional PRD capabilities in place: audit trail triggers (§42), absence notif
 2. SIS editing: student, guardian and link forms; class and enrolment setup; CSV import from cleaned master lists.
 3. Parent consent form (versioned choices, revision/withdrawal) and the generic Forms & Actions renderer.
 4. Teacher portfolio entry and Human Values observation forms (Drive evidence links).
-5. ~~CMS editor and wiring public News/Events to Firestore; role router → `/sign-in`~~ (done 10 Oct 2026). Image library done 10 Oct 2026 (Content → Image library: browser-side resize to WebP, Storage `media/public/**`, `mediaRegistry` with required alt text and a pupil-consent check, picker on every image field). Next: publicAchievements editor.
+5. ~~CMS editor and wiring public News/Events to Firestore; role router → `/sign-in`~~ (done 10 Oct 2026). Image library hardened 12 Oct 2026 (Content → Image library: browser-side resize to WebP, consent-checked staging registry, matching Storage object, anonymous read only after approval, picker on every image field). Next: publicAchievements editor.
 6. Messages (threads), event registration, Google Calendar sync decision.

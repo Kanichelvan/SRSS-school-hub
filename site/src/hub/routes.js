@@ -32,6 +32,7 @@ export const hubRoutes = [
   // Parent — My Children | Progress | Attendance | Portfolio | Tasks | Reports | Fees | Meetings
   { path: "/hub/parent", hub: "parent", label: "Family dashboard", module: "dashboard", google: ["Calendar"], screen: "parentDashboard", index: true },
   { path: "/hub/parent/children", hub: "parent", label: "My children", module: "students", google: [], screen: "myChildren" },
+  { path: "/hub/parent/consent", hub: "parent", label: "Consent choices", module: "consent", google: [], screen: "parentConsent" },
   { path: "/hub/parent/progress", hub: "parent", label: "Progress", module: "assessments", google: [] },
   { path: "/hub/parent/attendance", hub: "parent", label: "Attendance", module: "attendance", google: [], screen: "childAttendance" },
   { path: "/hub/parent/portfolio", hub: "parent", label: "Portfolio · My SRSS Journey", module: "portfolio", google: ["Drive"], screen: "journey" },
@@ -58,6 +59,7 @@ export const hubRoutes = [
   { path: "/hub/admin/assessments", hub: "admin", label: "Assessments", module: "assessments", google: ["Sheets"] },
   { path: "/hub/admin/communications", hub: "admin", label: "Communications", module: "announcements", google: ["Gmail", "Groups"], screen: "announcements" },
   { path: "/hub/admin/consent", hub: "admin", label: "Consent", module: "consent", google: [], screen: "consentOverview" },
+  { path: "/hub/consent/print/:studentId?", hub: "admin", label: "Printable consent form", module: "consent", google: [], screen: "consentPrint", hidden: true },
   { path: "/hub/admin/showcase", hub: "admin", label: "Showcase moderation", module: "showcase", google: ["Drive"], screen: "showcase" },
   { path: "/hub/admin/content", hub: "admin", label: "Content", module: "content", google: ["Drive"], screen: "content" },
   { path: "/hub/admin/inbox", hub: "admin", label: "Website inbox", module: "inbox", google: ["Gmail"], screen: "inbox" },

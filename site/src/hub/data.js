@@ -3,7 +3,7 @@
 // return is one the signed-in user may read (by studentId, classId, audience key or own uid).
 import { useCallback, useEffect, useState } from "react";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../lib/firebase-firestore";
 
 export const withId = (snap) => ({ id: snap.id, ...snap.data() });
 const chunks = (values, size = 30) => Array.from({ length: Math.ceil(values.length / size) }, (_, i) => values.slice(i * size, i * size + size));

@@ -1,9 +1,10 @@
-// Website image library: resize in the browser, upload to Storage (media/public/**), register in
-// Firestore `mediaRegistry`. Resizing keeps public pages fast (hero-size images stay well under the
-// performance budget in docs/architecture.md) and strips camera metadata such as GPS location.
-import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
+// Website image library: resize in the browser, register a consent-checked staging record, upload to
+// Storage, then approve the record. Storage rules keep bytes private until the registry is approved.
+// Resizing keeps public pages fast and strips camera metadata such as GPS location.
+import { collection, doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "../lib/firebase";
+import { db } from "../lib/firebase-firestore";
+import { storage } from "../lib/firebase-storage";
 
 export const MAX_EDGE = 2000;
 const ACCEPTED = /^image\/(jpeg|png|webp)$/;
@@ -38,17 +39,19 @@ export async function prepareImage(file, maxEdge = MAX_EDGE) {
 
 export async function uploadToLibrary({ prepared, alt, caption = "", containsPupils, consentChecked, uid }) {
   const record = doc(collection(db, "mediaRegistry"));
-  const storagePath = `media/public/${record.id}.${prepared.extension}`;
+  const storagePath = `media/public/${record.id}`;
   const fileRef = ref(storage, storagePath);
-  await uploadBytes(fileRef, prepared.blob, { contentType: prepared.contentType, cacheControl: "public, max-age=31536000, immutable" });
-  const url = await getDownloadURL(fileRef);
   const entry = {
-    url, storagePath, alt: alt.trim(), caption: caption.trim(), containsPupils, consentChecked: containsPupils ? consentChecked : false,
+    url: "", storagePath, alt: alt.trim(), caption: caption.trim(), containsPupils, consentChecked: containsPupils ? consentChecked : false,
     width: prepared.width, height: prepared.height, bytes: prepared.blob.size, contentType: prepared.contentType, originalName: prepared.originalName,
-    classification: "public", status: "approved", uploadedBy: uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), updatedBy: uid,
+    classification: "public", status: "staging", uploadedBy: uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp(), updatedBy: uid,
   };
   await setDoc(record, entry);
-  return { id: record.id, ...entry };
+  await uploadBytes(fileRef, prepared.blob, { contentType: prepared.contentType, cacheControl: "public, max-age=31536000, immutable" });
+  const url = await getDownloadURL(fileRef);
+  const approved = { ...entry, url, status: "approved", updatedAt: serverTimestamp() };
+  await updateDoc(record, { url, status: "approved", updatedAt: serverTimestamp(), updatedBy: uid });
+  return { id: record.id, ...approved };
 }
 
 export const formatBytes = (bytes) => (bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);

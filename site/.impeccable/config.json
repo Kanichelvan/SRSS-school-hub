@@ -20,6 +20,15 @@
         ],
         "createdAt": "2026-10-09T18:57:28.595Z",
         "reason": "Claude: L195 is the Student 360 tab underline (border-bottom on an unrounded tab button), a standard active-tab indicator"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/legal/legal.css"
+        ],
+        "createdAt": "2026-10-13T02:36:40.546Z",
+        "reason": "Claude: the navy left-ruled institution boxes (.legal-box, .legal-about) reproduce the user's MySAIYa / Sai SMS legal-page reference, which the user asked the legal pages to follow"
       }
     ]
   }

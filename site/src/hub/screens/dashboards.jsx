@@ -7,6 +7,7 @@ import { can } from "../../auth/permissions";
 import { announcementsFor, daysAgo, eventsFor, getMany, list, listIn, one, today, useLoad } from "../data";
 import { HUMAN_VALUES, attendanceByClass, attendanceSummary, completeness, followUpPrompts, nextClass, parentActions, todaysLessons } from "../logic/dashboard";
 import { ActionsRequired, ChildSwitcher, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, TrendBars, formatDate } from "../ui";
+import { CONSENT_FORM_VERSION, CONSENT_ITEMS } from "../consentForm";
 
 const greeting = () => { const hour = new Date().getHours(); return hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"; };
 const firstName = (auth) => (auth.user.displayName || auth.user.email || "").split(/[ @]/)[0];
@@ -162,7 +163,7 @@ export function ParentDashboard() {
   const { data, loading, error } = useLoad(async () => {
     const children = (await getMany("students", childIds)).sort((a, b) => (b.currentStandard || 0) - (a.currentStandard || 0));
     const [definitions, statuses, requests, fees] = await Promise.all([
-      list("consentDefinitions", where("status", "==", "active")),
+      CONSENT_ITEMS.map((item) => ({ ...item, version: CONSENT_FORM_VERSION })),
       getMany("studentConsentStatus", childIds),
       list("formSubmissions", where("requestedFromUid", "==", auth.user.uid), where("status", "==", "pending")),
       can(auth.roles, "fees", "V") ? listIn("studentFeeAssignments", "studentId", childIds) : [],

@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 import { addDoc, collection, doc, orderBy, serverTimestamp, setDoc, updateDoc, writeBatch } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db } from "../../lib/firebase-firestore";
 import { MAX_EDGE, formatBytes, prepareImage, uploadToLibrary } from "../media";
 import { useAuth } from "../../auth/AuthProvider";
 import { list, one, useLoad } from "../data";

@@ -39,9 +39,9 @@ export function parentActions({ children, consentDefinitions, consentStatus, for
   for (const child of children) {
     // Missing consents are grouped into one action per child so the list stays short and scannable.
     const status = consentStatus[child.id]?.types || {};
-    const missing = consentDefinitions.filter((definition) => !status[definition.type]);
-    if (missing.length === 1) actions.push({ kind: "consent", studentId: child.id, title: `${missing[0].title} consent awaiting your response`, childName: child.preferredName || child.name, to: `/hub/forms?consent=${missing[0].type}&student=${child.id}`, dueDate: null });
-    if (missing.length > 1) actions.push({ kind: "consent", studentId: child.id, title: `${missing.length} consent choices awaiting your response`, detail: missing.map((definition) => definition.title).join(", "), childName: child.preferredName || child.name, to: `/hub/forms?student=${child.id}`, dueDate: null });
+    const missing = consentDefinitions.filter((definition) => !status[definition.type] || (status[definition.type].version ?? 1) < (definition.version ?? 1));
+    if (missing.length === 1) actions.push({ kind: "consent", studentId: child.id, title: `${missing[0].title} consent awaiting your response`, childName: child.preferredName || child.name, to: `/hub/parent/consent?student=${child.id}`, dueDate: null });
+    if (missing.length > 1) actions.push({ kind: "consent", studentId: child.id, title: `${missing.length} consent choices awaiting your response`, detail: missing.map((definition) => definition.title).join(", "), childName: child.preferredName || child.name, to: `/hub/parent/consent?student=${child.id}`, dueDate: null });
     const fee = fees.find((item) => item.studentId === child.id);
     if (fee && fee.outstanding > 0) actions.push({ kind: "payment", studentId: child.id, title: `Outstanding fees: RM ${fee.outstanding.toLocaleString("en-MY")}`, childName: child.preferredName || child.name, to: "/hub/parent/fees", dueDate: fee.nextDueDate || null });
   }

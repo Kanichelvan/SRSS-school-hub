@@ -37,6 +37,9 @@ service cloud.firestore {
     function familyCanSee(studentId) { return isSelf(studentId) || isGuardianOf(studentId); }
     function staffCanSee(studentId, classId) { return wideStudentRead() || (teaching() && (inClassScope(classId) || isAssigned(studentId))); }
     function teacherCanWrite(studentId, classId) { return teaching() && (inClassScope(classId) || isAssigned(studentId)); }
+    function studentIsInClass(studentId, classId) {
+      return get(/databases/$(database)/documents/students/$(studentId)).data.get('currentClassId', '') == classId;
+    }
 
     // ---------- helpers ----------
     function data() { return request.resource.data; }
@@ -162,7 +165,11 @@ service cloud.firestore {
     }
     match /attendanceRecords/{recordId} {
       allow read: if staffCanSee(resource.data.studentId, resource.data.classId) || familyCanSee(resource.data.studentId);
-      allow create, update: if ((teaching() && inClassScope(data().classId)) || isAdmin()) && data().markedBy == uid()
+      allow create: if ((teaching() && inClassScope(data().classId) && studentIsInClass(data().studentId, data().classId)) || isAdmin())
+        && data().markedBy == uid()
+        && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other'];
+      allow update: if ((teaching() && inClassScope(resource.data.classId)) || isAdmin())
+        && unchanged(['studentId', 'classId', 'sessionId', 'date']) && data().markedBy == uid()
         && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other'];
     }
 
@@ -323,10 +330,24 @@ service cloud.firestore {
     match /consentRecords/{id} {
       allow read: if (signedIn() && resource.data.guardianUid == uid()) || hasAny(['privacySteward', 'schoolAdmin', 'leadership', 'auditor'])
         || staffCanSee(resource.data.studentId, resource.data.get('classId', ''));
-      allow create: if isGuardianOf(data().studentId) && data().guardianUid == uid()
-        && data().response in ['granted', 'declined', 'withdrawn'] && data().definitionVersion is int
-        && data().createdAt == request.time;
+      // A guardian answers for their own child; the office may enter answers from a signed paper form.
+      allow create: if data().response in ['granted', 'declined', 'withdrawn'] && data().definitionVersion is int
+        && data().createdAt == request.time
+        && ((isGuardianOf(data().studentId) && data().guardianUid == uid())
+          || (hasAny(['schoolAdmin', 'privacySteward']) && data().source == 'paperForm' && data().recordedBy == uid()
+              && data().guardianName is string && data().guardianName.size() > 1));
       allow update: if false;
+    }
+    // Written only by the sendConsentReminders function.
+    match /consentReminders/{studentId} {
+      allow read: if hasAny(['schoolAdmin', 'privacySteward', 'leadership']);
+      allow write: if false;
+    }
+    // Staff confidentiality and acceptable-use acknowledgement (framework Part V); one per person, versioned.
+    match /policyAcknowledgements/{userId} {
+      allow read: if signedIn() && (userId == uid() || hasAny(['schoolAdmin', 'privacySteward', 'leadership', 'auditor']));
+      allow create, update: if signedIn() && userId == uid() && data().uid == uid() && data().version is int
+        && data().acknowledgedAt == request.time && (resource == null || data().version > resource.data.version);
     }
     match /studentConsentStatus/{studentId} {
       allow read: if familyCanSee(studentId) || staffCanSee(studentId, resource.data.get('classId', ''))
@@ -430,15 +451,19 @@ service cloud.firestore {
     // confirm public-media consent was checked (CON-002). Files live at media/public/** in Storage.
     function mediaWriter() { return hasAny(['contentEditor', 'schoolAdmin', 'leadership']); }
     function mediaValid() {
-      return data().classification == 'public' && data().status in ['approved', 'archived']
+      return data().classification == 'public' && data().status in ['staging', 'approved', 'archived']
         && data().alt is string && data().alt.size() > 0 && data().alt.size() <= 250
         && data().storagePath is string && data().storagePath.matches('media/public/.+')
         && (data().get('containsPupils', true) == false || data().get('consentChecked', false) == true);
     }
     match /mediaRegistry/{id} {
       allow read: if isStaff() || (resource.data.classification == 'public' && resource.data.status == 'approved');
-      allow create: if mediaWriter() && mediaValid() && data().uploadedBy == uid() && data().status == 'approved';
-      allow update: if mediaWriter() && mediaValid() && unchanged(['storagePath', 'url', 'uploadedBy', 'createdAt']);
+      // Register a consent-checked staging record first. Storage rules consult it before accepting bytes;
+      // only the subsequent approved state is anonymously readable.
+      allow create: if mediaWriter() && mediaValid() && data().uploadedBy == uid() && data().status == 'staging'
+        && data().url == '' && data().storagePath == 'media/public/' + id;
+      allow update: if mediaWriter() && mediaValid() && unchanged(['storagePath', 'uploadedBy', 'createdAt'])
+        && (resource.data.url == '' || data().url == resource.data.url);
     }
 
     // ===================== GOVERNANCE =====================

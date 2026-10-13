@@ -26,7 +26,7 @@ Status: planning baseline, aligned on 9 Oct 2026 with the *SRSS Digital Hub Mast
 | Academics | Curriculum & academic pathway, Learning labs (→ `/#learning`) · Assessment structure (→ `/faq`) · Co-curricular and Enrichment activities (→ `/#school-life`) |
 | Admissions | Apply now, Registration (→ `/#enquiry`) · Admission process (→ `/#admissions`) · Entry requirements, Fee structure (→ `/faq`) · Refund policy (*Soon*) · Open house (→ calendar) · Contact details (→ `/#contact`) · Visit SRSS (opens the visit form) |
 | Student Life | Morning assembly, Well-being (→ `/resources/prayer-pledge-anthem#silent-sitting`) · Prayer & pledge (→ `…#prayers`) · Dress code, Leadership (*Soon*) · Achievements (→ `/#news`) · Facilities usage (→ `/about#campus`) |
-| Resources | Forms (→ `/hub/forms`) · Useful links, Parents’ handbook (*Soon*) · Calendar, Monthly events (→ calendar) · News (→ `/#news`) |
+| Resources | Forms (→ `/hub/forms`) · Useful links, Parents’ handbook (*Soon*) · Calendar, Monthly events (→ calendar) · News (→ `/#news`) · Legal & policies (→ `/legal`) |
 | Hubs | Student Hub · Teachers Hub · Parents Hub · Admin Hub (→ `/hub/{role}`, sign-in first) |
 
 Pages still to create so every item has its own home: Parent–Teacher Association, Refund policy, Dress code, Leadership, Useful links, Parents’ handbook, and dedicated pages for Fees, Entry requirements, Assessment, Uniform/transport/meals, Co-curricular and Enrichment (currently FAQ or homepage sections).
@@ -50,6 +50,7 @@ The existing approved homepage elements (role router, Values Garden, FAQ preview
 | Resources (utility) | `/resources` (public calendar, document vault with search/filter, emergency & key contacts) · *existing:* `/resources/prayer-pledge-anthem` · `/faq` |
 | Contact | `/contact` |
 | SRSS25 | `/srss25` (commemorative badge, 2002–2027 timeline, archival photos, gala registration — the homepage carries one band linking here, decision D5) · `/srss25/our-25-years` · `/srss25/timeline` · `/srss25/stories` · `/srss25/alumni` · `/srss25/celebrations` · `/srss25/legacy` |
+| Legal & policies | `/legal` (index, safeguarding route) · `/legal/terms-of-use` · `/legal/privacy-policy` · `/legal/child-protection` · `/legal/online-safeguarding` · `/legal/intellectual-property` · `/legal/media-consent` · `/legal/disclaimer` · `/legal/cookies` · `/legal/accessibility-complaints` · `/legal/data-protection-retention` · `/legal/parental-consent` — linked from the footer and Resources menu; status and approvals in `docs/legal-verification.md` |
 | Utility | `/sign-in` · `/verify/:certificateCode` (public certificate check, safe fields only) · `/search` (public content only) |
 
 Current implementation note: `/contact`, `/learning`, `/admissions` and `/news` currently resolve to homepage anchors; they become pages as content and owners are ready.

@@ -15,10 +15,17 @@ service firebase.storage {
     function me() { return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data; }
     function sizeUnder(mb) { return request.resource.size < mb * 1024 * 1024; }
 
-    // Website image library (registered in Firestore mediaRegistry). The hub resizes images before upload.
-    match /media/public/{path=**} {
-      allow read: if true;
-      allow create, update: if roles().hasAny(['contentEditor', 'schoolAdmin', 'leadership']) && sizeUnder(10)
+    // Website image library. The Firestore registry is created first and carries the consent decision.
+    // Bytes remain private while staging and become public only when that same record is approved.
+    match /media/public/{mediaId} {
+      function entry() { return firestore.get(/databases/(default)/documents/mediaRegistry/$(mediaId)).data; }
+      allow read: if entry().classification == 'public' && (entry().status == 'approved'
+        || (signedIn() && entry().status == 'staging' && entry().uploadedBy == request.auth.uid));
+      allow create: if roles().hasAny(['contentEditor', 'schoolAdmin', 'leadership'])
+        && entry().uploadedBy == request.auth.uid && entry().status == 'staging'
+        && entry().classification == 'public' && entry().storagePath == 'media/public/' + mediaId
+        && (entry().get('containsPupils', true) == false || entry().get('consentChecked', false) == true)
+        && sizeUnder(10)
         && request.resource.contentType.matches('image/(jpeg|png|webp)|application/pdf');
     }
 

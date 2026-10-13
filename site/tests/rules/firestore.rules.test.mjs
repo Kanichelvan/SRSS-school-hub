@@ -5,6 +5,7 @@ import { assertFails, assertSucceeds, initializeTestEnvironment } from "@firebas
 import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
 
 let env;
+const [firestoreHost, firestorePort = "8080"] = (process.env.FIRESTORE_EMULATOR_HOST || "127.0.0.1:8080").split(":");
 // Scope documents mirror what functions/scope.js derives.
 const people = {
   parent: { roles: ["parent"], childIds: ["stu-a"], familyClassIds: ["c4"], audienceKeys: ["school", "role:parents", "class:c4", "standard:4", "user:parent"] },
@@ -25,7 +26,7 @@ const anon = () => env.unauthenticatedContext().firestore();
 const seed = (path, data) => env.withSecurityRulesDisabled((ctx) => setDoc(doc(ctx.firestore(), path), data));
 
 before(async () => {
-  env = await initializeTestEnvironment({ projectId: "demo-srss-rules", firestore: { rules: await readFile(new URL("../../firestore.rules", import.meta.url), "utf8"), host: "127.0.0.1", port: 8080 } });
+  env = await initializeTestEnvironment({ projectId: "demo-srss-tests", firestore: { rules: await readFile(new URL("../../firestore.rules", import.meta.url), "utf8"), host: firestoreHost, port: Number(firestorePort) } });
 });
 after(() => env?.cleanup());
 beforeEach(async () => {
@@ -104,6 +105,13 @@ describe("ATT-001 / ATT-002 attendance", () => {
     await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/x"), { classId: "c4", studentId: "stu-a", status: "skipped", markedBy: "teacher" }));
     await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/y"), { classId: "c4", studentId: "stu-a", status: "present", markedBy: "someone-else" }));
   });
+  test("attendance identity and class membership cannot be rewritten", async () => {
+    await seed("attendanceRecords/stable", { sessionId: "c4_2026-10-01_am", classId: "c4", date: "2026-10-01", studentId: "stu-a", status: "present", markedBy: "teacher" });
+    await assertSucceeds(updateDoc(doc(as("teacher"), "attendanceRecords/stable"), { status: "late", markedBy: "teacher" }));
+    await assertFails(updateDoc(doc(as("teacher"), "attendanceRecords/stable"), { studentId: "stu-b", markedBy: "teacher" }));
+    await assertFails(updateDoc(doc(as("teacher"), "attendanceRecords/stable"), { classId: "c5", markedBy: "teacher" }));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/unrelated"), { sessionId: "c4_2026-10-02_am", classId: "c4", date: "2026-10-02", studentId: "stu-b", status: "present", markedBy: "teacher" }));
+  });
 });
 
 describe("POR-001 / CON-002 portfolio visibility and consent", () => {
@@ -135,9 +143,29 @@ describe("CON-001 / CON-006 consent", () => {
     await assertSucceeds(setDoc(doc(as("parent"), "consentRecords/new"), record));
     await assertFails(setDoc(doc(as("parent"), "consentRecords/new2"), { ...record, studentId: "stu-b" }));
   });
+  test("the office enters answers only from a signed paper form, naming the guardian", async () => {
+    const paper = { studentId: "stu-b", classId: "c5", guardianUid: null, guardianName: "Mrs Tan", recordedBy: "admin", source: "paperForm", consentType: "socialMedia", response: "declined", definitionVersion: 1, createdAt: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(as("admin"), "consentRecords/paper-1"), paper));
+    await assertFails(setDoc(doc(as("admin"), "consentRecords/paper-2"), { ...paper, source: "parentPortal" }));
+    await assertFails(setDoc(doc(as("teacher"), "consentRecords/paper-3"), { ...paper, recordedBy: "teacher" }));
+  });
   test("consent records are never overwritten", async () => {
     await assertFails(updateDoc(doc(as("parent"), "consentRecords/cr-1"), { response: "withdrawn" }));
     await assertFails(updateDoc(doc(as("admin"), "consentRecords/cr-1"), { response: "withdrawn" }));
+  });
+  test("only the office and leadership see reminder history, and only the server writes it", async () => {
+    await assertSucceeds(getDoc(doc(as("admin"), "consentReminders/stu-a")));
+    await assertFails(getDoc(doc(as("parent"), "consentReminders/stu-a")));
+    await assertFails(setDoc(doc(as("admin"), "consentReminders/stu-a"), { studentId: "stu-a" }));
+  });
+  test("staff acknowledge the confidentiality terms for themselves, once per version", async () => {
+    const ack = (who, version) => ({ uid: who, version, acknowledgedAt: serverTimestamp() });
+    await assertSucceeds(setDoc(doc(as("teacher"), "policyAcknowledgements/teacher"), ack("teacher", 1)));
+    await assertFails(setDoc(doc(as("teacher"), "policyAcknowledgements/admin"), ack("admin", 1)));
+    await assertFails(setDoc(doc(as("teacher"), "policyAcknowledgements/teacher"), ack("teacher", 1)));
+    await assertSucceeds(setDoc(doc(as("teacher"), "policyAcknowledgements/teacher"), ack("teacher", 2)));
+    await assertSucceeds(getDoc(doc(as("admin"), "policyAcknowledgements/teacher")));
+    await assertFails(getDoc(doc(as("parent"), "policyAcknowledgements/teacher")));
   });
 });
 
@@ -200,18 +228,21 @@ describe("PUB-002 CMS and public admissions", () => {
 });
 
 describe("PUB-002 / CON-002 website image library", () => {
-  const image = { url: "https://example.test/a.webp", storagePath: "media/public/a.webp", alt: "Pupils planting the values garden", classification: "public", status: "approved", containsPupils: true, consentChecked: true, uploadedBy: "editor", createdAt: serverTimestamp() };
+  const image = (id, changes = {}) => ({ url: "", storagePath: `media/public/${id}`, alt: "Pupils planting the values garden", classification: "public", status: "staging", containsPupils: true, consentChecked: true, uploadedBy: "editor", createdAt: serverTimestamp(), ...changes });
   test("editors register images with alt text and a consent check for pupil photos", async () => {
-    await assertSucceeds(setDoc(doc(as("editor"), "mediaRegistry/m1"), image));
-    await assertFails(setDoc(doc(as("editor"), "mediaRegistry/m2"), { ...image, alt: "" }));
-    await assertFails(setDoc(doc(as("editor"), "mediaRegistry/m3"), { ...image, consentChecked: false }));
-    await assertSucceeds(setDoc(doc(as("editor"), "mediaRegistry/m4"), { ...image, containsPupils: false, consentChecked: false }));
-    await assertFails(setDoc(doc(as("teacher"), "mediaRegistry/m5"), { ...image, uploadedBy: "teacher" }));
-    await assertFails(setDoc(doc(as("editor"), "mediaRegistry/m6"), { ...image, uploadedBy: "someone-else" }));
+    await assertSucceeds(setDoc(doc(as("editor"), "mediaRegistry/m1"), image("m1")));
+    await assertSucceeds(updateDoc(doc(as("editor"), "mediaRegistry/m1"), { url: "https://example.test/a.webp", status: "approved", updatedBy: "editor" }));
+    await assertFails(updateDoc(doc(as("editor"), "mediaRegistry/m1"), { url: "https://example.test/replacement.webp" }));
+    await assertFails(setDoc(doc(as("editor"), "mediaRegistry/m2"), image("m2", { alt: "" })));
+    await assertFails(setDoc(doc(as("editor"), "mediaRegistry/m3"), image("m3", { consentChecked: false })));
+    await assertSucceeds(setDoc(doc(as("editor"), "mediaRegistry/m4"), image("m4", { containsPupils: false, consentChecked: false })));
+    await assertFails(setDoc(doc(as("teacher"), "mediaRegistry/m5"), image("m5", { uploadedBy: "teacher" })));
+    await assertFails(setDoc(doc(as("editor"), "mediaRegistry/m6"), image("m6", { uploadedBy: "someone-else" })));
   });
   test("the file location cannot be rewritten; archived images leave the public listing", async () => {
-    await seed("mediaRegistry/m1", { ...image, createdAt: new Date() });
-    await assertFails(updateDoc(doc(as("editor"), "mediaRegistry/m1"), { storagePath: "media/public/other.webp" }));
+    await seed("mediaRegistry/m1", image("m1", { url: "https://example.test/a.webp", status: "approved", createdAt: new Date() }));
+    await assertFails(updateDoc(doc(as("editor"), "mediaRegistry/m1"), { storagePath: "media/public/other" }));
+    await assertFails(updateDoc(doc(as("editor"), "mediaRegistry/m1"), { url: "https://example.test/replacement.webp" }));
     await assertSucceeds(updateDoc(doc(as("editor"), "mediaRegistry/m1"), { status: "archived" }));
     await assertFails(getDoc(doc(anon(), "mediaRegistry/m1")));
   });

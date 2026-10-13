@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { BookOpen } from "@phosphor-icons/react/dist/csr/BookOpen";
 import { CalendarBlank } from "@phosphor-icons/react/dist/csr/CalendarBlank";
@@ -35,6 +35,11 @@ import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
 import { siteNav } from "./data/navigation.js";
+import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
+
+// Policy pages load on demand so their text never weighs on the homepage.
+const LegalPage = lazy(() => import("./legal/LegalPage.jsx"));
+const legalSlugFrom = (path) => (path === "/legal" || path === "/legal/" ? "" : path.startsWith("/legal/") ? path.slice(7).replace(/\/$/, "") : null);
 
 const values = [
   {
@@ -310,6 +315,7 @@ export function App() {
   const [isInspiration, setIsInspiration] = useState(() => window.location.pathname === "/about/inspiration");
   const [isFaq, setIsFaq] = useState(() => window.location.pathname === "/faq");
   const [isPrayerPage, setIsPrayerPage] = useState(() => window.location.pathname === "/resources/prayer-pledge-anthem");
+  const [legalSlug, setLegalSlug] = useState(() => legalSlugFrom(window.location.pathname));
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(null);
@@ -376,6 +382,9 @@ export function App() {
       setIsInspiration(inspirationRoute);
       setIsFaq(faqRoute);
       setIsPrayerPage(prayerPageRoute);
+      const legalRoute = legalSlugFrom(window.location.pathname);
+      setLegalSlug(legalRoute);
+      if (legalRoute !== null) return; // LegalPage sets its own title.
       document.title = voicesRoute ? "Voices of SRSS | Sekolah Rendah Sathya Sai" : inspirationRoute ? "Our Inspiration | Sekolah Rendah Sathya Sai" : prayerPageRoute ? "Prayer, Pledge & Anthem | SRSS" : aboutRoute ? "About SRSS | Sekolah Rendah Sathya Sai" : faqRoute ? "Frequently Asked Questions | SRSS" : "Sekolah Rendah Sathya Sai | Human Excellence";
     };
     handleRouteChange();
@@ -444,6 +453,8 @@ export function App() {
   ].filter((item) => item.date).sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 8), [managedContent.news, managedContent.events]);
   const tickerItems = useMemo(() => storyItems.slice(0, 6).map((item) => ({ id: `${item.type}-${item.id}`, date: item.date, title: item.title })), [storyItems]);
 
+  // The homepage already ends with Contact & visit, so the pre-footer invitation shows on other public pages.
+  const isHome = legalSlug === null && !isAbout && !isFaq && !isPrayerPage;
   const handleVisitSubmit = (event) => {
     event.preventDefault();
     setSent(true);
@@ -541,7 +552,7 @@ export function App() {
         </div>
       )}
 
-      {isVoices ? <VoicesPage /> : isInspiration ? <InspirationPage /> : isPrayerPage ? <PrayerPledgeAnthemPage /> : isAbout ? <AboutPage content={managedContent.about} onVisit={() => { setSent(false); setVisitOpen(true); }} /> : isFaq ? <FaqPage items={managedContent.faqs?.length ? managedContent.faqs : defaultFaqs} /> : <main id="main">
+      {legalSlug !== null ? <Suspense fallback={<main id="main" className="legal-page" />}><LegalPage slug={legalSlug} /></Suspense> : isVoices ? <VoicesPage /> : isInspiration ? <InspirationPage /> : isPrayerPage ? <PrayerPledgeAnthemPage /> : isAbout ? <AboutPage content={managedContent.about} onVisit={() => { setSent(false); setVisitOpen(true); }} /> : isFaq ? <FaqPage items={managedContent.faqs?.length ? managedContent.faqs : defaultFaqs} /> : <main id="main">
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="hero-copy">
             <p className="eyebrow">Sekolah Rendah Sathya Sai&nbsp;&nbsp;·&nbsp;&nbsp;Since 2002</p>
@@ -698,8 +709,8 @@ export function App() {
               <label>Parent / guardian name<input required name="parentName" autoComplete="name" /></label><label>Email address<input required name="email" type="email" autoComplete="email" /></label>
               <label>Child’s name<input required name="childName" /></label><label>Child’s age<select required name="childAge" defaultValue=""><option value="" disabled>Select age</option>{[5,6,7,8,9,10,11,12].map(age => <option key={age}>{age}</option>)}</select></label>
               <label>Current school<input name="currentSchool" /></label><label>How did you hear about SRSS?<select name="referralSource" defaultValue=""><option value="" disabled>Select one</option><option>Family or friend</option><option>Social media</option><option>School event</option><option>Online search</option><option>Other</option></select></label>
-              <label className="wide-label">Questions or anything you would like us to know<textarea name="questions" rows="3" /></label>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send enquiry <ArrowRight size={18} weight="bold" /></button>
-            </form>) : (contactSent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Thank you for writing.</h3><p>We will pass your message to the right person at school.</p></div> : <form className="school-form contact-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); try { await submitPublicForm("contactMessages", Object.fromEntries(new FormData(event.currentTarget))); setContactSent(true); } catch (reason) { setFormError(reason.message || "Your message could not be sent. Please try again."); } }}><label>Name<input required name="name" autoComplete="name" /></label><label>Email<input required name="email" type="email" autoComplete="email" /></label><label className="wide-label">Subject<select required name="subject" defaultValue=""><option value="" disabled>Select a subject</option><option>General</option><option>Admissions</option><option>Feedback</option><option>Other</option></select></label><label className="wide-label">Message<textarea required name="message" rows="5" /></label>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send message <ArrowRight size={18} weight="bold" /></button></form>)}
+              <label className="wide-label">Questions or anything you would like us to know<textarea name="questions" rows="3" /></label><p className="form-privacy wide-label">The School uses these details to reply to you, as described in our <a href="/legal/privacy-policy">Privacy Policy</a>.</p>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send enquiry <ArrowRight size={18} weight="bold" /></button>
+            </form>) : (contactSent ? <div className="form-success" role="status"><CheckCircle size={34} weight="duotone" /><h3>Thank you for writing.</h3><p>We will pass your message to the right person at school.</p></div> : <form className="school-form contact-form" onSubmit={async (event) => { event.preventDefault(); setFormError(""); try { await submitPublicForm("contactMessages", Object.fromEntries(new FormData(event.currentTarget))); setContactSent(true); } catch (reason) { setFormError(reason.message || "Your message could not be sent. Please try again."); } }}><label>Name<input required name="name" autoComplete="name" /></label><label>Email<input required name="email" type="email" autoComplete="email" /></label><label className="wide-label">Subject<select required name="subject" defaultValue=""><option value="" disabled>Select a subject</option><option>General</option><option>Admissions</option><option>Feedback</option><option>Other</option></select></label><label className="wide-label">Message<textarea required name="message" rows="5" /></label><p className="form-privacy wide-label">The School uses these details to reply to you, as described in our <a href="/legal/privacy-policy">Privacy Policy</a>.</p>{formError && <p className="form-error wide-label" role="alert">{formError}</p>}<button className="primary-button" type="submit">Send message <ArrowRight size={18} weight="bold" /></button></form>)}
           </div>
         </section>
 
@@ -720,36 +731,8 @@ export function App() {
       </main>}
 
 
-      <footer id="community">
-        <div className="footer-inner">
-          <div className="footer-about">
-            <div className="footer-brand">
-              <img src="/assets/srss-logo.png" alt="" />
-              <div><strong>Sekolah Rendah Sathya Sai</strong><span>Shaping Minds. Nurturing Hearts. Inspiring Lives.</span></div>
-            </div>
-            <p><strong>Sekolah Rendah Sathya Sai</strong> is a human value-based primary school dedicated to nurturing academic excellence, character, and compassionate leadership. Guided by the philosophy of Sathya Sai Educare, we inspire every child to discover the human values of Truth, Right Conduct, Peace, Love, and Nonviolence, empowering them to become confident learners and responsible global citizens.</p>
-          </div>
-          <address className="footer-contact">
-            <h2>Contact</h2>
-            <strong>Sekolah Rendah Sathya Sai</strong>
-            <span>6, Jalan Puchong, Taman Tan Yew Lai,<br />58200 Kuala Lumpur,<br />Wilayah Persekutuan Kuala Lumpur</span>
-            <a href="tel:+60126001926">+60 12-600 1926</a>
-            <a href="mailto:saischoolpuchong@gmail.com">saischoolpuchong@gmail.com</a>
-          </address>
-          <nav className="footer-quick-links" aria-label="Footer quick links">
-            <h2>Quick links</h2>
-            <a href="/about#top">About us</a>
-            <a href="/faq">FAQ</a>
-            <a href="/#contact">Visit SRSS</a>
-            <a href="/hub/student">Student Hub</a>
-            <a href="/hub/teacher">Teachers Hub</a>
-            <a href="/hub/admin">Admin Hub</a>
-            <a href="/hub/parent">Parents Hub</a>
-            <a href="/resources/prayer-pledge-anthem">Resources</a>
-          </nav>
-        </div>
-        <div className="footer-base"><span>© 2026 Sekolah Rendah Sathya Sai</span><button type="button" onClick={() => setVisitOpen(true)}>Contact the school</button></div>
-      </footer>
+      {!isHome && <PreFooter onVisit={() => { setSent(false); setVisitOpen(true); }} />}
+      <SiteFooter onVisit={() => { setSent(false); setVisitOpen(true); }} />
 
       <div className={`floating-actions${fabOpen ? " is-open" : ""}`}>
         <button type="button" className={`to-top${showTop ? " is-visible" : ""}`} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })} aria-label="Back to top" tabIndex={showTop ? 0 : -1} aria-hidden={!showTop}><ArrowUp size={20} weight="bold" /></button>
@@ -775,7 +758,7 @@ export function App() {
                   <label>Parent or guardian name<input required name="name" autoComplete="name" /></label>
                   <label>Email address<input required type="email" name="email" autoComplete="email" /></label>
                   <label>Child’s current year<select required defaultValue=""><option value="" disabled>Select a year</option><option>Preschool</option><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option><option>Year 5</option><option>Year 6</option></select></label>
-                  <button className="primary-button" type="submit">Request a visit <ArrowRight size={18} weight="bold" /></button>
+                  <p className="form-privacy">The School uses these details to arrange your visit, as described in our <a href="/legal/privacy-policy">Privacy Policy</a>.</p><button className="primary-button" type="submit">Request a visit <ArrowRight size={18} weight="bold" /></button>
                 </form>
               </>
             ) : (

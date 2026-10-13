@@ -1,14 +1,11 @@
-// Firebase client for the secure hub. Loaded only on /sign-in and /hub routes so the public site
-// bundle stays free of Firebase. With VITE_USE_EMULATORS=true (the default for local development)
-// everything runs against the local emulator suite using the offline "demo-srss" project.
+// Shared Firebase app configuration for the secure hub. Individual service clients live in
+// firebase-auth.js, firebase-firestore.js, firebase-functions.js and firebase-storage.js so
+// route-level code splitting does not pull every Firebase SDK into the authenticated core.
 import { initializeApp } from "firebase/app";
-import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import { connectFunctionsEmulator, getFunctions } from "firebase/functions";
-import { connectStorageEmulator, getStorage } from "firebase/storage";
 
 const env = import.meta.env;
 export const usingEmulators = env.VITE_USE_EMULATORS !== "false";
+export const emulatorHost = env.VITE_EMULATOR_HOST || "127.0.0.1";
 
 const config = {
   apiKey: env.VITE_FIREBASE_API_KEY || "demo-api-key",
@@ -22,15 +19,4 @@ const config = {
 export const workspaceDomain = env.VITE_WORKSPACE_DOMAIN || "";
 
 export const app = initializeApp(config);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export const functions = getFunctions(app, env.VITE_FIREBASE_REGION || "asia-southeast1");
-
-if (usingEmulators) {
-  const host = env.VITE_EMULATOR_HOST || "127.0.0.1";
-  connectAuthEmulator(auth, `http://${host}:9099`, { disableWarnings: true });
-  connectFirestoreEmulator(db, host, 8080);
-  connectStorageEmulator(storage, host, 9199);
-  connectFunctionsEmulator(functions, host, 5001);
-}
+export const firebaseRegion = env.VITE_FIREBASE_REGION || "asia-southeast1";
