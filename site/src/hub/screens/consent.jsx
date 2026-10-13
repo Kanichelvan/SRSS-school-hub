@@ -5,25 +5,25 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { doc, getDoc, serverTimestamp, setDoc, writeBatch, collection } from "firebase/firestore";
 import { db } from "../../lib/firebase-firestore";
 import { useAuth } from "../../auth/AuthProvider";
-import { getMany, today, useLoad } from "../data";
-import { ACKNOWLEDGEMENT, CONSENT_FORM_VERSION, CONSENT_ITEMS, consentQuestion, isCurrent, responseFor } from "../consentForm";
+import { consentItems, getMany, today, useLoad } from "../data";
+import { ACKNOWLEDGEMENT, CONSENT_FORM_VERSION, consentQuestion, formVersionLabel, isCurrent, responseFor } from "../consentForm";
 import { EmptyState, ErrorNote, Loading, PageHeader, formatDate } from "../ui";
 
 const answerFrom = (response) => (response === "granted" ? "yes" : response === "declined" || response === "withdrawn" ? "no" : "");
 
 // `office` mode records the answers from a signed paper form, for families without a hub account.
-export function ChildConsent({ child, status, guardian, office = false, onSaved }) {
+export function ChildConsent({ child, items, status, guardian, office = false, onSaved }) {
   const auth = useAuth();
   const name = child.preferredName || child.name?.split(" ")[0] || "your child";
-  const initial = useMemo(() => Object.fromEntries(CONSENT_ITEMS.map((item) => [item.type, isCurrent(status?.[item.type]) ? answerFrom(status[item.type].response) : ""])), [status]);
+  const initial = useMemo(() => Object.fromEntries(items.map((item) => [item.type, isCurrent(status?.[item.type], item) ? answerFrom(status[item.type].response) : ""])), [status, items]);
   const [answers, setAnswers] = useState(initial);
   const [acknowledged, setAcknowledged] = useState(false);
   const [paperName, setPaperName] = useState("");
   const [state, setState] = useState({ busy: false, saved: false, error: null });
   useEffect(() => setAnswers(initial), [initial]);
 
-  const unanswered = CONSENT_ITEMS.filter((item) => !answers[item.type]);
-  const changed = CONSENT_ITEMS.filter((item) => answers[item.type] && answers[item.type] !== initial[item.type]);
+  const unanswered = items.filter((item) => !answers[item.type]);
+  const changed = items.filter((item) => answers[item.type] && answers[item.type] !== initial[item.type]);
   const lastUpdated = Math.max(0, ...Object.values(status || {}).map((entry) => Number(entry.at) || 0)) || null;
 
   async function save(event) {
@@ -35,13 +35,13 @@ export function ChildConsent({ child, status, guardian, office = false, onSaved 
       const base = { studentId: child.id, classId: child.currentClassId || "", definitionVersion: CONSENT_FORM_VERSION, choice: null, effectiveFrom: today(), createdAt: serverTimestamp(), createdBy: auth.user.uid,
         ...(office ? { guardianUid: null, guardianName: paperName.trim(), recordedBy: auth.user.uid, source: "paperForm" } : { guardianUid: auth.user.uid, source: "parentPortal" }) };
       for (const item of changed) {
-        batch.set(doc(collection(db, "consentRecords")), { ...base, consentType: item.type, definitionId: item.type, response: responseFor(answers[item.type], status?.[item.type]?.response) });
+        batch.set(doc(collection(db, "consentRecords")), { ...base, consentType: item.type, definitionId: item.type, definitionVersion: item.version ?? CONSENT_FORM_VERSION, response: responseFor(answers[item.type], status?.[item.type]?.response) });
       }
       batch.set(doc(collection(db, "consentRecords")), { ...base, consentType: ACKNOWLEDGEMENT.type, definitionId: ACKNOWLEDGEMENT.type, response: "granted" });
       await batch.commit();
       setAcknowledged(false);
       setState({ busy: false, saved: true, error: null });
-      onSaved(child.id, Object.fromEntries(CONSENT_ITEMS.map((item) => [item.type, { response: responseFor(answers[item.type], status?.[item.type]?.response), version: CONSENT_FORM_VERSION, at: Date.now() }])));
+      onSaved(child.id, Object.fromEntries(items.map((item) => [item.type, { response: responseFor(answers[item.type], status?.[item.type]?.response), version: item.version ?? CONSENT_FORM_VERSION, at: Date.now() }])));
     } catch (reason) {
       setState({ busy: false, saved: false, error: reason.code === "permission-denied" ? (office ? "Your role can’t record consent. Ask the school office or the privacy steward." : "Your account isn’t linked to this child yet. Please contact the school office.") : "Your choices couldn’t be saved. Check your connection and try again." });
     }
@@ -54,7 +54,7 @@ export function ChildConsent({ child, status, guardian, office = false, onSaved 
         <dl>{!office && <div><dt>Parent or guardian</dt><dd>{guardian}</dd></div>}{lastUpdated && <div><dt>Last updated</dt><dd>{formatDate(lastUpdated, { day: "numeric", month: "short", year: "numeric" })}</dd></div>}</dl>
       </header>
       <ol className="hub-consent-items">
-        {CONSENT_ITEMS.map((item) => (
+        {items.map((item) => (
           <li key={item.type}>
             <fieldset>
               <legend><strong>{item.title}</strong><span>{consentQuestion(item, name)}</span></legend>
@@ -87,8 +87,8 @@ export function ParentConsent() {
   const [params] = useSearchParams();
   const [overrides, setOverrides] = useState({});
   const { data, loading, error } = useLoad(async () => {
-    const [children, statuses] = await Promise.all([getMany("students", childIds), getMany("studentConsentStatus", childIds)]);
-    return { children: children.sort((a, b) => (b.currentStandard || 0) - (a.currentStandard || 0)), statuses: Object.fromEntries(statuses.map((status) => [status.id, status.types || {}])) };
+    const [children, statuses, items] = await Promise.all([getMany("students", childIds), getMany("studentConsentStatus", childIds), consentItems()]);
+    return { items, children: children.sort((a, b) => (b.currentStandard || 0) - (a.currentStandard || 0)), statuses: Object.fromEntries(statuses.map((status) => [status.id, status.types || {}])) };
   }, [childIds.join("|")]);
   useEffect(() => { const id = params.get("student"); if (data && id) document.getElementById(`child-${id}`)?.scrollIntoView(); }, [data, params]);
   const guardian = auth.user.displayName || auth.user.email;
@@ -97,7 +97,7 @@ export function ParentConsent() {
     <PageHeader kicker="My family" title="Consent choices">A few yes or no questions for each child. Saying no will never stop your child taking part in lessons or school activities, and you can change your answers at any time.</PageHeader>
     <ErrorNote error={error} />
     {loading ? <Loading /> : !data.children.length ? <EmptyState title="No children are linked to this account yet.">Please contact the school office to link your account.</EmptyState> : <>
-      {data.children.map((child) => <ChildConsent key={child.id} child={child} guardian={guardian} status={{ ...data.statuses[child.id], ...overrides[child.id] }} onSaved={(id, types) => setOverrides((current) => ({ ...current, [id]: types }))} />)}
+      {data.children.map((child) => <ChildConsent key={child.id} child={child} items={data.items} guardian={guardian} status={{ ...data.statuses[child.id], ...overrides[child.id] }} onSaved={(id, types) => setOverrides((current) => ({ ...current, [id]: types }))} />)}
       <p className="hub-hint hub-consent-note">The School will always ask you separately before sharing anything with outside organisations or news media, and before any use not listed here. Read more in the <a href="/legal/media-consent" target="_blank" rel="noreferrer">Photography, Video, Student Work & Media Consent Policy</a> and the <a href="/legal/parental-consent" target="_blank" rel="noreferrer">Parental Consent Policy</a>.</p>
     </>}
   </>;
@@ -142,16 +142,18 @@ export function StaffAcknowledgement() {
 // Printable paper form for families without a hub account (Accessibility policy §5). Pre-filled when a pupil is given.
 export function ConsentPrint() {
   const { studentId } = useParams();
-  const { data: child } = useLoad(async () => (studentId ? (await getMany("students", [studentId]))[0] || null : null), [studentId]);
+  const { data } = useLoad(async () => ({ child: studentId ? (await getMany("students", [studentId]))[0] || null : null, items: await consentItems() }), [studentId]);
+  const child = data?.child;
+  const items = data?.items || [];
   const name = child ? child.preferredName || child.name?.split(" ")[0] : null;
   return (
     <div className="hub-print-form">
       <p className="hub-print-actions"><button type="button" className="hub-button" onClick={() => window.print()}>Print this form</button> <Link to="/hub/admin/consent">Back to consent</Link></p>
       <article>
-        <header><img src="/assets/srss-logo.png" alt="" /><div><strong>Sekolah Rendah Sathya Sai</strong><span>Consent choices · form version {CONSENT_FORM_VERSION}</span></div></header>
+        <header><img src="/assets/srss-logo.png" alt="" /><div><strong>Sekolah Rendah Sathya Sai</strong><span>Consent choices · form version {formVersionLabel(items)}</span></div></header>
         <p>Please answer each question, sign below and return this form to the school office. Saying no will never stop your child taking part in lessons or school activities. You can change your answers at any time by contacting the office or through the Parents Hub.</p>
         <dl><div><dt>Child’s name</dt><dd>{child?.name || ""}</dd></div><div><dt>Standard / class</dt><dd>{child?.currentStandard ? `Standard ${child.currentStandard}` : ""}</dd></div></dl>
-        <ol>{CONSENT_ITEMS.map((item) => <li key={item.type}><strong>{item.title}</strong><span>{consentQuestion(item, name)}</span><small>{item.detail}</small><em>☐ Yes &nbsp;&nbsp; ☐ No</em></li>)}</ol>
+        <ol>{items.map((item) => <li key={item.type}><strong>{item.title}</strong><span>{consentQuestion(item, name)}</span><small>{item.detail}</small><em>☐ Yes &nbsp;&nbsp; ☐ No</em></li>)}</ol>
         <p>I am this child’s parent or legal guardian, and I have read the Terms of Use and Privacy Policy at {window.location.host}/legal, or on request from the office.</p>
         <dl className="hub-print-sign"><div><dt>Parent or guardian name</dt><dd /></div><div><dt>Signature</dt><dd /></div><div><dt>Date</dt><dd /></div></dl>
         <footer>The School will always ask separately before sharing anything with outside organisations or news media. Questions: +60 12-600 1926 · saischoolpuchong@gmail.com</footer>

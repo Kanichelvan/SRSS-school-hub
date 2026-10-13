@@ -67,7 +67,7 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/about/our-people` | Our People | Own page | Leadership |
 | `/about/school-profile` | School Profile | Section of `/about#school-profile` | School office |
 | `/about/campus` | Campus | Section of `/about#campus` | School office |
-| `/about/silver-jubilee` | Silver Jubilee | Section of `/about#srss25` | Content editor |
+| `/about/silver-jubilee` | Silver Jubilee | Own page | Content editor |
 | `/learning` | Learning | Own page | Academic coordinator |
 | `/learning/curriculum` | Curriculum | Section of `/learning#curriculum` | Academic coordinator |
 | `/learning/learning-journey` | Learning Journey | Section of `/learning#learning-journey` | Academic coordinator |
@@ -78,11 +78,11 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/learning/learning-environment` | Learning Environment | Section of `/learning#learning-environment` | Academic coordinator |
 | `/student-life` | Student Life | Own page | Content editor |
 | `/student-life/events` | Events | Section of `/student-life#events` | Content editor |
-| `/student-life/sports` | Sports | Section of `/student-life#stories` | Content editor |
-| `/student-life/arts-culture` | Arts & Culture | Section of `/student-life#stories` | Content editor |
-| `/student-life/service` | Service | Section of `/student-life#stories` | Content editor |
-| `/student-life/leadership` | Student Leadership | Section of `/student-life#stories` | Content editor |
-| `/student-life/achievements` | Achievements | Section of `/student-life#stories` | Content editor |
+| `/student-life/sports` | Sports | Section of `/student-life#stories` (Sports stories only) | Content editor |
+| `/student-life/arts-culture` | Arts & Culture | Section of `/student-life#stories` (Arts & Culture stories only) | Content editor |
+| `/student-life/service` | Service | Section of `/student-life#stories` (Service stories only) | Content editor |
+| `/student-life/leadership` | Student Leadership | Section of `/student-life#stories` (Leadership stories only) | Content editor |
+| `/student-life/achievements` | Achievements | Section of `/student-life#stories` (Achievements stories only) | Content editor |
 | `/student-life/stories` | Stories | Section of `/student-life#stories` | Content editor |
 | `/student-life/gallery` | Gallery | Section of `/student-life#gallery` | Content editor |
 | `/join` | Join SRSS | Own page | Admissions officer |
@@ -158,23 +158,32 @@ The welcome names the school, not the platform: the Digital Hub is the platform,
 | Before the First Bell | `/resources/prayer-pledge-anthem`, featured in Student Life › A day at SRSS | Kept |
 | “Hubs” menu | Sign In → `/login` | Replaced |
 
-### Still to do (Phase 2, public website completion)
+### Phase 2 — public website completion
 
-These are standalone pages, written once verified content exists:
+Done (13 Oct 2026):
 
-- Our Story timeline and then-and-now photographs
-- Sathya Sai Education: replace the empty BODY + MIND + HEART + SPIRIT panel with an interactive four-dimension framework, and add the five values and the three H’s
-- Our People staff directory
-- School Profile and prospectus download
-- Silver Jubilee mini-site with its own sub-navigation
-- Curriculum detail
-- Learning Journey (Standard 1–6)
-- Enrichment
-- Reading & Library
-- Learning Support
-- Sports, Arts & Culture, Service, Leadership and Achievements: stories filtered by category, which needs a category on each story
-- How to Apply: required documents
-- Alumni registration and volunteer sign-up: public Google Forms are allowed for low-risk intake
+- **Sathya Sai Education** is a full page: the inspiration, Educare, five value cards in the petal colours (with "How children practise it"), an interactive Body · Mind · Heart · Spirit framework around Human Excellence (it also replaces the empty equation panel on About), Head, Heart and Hands, the global movement, Educare in action at SRSS, and questions.
+- **Silver Jubilee mini-site** at `/about/silver-jubilee`, with its own sub-navigation: journey themes, alumni memories, SRSS25 stories, SRSS25 events, ways to get involved, and a "Share your SRSS memory" form.
+- **One School Stories system.** The hub news editor offers the categories School News, Achievements, Academic, Sports, Arts & Culture, Service, Leadership, Community and SRSS25 (`src/data/stories.js`). Each Student Life page shows its own category, with chips to switch between them, and SRSS25 stories feed the Jubilee page.
+- **Community sign-ups.** Alumni registration, volunteering, support and SRSS25 memories are real forms. They land in the hub’s website inbox with their own subject, so there are no email links to manage.
+
+- **School-written pages.** Every page waiting on school content is listed in the hub under **Content › Website pages**, with its status:
+  - Our Story, School Profile, Campus;
+  - Curriculum, Learning Journey, Enrichment, Reading & Library, Learning Support, Learning Environment;
+  - How to Apply and Downloads;
+  - a staff directory added to Our People.
+
+  Each starts from one template: introduction, hero image, sections, timeline, people and documents. Empty parts aren’t shown. It goes through the usual draft → review → Leadership publishes workflow. Once published, the address becomes a full page automatically; until then it shows the matching section of its parent page. No developer is needed.
+
+Still waiting for verified content from the school, now written in the hub rather than by a developer:
+
+- Our Story timeline and then-and-now photographs: the dates in the codebase are unconfirmed and are not published.
+- Our People staff directory.
+- School Profile prospectus download.
+- Curriculum detail, Learning Journey (Standard 1–6), Enrichment, Reading & Library and Learning Support pages.
+- How to Apply required-documents list.
+- Silver Jubilee timeline, founders and pioneers, and anniversary projects.
+- The Integral education descriptions on Sathya Sai Education are new explanatory copy, and need a check by the school.
 
 ### Public content rules
 

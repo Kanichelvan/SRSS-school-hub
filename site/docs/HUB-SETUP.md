@@ -44,9 +44,9 @@ No Firebase account is needed; everything runs against the offline `demo-srss` p
    export JAVA_HOME="$HOME/.local/jdk-21/Contents/Home" PATH="$HOME/.local/jdk-21/Contents/Home/bin:$PATH"
    ```
 2. Terminal 1: `npm run emulators` (Auth, Firestore, Functions, Storage; UI at http://localhost:4000).
-3. Terminal 2: `npm run seed` — 13 demo accounts (one per role), 36 fictional pupils, a week of attendance, consents, portfolio, admissions.
+3. Terminal 2: `npm run seed` — the fictional 2027 demo school from `scripts/demo-data/school-2027.mjs`: 16 demo accounts (super admin, office, two teachers, two families, a pupil and the other roles), 36 fictional pupils with 2026 history, a week of attendance with one correction, portfolio entries, announcements and events. Re-running restores the same records; `npm run seed -- --reset` wipes the emulators first. The script refuses to run against anything but the local emulators.
 4. Terminal 3: `npm run dev`, open `/sign-in` and use **Local demo accounts**.
-5. Tests: `npm test` (unit) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records).
+5. Tests: `npm test` (unit), `npm run test:e2e` (the admin → teacher → parent journey and the access denials, against Auth, Firestore and Functions emulators) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records). `scripts/test-rules.mjs` runs the emulators with `HTTPS_PROXY`/`HTTP_PROXY` removed, because firebase-tools would otherwise send the Storage emulator's registry lookups to the Firestore emulator through the proxy (it ignores `NO_PROXY`) and treat the failure as a missing record.
 
 ### This Mac: iCloud "Optimize Mac Storage"
 
@@ -85,3 +85,14 @@ The production project is **SRSSDigitalHub** (project ID `srssdigitalhub`, numbe
 ### C. Data and governance (Phase 0)
 
 Clean and assign IDs to student, guardian and staff master lists; define guardian ↔ student links with relationship and portal access; confirm the consent definitions and versions; name an owner and review cycle for every content area and integration (PRD §51, §62).
+
+## Roles, accounts and the first Super Administrator
+
+- Six main roles: Super Administrator (`superAdmin`), School Administrator (`schoolAdmin`), Teacher, Parent, Student, Content Editor; other roles (Class Teacher, Portfolio Moderator, Leadership…) are added to a person as extra responsibilities.
+- Accounts are created from the Students, Parents & guardians or Staff page (“Create account”), which calls the `provisionAccount` function: it creates the sign-in account with no password, gives it its roles and links it to the person record. People then sign in with Google or “Email me a sign-in link”.
+- The school office can give family and teacher roles. Administrator and other staff roles, and disabling staff accounts, need a Super Administrator. Nobody changes their own roles.
+- Bootstrap the first Super Administrator once on the real project: `node scripts/grant-access-admin.mjs --project srssdigitalhub --email <person> --roles superAdmin` (needs `gcloud auth application-default login`). They then sign out and back in.
+
+## Each new academic year
+
+Admin › School setup wizard: add the year and its terms → copy last year's classes → choose class teachers and carry teacher assignments forward → promote pupils (Standard 6 graduate) → check guardian links → make the year current. Earlier years' enrolments and assignments stay as history; activating the year moves every account to its new classes within a minute (`scopeOnSchoolYear`).

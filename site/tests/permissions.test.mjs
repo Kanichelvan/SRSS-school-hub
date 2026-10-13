@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { MODULES, ROLE_IDS, can, canOpen, hubsFor, matrixForTesting, primaryHub } from "../src/auth/permissions.js";
-import { ROLE_IDS as FUNCTION_ROLE_IDS } from "../functions/roles.js";
+import { MODULES, OFFICE_ASSIGNABLE_ROLES, PRIMARY_ROLES, ROLE_IDS, assignableRoles, can, canOpen, hubsFor, isElevated, matrixForTesting, primaryHub } from "../src/auth/permissions.js";
+import { OFFICE_ASSIGNABLE_ROLES as FUNCTION_OFFICE_ROLES, ROLE_IDS as FUNCTION_ROLE_IDS } from "../functions/roles.js";
 import { hubRoutes } from "../src/hub/routes.js";
 import { authErrorMessage } from "../src/auth/authErrors.js";
 
@@ -14,6 +14,31 @@ test("every matrix cell names a known role and module", () => {
 
 test("Cloud Functions accept exactly the hub roles", () => {
   assert.deepEqual([...FUNCTION_ROLE_IDS].sort(), [...ROLE_IDS].sort());
+  assert.deepEqual([...FUNCTION_OFFICE_ROLES].sort(), [...OFFICE_ASSIGNABLE_ROLES].sort());
+});
+
+test("the six initial roles exist; a person can hold several", () => {
+  assert.deepEqual(PRIMARY_ROLES, ["superAdmin", "schoolAdmin", "teacher", "parent", "student", "contentEditor"]);
+  assert.deepEqual(hubsFor(["teacher", "parent"]), ["teacher", "parent"]);
+  assert.equal(primaryHub(["superAdmin"]), "admin");
+});
+
+test("only a Super Administrator can grant elevated roles; the office grants family and teacher roles", () => {
+  assert.deepEqual(assignableRoles(["superAdmin"]), ROLE_IDS);
+  assert.deepEqual(assignableRoles([], { accessAdmin: true }), ROLE_IDS);
+  assert.deepEqual(assignableRoles(["schoolAdmin"]).sort(), [...OFFICE_ASSIGNABLE_ROLES].sort());
+  for (const role of ["schoolAdmin", "superAdmin", "leadership", "contentEditor"]) assert.equal(isElevated(role), true, role);
+  for (const role of ["teacher", "parent", "student"]) assert.equal(isElevated(role), false, role);
+  assert.deepEqual(assignableRoles(["teacher"]), []);
+  assert.deepEqual(assignableRoles(["contentEditor"]), []);
+});
+
+test("a Super Administrator holds the widest of office, leadership and technical rights", () => {
+  assert.equal(can(["superAdmin"], "calendar", "U"), "all");
+  assert.equal(can(["superAdmin"], "content", "A"), "all");
+  assert.equal(can(["superAdmin"], "accessAdministration", "U"), "all");
+  assert.equal(can(["superAdmin"], "settings", "U"), "all");
+  assert.equal(can(["superAdmin"], "fees", "U"), null);
 });
 
 test("every hub route points at a known module", () => {
@@ -42,7 +67,7 @@ test("financial records are separated from teacher access (PRD §17, §36)", () 
 
 test("only the portfolio moderator or leadership approves public showcase (CON-002)", () => {
   const approvers = ROLE_IDS.filter((role) => can([role], "showcase", "A"));
-  assert.deepEqual(approvers.sort(), ["leadership", "portfolioModerator"]);
+  assert.deepEqual(approvers.sort(), ["leadership", "portfolioModerator", "superAdmin"]);
   assert.equal(can(["teacher"], "showcase", "C"), "class");
 });
 

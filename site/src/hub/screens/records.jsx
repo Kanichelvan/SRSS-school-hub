@@ -3,8 +3,10 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { orderBy, where, limit } from "firebase/firestore";
 import { useAuth } from "../../auth/AuthProvider";
+import { JourneySummary } from "./quest";
 import { can, canOpen } from "../../auth/permissions";
-import { getMany, list, listIn, one, useLoad } from "../data";
+import { currentYearId, getMany, list, listIn, one, useLoad } from "../data";
+import { humanValuesOf } from "../portfolio";
 import { ATTENDANCE_LABELS, COMPLETENESS_FIELDS, HUMAN_VALUES, STUDENT_360_TABS, attendanceSummary, completeness } from "../logic/dashboard";
 import { DataTable, EmptyState, ErrorNote, LastUpdated, Loading, PageHeader, Section, StatCard, StatusBadge, formatDate } from "../ui";
 
@@ -21,8 +23,8 @@ async function visibleStudents(auth) {
 export function StudentRegister() {
   const auth = useAuth();
   const { data, loading, error } = useLoad(async () => {
-    const [students, classes] = await Promise.all([visibleStudents(auth), list("classes")]);
-    return { students: students.map((student) => ({ ...student, className: classes.find((cls) => cls.id === student.currentClassId)?.name || "—", record: completeness(student) })), classes };
+    const [students, classes, yearId] = await Promise.all([visibleStudents(auth), list("classes"), currentYearId()]);
+    return { students: students.map((student) => ({ ...student, className: classes.find((cls) => cls.id === student.currentClassId)?.name || "—", record: completeness(student) })), classes, yearId };
   }, [auth.user.uid]);
   const columns = [
     { key: "name", label: "Name", render: (row) => <span className="hub-cell-strong">{row.name}</span> },
@@ -38,7 +40,7 @@ export function StudentRegister() {
     {loading ? <Loading /> : <DataTable rows={data.students} columns={columns} searchKeys={["name", "studentNumber", "preferredName"]} exportName="srss-students" rowHref={(row) => `/hub/students/${row.id}`}
       filters={[
         { key: "currentStandard", label: "Standard", options: [1, 2, 3, 4, 5, 6].map((s) => [String(s), `Standard ${s}`]) },
-        { key: "currentClassId", label: "Class", options: data.classes.filter((cls) => cls.academicYearId === "ay2026").map((cls) => [cls.id, cls.name]) },
+        { key: "currentClassId", label: "Class", options: data.classes.filter((cls) => cls.academicYearId === data.yearId).map((cls) => [cls.id, cls.name]) },
         { key: "status", label: "Status", options: [["active", "Active"], ["withdrawn", "Withdrawn"], ["graduated", "Graduated"]] },
         { key: "recordState", label: "Record", value: (row) => (row.record.complete ? "complete" : "incomplete"), options: [["complete", "Complete"], ["incomplete", "Incomplete"]] },
       ]} />}
@@ -117,7 +119,7 @@ function Student360Tab({ tab, student, cls }) {
   }
   if (tab === "portfolio") return <PortfolioList entries={data.entries} />;
   if (tab === "humanExcellence") return data.observations.length ? <ul className="hub-cards">{data.observations.map((item) => <li key={item.id} className="hub-card"><StatusBadge status="good" label={HUMAN_VALUES[item.value]} /><p>{item.observation}</p><small>{item.context}</small></li>)}</ul> : <EmptyState title="No observations recorded yet.">Teachers record specific observations, never scores.</EmptyState>;
-  if (tab === "achievements") return data.items.length ? <ul className="hub-list">{data.items.map((item) => <li key={item.id}><strong>{item.title}</strong><small>{formatDate(item.date, { day: "numeric", month: "short", year: "numeric" })}</small></li>)}</ul> : <EmptyState title="No achievements recorded yet." />;
+  if (tab === "achievements") return <><JourneySummary studentId={studentId} compact />{data.items.length ? <ul className="hub-list">{data.items.map((item) => <li key={item.id}><strong>{item.title}</strong><small>{formatDate(item.date, { day: "numeric", month: "short", year: "numeric" })}</small></li>)}</ul> : <EmptyState title="No achievements recorded yet." />}</>;
   if (tab === "fees") return data.fees.length ? <ul className="hub-list">{data.fees.map((fee) => <li key={fee.id}><strong>RM {fee.amountDue?.toLocaleString("en-MY")} due · RM {fee.amountPaid?.toLocaleString("en-MY")} paid</strong><StatusBadge status={fee.outstanding > 0 ? "pending" : "complete"} label={fee.outstanding > 0 ? `RM ${fee.outstanding.toLocaleString("en-MY")} outstanding` : "Paid"} /></li>)}</ul> : <EmptyState title="No fee records." />;
   if (tab === "history") return data.logs.length ? <ul className="hub-list">{data.logs.map((log) => <li key={log.id}><strong>{log.type}</strong><small>{formatDate(log.at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} · {log.fields?.join(", ") || "—"}</small></li>)}</ul> : <EmptyState title="No changes recorded yet." />;
   return null;
@@ -137,7 +139,7 @@ async function portfolioFor(auth, student) {
 }
 
 export function PortfolioList({ entries }) {
-  return entries.length ? <ul className="hub-cards">{entries.map((entry) => <li key={entry.id} className="hub-card"><div className="hub-card-top"><strong>{entry.title}</strong><StatusBadge status={entry.visibility} /></div><p>{entry.description}</p>{entry.teacherObservation && <p className="hub-quote">“{entry.teacherObservation}”</p>}<small>{formatDate(entry.date, { day: "numeric", month: "short", year: "numeric" })}{entry.humanValue ? ` · ${HUMAN_VALUES[entry.humanValue]}` : ""}</small></li>)}</ul> : <EmptyState title="No portfolio entries yet." />;
+  return entries.length ? <ul className="hub-cards">{entries.map((entry) => <li key={entry.id} className="hub-card"><div className="hub-card-top"><strong>{entry.title}</strong><StatusBadge status={entry.visibility} /></div><p>{entry.description}</p>{entry.teacherObservation && <p className="hub-quote">“{entry.teacherObservation}”</p>}<small>{formatDate(entry.date, { day: "numeric", month: "short", year: "numeric" })}{humanValuesOf(entry).length ? ` · ${humanValuesOf(entry).map((value) => HUMAN_VALUES[value]).join(", ")}` : ""}</small></li>)}</ul> : <EmptyState title="No portfolio entries yet." />;
 }
 
 export function StaffDirectory() {

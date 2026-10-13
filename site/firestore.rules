@@ -3,7 +3,8 @@ rules_version = '2';
 // SRSS Digital Hub — data-layer access control (PRD §43–44, §49; AUTH-002, CON-002, DASH-002).
 // Mirrors src/auth/permissions.js. Collections follow the PRD Firestore domain model (§47, revised §18).
 //
-// Identity: roles come from the `roles` custom claim, set only by the setUserRoles function.
+// Identity: roles come from the `roles` custom claim, set only by the setUserRoles / provisionAccount
+//           functions. superAdmin holds everything schoolAdmin, leadership and technicalAdmin hold.
 // Context:  users/{uid} is a server-derived scope document (functions/scope.js) built from
 //           studentGuardianLinks, teacherAssignments, classes and support plans. Clients never write it.
 // Records:  every per-child record carries studentId and classId (the enrolment class at the time),
@@ -22,11 +23,11 @@ service cloud.firestore {
     function uid() { return request.auth.uid; }
 
     function teaching() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher']); }
-    function isStaff() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher', 'academicCoordinator', 'schoolAdmin', 'admissionsOfficer', 'financeOfficer', 'leadership', 'safeguardingLead', 'privacySteward', 'portfolioModerator', 'contentEditor', 'technicalAdmin', 'librarian', 'auditor']); }
-    function isAdmin() { return hasRole('schoolAdmin'); }
-    function isLeader() { return hasRole('leadership'); }
+    function isStaff() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher', 'academicCoordinator', 'schoolAdmin', 'admissionsOfficer', 'financeOfficer', 'leadership', 'safeguardingLead', 'privacySteward', 'portfolioModerator', 'contentEditor', 'technicalAdmin', 'librarian', 'auditor', 'superAdmin']); }
+    function isAdmin() { return hasAny(['schoolAdmin', 'superAdmin']); }
+    function isLeader() { return hasAny(['leadership', 'superAdmin']); }
     // Roles with school-wide read of ordinary (non-restricted) student records.
-    function wideStudentRead() { return hasAny(['academicCoordinator', 'schoolAdmin', 'leadership', 'safeguardingLead', 'privacySteward', 'auditor']); }
+    function wideStudentRead() { return hasAny(['academicCoordinator', 'schoolAdmin', 'leadership', 'safeguardingLead', 'privacySteward', 'auditor', 'superAdmin']); }
 
     // ---------- context ----------
     function inClassScope(classId) { return classId in me().get('classIds', []); }
@@ -51,8 +52,42 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/studentConsentStatus/$(studentId)).data.get(['types', type, 'response'], '') == 'granted';
     }
     function fiveValues() { return ['truth', 'rightConduct', 'peace', 'love', 'nonViolence']; }
+    // Who changed a record and when is always recorded by the writer and checked here (audit information).
+    function stamped() { return data().updatedBy == uid() && data().updatedAt == request.time; }
+    function newStamped() { return stamped() && data().createdBy == uid() && data().createdAt == request.time; }
+    function text(field, max) { return data()[field] is string && data()[field].size() > 0 && data()[field].size() <= max; }
+    function optionalText(field, max) { return data().get(field, '') == null || (data().get(field, '') is string && data().get(field, '').size() <= max); }
+    function isoDate(field) { return data()[field] is string && data()[field].matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'); }
+    function lifecycle() { return data().status in ['active', 'archived']; }
+    function keepsHistory() { return unchanged(['createdAt', 'createdBy']); }
+    function yearExists(id) { return exists(/databases/$(database)/documents/academicYears/$(id)); }
+    function classRecord(id) { return get(/databases/$(database)/documents/classes/$(id)).data; }
+    // Subject-level permission: a teacher writes for a subject they are assigned in that class
+    // (class teachers and support staff for their own pupils need no subject assignment).
+    function subjectAllowed(studentId, classId) {
+      return data().get('subjectId', null) == null || inHomeroom(classId) || isAssigned(studentId)
+        || (classId + ':' + data().subjectId) in me().get('assignmentKeys', []);
+    }
 
     // ===================== IDENTITY =====================
+    // Engagement is served exclusively by the authenticated `engagement` callable. It validates
+    // audience, SIS relationships, assignments, schedules, scores and private review scope. In
+    // particular, answer keys and attempt snapshots cannot be read through the web SDK at all.
+    match /challengeCampaigns/{id} { allow read, write: if false; }
+    match /challengeDefinitions/{id} { allow read, write: if false; }
+    match /challengeQuestions/{id} { allow read, write: if false; }
+    match /challengeAttempts/{id} { allow read, write: if false; }
+    match /challengeSubmissions/{id} { allow read, write: if false; }
+    match /challengeReleases/{id} { allow read, write: if false; }
+    match /badgeDefinitions/{id} { allow read, write: if false; }
+    match /studentBadges/{id} { allow read, write: if false; }
+    match /pointsLedger/{id} { allow read, write: if false; }
+    match /questRewards/{id} { allow read, write: if false; }
+    match /questCorrections/{id} { allow read, write: if false; }
+    match /questParticipantState/{id} { allow read, write: if false; }
+    match /studentAchievementSummaries/{id} { allow read, write: if false; }
+    match /nilamRecords/{id} { allow read, write: if false; }
+    match /nilamVerifiedKeys/{id} { allow read, write: if false; }
     match /users/{userId} {
       allow read: if signedIn() && (userId == uid() || isAdmin() || isLeader() || hasRole('technicalAdmin'));
       allow write: if false; // derived by Cloud Functions
@@ -61,8 +96,10 @@ service cloud.firestore {
     match /userRoles/{assignmentId} { allow read: if isAdmin() || isLeader() || hasRole('technicalAdmin'); allow write: if false; }
 
     match /staff/{staffId} {
-      allow read: if isStaff() || (hasRole('parent') && resource.data.get('directoryVisible', false) == true);
-      allow create, update: if isAdmin();
+      allow read: if isStaff() || (hasAny(['parent', 'student']) && resource.data.get('directoryVisible', false) == true);
+      // Sign-in accounts are linked only by the provisionAccount function (`uid`).
+      allow create: if isAdmin() && newStamped() && data().get('uid', null) == null && text('name', 120) && optionalText('email', 200) && lifecycle();
+      allow update: if isAdmin() && stamped() && keepsHistory() && unchanged(['uid']) && text('name', 120) && optionalText('email', 200) && lifecycle();
       // Employment, qualifications and HR documents: narrower than the directory (PRD §34).
       match /private/{docId} {
         allow read: if isAdmin() || isLeader() || (signedIn() && resource.data.get('staffUid', '') == uid());
@@ -72,32 +109,86 @@ service cloud.firestore {
 
     match /guardians/{guardianId} {
       allow read: if (hasRole('parent') && me().get('guardianId', '') == guardianId)
-        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead'])
+        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin'])
         || (teaching() && resource.data.get('classIds', []).hasAny(me().get('classIds', [])));
-      allow create, update: if isAdmin();
+      // `uid` (sign-in account) and `classIds` are set by the server only.
+      allow create: if isAdmin() && newStamped() && data().get('uid', null) == null && !('classIds' in data()) && text('name', 120) && optionalText('email', 200) && lifecycle();
+      allow update: if isAdmin() && stamped() && keepsHistory() && unchanged(['uid', 'classIds']) && text('name', 120) && optionalText('email', 200) && lifecycle();
     }
 
     // Student ↔ Guardian (PRD §18). Relationship is separate from portal access (hasPortalAccess).
     match /studentGuardianLinks/{linkId} {
       allow read: if (signedIn() && resource.data.get('guardianUid', '') == uid()) || isGuardianOf(resource.data.studentId)
-        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead'])
+        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin'])
         || staffCanSee(resource.data.studentId, resource.data.get('classId', ''));
-      allow create, update: if isAdmin()
-        && data().relationship in ['mother', 'father', 'legalGuardian', 'caregiver', 'emergencyContact', 'collectionPerson'];
+      // Only the office links a guardian to a child — a parent can never link themselves. The account id and
+      // class are copied from the guardian and student records, so a link can't point anywhere else.
+      function linkValid() {
+        return data().relationship in ['mother', 'father', 'legalGuardian', 'caregiver', 'emergencyContact', 'collectionPerson']
+          && data().hasPortalAccess is bool && data().get('isEmergencyContact', false) is bool && data().get('canCollect', false) is bool;
+      }
+      allow create: if isAdmin() && newStamped() && linkValid() && data().status == 'active'
+        && data().get('guardianUid', null) == get(/databases/$(database)/documents/guardians/$(data().guardianId)).data.get('uid', null)
+        && data().get('classId', null) == get(/databases/$(database)/documents/students/$(data().studentId)).data.get('currentClassId', null);
+      allow update: if isAdmin() && stamped() && keepsHistory() && linkValid() && lifecycle()
+        && unchanged(['studentId', 'guardianId', 'guardianUid', 'classId']);
     }
 
     // ===================== ACADEMIC STRUCTURE (SIS-001) =====================
-    match /academicYears/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
-    match /terms/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
-    match /standards/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
-    match /classes/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
-    match /subjects/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
-    match /classSubjects/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
-    match /teacherAssignments/{id} { allow read: if isStaff(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
-    // Historical enrolment is authoritative; students.currentClassId is only a cache (PRD §19).
+    // Records are archived, never deleted, and the fields that give them meaning can't be rewritten later,
+    // so last year's classes, assignments and enrolments stay exactly as they were.
+    function setupStaff() { return hasAny(['academicCoordinator', 'schoolAdmin', 'superAdmin']); }
+    match /academicYears/{id} {
+      allow read: if signedIn();
+      allow create: if setupStaff() && newStamped() && lifecycle() && data().name is string && data().name.matches('^[0-9]{4}$') && id == 'ay' + data().name
+        && isoDate('startDate') && isoDate('endDate') && data().startDate < data().endDate;
+      allow update: if setupStaff() && stamped() && keepsHistory() && lifecycle() && unchanged(['name']) && isoDate('startDate') && isoDate('endDate') && data().startDate < data().endDate;
+    }
+    match /terms/{id} {
+      allow read: if signedIn();
+      allow create: if setupStaff() && newStamped() && lifecycle() && text('name', 60) && yearExists(data().academicYearId)
+        && isoDate('startDate') && isoDate('endDate') && data().startDate < data().endDate;
+      allow update: if setupStaff() && stamped() && keepsHistory() && lifecycle() && unchanged(['academicYearId']) && text('name', 60)
+        && isoDate('startDate') && isoDate('endDate') && data().startDate < data().endDate;
+    }
+    match /standards/{id} {
+      allow read: if signedIn();
+      allow create: if setupStaff() && newStamped() && lifecycle() && data().level is int && data().level >= 1 && data().level <= 6 && id == 'std' + string(data().level) && text('name', 60);
+      allow update: if setupStaff() && stamped() && keepsHistory() && lifecycle() && unchanged(['level']) && text('name', 60);
+    }
+    // A teacher can never make themselves a class teacher.
+    match /classes/{id} {
+      allow read: if signedIn();
+      allow create: if setupStaff() && newStamped() && lifecycle() && text('name', 60) && data().standard is int && data().standard >= 1 && data().standard <= 6
+        && yearExists(data().academicYearId) && data().get('classTeacherUid', null) != uid();
+      allow update: if setupStaff() && stamped() && keepsHistory() && lifecycle() && text('name', 60) && unchanged(['academicYearId', 'standard'])
+        && (data().get('classTeacherUid', null) == resource.data.get('classTeacherUid', null) || data().get('classTeacherUid', null) != uid());
+    }
+    match /subjects/{id} {
+      allow read: if signedIn();
+      allow create: if setupStaff() && newStamped() && lifecycle() && text('name', 80) && id.matches('^[a-z0-9-]{1,30}$');
+      allow update: if setupStaff() && stamped() && keepsHistory() && lifecycle() && text('name', 80);
+    }
+    match /classSubjects/{id} { allow read: if signedIn(); allow create, update: if setupStaff(); }
+    // Teacher permissions derive from these. Nobody assigns themselves; who, which class, which subject and
+    // which year never change — a change of teacher is a new assignment, and the old one is archived.
+    match /teacherAssignments/{id} {
+      // Pupils and families see who teaches their class (My Class).
+      allow read: if isStaff() || resource.data.classId in me().get('familyClassIds', []);
+      allow create: if setupStaff() && newStamped() && data().status == 'active' && data().teacherUid is string && data().teacherUid != uid()
+        && classRecord(data().classId).academicYearId == data().academicYearId && exists(/databases/$(database)/documents/subjects/$(data().subjectId));
+      allow update: if setupStaff() && stamped() && keepsHistory() && lifecycle() && unchanged(['teacherUid', 'classId', 'subjectId', 'academicYearId']);
+    }
+    // Historical enrolment is authoritative; students.currentClassId is only a cache (PRD §19). Moving class
+    // ends the old enrolment (transferred) and starts a new one; nothing is overwritten or deleted.
     match /enrollments/{id} {
       allow read: if familyCanSee(resource.data.studentId) || staffCanSee(resource.data.studentId, resource.data.classId);
-      allow create, update: if isAdmin();
+      allow create: if isAdmin() && newStamped() && data().status == 'active' && isoDate('startDate')
+        && existsAfter(/databases/$(database)/documents/students/$(data().studentId))
+        && classRecord(data().classId).academicYearId == data().academicYearId
+        && classRecord(data().classId).standard == data().standard;
+      allow update: if isAdmin() && stamped() && keepsHistory() && unchanged(['studentId', 'classId', 'academicYearId', 'standard', 'startDate'])
+        && data().status in ['active', 'transferred', 'completed', 'withdrawn', 'archived'];
     }
 
     // ===================== STUDENTS (SIS-002) =====================
@@ -105,11 +196,15 @@ service cloud.firestore {
       allow read: if familyCanSee(studentId)
         || staffCanSee(studentId, resource.data.get('currentClassId', ''))
         || hasAny(['financeOfficer', 'portfolioModerator']);
-      allow create, update: if isAdmin();
+      // The current class is a cache kept by the server from enrolments; the account link is server-only too.
+      allow create: if isAdmin() && newStamped() && text('name', 120) && data().get('uid', null) == null && data().get('currentClassId', null) == null
+        && data().status in ['active', 'withdrawn', 'graduated', 'archived'];
+      allow update: if isAdmin() && stamped() && keepsHistory() && text('name', 120) && unchanged(['uid', 'currentClassId', 'currentStandard'])
+        && data().status in ['active', 'withdrawn', 'graduated', 'archived'];
       // Medical and other RESTRICTED personal data (PRD §50).
       match /restricted/{docId} {
-        allow read: if hasAny(['schoolAdmin', 'safeguardingLead', 'leadership']);
-        allow create, update: if hasAny(['schoolAdmin', 'safeguardingLead']);
+        allow read: if hasAny(['schoolAdmin', 'safeguardingLead', 'leadership', 'superAdmin']);
+        allow create, update: if hasAny(['schoolAdmin', 'safeguardingLead', 'superAdmin']);
       }
     }
 
@@ -130,13 +225,13 @@ service cloud.firestore {
 
     match /studentSupportPlans/{id} {
       allow read: if (hasRole('specialistTeacher') && isAssigned(resource.data.studentId)) || inHomeroom(resource.data.classId)
-        || hasAny(['academicCoordinator', 'leadership', 'safeguardingLead'])
+        || hasAny(['academicCoordinator', 'leadership', 'safeguardingLead', 'superAdmin'])
         || (familyCanSee(resource.data.studentId) && resource.data.get('familyVisible', false) == true);
       allow create, update: if (hasRole('specialistTeacher') && isAssigned(data().studentId)) || hasRole('academicCoordinator');
     }
     match /studentSupportSessions/{id} {
       allow read: if (hasRole('specialistTeacher') && isAssigned(resource.data.studentId)) || inHomeroom(resource.data.classId)
-        || hasAny(['academicCoordinator', 'leadership', 'safeguardingLead']);
+        || hasAny(['academicCoordinator', 'leadership', 'safeguardingLead', 'superAdmin']);
       allow create, update: if (hasRole('specialistTeacher') && isAssigned(data().studentId)) || hasRole('academicCoordinator');
     }
 
@@ -146,12 +241,12 @@ service cloud.firestore {
       allow read: if resource.data.classification == 'restricted'
         ? (hasRole('safeguardingLead') || (signedIn() && uid() in resource.data.get('allowedUids', [])))
         : ((signedIn() && (resource.data.reporterUid == uid() || uid() in resource.data.get('assignedStaffUids', [])))
-          || inHomeroom(resource.data.classId) || hasAny(['schoolAdmin', 'leadership', 'safeguardingLead'])
+          || inHomeroom(resource.data.classId) || hasAny(['schoolAdmin', 'leadership', 'safeguardingLead', 'superAdmin'])
           || (familyCanSee(resource.data.studentId) && resource.data.get('familyVisible', false) == true));
-      allow create: if (teaching() || hasAny(['schoolAdmin', 'safeguardingLead'])) && data().reporterUid == uid() && data().status == 'reported';
+      allow create: if (teaching() || hasAny(['schoolAdmin', 'safeguardingLead', 'superAdmin'])) && data().reporterUid == uid() && data().status == 'reported';
       allow update: if unchanged(['reporterUid', 'createdAt', 'createdBy']) && (resource.data.classification == 'restricted'
         ? hasRole('safeguardingLead')
-        : (uid() in resource.data.get('assignedStaffUids', []) || inHomeroom(resource.data.classId) || hasAny(['schoolAdmin', 'safeguardingLead'])));
+        : (uid() in resource.data.get('assignedStaffUids', []) || inHomeroom(resource.data.classId) || hasAny(['schoolAdmin', 'safeguardingLead', 'superAdmin'])));
     }
 
     // ===================== ATTENDANCE (ATT-001, ATT-002) =====================
@@ -161,20 +256,24 @@ service cloud.firestore {
       allow read: if wideStudentRead() || (teaching() && inClassScope(resource.data.classId));
       allow create: if ((teaching() && inClassScope(data().classId)) || isAdmin()) && data().openedBy == uid() && data().status in ['open', 'submitted'];
       allow update: if ((teaching() && inClassScope(resource.data.classId)) || isAdmin()) && unchanged(['classId', 'date', 'openedBy'])
-        && (data().status != 'submitted' || data().submittedBy == uid());
+        && (data().get('submittedBy', null) == resource.data.get('submittedBy', null) || data().submittedBy == uid())
+        && data().status in ['open', 'submitted'];
     }
     match /attendanceRecords/{recordId} {
       allow read: if staffCanSee(resource.data.studentId, resource.data.classId) || familyCanSee(resource.data.studentId);
       allow create: if ((teaching() && inClassScope(data().classId) && studentIsInClass(data().studentId, data().classId)) || isAdmin())
         && data().markedBy == uid()
         && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other'];
+      // Records exist only once a register is submitted, so any later change is a correction: it needs a
+      // reason and names who made it. The audit trigger keeps every version's changed fields.
       allow update: if ((teaching() && inClassScope(resource.data.classId)) || isAdmin())
         && unchanged(['studentId', 'classId', 'sessionId', 'date']) && data().markedBy == uid()
-        && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other'];
+        && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other']
+        && (data().status == resource.data.status || (text('correctionReason', 300) && data().correctedBy == uid() && data().correctedAt == request.time));
     }
 
     // ===================== ACADEMICS (phase 2) =====================
-    match /assessmentPeriods/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin']); }
+    match /assessmentPeriods/{id} { allow read: if signedIn(); allow create, update: if hasAny(['academicCoordinator', 'schoolAdmin', 'superAdmin']); }
     match /assessments/{id} {
       allow read: if isStaff() || (resource.data.get('classId', '') in me().get('familyClassIds', []));
       allow create, update: if hasRole('academicCoordinator') || (teaching() && inClassScope(data().classId));
@@ -219,26 +318,39 @@ service cloud.firestore {
     // from a teacher's choice alone: only a moderator can set it, and only with recorded consent.
     function portfolioVisibilityOk(studentId) {
       return data().visibility in ['internal', 'family', 'showcaseCandidate']
-        || (data().visibility == 'publicShowcase' && hasAny(['portfolioModerator', 'leadership']) && consentGranted(studentId, 'publicShowcase'));
+        || (data().visibility == 'publicShowcase' && hasAny(['portfolioModerator', 'leadership', 'superAdmin']) && consentGranted(studentId, 'publicShowcase'));
+    }
+    // Entries carry private media references (Google Drive links), so they are never public themselves:
+    // an approved public showcase entry is copied, without media or surname, to showcaseItems by the server.
+    function entryValid() {
+      return text('title', 140) && optionalText('description', 4000)
+        && data().get('humanValues', []) is list && data().get('humanValues', []).hasOnly(fiveValues())
+        && data().get('achievementTags', []) is list && data().get('achievementTags', []).size() <= 10
+        && data().get('mediaReferences', []) is list && data().get('mediaReferences', []).size() <= 10
+        && data().get('moderationStatus', null) in [null, 'pending', 'approved', 'returned']
+        && (data().get('moderationStatus', null) != 'approved' || hasAny(['portfolioModerator', 'leadership', 'superAdmin']));
     }
     match /portfolioEntries/{id} {
-      allow read: if (resource.data.visibility == 'publicShowcase' && resource.data.get('moderationStatus', '') == 'approved')
-        || staffCanSee(resource.data.studentId, resource.data.classId)
+      allow read: if staffCanSee(resource.data.studentId, resource.data.classId)
         || (familyCanSee(resource.data.studentId) && resource.data.visibility != 'internal')
         || (hasRole('portfolioModerator') && resource.data.visibility in ['showcaseCandidate', 'publicShowcase']);
-      allow create: if createdByMe() && data().visibility in ['internal', 'family']
-        && (teacherCanWrite(data().studentId, data().classId) || (isSelf(data().studentId) && data().status == 'submitted'));
-      allow update: if unchanged(['studentId', 'createdBy', 'createdAt']) && portfolioVisibilityOk(resource.data.studentId)
-        && (teacherCanWrite(resource.data.studentId, resource.data.classId) || hasAny(['portfolioModerator', 'leadership']));
+      // Teachers write for pupils actually in the class, and for subjects they are assigned to teach there.
+      allow create: if createdByMe() && entryValid() && data().visibility in ['internal', 'family', 'showcaseCandidate']
+        && ((teacherCanWrite(data().studentId, data().classId) && studentIsInClass(data().studentId, data().classId) && subjectAllowed(data().studentId, data().classId))
+          || (isSelf(data().studentId) && data().status == 'submitted'));
+      allow update: if unchanged(['studentId', 'classId', 'createdBy', 'createdAt']) && entryValid() && portfolioVisibilityOk(resource.data.studentId)
+        && ((teacherCanWrite(resource.data.studentId, resource.data.classId) && subjectAllowed(resource.data.studentId, resource.data.classId))
+          || hasAny(['portfolioModerator', 'leadership', 'superAdmin']));
     }
+    // Public-safe copies of approved showcase entries (written by the server only).
+    match /showcaseItems/{id} { allow read: if resource.data.status == 'published' || isStaff(); allow write: if false; }
     match /portfolioMedia/{id} {
-      allow read: if (resource.data.visibility == 'publicShowcase' && resource.data.get('moderationStatus', '') == 'approved')
-        || staffCanSee(resource.data.studentId, resource.data.classId)
+      allow read: if staffCanSee(resource.data.studentId, resource.data.classId)
         || (familyCanSee(resource.data.studentId) && resource.data.visibility != 'internal');
       allow create: if createdByMe() && data().visibility in ['internal', 'family']
         && (teacherCanWrite(data().studentId, data().classId) || isSelf(data().studentId));
       allow update: if unchanged(['studentId', 'createdBy']) && portfolioVisibilityOk(resource.data.studentId)
-        && (teacherCanWrite(resource.data.studentId, resource.data.classId) || hasAny(['portfolioModerator', 'leadership']));
+        && (teacherCanWrite(resource.data.studentId, resource.data.classId) || hasAny(['portfolioModerator', 'leadership', 'superAdmin']));
     }
     // Specific observations, never numeric character scores (PRD §26, POR-001 AC2).
     match /humanValuesObservations/{id} {
@@ -259,13 +371,24 @@ service cloud.firestore {
     // ===================== COMMUNICATION (DASH-002) =====================
     // audienceKeys: ['school'] · ['role:parents'] · ['standard:4'] · ['class:<id>'] · ['user:<uid>'] …
     // Each user's own keys are derived server-side, so targeting is enforced here, not in the UI.
+    // Internal notices only — public website news is the separate newsPosts collection.
+    // Admins and leadership publish to any audience; a teacher publishes routine notices to one of their own
+    // classes. Scheduled notices are published by the publishScheduledAnnouncements function.
+    function announcementValid() {
+      return text('title', 140) && data().get('body', '') is string && data().get('body', '').size() <= 5000
+        && data().status in ['draft', 'scheduled', 'published', 'archived']
+        && data().audienceKeys is list && data().audienceKeys.size() > 0 && data().audienceKeys.size() <= 30
+        && data().get('pinned', false) is bool && data().get('attachments', []) is list && data().get('attachments', []).size() <= 5;
+    }
+    function teacherNotice() {
+      return teaching() && data().audienceKeys.size() == 1 && data().audienceKeys[0] in me().get('publishKeys', [])
+        && !(data().get('category', 'class') in ['school', 'urgent']) && data().get('pinned', false) == false;
+    }
     match /announcements/{id} {
       allow read: if signedIn() && ((resource.data.status == 'published' && audienceMatches())
         || resource.data.createdBy == uid() || isAdmin() || isLeader());
-      allow create: if createdByMe() && (isAdmin() || isLeader()
-        || (teaching() && data().audienceKeys.size() == 1 && data().audienceKeys[0] in me().get('publishKeys', [])));
-      allow update: if unchanged(['createdBy']) && (isAdmin() || isLeader()
-        || (resource.data.createdBy == uid() && data().audienceKeys.size() == 1 && data().audienceKeys[0] in me().get('publishKeys', [])));
+      allow create: if createdByMe() && announcementValid() && (isAdmin() || isLeader() || teacherNotice());
+      allow update: if unchanged(['createdBy']) && announcementValid() && (isAdmin() || isLeader() || (resource.data.createdBy == uid() && teacherNotice()));
     }
     match /notificationRecords/{id} {
       allow read: if signedIn() && resource.data.recipientUid == uid();
@@ -286,8 +409,20 @@ service cloud.firestore {
     // ===================== CALENDAR =====================
     match /events/{id} {
       allow read: if (resource.data.status == 'published' && resource.data.get('publicListing', false) == true)
-        || (signedIn() && resource.data.status == 'published' && audienceMatches()) || isAdmin() || isLeader();
-      allow create, update: if isAdmin() || isLeader();
+        || (signedIn() && resource.data.status == 'published' && audienceMatches()) || isAdmin() || isLeader()
+        || (signedIn() && resource.data.get('createdBy', '') == uid());
+      function eventValid() {
+        return text('title', 140) && isoDate('date') && (data().get('endDate', null) == null || (isoDate('endDate') && data().endDate >= data().date))
+          && data().status in ['draft', 'published', 'archived'] && data().audienceKeys is list && data().audienceKeys.size() > 0 && data().audienceKeys.size() <= 30
+          && data().get('attachments', []) is list && data().get('attachments', []).size() <= 5;
+      }
+      // Teachers add class events (lessons, trips, meetings) for their own classes; never public listings.
+      function teacherEvent() {
+        return teaching() && data().audienceKeys.size() == 1 && data().audienceKeys[0] in me().get('publishKeys', [])
+          && data().get('category', 'class') in ['class', 'academic', 'meeting'] && data().get('publicListing', false) == false;
+      }
+      allow create: if eventValid() && newStamped() && (isAdmin() || isLeader() || teacherEvent());
+      allow update: if eventValid() && stamped() && keepsHistory() && (isAdmin() || isLeader() || (resource.data.createdBy == uid() && teacherEvent()));
     }
     match /registrations/{id} {
       allow read: if (signedIn() && resource.data.registrantUid == uid()) || isAdmin() || isLeader();
@@ -302,50 +437,56 @@ service cloud.firestore {
 
     // ===================== FORMS & CONSENT (DASH-001, CON-001) =====================
     match /formDefinitions/{id} {
-      allow read: if (signedIn() && resource.data.status == 'published' && audienceMatches()) || hasAny(['schoolAdmin', 'privacySteward', 'leadership']);
-      allow create, update: if hasAny(['schoolAdmin', 'privacySteward']);
+      allow read: if (signedIn() && resource.data.status == 'published' && audienceMatches()) || hasAny(['schoolAdmin', 'privacySteward', 'leadership', 'superAdmin']);
+      allow create, update: if hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']);
     }
     // Requests addressed to a user (requestedFromUid, status 'pending') power the Actions Required widget.
     match /formSubmissions/{id} {
       allow read: if signedIn() && (resource.data.get('requestedFromUid', '') == uid() || resource.data.get('submittedByUid', '') == uid()
-        || resource.data.get('assignedToUid', '') == uid() || hasAny(['schoolAdmin', 'privacySteward']));
+        || resource.data.get('assignedToUid', '') == uid() || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']));
       allow create: if (signedIn() && data().submittedByUid == uid() && data().status in ['draft', 'submitted']
           && (data().get('studentId', null) == null || familyCanSee(data().studentId)))
         || ((isAdmin() || hasRole('privacySteward') || teaching()) && data().status == 'pending' && createdByMe());
       allow update: if unchanged(['formId', 'studentId', 'requestedFromUid', 'createdBy'])
         && ((signedIn() && uid() in [resource.data.get('requestedFromUid', ''), resource.data.get('submittedByUid', '')]
              && resource.data.status in ['pending', 'draft'] && data().status in ['draft', 'submitted'])
-          || (signedIn() && resource.data.get('assignedToUid', '') == uid()) || hasAny(['schoolAdmin', 'privacySteward']));
+          || (signedIn() && resource.data.get('assignedToUid', '') == uid()) || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']));
     }
     match /workflowActions/{id} {
-      allow read: if signedIn() && (uid() in resource.data.get('participantUids', []) || hasAny(['schoolAdmin', 'privacySteward']));
-      allow create: if signedIn() && data().actorUid == uid() && (hasAny(['schoolAdmin', 'privacySteward']) || teaching());
+      allow read: if signedIn() && (uid() in resource.data.get('participantUids', []) || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']));
+      allow create: if signedIn() && data().actorUid == uid() && (hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']) || teaching());
     }
 
+    // The questions families answer. Changing a question's wording raises its version, so families are asked
+    // again; earlier answers stay on record against the version they answered.
     match /consentDefinitions/{id} {
+      function definitionValid() { return id.matches('^[A-Za-z]{2,40}$') && data().type == id && text('title', 120) && text('question', 400) && optionalText('detail', 600) && data().version is int && data().version >= 1 && lifecycle(); }
       allow read: if signedIn();
-      allow create, update: if hasAny(['privacySteward', 'schoolAdmin']);
+      allow create: if hasAny(['privacySteward', 'schoolAdmin', 'superAdmin']) && newStamped() && definitionValid();
+      allow update: if hasAny(['privacySteward', 'schoolAdmin', 'superAdmin']) && stamped() && keepsHistory() && definitionValid()
+        && data().version >= resource.data.get('version', 1)
+        && (data().question == resource.data.get('question', '') || data().version > resource.data.get('version', 1));
     }
     // Append-only: a revision or withdrawal is a new record; history is never overwritten (CON-006).
     match /consentRecords/{id} {
-      allow read: if (signedIn() && resource.data.guardianUid == uid()) || hasAny(['privacySteward', 'schoolAdmin', 'leadership', 'auditor'])
+      allow read: if (signedIn() && resource.data.guardianUid == uid()) || hasAny(['privacySteward', 'schoolAdmin', 'leadership', 'auditor', 'superAdmin'])
         || staffCanSee(resource.data.studentId, resource.data.get('classId', ''));
       // A guardian answers for their own child; the office may enter answers from a signed paper form.
       allow create: if data().response in ['granted', 'declined', 'withdrawn'] && data().definitionVersion is int
         && data().createdAt == request.time
         && ((isGuardianOf(data().studentId) && data().guardianUid == uid())
-          || (hasAny(['schoolAdmin', 'privacySteward']) && data().source == 'paperForm' && data().recordedBy == uid()
+          || (hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']) && data().source == 'paperForm' && data().recordedBy == uid()
               && data().guardianName is string && data().guardianName.size() > 1));
       allow update: if false;
     }
     // Written only by the sendConsentReminders function.
     match /consentReminders/{studentId} {
-      allow read: if hasAny(['schoolAdmin', 'privacySteward', 'leadership']);
+      allow read: if hasAny(['schoolAdmin', 'privacySteward', 'leadership', 'superAdmin']);
       allow write: if false;
     }
     // Staff confidentiality and acceptable-use acknowledgement (framework Part V); one per person, versioned.
     match /policyAcknowledgements/{userId} {
-      allow read: if signedIn() && (userId == uid() || hasAny(['schoolAdmin', 'privacySteward', 'leadership', 'auditor']));
+      allow read: if signedIn() && (userId == uid() || hasAny(['schoolAdmin', 'privacySteward', 'leadership', 'auditor', 'superAdmin']));
       allow create, update: if signedIn() && userId == uid() && data().uid == uid() && data().version is int
         && data().acknowledgedAt == request.time && (resource == null || data().version > resource.data.version);
     }
@@ -364,7 +505,7 @@ service cloud.firestore {
         && data().get('childName', '') is string && data().get('childName', '').size() <= 120
         && data().get('currentSchool', '') is string && data().get('currentSchool', '').size() <= 200
         && data().get('message', '') is string && data().get('message', '').size() <= 4000;
-      allow read, update: if hasAny(['admissionsOfficer', 'schoolAdmin']);
+      allow read, update: if hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']);
       allow get, list: if isLeader();
     }
     // Website contact form: anyone may write one well-formed message; only the office reads them.
@@ -373,44 +514,44 @@ service cloud.firestore {
         && data().status == 'new' && data().createdAt == request.time
         && data().name is string && data().name.size() > 0 && data().name.size() <= 120
         && data().email is string && data().email.size() <= 200
-        && data().subject in ['General', 'Admissions', 'Feedback', 'Other']
+        && data().subject in ['General', 'Admissions', 'Feedback', 'Other', 'Alumni', 'Volunteer', 'Support SRSS', 'SRSS25 memory']
         && data().message is string && data().message.size() > 0 && data().message.size() <= 4000;
-      allow read: if hasAny(['schoolAdmin', 'leadership', 'admissionsOfficer']);
-      allow update: if hasAny(['schoolAdmin', 'leadership']) && unchanged(['name', 'email', 'subject', 'message', 'createdAt']);
+      allow read: if hasAny(['schoolAdmin', 'leadership', 'admissionsOfficer', 'superAdmin']);
+      allow update: if hasAny(['schoolAdmin', 'leadership', 'superAdmin']) && unchanged(['name', 'email', 'subject', 'message', 'createdAt']);
     }
     // Enquiry → Visit → Started → Submitted → Documents Pending → Under Review → Interview → Decision →
     // Offer → Accepted → Onboarding → Enrolled (PRD §33). Conversion to a student is server-side.
     match /applications/{id} {
-      allow read: if (signedIn() && resource.data.applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin', 'leadership']);
+      allow read: if (signedIn() && resource.data.applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin', 'leadership', 'superAdmin']);
       allow create: if (signedIn() && data().applicantUid == uid() && data().status in ['started', 'submitted'])
-        || (hasAny(['admissionsOfficer', 'schoolAdmin']) && createdByMe());
+        || (hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']) && createdByMe());
       allow update: if (signedIn() && resource.data.applicantUid == uid() && resource.data.status in ['started', 'documentsPending']
           && data().status in ['started', 'submitted', 'documentsPending'] && unchanged(['applicantUid', 'decision', 'reviewerUid']))
-        || (hasAny(['admissionsOfficer', 'schoolAdmin']) && unchanged(['applicantUid']) && data().status != 'enrolled');
+        || (hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']) && unchanged(['applicantUid']) && data().status != 'enrolled');
     }
     match /applicationDocuments/{id} {
-      allow read: if (signedIn() && resource.data.applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin']);
-      allow create: if (signedIn() && data().applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin']);
-      allow update: if hasAny(['admissionsOfficer', 'schoolAdmin']);
+      allow read: if (signedIn() && resource.data.applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']);
+      allow create: if (signedIn() && data().applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']);
+      allow update: if hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']);
     }
     match /applicationActions/{id} {
-      allow read: if hasAny(['admissionsOfficer', 'schoolAdmin', 'leadership']);
-      allow create: if hasAny(['admissionsOfficer', 'schoolAdmin']) && data().actorUid == uid();
+      allow read: if hasAny(['admissionsOfficer', 'schoolAdmin', 'leadership', 'superAdmin']);
+      allow create: if hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']) && data().actorUid == uid();
     }
 
     // ===================== FINANCE-LITE (phase 2) =====================
-    match /feeStructures/{id} { allow read: if hasAny(['financeOfficer', 'schoolAdmin', 'leadership', 'parent']); allow create, update: if hasRole('financeOfficer'); }
+    match /feeStructures/{id} { allow read: if hasAny(['financeOfficer', 'schoolAdmin', 'leadership', 'parent', 'superAdmin']); allow create, update: if hasRole('financeOfficer'); }
     match /studentFeeAssignments/{id} {
-      allow read: if hasAny(['financeOfficer', 'schoolAdmin', 'leadership', 'auditor']) || isGuardianOf(resource.data.studentId);
+      allow read: if hasAny(['financeOfficer', 'schoolAdmin', 'leadership', 'auditor', 'superAdmin']) || isGuardianOf(resource.data.studentId);
       allow create, update: if hasRole('financeOfficer');
     }
     match /payments/{id} {
-      allow read: if hasAny(['financeOfficer', 'schoolAdmin', 'leadership', 'auditor']) || isGuardianOf(resource.data.studentId);
+      allow read: if hasAny(['financeOfficer', 'schoolAdmin', 'leadership', 'auditor', 'superAdmin']) || isGuardianOf(resource.data.studentId);
       allow create, update: if hasRole('financeOfficer');
     }
     // Financial assistance is RESTRICTED (PRD §50): finance and leadership only, plus the child's guardian.
     match /concessions/{id} {
-      allow read: if hasAny(['financeOfficer', 'leadership']) || isGuardianOf(resource.data.studentId);
+      allow read: if hasAny(['financeOfficer', 'leadership', 'superAdmin']) || isGuardianOf(resource.data.studentId);
       allow create, update: if hasRole('financeOfficer');
     }
 
@@ -431,16 +572,16 @@ service cloud.firestore {
     }
 
     // ===================== ASSETS (later) =====================
-    match /assets/{id} { allow read: if isStaff(); allow create, update: if hasAny(['schoolAdmin', 'technicalAdmin']); }
-    match /assetAssignments/{id} { allow read: if isStaff(); allow create, update: if hasAny(['schoolAdmin', 'technicalAdmin']); }
-    match /assetMaintenance/{id} { allow read: if isStaff(); allow create, update: if hasAny(['schoolAdmin', 'technicalAdmin']); }
+    match /assets/{id} { allow read: if isStaff(); allow create, update: if hasAny(['schoolAdmin', 'technicalAdmin', 'superAdmin']); }
+    match /assetAssignments/{id} { allow read: if isStaff(); allow create, update: if hasAny(['schoolAdmin', 'technicalAdmin', 'superAdmin']); }
+    match /assetMaintenance/{id} { allow read: if isStaff(); allow create, update: if hasAny(['schoolAdmin', 'technicalAdmin', 'superAdmin']); }
 
     // ===================== PUBLIC WEBSITE CMS (PUB-002) =====================
     // Draft → Review → Approved → Published → Archived. Editors draft; leadership approves and publishes.
-    function cmsRead() { return resource.data.status == 'published' || hasAny(['contentEditor', 'leadership', 'schoolAdmin']); }
+    function cmsRead() { return resource.data.status == 'published' || hasAny(['contentEditor', 'leadership', 'schoolAdmin', 'superAdmin']); }
     // Editors draft and submit for review; only leadership publishes or changes what is already live.
     function cmsWrite() { return (hasRole('contentEditor') && data().status in ['draft', 'review', 'archived'] && (resource == null || resource.data.status != 'published')) || isLeader(); }
-    function cmsStaff() { return hasAny(['contentEditor', 'leadership', 'schoolAdmin']); }
+    function cmsStaff() { return hasAny(['contentEditor', 'leadership', 'schoolAdmin', 'superAdmin']); }
     // pages/{homepage|about|faqs} hold the live public copy; pageDrafts/{id} hold staff edits until
     // leadership publishes them, so drafts are never publicly readable.
     match /pages/{id} { allow read: if cmsRead(); allow create, update: if cmsWrite(); }
@@ -449,7 +590,7 @@ service cloud.firestore {
     match /publicAchievements/{id} { allow read: if cmsRead(); allow create, update: if cmsWrite(); }
     // Website image library. Every image needs alt text; a photo showing pupils needs the uploader to
     // confirm public-media consent was checked (CON-002). Files live at media/public/** in Storage.
-    function mediaWriter() { return hasAny(['contentEditor', 'schoolAdmin', 'leadership']); }
+    function mediaWriter() { return hasAny(['contentEditor', 'schoolAdmin', 'leadership', 'superAdmin']); }
     function mediaValid() {
       return data().classification == 'public' && data().status in ['staging', 'approved', 'archived']
         && data().alt is string && data().alt.size() > 0 && data().alt.size() <= 250
@@ -474,14 +615,27 @@ service cloud.firestore {
       allow create, update: if isAdmin();
     }
     match /auditLogs/{id} {
-      allow read: if hasAny(['schoolAdmin', 'leadership', 'auditor', 'privacySteward']);
+      allow read: if hasAny(['schoolAdmin', 'leadership', 'auditor', 'privacySteward', 'superAdmin']);
       allow write: if false; // Cloud Functions only
     }
     match /dataReviewTasks/{id} {
-      allow read: if hasAny(['schoolAdmin', 'privacySteward', 'leadership']) || (signedIn() && resource.data.get('assignedToUid', '') == uid());
-      allow create, update: if hasAny(['schoolAdmin', 'privacySteward']);
+      allow read: if hasAny(['schoolAdmin', 'privacySteward', 'leadership', 'superAdmin']) || (signedIn() && resource.data.get('assignedToUid', '') == uid());
+      allow create, update: if hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']);
     }
-    match /settings/{id} { allow read: if signedIn(); allow create, update: if hasAny(['schoolAdmin', 'technicalAdmin']); }
+    match /settings/{id} {
+      allow read: if signedIn();
+      allow create, update: if id != 'engagement' && hasAny(['schoolAdmin', 'technicalAdmin', 'superAdmin'])
+        && (data().get('currentAcademicYearId', null) == null || yearExists(data().currentAcademicYearId));
+    }
+
+    // ===================== CONFIGURATION LISTS =====================
+    function listItemValid() { return text('name', 60) && optionalText('description', 300) && data().get('order', 0) is int && lifecycle(); }
+    function listWrite(writers) { return hasAny(writers) && listItemValid() && (resource == null ? newStamped() : (stamped() && keepsHistory())); }
+    match /announcementCategories/{id} { allow read: if signedIn(); allow create, update: if listWrite(['schoolAdmin', 'superAdmin']); }
+    match /portfolioCategories/{id} { allow read: if signedIn(); allow create, update: if listWrite(['schoolAdmin', 'superAdmin', 'academicCoordinator']); }
+    match /portfolioTags/{id} { allow read: if signedIn(); allow create, update: if listWrite(['schoolAdmin', 'superAdmin', 'academicCoordinator']); }
+    // Read by the public Resources › Downloads page.
+    match /downloadCategories/{id} { allow read: if signedIn() || resource.data.status == 'active'; allow create, update: if listWrite(['schoolAdmin', 'superAdmin', 'contentEditor']); }
 
     // Certificate verification (srss §38): look up one code at a time, never list.
     match /certificateVerifications/{code} { allow get: if true; allow list, write: if false; }

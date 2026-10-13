@@ -16,8 +16,8 @@ export function StatCard({ label, value, detail, tone = "neutral", to }) {
   return to ? <Link className={`hub-stat hub-tone-${tone}`} to={to}>{body}</Link> : <div className={`hub-stat hub-tone-${tone}`}>{body}</div>;
 }
 
-const BADGE_TONES = { submitted: "good", present: "good", published: "good", granted: "good", active: "good", approved: "good", complete: "good", missing: "warn", open: "info", pending: "warn", late: "warn", review: "info", underReview: "info", absent: "bad", declined: "bad", withdrawn: "bad", overdue: "bad", new: "info", handled: "good" };
-const LABELS = { submitted: "Submitted", missing: "Not submitted", open: "In progress", underReview: "Under review", showcaseCandidate: "Showcase candidate", publicShowcase: "Public showcase", visitBooked: "Visit booked", review: "In review", draft: "Draft", archived: "Archived", handled: "Handled" };
+const BADGE_TONES = { scheduled: "info", transferred: "neutral", completed: "neutral", disabled: "bad", excused: "info", returned: "warn", submitted: "good", present: "good", published: "good", granted: "good", active: "good", approved: "good", complete: "good", missing: "warn", open: "info", pending: "warn", late: "warn", review: "info", underReview: "info", absent: "bad", declined: "bad", withdrawn: "bad", overdue: "bad", new: "info", handled: "good" };
+const LABELS = { family: "Parent-visible", internal: "Internal", scheduled: "Scheduled", transferred: "Moved class", disabled: "Disabled", submitted: "Submitted", missing: "Not submitted", open: "In progress", underReview: "Under review", showcaseCandidate: "Showcase candidate", publicShowcase: "Public showcase", visitBooked: "Visit booked", review: "In review", draft: "Draft", archived: "Archived", handled: "Handled" };
 export function StatusBadge({ status, label }) {
   // Text always accompanies colour — no colour-only status (PRD §54).
   return <span className={`hub-badge hub-tone-${BADGE_TONES[status] || "neutral"}`}>{label || LABELS[status] || String(status ?? "").replace(/^\w/, (c) => c.toUpperCase())}</span>;
@@ -47,9 +47,9 @@ export function LastUpdated({ record, people = {} }) {
 }
 
 // Data table: search, filters, sortable columns, pagination, CSV export (PRD §59 Data components).
-export function DataTable({ columns, rows, searchKeys = [], filters = [], pageSize = 15, exportName, onRowClick, rowHref, empty = "No records match.", initialSort }) {
+export function DataTable({ columns, rows, searchKeys = [], filters = [], initialFilters = {}, pageSize = 15, exportName, onRowClick, rowHref, empty = "No records match.", initialSort }) {
   const [term, setTerm] = useState("");
-  const [values, setValues] = useState({});
+  const [values, setValues] = useState(initialFilters);
   const [sort, setSort] = useState(initialSort || { key: columns[0]?.key, dir: 1 });
   const [page, setPage] = useState(0);
 
