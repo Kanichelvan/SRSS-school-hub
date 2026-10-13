@@ -46,7 +46,7 @@ No Firebase account is needed; everything runs against the offline `demo-srss` p
 2. Terminal 1: `npm run emulators` (Auth, Firestore, Functions, Storage; UI at http://localhost:4000).
 3. Terminal 2: `npm run seed` — 13 demo accounts (one per role), 36 fictional pupils, a week of attendance, consents, portfolio, admissions.
 4. Terminal 3: `npm run dev`, open `/sign-in` and use **Local demo accounts**.
-5. Tests: `npm test` (unit) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records).
+5. Tests: `npm test` (unit) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records). `scripts/test-rules.mjs` runs the emulators with `HTTPS_PROXY`/`HTTP_PROXY` removed, because firebase-tools would otherwise send the Storage emulator's registry lookups to the Firestore emulator through the proxy (it ignores `NO_PROXY`) and treat the failure as a missing record.
 
 ### This Mac: iCloud "Optimize Mac Storage"
 
