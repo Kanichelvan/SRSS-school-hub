@@ -136,7 +136,7 @@ export function SetupWizard() {
     <PageHeader kicker="School setup" title="Welcome to SRSS Digital Hub" actions={data.years.length > 1 && <label className="hub-inline-field">Preparing<select value={target?.id || ""} onChange={(event) => setChosenYear(event.target.value)}>{data.years.filter((year) => (year.status ?? "active") === "active").map((year) => <option key={year.id} value={year.id}>{year.name}</option>)}</select></label>}>
       Let’s prepare your school for the new academic year. {done} of {SETUP_STEPS.length} steps complete.
     </PageHeader>
-    <div className="hub-progress" role="progressbar" aria-valuemin={0} aria-valuemax={SETUP_STEPS.length} aria-valuenow={done} aria-label="Setup progress"><span style={{ width: `${(done / SETUP_STEPS.length) * 100}%` }} /></div>
+    <div className="hub-progress" role="progressbar" aria-valuemin={0} aria-valuemax={SETUP_STEPS.length} aria-valuenow={done} aria-label="Setup progress"><span style={{ transform: `scaleX(${done / SETUP_STEPS.length})` }} /></div>
     <div aria-live="polite">{notice && <p className={notice.tone === "bad" ? "hub-error" : "hub-status"} role="status">{notice.text}</p>}</div>
     <ol className="hub-wizard">{SETUP_STEPS.map(([id, title], index) => {
       const step = status.steps[id];
