@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { ArrowUp } from "@phosphor-icons/react/dist/csr/ArrowUp";
 import { Buildings } from "@phosphor-icons/react/dist/csr/Buildings";
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
@@ -11,6 +10,7 @@ import { Phone } from "@phosphor-icons/react/dist/csr/Phone";
 import { Student } from "@phosphor-icons/react/dist/csr/Student";
 import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
 import { SAFEGUARDING_HREF } from "./legal/registry.js";
+import { CookiePreferencesButton } from "./components/CookiePreferences.jsx";
 
 const MAP_HREF = "https://maps.google.com/?q=6+Jalan+Puchong+Taman+Tan+Yew+Lai+58200+Kuala+Lumpur";
 const PHONE = ["+60 12-600 1926", "tel:+60126001926"];
@@ -48,7 +48,7 @@ export function PreFooter({ onVisit }) {
           <p>Discover an education that nurtures academic excellence, character and human values.</p>
         </div>
         <div className="prefooter-actions">
-          <a className="prefooter-primary" href="/about">Discover SRSS <ArrowRight size={17} weight="bold" aria-hidden="true" /></a>
+          <a className="prefooter-primary" href="/about">Discover SRSS</a>
           <button type="button" className="prefooter-secondary" onClick={onVisit}>Arrange a School Visit</button>
         </div>
       </div>
@@ -106,7 +106,7 @@ export function SiteFooter({ onVisit }) {
           <p>© {year} Sathya Sai International Organisation of Malaysia. All rights reserved.</p>
           <p className="site-footer-jubilee"><strong>SRSS25</strong> | 25 years of Shaping Minds. Nurturing Hearts. Inspiring Lives.</p>
         </div>
-        <p className="site-footer-utility"><a href="/legal/accessibility-complaints">Accessibility</a><span aria-hidden="true">·</span><a href="/legal/privacy">Privacy</a><span aria-hidden="true">·</span><button type="button" onClick={scrollToTop}>Back to Top <ArrowUp size={13} weight="bold" aria-hidden="true" /></button></p>
+        <p className="site-footer-utility"><a href="/legal/accessibility-complaints">Accessibility</a><span aria-hidden="true">·</span><a href="/legal/privacy">Privacy</a><span aria-hidden="true">·</span><CookiePreferencesButton /><span aria-hidden="true">·</span><button type="button" onClick={scrollToTop}>Back to Top <ArrowUp size={13} weight="bold" aria-hidden="true" /></button></p>
       </div>
     </footer>
   );

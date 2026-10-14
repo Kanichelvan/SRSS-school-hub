@@ -2,7 +2,7 @@
 
 Sources: photographs supplied directly by the user, plus selected images from [Sathya Sai Primary School Malaysia on Facebook](https://www.facebook.com/SSPSM/).
 
-The user requested these publicly displayed official-page photographs for the local website prototype. Before production publication, the school should confirm consent and reuse permissions. Originals are preserved separately; processed files are placement copies and have not been generatively altered.
+The user requested these publicly displayed official-page photographs for the local website prototype. Before production publication, the school should confirm consent and reuse permissions. Originals are preserved separately; files in the original processed-photo tables are placement copies and have not been generatively altered. Background-removed header derivatives are documented separately below.
 
 | Original | Processed | Visible subject | Placement | Crop / edits | Publication note |
 |---|---|---|---|---|---|
@@ -46,3 +46,17 @@ User supplied. Originals are preserved byte-for-byte in `originals/`. Web deriva
 | `chess-tournament.jpg` | `chess-tournament-960.jpg` | Small moments montage | SRSS pupils competing at a chess tournament. |
 | `field-friends.jpg` | `field-friends-1052.jpg` | Small moments montage | Smiling SRSS pupils sitting together on the school field. |
 | `scouts-outing.jpg` | `scouts-outing-544.jpg` | Small moments montage | SRSS Scouts walking together during an outdoor activity. |
+## Background-removed header derivatives — 14 October 2026
+
+The local header refinement uses sibling assets under `hero/`; originals and gallery photographs remain unchanged. Built-in imagegen supplied alpha cutouts, followed by mechanical resizing/compression. `hero/manifest.json` records exact source hashes, dimensions and each responsive export. Prompts are stored in `site/docs/HERO-PHOTO-PROMPTS.json`.
+
+| Source | Full transparent derivative | Placement | Classification / approval |
+| --- | --- | --- | --- |
+| `../srss-hero-learning.png` | `hero/reading-cutout-v1.png` | Homepage opening hero | Illustrative; edited derivative for local review |
+| `processed/science-lab-lesson-1600.jpg` | `hero/science-cutout-v1.png` | Learning header | Documentary source, background edited; publication approval pending |
+| `processed/field-friends-1052.jpg` | `hero/friends-cutout-v1.png` | About default, Join and Admissions headers | Documentary source, background edited; publication approval pending |
+| `../sathya-sai-baba-portrait.jpg` | `hero/founder-cutout-v1.png` | Sathya Sai Education header | Adapted illustration; edited derivative for local review |
+
+### Documentary photographs and founder illustration — 15 October 2026
+
+Ten originals supplied directly by the user are preserved byte for byte in `originals/2026-10-15-*`. The source hashes, native dimensions, factual descriptions, focal points and responsive exports are recorded in `intake-2026-10-15.json`. WebP exports only normalise EXIF orientation, resize downward and compress; no AI reconstruction, face changes or enlargement. Nine documentary photos populate Small moments; the orange-robed illustration accompanies the short founder quote. The screenshot provided alongside them is a spacing reference only. Publication was authorised by the user’s commit, push, merge and deploy request on 15 October 2026.

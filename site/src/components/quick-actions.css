@@ -1,0 +1,39 @@
+/* A small metallic drop-up: the labels float individually, without a menu card. */
+.quick-actions { --quick-gutter: 22px; position: fixed; z-index: 30; right: var(--quick-gutter); bottom: max(var(--quick-gutter), env(safe-area-inset-bottom)); display: grid; justify-items: end; gap: 12px; }
+.quick-action-toggle, .quick-actions-top { display: grid; place-items: center; border-radius: 50%; cursor: pointer; }
+.quick-action-toggle { width: 60px; height: 60px; border: 3px solid white; color: var(--navy-950); background: var(--gold-foil); box-shadow: inset 0 1px 3px #fff9, 0 9px 26px #06162f38; }
+.quick-action-toggle svg { transition: rotate .4s var(--ease-out); }
+.quick-action-toggle.is-open svg { rotate: 45deg; }
+.quick-action-toggle:hover { filter: brightness(1.06); }
+.quick-actions-top { width: 46px; height: 46px; border: 2px solid var(--navy-950); color: var(--navy-950); background: #fffffff0; box-shadow: 0 6px 18px #06162f1f; }
+.quick-actions-links { position: absolute; bottom: 74px; right: 0; display: grid; gap: 8px; width: max-content; max-width: calc(100vw - 2 * var(--quick-gutter)); max-height: calc(100dvh - var(--public-header-height, 130px) - 110px); overflow-y: auto; overscroll-behavior: contain; padding: 5px; scrollbar-width: thin; scrollbar-color: #c9a54380 transparent; }
+.quick-action { display: flex; align-items: center; justify-content: end; gap: 12px; min-height: 50px; margin: 0; padding: 0; border: 0; color: var(--navy-950); background: transparent; text-decoration: none; cursor: pointer; animation: quick-action-arrive .35s calc(var(--quick-order) * 25ms) var(--ease-out) both; }
+.quick-action-label { max-width: 190px; padding: 9px 14px; border: 1px solid #ffffffb3; border-radius: 12px; background: #ffffffd6; backdrop-filter: blur(10px); box-shadow: 0 4px 12px #06162f12; font: 600 11px/1.35 var(--ui); text-align: left; transition: background .25s ease; }
+.quick-action-label small { display: block; margin-top: 2px; color: #31465c; font: 500 9px/1.3 var(--ui); }
+.quick-action-orb { position: relative; flex: 0 0 50px; display: grid; place-items: center; width: 50px; height: 50px; overflow: hidden; border: 2px solid white; border-radius: 50%; color: white; background: var(--quick-metal); box-shadow: inset 0 1px 3px #ffffff80, inset 0 -3px 7px #0003, 0 5px 12px #06162f20; transition: scale .25s var(--ease-out), filter .25s ease; }
+.quick-action-orb::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 30%, #ffffff40 47%, transparent 62%); pointer-events: none; }
+.quick-action-orb svg { position: relative; filter: drop-shadow(0 1px 1px #0004); }
+.quick-action-gold { --quick-metal: linear-gradient(135deg, #714702, #b7830c 35%, #f3df86 57%, #b08a21 78%, #70500b); }
+.quick-action-violet { --quick-metal: linear-gradient(135deg, #45219b, #8050e3 35%, #c4a4ff 57%, #7644d2 78%, #462184); }
+.quick-action-orange { --quick-metal: linear-gradient(135deg, #8c2d09, #dd6119 35%, #ffc484 57%, #d96c25 78%, #93400a); }
+.quick-action-rose { --quick-metal: linear-gradient(135deg, #810c43, #c53076 35%, #f79fce 57%, #c14787 78%, #8a1b4d); }
+.quick-action-blue { --quick-metal: linear-gradient(135deg, #062e65, #185992 35%, #82b8e4 57%, #216696 78%, #082f59); }
+.quick-action-purple { --quick-metal: linear-gradient(135deg, #4a0f55, #7b2482 35%, #d6a0da 57%, #9837a1 78%, #5f176c); }
+.quick-action-green { --quick-metal: linear-gradient(135deg, #075333, #187649 35%, #91c7a8 57%, #247d53 78%, #075333); }
+.quick-action-navy { --quick-metal: linear-gradient(135deg, #06162f, #183f64 35%, #81a0ba 57%, #234c70 78%, #0a1e3e); }
+.quick-action:hover .quick-action-orb { scale: 1.04; filter: brightness(1.06); }
+.quick-action:hover .quick-action-label, .quick-action:focus-visible .quick-action-label { background: #fffffff2; }
+.quick-action:focus-visible, .quick-action-toggle:focus-visible, .quick-actions-top:focus-visible { outline: 3px solid #d2ac47; outline-offset: 3px; }
+@keyframes quick-action-arrive { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+@media (max-width: 620px) {
+  .quick-actions { --quick-gutter: 14px; }
+  .quick-action-toggle { width: 56px; height: 56px; }
+  .quick-actions-links { bottom: 70px; gap: 6px; }
+  .quick-action { gap: 10px; min-height: 46px; }
+  .quick-action-orb { flex-basis: 46px; width: 46px; height: 46px; }
+  .quick-action-label { max-width: 180px; padding: 8px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quick-action { animation: none; }
+  .quick-action-toggle svg, .quick-action-orb, .quick-action-label { transition: none; }
+}

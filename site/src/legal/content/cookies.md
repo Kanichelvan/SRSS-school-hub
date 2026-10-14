@@ -266,7 +266,7 @@ Nothing in this Policy limits rights or obligations that cannot lawfully be excl
 
 ## Schedule A — Technologies in use
 
-This schedule lists the cookies, browser storage and outside services the SRSS Digital Hub actually uses. It was prepared from a review of the Platform’s software on 13th October 2026 and will be confirmed again when the Platform goes live.
+This schedule lists the cookies, browser storage and outside services the SRSS Digital Hub actually uses. It was prepared from a review of the Platform’s software on 15th October 2026 and will be confirmed again when the Platform goes live.
 
 **No analytics, advertising or tracking tools are in use.** The Platform does not use Google Analytics, advertising networks, social media pixels or similar technologies. The School will update this schedule, and provide any required notice or choice, before introducing one.
 
@@ -276,9 +276,10 @@ This schedule lists the cookies, browser storage and outside services the SRSS D
 |---|---|---|---|---|---|
 | Firebase sign-in session (browser database “firebaseLocalStorageDb”) | Digital Hub, after signing in | Your account identifier and secure sign-in tokens | Keeps you signed in and lets the Hub check your role | Until you sign out | Strictly necessary |
 | srss.hub.signInEmail (local storage) | Digital Hub, when signing in with an emailed link | The email address you entered | Completes link sign-in on the same device | Removed once sign-in is complete | Strictly necessary |
-| srss.hub.activeHub (local storage) | Digital Hub, for accounts with more than one hub | Which hub you last opened, for example Parents Hub | Opens the same hub next time | Removed when you sign out | Functional |
+| srss.cookiePreferences.v1 (local storage) | Public website and Digital Hub | Your optional-service choices and their expiry, without your name or email | Remembers this choice for 180 days | 180 days after saving | Strictly necessary |
+| srss.hub.activeHub (local storage) | Digital Hub, for accounts with more than one hub | Which hub you last opened, for example Parents Hub | Opens the same hub next time, only when “Remember my hub” is allowed | Removed when you sign out or withdraw this preference | Functional |
 
-The public website sets no cookies or browser storage of its own.
+On your first visit, a compact Cookie choices prompt keeps optional services off until you choose. Accept allows the optional services, Decline keeps necessary services only, and Manage preferences opens the detailed choices. Closing an unanswered prompt keeps optional services off. Reopen Cookie preferences from either footer to change your choice. Maps and YouTube embeds unload when permission is withdrawn; locally hosted school photographs and videos do not require this optional permission. If browser storage is unavailable, choices apply for the current session.
 
 ### A.2 Outside services
 
@@ -288,8 +289,8 @@ The public website sets no cookies or browser storage of its own.
 | Google sign-in | Google | Digital Hub, “Continue with school Google account” | Your school Google account details | Google sets its own cookies on Google’s websites |
 | Cloud Firestore, Cloud Storage and Cloud Functions | Google Cloud (Firebase), region asia-southeast1 (Singapore) | Public pages read published news, events and images; enquiry and contact forms; all Digital Hub records | What you submit or view, and your IP address | No cookies |
 | Google Fonts | Google | Every page | Your IP address and browser details when the typefaces download | Google states that this service does not set cookies |
-| Google Maps (embedded map) | Google | Homepage, “Visit SRSS” | Your IP address and browser details when the map loads | Google may set its own cookies |
-| YouTube in privacy-enhanced mode (youtube-nocookie.com) | Google | “Before the First Bell” page, only after you press play | Your IP address and viewing activity for that video | YouTube may store identifiers once a video plays |
+| Google Maps (embedded map) | Google | Contact & visit, only after allowing external maps and videos | Your IP address and browser details when the map loads | Google may set its own cookies |
+| YouTube in privacy-enhanced mode (youtube-nocookie.com) | Google | “Before the First Bell” page, only after allowing external maps and videos and pressing play | Your IP address and viewing activity for that video | YouTube may store identifiers once a video plays |
 
 Links to Facebook and Google Maps open those websites in a new tab. No Facebook content is embedded in the Platform.
 

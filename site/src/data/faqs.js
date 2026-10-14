@@ -16,7 +16,7 @@ export const defaultFaqs = [
   {
     question: "What curriculum does SRSS follow?",
     paragraphs: [
-      "SRSS follows the Malaysian National Primary School Curriculum (KSSR – Kurikulum Standard Sekolah Rendah) in accordance with the framework established by the Ministry of Education Malaysia.",
+      "From 2027, Standard 1 follows the Ministry of Education’s new KP2027 syllabus. Standards 2–6 follow KSSR (Kurikulum Standard Sekolah Rendah), Malaysia’s national primary curriculum.",
       "Across the six years of primary education, students build strong foundations in literacy, numeracy, scientific understanding, communication, critical thinking and problem-solving.",
       "Alongside the national curriculum, SRSS places particular emphasis on the holistic development of every child, integrating academic learning with character development and Education in Human Values.",
     ],
@@ -24,10 +24,11 @@ export const defaultFaqs = [
   {
     question: "What subjects are offered at SRSS?",
     paragraphs: [
-      "Students receive a broad primary education that develops competency across languages, Mathematics, Science, History, the Arts, Physical Education and other areas prescribed within the national curriculum.",
+      "Under KP2027, Standard 1 studies Alam dan Manusia, Mathematics, Malay and English. For Standards 2–6 under KSSR, core subjects include Malay, English, Mathematics, Science and Moral Education; History is a core subject in Standards 4–6.",
+      "Non-core subjects include Technology Design (RBT), Visual Arts, Music, and Physical and Health Education. SRSS also offers ICT alongside its values education and additional language classes.",
       "Bahasa Malaysia and English form an important part of every student’s language development. Students may also learn an additional language through supplementary classes in:",
     ],
-    bullets: ["Mandarin", "Tamil", "Telugu", "Malayalam"],
+    bullets: ["Tamil", "Chinese", "Telugu"],
     sections: [
       {
         heading: "Sathya Sai Education in Human Values",
@@ -46,7 +47,7 @@ export const defaultFaqs = [
       "SRSS provides a bilingual learning environment, with both English and Bahasa Malaysia playing important roles throughout school life.",
       "Science and Mathematics are taught through the Dual Language Programme (DLP), enabling students to learn these subjects in English while developing familiarity with the appropriate terminology in Bahasa Malaysia.",
       "Subjects such as History, Visual Arts, Music and Physical Education are predominantly taught in Bahasa Malaysia, while many school assemblies, SSEHV activities, presentations and special programmes are conducted in English.",
-      "Students therefore become comfortable communicating and learning across both languages, while supplementary Mandarin, Tamil, Telugu or Malayalam classes further enrich their multilingual experience.",
+      "Students therefore become comfortable communicating and learning across both languages, while supplementary Tamil, Chinese and Telugu classes further enrich their multilingual experience.",
     ],
   },
   {

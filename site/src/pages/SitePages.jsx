@@ -2,6 +2,8 @@
 // shared homepage blocks (passed in as `blocks`), FAQ records and the route map. Child URLs that are
 // "sections" scroll to the matching anchor here until they earn standalone pages (see src/data/siteMap.js).
 import { useMemo, useState } from "react";
+import HeroVideo, { HERO_CLIPS } from '../components/HeroVideo.jsx';
+import HeroPhoto, { HERO_PHOTOS } from '../components/HeroPhoto.jsx';
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
 import { CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
@@ -26,9 +28,9 @@ export function Breadcrumbs({ entry }) {
   );
 }
 
-function PageHero({ eyebrow, title, children, actions, image, alt }) {
+function PageHero({ eyebrow, title, children, actions, image, alt, video, photo }) {
   return (
-    <section className={`landing-hero${image ? "" : " landing-hero-plain"}`} id="top">
+    <section className={`landing-hero${image || video || photo ? "" : " landing-hero-plain"}`} id="top">
       <div className="page-inner landing-hero-grid">
         <div>
           <p className="eyebrow">{eyebrow}</p>
@@ -36,7 +38,7 @@ function PageHero({ eyebrow, title, children, actions, image, alt }) {
           <div className="landing-hero-copy">{children}</div>
           {actions && <div className="landing-hero-actions">{actions}</div>}
         </div>
-        {image && <figure><img src={image} alt={alt} /></figure>}
+        {photo ? <figure><HeroPhoto image={photo} priority /></figure> : video ? <figure><HeroVideo clip={video} priority /></figure> : image && <figure><img src={image} alt={alt} /></figure>}
       </div>
     </section>
   );
@@ -85,23 +87,25 @@ export function OrganisationChart() {
 // ---------- 02 Learning ----------
 export function LearningPage({ blocks, faqs }) {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Learning at SRSS" title="Every Child. Every Possibility." image="/assets/photos/processed/science-lab-lesson-1600.jpg" alt="A teacher demonstrating a science experiment to SRSS pupils."
-      actions={<><a className="primary-button" href="/learning/curriculum">Explore the Curriculum <ArrowRight size={18} /></a><a className="text-button" href="/student-life">Discover Student Life <ArrowRight size={18} /></a></>}>
+    <PageHero eyebrow="Learning at SRSS" title="Every Child. Every Possibility." photo={HERO_PHOTOS.science}
+      actions={<><a className="primary-button" href="/learning/curriculum">Explore the Curriculum</a><a className="text-button" href="/student-life">Discover Student Life</a></>}>
       <p>At SRSS, learning develops knowledge, curiosity, confidence, character and the ability to contribute meaningfully to the world.</p>
     </PageHero>
     <Directory path="/learning" title="Learning at SRSS" />
     <LearningApproach />
-    <PageSection id="curriculum" eyebrow="Curriculum" title="Malaysia’s national curriculum, taught with heart." intro="SRSS follows the national primary curriculum, with the five human values woven through every subject.">
+    <div id="curriculum" className="anchor-block">{blocks.learning()}</div>
+    {blocks.activeBodies()}
+    <PageSection id="curriculum-questions" eyebrow="Curriculum questions" title="Learning, explained.">
       <FaqList items={faqs} questions={FAQ_TOPICS.curriculum} idPrefix="curriculum" firstOpen />
     </PageSection>
     <PageSection id="learning-journey" eyebrow="The learning journey" title="Standard 1 to Standard 6." tone="ivory">
       <FaqList items={faqs} questions={FAQ_TOPICS.journey} idPrefix="journey" firstOpen />
     </PageSection>
-    <div id="human-values" className="anchor-block">{blocks.learning()}</div>
+    <div id="human-values" className="anchor-block">{blocks.values()}</div>
     <LearningSpaces id="learning-environment" eyebrow="Learning environment" />
     <Closing title="See learning come alive.">
-      <a className="primary-button" href="/student-life">Discover Student Life <ArrowRight size={18} /></a>
-      <a className="text-button" href="/about/sathya-sai-education">The philosophy behind it <ArrowRight size={18} /></a>
+      <a className="primary-button" href="/student-life">Discover Student Life</a>
+      <a className="text-button" href="/about/sathya-sai-education">The philosophy behind it</a>
     </Closing>
   </main>;
 }
@@ -114,8 +118,8 @@ export function StoryFilters({ current }) {
 
 export function StudentLifePage({ blocks, faqs, entry }) {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Student Life" title="Growing Together. Learning for Life." image="/assets/photos/processed/sports-day-march-1600.jpg" alt="SRSS pupils taking part in a Sports Day march."
-      actions={<><a className="primary-button" href="/student-life/gallery">See school life <ArrowRight size={18} /></a><a className="text-button" href="/student-life/stories">Read our stories <ArrowRight size={18} /></a></>}>
+    <PageHero eyebrow="Student Life" title="Growing Together. Learning for Life." video={HERO_CLIPS.malaysia}
+      actions={<><a className="primary-button" href="/student-life/gallery">See school life</a><a className="text-button" href="/student-life/stories">Read our stories</a></>}>
       <p>Beyond lessons and examinations, SRSS offers children opportunities to discover their talents, build friendships, develop confidence and practise human values through meaningful experiences.</p>
     </PageHero>
     <Directory path="/student-life" title="Student Life" />
@@ -129,8 +133,8 @@ export function StudentLifePage({ blocks, faqs, entry }) {
     <div id="stories" className="anchor-block">{blocks.news({ category: entry?.category })}</div>
     <div id="events" className="anchor-block">{blocks.calendar()}</div>
     <Closing title="Come and see a school day for yourself.">
-      <button type="button" className="primary-button" onClick={blocks.openVisit}>Arrange a visit <ArrowRight size={18} /></button>
-      <a className="text-button" href="/join">Join SRSS <ArrowRight size={18} /></a>
+      <button type="button" className="primary-button" onClick={blocks.openVisit}>Arrange a visit</button>
+      <a className="text-button" href="/join">Join SRSS</a>
     </Closing>
   </main>;
 }
@@ -160,7 +164,7 @@ export function CommunityForm({ subject, intro, extra = [], messageLabel, submit
       <label className="wide-label">{messageLabel}<textarea required name="message" rows="4" maxLength={3500} /></label>
       <p className="form-privacy wide-label">{note} The School uses these details to reply to you, as described in our <a href="/legal/privacy">Privacy Policy</a>.</p>
       {state.error && <p className="form-error wide-label" role="alert">{state.error}</p>}
-      <button className="primary-button" type="submit" disabled={state.busy}>{state.busy ? "Sending…" : submitLabel} <ArrowRight size={18} weight="bold" /></button>
+      <button className="primary-button" type="submit" disabled={state.busy}>{state.busy ? "Sending…" : submitLabel}</button>
     </form>
   );
 }
@@ -190,7 +194,7 @@ function CommunityCard({ item }) {
 
 export function JoinPage() {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Join SRSS" title="Be Part of Something Meaningful." image="/assets/photos/processed/field-friends-1052.jpg" alt="Smiling SRSS pupils sitting together on the school field.">
+    <PageHero eyebrow="Join SRSS" title="Be Part of Something Meaningful." photo={HERO_PHOTOS.friends}>
       <p>Whether you are choosing a school for your child, reconnecting as an alumnus or contributing your time and talents, there is a place for you in the SRSS community.</p>
     </PageHero>
     <section className="page-pathways page-inner" aria-label="Two ways to join SRSS">
@@ -205,8 +209,8 @@ export function JoinPage() {
 
 export function AdmissionsPage({ blocks, faqs, pillars }) {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Admissions" title="Begin the journey." image="/assets/photos/processed/assembly-achievements-1280.jpg" alt="SRSS pupils sharing certificates during assembly."
-      actions={<><a className="primary-button" href="#enquiry">Make an enquiry <ArrowRight size={18} /></a><button type="button" className="text-button" onClick={blocks.openVisit}>Book a visit <ArrowRight size={18} /></button></>}>
+    <PageHero eyebrow="Admissions" title="Begin the journey." photo={HERO_PHOTOS.friends}
+      actions={<><a className="primary-button" href="#enquiry">Make an enquiry</a><button type="button" className="text-button" onClick={blocks.openVisit}>Book a visit</button></>}>
       <p>SRSS welcomes primary-age children, Standard 1 to Standard 6, from families of every background who share a values-based approach to education.</p>
     </PageHero>
     <Directory path="/join/admissions" title="Admissions" />
@@ -291,7 +295,7 @@ export function GovernancePage() {
       <p className="page-note">The Principal is the first point of contact through the school office on <a href={contact.phoneHref}>{contact.phone}</a>. Concerns about the Principal go to the Chair of the Board of Governors, Dr Maniam.</p>
     </PageSection>
     <Closing title="Meet the people who make SRSS.">
-      <a className="primary-button" href="/about/our-people">Our People <ArrowRight size={18} /></a>
+      <a className="primary-button" href="/about/our-people">Our People</a>
     </Closing>
   </main>;
 }
@@ -355,7 +359,7 @@ const SECTIONS_SSE = [["The inspiration", "inspiration"], ["Educare", "educare"]
 
 export function SathyaSaiEducationPage({ values, quote, faqs }) {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Sathya Sai Education" title="Drawing Out What Is Already Within." image="/assets/sathya-sai-baba-portrait.jpg" alt="Illustrated portrait of Bhagawan Sri Sathya Sai Baba in an orange robe">
+    <PageHero eyebrow="Sathya Sai Education" title="Drawing Out What Is Already Within." photo={HERO_PHOTOS.founder}>
       <p>Discover the philosophy of Sathya Sai Educare and an approach to education that seeks to develop the whole person.</p>
     </PageHero>
     <nav className="page-subnav" aria-label="On this page"><div className="page-inner">{SECTIONS_SSE.map(([label, id]) => <a key={id} href={`#${id}`}>{label}</a>)}</div></nav>
@@ -398,8 +402,8 @@ export function SathyaSaiEducationPage({ values, quote, faqs }) {
       <FaqList items={faqs} questions={FAQ_TOPICS.whySrss} idPrefix="sse" firstOpen />
     </PageSection>
     <Closing title="See how we integrate human values.">
-      <a className="primary-button" href="/learning/human-values">Human Values in Learning <ArrowRight size={18} /></a>
-      <a className="text-button" href="/about/our-people">Meet Our People <ArrowRight size={18} /></a>
+      <a className="primary-button" href="/learning/human-values">Human Values in Learning</a>
+      <a className="text-button" href="/about/our-people">Meet Our People</a>
     </Closing>
   </main>;
 }
@@ -414,11 +418,12 @@ export function JubileePage({ blocks, motto }) {
       <div className="page-inner jubilee-hero-grid">
         <div>
           <p className="eyebrow">SRSS25 · 2002–2027 · Silver Jubilee</p>
+          <img className="jubilee-video-brand" src="/assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" />
           <h1>25 Years of Education for Life.</h1>
           <div className="landing-hero-copy"><p>A quarter-century of learning, growing and nurturing human values — and an invitation to everyone who has been part of the journey.</p></div>
-          <div className="landing-hero-actions"><a className="primary-button" href="#memories">Share your SRSS memory <ArrowRight size={18} /></a><a className="text-button" href="#events">Anniversary events <ArrowRight size={18} /></a></div>
+          <div className="landing-hero-actions"><a className="primary-button" href="#memories">Share your SRSS memory</a><a className="text-button" href="#events">Anniversary events</a></div>
         </div>
-        <figure className="jubilee-mark"><img src="/assets/brand/originals/srss-25-anniversary-mark.png" alt="SRSS 25th anniversary mark" /><figcaption>{motto}</figcaption></figure>
+        <figure className="jubilee-hero-video"><HeroVideo clip={HERO_CLIPS.school} priority /><figcaption className="jubilee-video-motto">{motto}</figcaption></figure>
       </div>
     </section>
     <nav className="page-subnav jubilee-subnav" aria-label="SRSS25"><div className="page-inner">{JUBILEE_NAV.map(([label, id]) => <a key={id} href={`#${id}`}>{label}</a>)}</div></nav>
@@ -491,8 +496,8 @@ export function ContentPage({ entry, content, parent }) {
       <nav className="page-directory content-related" aria-label={`More in ${parent?.label}`}>{siblings.map((item) => <a key={item.path} href={item.path}><strong>{item.label}</strong><span>{item.summary}</span><ArrowRight size={16} aria-hidden="true" /></a>)}</nav>
     </div></section>}
     <Closing title="Come and discover SRSS for yourself.">
-      <a className="primary-button" href="/join/admissions">Admissions <ArrowRight size={18} /></a>
-      {parent && <a className="text-button" href={parent.path}>Back to {parent.label} <ArrowRight size={18} /></a>}
+      <a className="primary-button" href="/join/admissions">Admissions</a>
+      {parent && <a className="text-button" href={parent.path}>Back to {parent.label}</a>}
     </Closing>
   </main>;
 }

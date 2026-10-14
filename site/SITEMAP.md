@@ -72,7 +72,7 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/learning/curriculum` | Curriculum | Section of `/learning#curriculum` | Academic coordinator |
 | `/learning/learning-journey` | Learning Journey | Section of `/learning#learning-journey` | Academic coordinator |
 | `/learning/human-values` | Human Values | Section of `/learning#human-values` | Academic coordinator |
-| `/learning/enrichment` | Enrichment | Section of `/learning#human-values` | Academic coordinator |
+| `/learning/enrichment` | Enrichment | Section of `/learning#active-bodies` | Academic coordinator |
 | `/learning/reading-library` | Reading & Library | Section of `/learning#learning-environment` | Academic coordinator |
 | `/learning/learning-support` | Learning Support | Section of `/learning#learning-environment` | Academic coordinator |
 | `/learning/learning-environment` | Learning Environment | Section of `/learning#learning-environment` | Academic coordinator |
@@ -123,17 +123,16 @@ The secure hub uses `/login` (with `/sign-in` kept as an alias) and `/hub/studen
 
 1. Announcement bar
 2. Hero ("The End of Education is Character")
-3. Welcome to Sekolah Rendah Sathya Sai ("Learning for Life. Growing in Human Excellence.") with Our Educational Promise (the four mission pillars → Vision & Mission)
-4. Learning at SRSS (→ Learning)
-5. Find your way · I am a… (Parent, Student and Teacher sign in to their hubs; Prospective family → Admissions; Staff → Admin Hub)
-6. Life at SRSS (six photos → Student Life › Gallery)
-7. Our People (Principal’s message → Our People)
-8. Silver Jubilee (→ About › Silver Jubilee)
-9. News & Events, with the calendar
-10. Five FAQs (→ Resources › FAQs)
-11. Admissions invitation (→ Join › Admissions, or book a visit)
-12. Contact
-13. Footer
+3. Welcome to Sekolah Rendah Sathya Sai, followed by the five vibrant outcome file tabs
+4. Interactive Values Garden
+5. Open academic overview (copy left, microscope photograph right)
+6. Active bodies (football photograph left)
+7. Small moments. Lasting roots. (nine supplied photographs; no visible generic captions)
+8. Gold founder quote — “Education for life, not mere living.” — with a link to the Principal’s welcome
+9. Stories & Happenings: prominent SRSS25 invitation, blended assembly loop, reporting and integrated school calendar
+10. Begin the journey / Find your way: admissions invitation, five-role hub access and compact Contact & visit disclosure
+11. Collapsed FAQ, with five individual answers and a link to the complete FAQ
+12. Footer, including Cookie preferences
 
 The welcome names the school, not the platform: the Digital Hub is the platform, and the school is the identity.
 
@@ -141,10 +140,12 @@ The welcome names the school, not the platform: the Digital Hub is the platform,
 
 | Existing content | Now lives at | Status |
 |---|---|---|
-| Homepage hero, role selector, Silver Jubilee band, “Small moments” carousel | `/` | Kept. Role destinations corrected and gallery shortened to six photos. |
+| Homepage hero, role selector, Silver Jubilee band, “Small moments” carousel | `/` | Kept. Role destinations corrected; nine newly supplied photos lead the consistent gallery frames. |
 | “Welcome to SRSS Digital Hub” | `/` | Renamed “Welcome to Sekolah Rendah Sathya Sai” |
-| Values-integrated curriculum, whole-child development pillars | `/join/why-srss` | Moved from the homepage. The homepage now shows the four mission pillars. |
-| Learning experience tabs and Values Garden | `/learning/human-values` | One component, also previewed on the homepage |
+| Values-integrated curriculum, whole-child development pillars | `/join/why-srss` | Moved from the homepage. The homepage combines them into five outcome file tabs. |
+| Academic programme, subjects and school hours | `/learning/curriculum` | Shared AcademicOverview, also shown on the homepage |
+| Values Garden | `/learning/human-values` | Shared ValuesGarden, following the outcome file tabs on the homepage |
+| Active bodies and co-curricular life | `/learning/enrichment` | Shared ActiveBodies, following academics on the homepage |
 | “More Than Schooling” framework (was on About) | `/learning` (approach) | Moved |
 | Learning spaces | `/about/campus` and `/learning/learning-environment` | One shared component |
 | Sathya Sai Baba and SSIOM page (`/about/inspiration`) | `/about/sathya-sai-education` | Redirected. Its duplicated governance chart was removed. |
@@ -224,3 +225,7 @@ Explicit non-goals for launch: payroll, accounting ledger, procurement ERP, mult
 ## Definition of ready for each page
 
 Named audience and content owner · canonical route and navigation parent · approved copy, assets and calls to action · mobile, keyboard and WCAG 2.2 AA behaviour · empty, loading, error and success states · page title and metadata · integration owner and privacy review where applicable · acceptance criteria and realistic sample data.
+
+### Homepage refinement — 15 October 2026
+
+After open academics and Active bodies: the supplied-photo Small moments carousel → the spacious gold founder quote with Principal welcome link → Stories & Happenings with SRSS25 invitation, reports and its integrated calendar → Begin the journey / Find your way, with compact contact disclosure → collapsed FAQ. Cookie preferences appear on first encounter and reopen from both public and Hub footers. Existing page URLs remain stable.

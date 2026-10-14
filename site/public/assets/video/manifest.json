@@ -1,0 +1,63 @@
+{
+  "excludedSource": "SRSS25_closure_03.mov",
+  "sourceOriginals": "Preserved unchanged in the user-supplied Downloads paths.",
+  "clips": [
+    {
+      "source": "Hailuo_Video_A large group of SRSS primary _555093935726632960.mp4",
+      "sourceSha256": "4ad3638e9c8e36fa3b892c6c5e27875203bcde51bf8d422ccabd30ee66062212",
+      "loop": "assembly-loop-v1.mp4",
+      "mobileLoop": "assembly-mobile-loop-v1.mp4",
+      "mobileWidth": 640,
+      "mobileBytes": 1002681,
+      "poster": "assembly-poster-v1.jpg",
+      "sourceDurationSeconds": 12.25,
+      "approximateLoopSeconds": 16.86,
+      "playbackSpeed": 0.645,
+      "loopDissolveSeconds": 1.2,
+      "fps": 30,
+      "interpolation": "motion-compensated",
+      "width": 1280,
+      "bytes": 2204275,
+      "audio": false,
+      "classification": "User-supplied illustrative Hailuo school scene; no event/date or pupil identity asserted."
+    },
+    {
+      "source": "Hailuo_Video_Scene & Setting_ A bright, sun_555096310273126401.mp4",
+      "sourceSha256": "d72ee908b4db2b6b7323253ef455c1408e24a7d52c10819b5d680da008eb9fea",
+      "loop": "malaysia-flag-loop-v1.mp4",
+      "mobileLoop": "malaysia-flag-mobile-loop-v1.mp4",
+      "mobileWidth": 640,
+      "mobileBytes": 1164121,
+      "poster": "malaysia-flag-poster-v1.jpg",
+      "sourceDurationSeconds": 12.25,
+      "approximateLoopSeconds": 16.86,
+      "playbackSpeed": 0.645,
+      "loopDissolveSeconds": 1.2,
+      "fps": 30,
+      "interpolation": "motion-compensated",
+      "width": 1280,
+      "bytes": 2167933,
+      "audio": false,
+      "classification": "User-supplied illustrative Hailuo school scene; no event/date or pupil identity asserted."
+    },
+    {
+      "source": "Hailuo_Video_Scene & Setting_ A bright, sun_555115340165939202.mp4",
+      "sourceSha256": "782dd26b330e3c67978259881e08114545f3fcbc2dbeeaecc0384b388b0a7018",
+      "loop": "school-flag-loop-v1.mp4",
+      "mobileLoop": "school-flag-mobile-loop-v1.mp4",
+      "mobileWidth": 640,
+      "mobileBytes": 1148850,
+      "poster": "school-flag-poster-v1.jpg",
+      "sourceDurationSeconds": 14.38,
+      "approximateLoopSeconds": 20.16,
+      "playbackSpeed": 0.645,
+      "loopDissolveSeconds": 1.2,
+      "fps": 30,
+      "interpolation": "motion-compensated",
+      "width": 1280,
+      "bytes": 2557700,
+      "audio": false,
+      "classification": "User-supplied illustrative Hailuo school scene; no event/date or pupil identity asserted."
+    }
+  ]
+}

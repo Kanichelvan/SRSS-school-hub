@@ -1,0 +1,36 @@
+/* Original SRSS25 artwork, with responsive semantic value controls over its petals. */
+.home-values-garden { padding: 22px 32px 64px; background: var(--ivory); border-bottom: 1px solid var(--line); }
+.home-values-garden > .home-values-inner { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: clamp(30px, 5vw, 78px); max-width: 1180px; margin: 0 auto; }
+.home-values-art { position: relative; isolation: isolate; container-type: inline-size; width: 100%; max-width: 560px; aspect-ratio: 1458 / 1534; margin-inline: auto; }
+.home-values-art > svg { display: block; width: 100%; height: auto; overflow: hidden; pointer-events: none; }
+.home-value-petal { position: absolute; left: var(--petal-x); top: var(--petal-y); translate: -50% -50%; rotate: var(--petal-angle); display: grid; place-items: center; width: 23%; min-height: max(44px, 12cqi); padding: 1.2cqi; border: 0; border-radius: 50%; color: white; background: transparent; font: 700 clamp(12px, 3.65cqi, 22px)/1.1 var(--ui); letter-spacing: .015em; text-align: center; text-transform: uppercase; text-shadow: 0 1px 3px #06162f80; cursor: pointer; transition: scale .3s var(--ease-out), text-shadow .3s ease; }
+.home-value-petal > span { display: grid; gap: 2px; }
+.home-value-petal > span > span { display: block; }
+.home-value-conduct, .home-value-nonviolence { font-size: clamp(11px, 3.1cqi, 19px); }
+.home-value-petal[aria-pressed="true"] { text-shadow: 0 1px 3px #06162f80, 0 0 14px #ffffff80; }
+.home-value-petal:focus-visible { outline: 2px solid white; outline-offset: 2px; background: #06162f26; }
+@media (hover: hover) { .home-value-petal:hover { scale: 1.05; text-shadow: 0 1px 3px #06162f80, 0 0 14px #ffffff80; } }
+.home-values-copy h2 { margin: 10px 0 18px; color: var(--navy-950); font: 600 clamp(30px, 3.2vw, 43px)/1.12 var(--serif); letter-spacing: -.02em; }
+.home-values-copy > p:not(.eyebrow) { margin: 0; color: var(--muted); font: 400 15px/1.8 var(--body); }
+.home-values-copy > p.home-values-cue { margin-top: 12px; color: var(--purple-700); font: 600 12px/1.6 var(--ui); }
+.home-value-explanation { margin-top: 22px; padding: 22px 24px; border-left: 3px solid var(--value-color); border-radius: 0 8px 8px 0; background: #ffffffc9; }
+.home-value-content { animation: editorial-arrive .4s var(--ease-out) both; }
+.home-value-content h3 { margin: 0 0 10px; color: var(--navy-950); font: 600 25px/1.2 var(--serif); }
+.home-value-content p { margin: 0; color: var(--muted); font: 400 14px/1.8 var(--body); }
+.home-value-content .home-value-practice { margin-top: 14px; color: var(--navy-950); font-weight: 600; }
+@media (max-width: 900px) {
+  .home-values-garden { padding: 12px 24px 48px; }
+  .home-values-garden > .home-values-inner { gap: 28px; }
+  .home-values-copy h2 { font-size: 32px; }
+}
+@media (max-width: 620px) {
+  .home-values-garden { padding: 8px 18px 42px; }
+  .home-values-garden > .home-values-inner { grid-template-columns: 1fr; gap: 28px; }
+  .home-values-art { max-width: 390px; }
+  .home-values-copy h2 br { display: none; }
+  .home-value-explanation { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-value-petal { transition: none; }
+  .home-value-content { animation: none; }
+}

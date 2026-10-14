@@ -1,0 +1,33 @@
+.hero-video { position: relative; min-width: 0; overflow: hidden; background: var(--navy-950); isolation: isolate; }
+.hero-video .hero-video-poster, .hero-video-footage { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.hero-video-footage { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.hero-video.has-frame .hero-video-footage { opacity: 1; }
+.hero-video-control { position: absolute; z-index: 3; right: 16px; bottom: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 13px; border: 1px solid #ffffff80; border-radius: 6px; color: white; background: #06162fe8; font: 500 11px var(--ui); cursor: pointer; }
+.hero-video-control:hover { background: var(--purple-metal); }
+.hero-video-caption { position: absolute; z-index: 2; left: 16px; bottom: 16px; padding: 5px 8px; border-radius: 3px; color: #ffffffdb; background: #06162fd9; font: 10px var(--body); }
+.landing-hero .hero-video { height: 100%; min-height: 420px; }
+.landing-hero figure:has(.hero-video)::before { pointer-events: none; }
+.jubilee-hero .jubilee-hero-video { display: flex; flex-direction: column; align-self: stretch; margin: 0; min-width: 0; }
+.jubilee-hero-video .hero-video { flex: 1; height: auto; min-height: 360px; border-radius: 8px; }
+.jubilee-hero .jubilee-hero-video::before { display: none; }
+.jubilee-hero .jubilee-hero-video img { min-height: 0; }
+.jubilee-video-brand { display: block; width: 68px; height: 68px; margin-bottom: 18px; object-fit: contain; }
+.jubilee-video-motto { margin-top: 18px; color: var(--gold-500); font: 600 15px var(--serif); }
+@media (max-width: 900px) {
+  .landing-hero .hero-video, .jubilee-hero-video .hero-video { min-height: 0; height: clamp(240px, 55vw, 400px); }
+  .landing-hero .hero-video .hero-video-poster { min-height: 0; max-height: none; }
+  .jubilee-hero .jubilee-hero-video { display: block; margin-top: 12px; }
+  .jubilee-hero-video .hero-video { flex: none; }
+}
+@media (max-width: 380px) {
+  .hero-video-caption { bottom: 68px; }
+  .hero-video-control { right: 12px; bottom: 12px; }
+}
+@media (max-width: 620px) {
+  /* Keep page-header controls clear of the floating quick-actions button. */
+  .hero-video:not(.hero-image) .hero-video-control { left: 12px; right: auto; bottom: 12px; }
+  .hero-video:not(.hero-image) .hero-video-caption { left: 12px; bottom: 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-video-footage { transition: none; }
+}

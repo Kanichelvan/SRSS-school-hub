@@ -58,3 +58,7 @@ node_modules.incomplete/
 
 # Parallel local checkouts are not distributable source.
 .claude/worktrees/
+
+# Byte-identical iCloud sync copies; originals remain versioned.
+* 2.*
+* 2
