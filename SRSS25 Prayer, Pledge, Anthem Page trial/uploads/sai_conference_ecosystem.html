@@ -853,7 +853,7 @@
             <!-- Speakers Section -->
             <section class="section" id="speakers">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Distinguished Speakers</h2>
-                
+
                 <div class="speakers-grid">
                     <div class="speaker-card">
                         <div class="speaker-avatar">DR</div>
@@ -861,35 +861,35 @@
                         <div class="speaker-title">Chairman, SSSIO</div>
                         <p>Leading the global Sai organization with wisdom and dedication to Swami's mission.</p>
                     </div>
-                    
+
                     <div class="speaker-card">
                         <div class="speaker-avatar">MK</div>
                         <div class="speaker-name">Bro Manoj Kumar</div>
                         <div class="speaker-title">Chairman, Zone 4</div>
                         <p>Guiding Zone 4 countries in their spiritual and service journey.</p>
                     </div>
-                    
+
                     <div class="speaker-card">
                         <div class="speaker-avatar">SI</div>
                         <div class="speaker-name">Dr Sunder Iyer</div>
                         <div class="speaker-title">International Speaker</div>
                         <p>Renowned for his insights on living with Swami and spiritual practices.</p>
                     </div>
-                    
+
                     <div class="speaker-card">
                         <div class="speaker-avatar">LG</div>
                         <div class="speaker-name">Bro Leonardo Gutter</div>
                         <div class="speaker-title">International Speaker</div>
                         <p>Sharing experiences of celebrating life with Swami's divine presence.</p>
                     </div>
-                    
+
                     <div class="speaker-card">
                         <div class="speaker-avatar">GB</div>
                         <div class="speaker-name">Bro George Bebedelis</div>
                         <div class="speaker-title">International Speaker</div>
                         <p>Expert in human values education and spiritual development.</p>
                     </div>
-                    
+
                     <div class="speaker-card">
                         <div class="speaker-avatar">DS</div>
                         <div class="speaker-name">Dr Sabbitan</div>
@@ -902,7 +902,7 @@
             <!-- Registration Section -->
             <section class="section" id="registration">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Conference Registration</h2>
-                
+
                 <div class="registration-cards">
                     <div class="reg-card">
                         <h3>Malaysian Delegates</h3>
@@ -917,7 +917,7 @@
                         <p><strong>FREE for under 18 years</strong></p>
                         <button class="reg-btn">Register Now</button>
                     </div>
-                    
+
                     <div class="reg-card">
                         <h3>International Delegates</h3>
                         <div class="reg-price">FREE</div>
@@ -931,7 +931,7 @@
                         </ul>
                         <button class="reg-btn">Register Now</button>
                     </div>
-                    
+
                     <div class="reg-card">
                         <h3>Day 2 Special Guests</h3>
                         <div class="reg-price">FREE</div>
@@ -961,7 +961,7 @@
             <!-- Venue Section -->
             <section class="section" id="venue">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Conference Venue</h2>
-                
+
                 <div class="venue-info">
                     <h3 class="venue-title">IDCC Ideal Convention Centre</h3>
                     <div class="venue-address">
@@ -1003,28 +1003,28 @@
             <!-- Contact Section -->
             <section class="section" id="contact">
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Contact Information</h2>
-                
+
                 <div class="contact-grid">
                     <div class="contact-card">
                         <div class="contact-title">General Inquiries</div>
                         <p><strong>Email:</strong> saizone4conference25@ssiomya.com</p>
                         <p style="margin-top: 10px;">For all conference-related questions, program details, and general information.</p>
                     </div>
-                    
+
                     <div class="contact-card">
                         <div class="contact-title">Registration Support</div>
                         <p><strong>Sis Sumithra:</strong> +60 16-339 9411</p>
                         <p><strong>Sis Suseela:</strong> +60 19-601 1958</p>
                         <p style="margin-top: 10px;">For registration assistance and payment guidance.</p>
                     </div>
-                    
+
                     <div class="contact-card">
                         <div class="contact-title">International Delegates</div>
                         <p><strong>Bro Gunasegaran Reddy:</strong> +60 12 235 7336</p>
                         <p><strong>Email:</strong> reddy@shanu.com.my</p>
                         <p style="margin-top: 10px;">Visa support, travel assistance, and international delegate services.</p>
                     </div>
-                    
+
                     <div class="contact-card">
                         <div class="contact-title">Organizing Committee</div>
                         <p><strong>Bro Anil Kumar (Chairman):</strong> +60 17-884 9027</p>
@@ -1059,17 +1059,17 @@
             // Hide all sections
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => section.classList.remove('active'));
-            
+
             // Remove active class from nav items
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
-            
+
             // Show selected section
             document.getElementById(sectionId).classList.add('active');
-            
+
             // Add active class to clicked nav item
             event.target.classList.add('active');
-            
+
             // Scroll to top of main content
             document.querySelector('.main-content').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1078,7 +1078,7 @@
         function toggleDay(dayId) {
             const content = document.getElementById(dayId + '-content');
             const toggle = document.getElementById(dayId + '-toggle');
-            
+
             content.classList.toggle('active');
             toggle.textContent = content.classList.contains('active') ? '−' : '+';
             toggle.style.transform = content.classList.contains('active') ? 'rotate(45deg)' : 'rotate(0deg)';
@@ -1105,7 +1105,7 @@
                 document.getElementById('hours').textContent = '00';
                 document.getElementById('minutes').textContent = '00';
                 document.getElementById('seconds').textContent = '00';
-                
+
                 document.querySelector('.countdown-title').textContent = 'Conference is Live!';
             }
         }
@@ -1115,7 +1115,7 @@
             // Start countdown timer
             updateCountdown();
             setInterval(updateCountdown, 1000);
-            
+
             // Auto-open first program day for better UX
             setTimeout(() => {
                 toggleDay('day1');
@@ -1139,7 +1139,7 @@
                 card.addEventListener('mouseenter', function() {
                     this.style.transform = 'translateY(-10px) scale(1.02)';
                 });
-                
+
                 card.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0) scale(1)';
                 });
