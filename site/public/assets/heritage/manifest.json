@@ -1,0 +1,62 @@
+{
+  "source_filename": "231C6522-06DD-48E3-8DCA-AE37260BD4B7_1_105_c.jpeg",
+  "preserved_original": "originals/srss-building-sketch.jpeg",
+  "source_sha256": "abe310f7b6f7e61c4b2c01caabd7f634f297b6a5d7259577aeb481cff3be147a",
+  "classification": "User-supplied architectural sketch; edited atmospheric illustration",
+  "placement": "Decorative homepage hero background, behind foreground people; hidden from assistive technology",
+  "edits": "Built-in imagegen transparency and soft navy adaptation; responsive mechanical WebP exports",
+  "approval_status": "Local design preview",
+  "variants": [
+    {
+      "file": "hero-school-sketch-v1-640.webp",
+      "width": 640,
+      "height": 427,
+      "bytes": 110878
+    },
+    {
+      "file": "hero-school-sketch-v1-960.webp",
+      "width": 960,
+      "height": 640,
+      "bytes": 293164
+    },
+    {
+      "file": "hero-school-sketch-v1-1536.webp",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 608982
+    }
+  ],
+  "web_usage": "640 and 960 px for the deliberately soft background; full 1536 derivative preserved",
+  "current_version": {
+    "source_filename": "codex-clipboard-fa1bceef-7fd8-4971-99ee-0249ef45e785.jpg",
+    "preserved_original": "originals/srss-building-sketch-hd-reference.jpg",
+    "source_sha256": "abe310f7b6f7e61c4b2c01caabd7f634f297b6a5d7259577aeb481cff3be147a",
+    "full_alpha_asset": "hero-school-sketch-v2.png",
+    "native_dimensions": [
+      1536,
+      1024
+    ],
+    "edits": "Built-in imagegen architectural detail preservation, softened perimeter and alpha; responsive mechanical WebP exports. Actual native output is 1536 x 1024.",
+    "variants": [
+      {
+        "file": "hero-school-sketch-v2-640.webp",
+        "width": 640,
+        "height": 427,
+        "bytes": 138216
+      },
+      {
+        "file": "hero-school-sketch-v2-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 295238
+      },
+      {
+        "file": "hero-school-sketch-v2-1536.webp",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 605884
+      }
+    ],
+    "web_usage": "Detailed 640/960/1536 variants layered behind the people; typography and people stay unchanged"
+  }
+}

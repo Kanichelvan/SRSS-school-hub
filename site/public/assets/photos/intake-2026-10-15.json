@@ -1,0 +1,277 @@
+[
+  {
+    "id": "medal-presentation",
+    "source_filename": "0789BFFB-905E-47B5-A4C7-B1BB90A8EE0F_4_5005_c.jpeg",
+    "source_sha256": "fc2d88bfe3630417f32d952bae9294d7b7ca8b2008915c3733e91f342f16332e",
+    "original": "assets/photos/originals/2026-10-15-medal-presentation.jpeg",
+    "width": 540,
+    "height": 360,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "A pupil receiving a medal during an outdoor school gathering.",
+    "focal": "50% 45%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-medal-presentation-480.webp",
+        "width": 480,
+        "height": 320
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-medal-presentation-540.webp",
+        "width": 540,
+        "height": 360
+      }
+    ]
+  },
+  {
+    "id": "running-on-field",
+    "source_filename": "A2F060AC-C954-4929-B350-07951AE62045_4_5005_c.jpeg",
+    "source_sha256": "533f4f172285ab322be4323883ff06e816a669685df710289c1672033ced5201",
+    "original": "assets/photos/originals/2026-10-15-running-on-field.jpeg",
+    "width": 540,
+    "height": 360,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "A pupil running across a grass field.",
+    "focal": "50% 55%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-running-on-field-480.webp",
+        "width": 480,
+        "height": 320
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-running-on-field-540.webp",
+        "width": 540,
+        "height": 360
+      }
+    ]
+  },
+  {
+    "id": "lion-dance",
+    "source_filename": "9FD5FAFC-2695-485F-9003-470D69EE294E_1_105_c.jpeg",
+    "source_sha256": "7429c5451806d757876d22a7c2b463d910c1c68efc3dd97c2e4544756dbcf7e4",
+    "original": "assets/photos/originals/2026-10-15-lion-dance.jpeg",
+    "width": 1086,
+    "height": 724,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Pupils watching a pink lion-dance costume in the school grounds.",
+    "focal": "50% 48%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-lion-dance-480.webp",
+        "width": 480,
+        "height": 320
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-lion-dance-900.webp",
+        "width": 900,
+        "height": 600
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-lion-dance-1086.webp",
+        "width": 1086,
+        "height": 724
+      }
+    ]
+  },
+  {
+    "id": "yellow-house-procession",
+    "source_filename": "1AB6E122-E939-4712-9BAC-29DCAC70A41B_1_105_c.jpeg",
+    "source_sha256": "9ec0a561a7fa1cfb7c4ea912f235add4a3987287f61909b138fb9cee9dc1219b",
+    "original": "assets/photos/originals/2026-10-15-yellow-house-procession.jpeg",
+    "width": 1088,
+    "height": 720,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Pupils in yellow shirts walking with a flag beside staff.",
+    "focal": "50% 42%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-yellow-house-procession-480.webp",
+        "width": 480,
+        "height": 318
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-yellow-house-procession-900.webp",
+        "width": 900,
+        "height": 596
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-yellow-house-procession-1088.webp",
+        "width": 1088,
+        "height": 720
+      }
+    ]
+  },
+  {
+    "id": "house-cheers",
+    "source_filename": "06DFC34B-2D5B-4119-8663-BD86D6F1D29F_1_105_c.jpeg",
+    "source_sha256": "ff729c5fa14ea408f72af5055fe15dbc6e6497a8374066c48f7b07e639065aa0",
+    "original": "assets/photos/originals/2026-10-15-house-cheers.jpeg",
+    "width": 1088,
+    "height": 720,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Pupils in red and green shirts raising their arms in the school grounds.",
+    "focal": "50% 42%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-house-cheers-480.webp",
+        "width": 480,
+        "height": 318
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-house-cheers-900.webp",
+        "width": 900,
+        "height": 596
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-house-cheers-1088.webp",
+        "width": 1088,
+        "height": 720
+      }
+    ]
+  },
+  {
+    "id": "school-gathering",
+    "source_filename": "B7DE29B3-7803-47B4-B942-B994C1AAADD8_1_105_c.jpeg",
+    "source_sha256": "51969c9ad6f421b868321e2e202b1295f08b9d430a0193e21c88175ced076fe8",
+    "original": "assets/photos/originals/2026-10-15-school-gathering.jpeg",
+    "width": 1022,
+    "height": 769,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Pupils seated together facing speakers in the school courtyard.",
+    "focal": "50% 52%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-school-gathering-480.webp",
+        "width": 480,
+        "height": 361
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-school-gathering-900.webp",
+        "width": 900,
+        "height": 677
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-school-gathering-1022.webp",
+        "width": 1022,
+        "height": 769
+      }
+    ]
+  },
+  {
+    "id": "assembly-school-facade",
+    "source_filename": "B6624C61-0838-4197-8037-492EAC0E3AAF_4_5005_c.jpeg",
+    "source_sha256": "944ac249268e80ca12de0814f7d50d3cf92e16708a77cc0d1bec3d59f1bfbfdc",
+    "original": "assets/photos/originals/2026-10-15-assembly-school-facade.jpeg",
+    "width": 720,
+    "height": 340,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Pupils gathered outdoors in front of the SRSS school building.",
+    "focal": "50% 45%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-assembly-school-facade-480.webp",
+        "width": 480,
+        "height": 227
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-assembly-school-facade-720.webp",
+        "width": 720,
+        "height": 340
+      }
+    ]
+  },
+  {
+    "id": "sports-school-banner",
+    "source_filename": "A584AD17-93E4-40E2-8567-1E5F0C0E54E5_1_105_c.jpeg",
+    "source_sha256": "4c372012da323b33a26421df71a1549d3df0d17d4265341d6aa7f1f921107d24",
+    "original": "assets/photos/originals/2026-10-15-sports-school-banner.jpeg",
+    "width": 1182,
+    "height": 665,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Pupils holding the Sekolah Rendah Sathya Sai banner beside other school groups on a field.",
+    "focal": "69% 48%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-sports-school-banner-480.webp",
+        "width": 480,
+        "height": 270
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-sports-school-banner-899.webp",
+        "width": 899,
+        "height": 506
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-sports-school-banner-1182.webp",
+        "width": 1182,
+        "height": 665
+      }
+    ]
+  },
+  {
+    "id": "pupils-seated-together",
+    "source_filename": "DD97113B-920E-4C16-9C4D-7C77033968F4.jpeg",
+    "source_sha256": "d7bf22f2a48dd8806757821ffd3fc2b3507f52675ad5cf6aa91d153a3e60e6ca",
+    "original": "assets/photos/originals/2026-10-15-pupils-seated-together.jpeg",
+    "width": 686,
+    "height": 386,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Pupils in lavender and purple uniforms seated together.",
+    "focal": "50% 45%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-pupils-seated-together-480.webp",
+        "width": 480,
+        "height": 270
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-pupils-seated-together-686.webp",
+        "width": 686,
+        "height": 386
+      }
+    ]
+  },
+  {
+    "id": "sathya-sai-orange-illustration",
+    "source_filename": "4F27206A-15D0-40A7-805A-A4AE47AB2CED_1_105_c.jpeg",
+    "source_sha256": "1fe68ab8d170c5dea22627539d2e19d2c79fb9f10b8dbfa96759533178116634",
+    "original": "assets/photos/originals/2026-10-15-sathya-sai-orange-illustration.jpeg",
+    "width": 724,
+    "height": 1086,
+    "people_present": true,
+    "publication_status": "approved by the user for deployment on 15 October 2026",
+    "edits": "EXIF orientation normalization, metadata-free responsive WebP compression only; no enlargement or content edits",
+    "alt": "Illustration of Sathya Sai Baba in an orange robe.",
+    "focal": "50% 50%",
+    "sizes": [
+      {
+        "src": "/assets/photos/processed/2026-10-15-sathya-sai-orange-illustration-480.webp",
+        "width": 480,
+        "height": 720
+      },
+      {
+        "src": "/assets/photos/processed/2026-10-15-sathya-sai-orange-illustration-724.webp",
+        "width": 724,
+        "height": 1086
+      }
+    ]
+  }
+]

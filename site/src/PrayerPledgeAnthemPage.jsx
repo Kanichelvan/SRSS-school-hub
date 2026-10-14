@@ -1,3 +1,4 @@
+import { useCookiePreferences } from './components/CookiePreferences.jsx';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { BookOpen } from "@phosphor-icons/react/dist/csr/BookOpen";
@@ -170,13 +171,15 @@ function SectionHero({ image, imagePosition, eyebrow, title, subtitle, children,
 // One look for every recording: a designed cover that turns into the YouTube player when pressed.
 // (YouTube's terms require the player to stay visible, so playback opens in a small video frame.)
 function MediaCard({ videoId, title, meta, accent = "peace", label = "Listen" }) {
+  const { preferences, openPreferences } = useCookiePreferences();
   const [playing, setPlaying] = useState(false);
+  useEffect(() => { if (!preferences.externalMedia) setPlaying(false); }, [preferences.externalMedia]);
   return <figure className={`ppa-media ppa-accent-${accent}`}>
-    {playing
+    {playing && preferences.externalMedia
       ? <iframe src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`} title={title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
-      : <button type="button" className="ppa-media-cover" onClick={() => setPlaying(true)} aria-label={`${label}: ${title}`}>
+      : <button type="button" className="ppa-media-cover" onClick={() => { preferences.externalMedia ? setPlaying(true) : openPreferences(); }} aria-label={`${label}: ${title}`}>
         <span className="ppa-media-rings" aria-hidden="true" /><span className="ppa-media-play" aria-hidden="true"><Play size={22} weight="fill" /></span>
-        <span className="ppa-media-text"><strong>{title}</strong><small>{meta}</small></span>
+        <span className="ppa-media-text"><strong>{title}</strong><small>{meta}</small>{!preferences.externalMedia && <small>Enable external maps and videos in Cookie preferences to play.</small>}</span>
       </button>}
   </figure>;
 }

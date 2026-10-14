@@ -1,0 +1,138 @@
+[
+  {
+    "name": "reading",
+    "original": "site/public/assets/srss-hero-learning.png",
+    "original_sha256": "2f943d937888944f76e43d77bba23224e7749ea15f1fb379e3c50466ff5bfcf8",
+    "full_alpha_asset": "reading-cutout-v1.png",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "classification": "illustrative",
+    "identifiable_people": true,
+    "edits": "Background removed with built-in imagegen; transparent natural edges and feathered bottom; mechanical WebP resizing. Originals unchanged.",
+    "publication_status": "Local design preview; publication approval pending for edited derivative",
+    "variants": [
+      {
+        "file": "reading-cutout-v1-640.webp",
+        "width": 640,
+        "height": 427,
+        "bytes": 77448
+      },
+      {
+        "file": "reading-cutout-v1-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 149582
+      },
+      {
+        "file": "reading-cutout-v1-1536.webp",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 272618
+      }
+    ]
+  },
+  {
+    "name": "science",
+    "original": "site/public/assets/photos/processed/science-lab-lesson-1600.jpg",
+    "original_sha256": "fbbaa4ef24b101d4e7bfceb9d5f735048e42ffca48bb02b7ec81abb85a36173c",
+    "full_alpha_asset": "science-cutout-v1.png",
+    "dimensions": [
+      1452,
+      1083
+    ],
+    "classification": "documentary derivative",
+    "identifiable_people": true,
+    "edits": "Background removed with built-in imagegen; transparent natural edges and feathered bottom; mechanical WebP resizing. Originals unchanged.",
+    "publication_status": "Local design preview; publication approval pending for edited derivative",
+    "variants": [
+      {
+        "file": "science-cutout-v1-640.webp",
+        "width": 640,
+        "height": 477,
+        "bytes": 86612
+      },
+      {
+        "file": "science-cutout-v1-960.webp",
+        "width": 960,
+        "height": 716,
+        "bytes": 160596
+      },
+      {
+        "file": "science-cutout-v1-1536.webp",
+        "width": 1452,
+        "height": 1083,
+        "bytes": 288730
+      }
+    ]
+  },
+  {
+    "name": "friends",
+    "original": "site/public/assets/photos/processed/field-friends-1052.jpg",
+    "original_sha256": "c9974c6d4dda9546d5881b3ce43b1596a8ea444e35d4835fc1fb2635821914a1",
+    "full_alpha_asset": "friends-cutout-v1.png",
+    "dimensions": [
+      2142,
+      734
+    ],
+    "classification": "documentary derivative",
+    "identifiable_people": true,
+    "edits": "Background removed with built-in imagegen; transparent natural edges and feathered bottom; mechanical WebP resizing. Originals unchanged.",
+    "publication_status": "Local design preview; publication approval pending for edited derivative",
+    "variants": [
+      {
+        "file": "friends-cutout-v1-640.webp",
+        "width": 640,
+        "height": 219,
+        "bytes": 59274
+      },
+      {
+        "file": "friends-cutout-v1-960.webp",
+        "width": 960,
+        "height": 329,
+        "bytes": 102866
+      },
+      {
+        "file": "friends-cutout-v1-1536.webp",
+        "width": 1536,
+        "height": 526,
+        "bytes": 208572
+      }
+    ]
+  },
+  {
+    "name": "founder",
+    "original": "site/public/assets/sathya-sai-baba-portrait.jpg",
+    "original_sha256": "ce69a03b92ce987eb9ca36fee3643e70fd8463b20f81d51c18fc81177ca6d30c",
+    "full_alpha_asset": "founder-cutout-v1.png",
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "classification": "illustration",
+    "identifiable_people": true,
+    "edits": "Transparent illustration adapted from the existing painted portrait with built-in imagegen; mechanical WebP resizing. This is illustrative, not a documentary portrait.",
+    "publication_status": "Local design preview; publication approval pending for edited derivative",
+    "variants": [
+      {
+        "file": "founder-cutout-v1-640.webp",
+        "width": 640,
+        "height": 640,
+        "bytes": 50406
+      },
+      {
+        "file": "founder-cutout-v1-960.webp",
+        "width": 960,
+        "height": 960,
+        "bytes": 95424
+      },
+      {
+        "file": "founder-cutout-v1-1536.webp",
+        "width": 1254,
+        "height": 1254,
+        "bytes": 134452
+      }
+    ]
+  }
+]

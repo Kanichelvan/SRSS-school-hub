@@ -1,0 +1,16 @@
+/* Real transparency keeps the header navy continuous around the subjects. */
+.hero:has(.hero-photo) .hero-copy { padding-top: 64px; padding-bottom: 94px; padding-right: 53%; }
+.hero-photo.hero-image { top: auto; bottom: 0; width: 53%; height: auto; max-height: 100%; object-fit: contain; object-position: right bottom; }
+.landing-hero figure:has(.hero-photo), .about-hero-photo:has(.hero-photo) { display: flex; align-items: center; margin: 0; overflow: visible; }
+.landing-hero figure:has(.hero-photo)::before, .about-hero-photo:has(.hero-photo)::before { display: none; }
+.landing-hero figure .hero-photo, .about-hero-photo .hero-photo { width: 100%; height: auto; min-height: 0; max-height: none; object-fit: contain; }
+.landing-hero figure .hero-photo-portrait { width: min(100%, 420px); margin-inline: auto; }
+.landing-hero:has(.hero-photo) .landing-hero-grid { padding-block: 44px; }
+@media (max-width: 900px) {
+  .hero:has(.hero-photo) .hero-copy { padding: 40px 0 12px; }
+  .hero-photo.hero-image { position: relative; top: auto; right: auto; bottom: auto; width: min(100%, 720px); max-height: none; height: auto; align-self: center; }
+  .landing-hero:has(.hero-photo) .landing-hero-grid { padding-block: 40px 0; }
+  .landing-hero figure:has(.hero-photo), .about-hero-photo:has(.hero-photo) { min-height: 0; margin: 22px 0 0; }
+  .landing-hero figure .hero-photo, .about-hero-photo .hero-photo { min-height: 0; max-height: none; }
+  .about-hero-grid:has(.hero-photo) { gap: 0; padding-bottom: 30px; }
+}

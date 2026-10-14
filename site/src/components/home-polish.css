@@ -1,0 +1,47 @@
+/* SRSS editorial rhythm: navy, warm paper, and metallic accents at decisions. */
+.hero { isolation: isolate; background: radial-gradient(ellipse at 82% 28%, #152b46 0%, transparent 66%), linear-gradient(115deg, #06162f 8%, #0b1e37 64%, #08192f); }
+.hero .hero-school-sketch { position: absolute; z-index: 0; right: -2%; bottom: 0; width: 78%; height: 112%; max-width: none; object-fit: contain; object-position: right bottom; opacity: .25; pointer-events: none; }
+.hero .hero-actions { margin-top: 25px; }
+.hero .hero-photo { animation: editorial-arrive 1.4s .15s var(--ease-out) both; }
+.home-welcome { border-top: 2px solid #c9a543; background: var(--ivory); }
+.role-router .role-parent { --role-accent: #1453b1; --role-ink: white; --role-metal: linear-gradient(115deg, #08347b 0%, #1458b5 25%, #276ac1 43%, #104baf 57%, #1c60b8 76%, #082f74 100%); }
+.role-router .role-student { --role-accent: var(--purple-700); --role-ink: white; --role-metal: var(--purple-metal); }
+.role-router .role-teacher { --role-accent: #b34405; --role-ink: var(--navy-950); --role-metal: linear-gradient(115deg, #f57819 0%, #ffa44e 25%, #ffba6e 43%, #f28828 57%, #ffb568 76%, #f07a0d 100%); }
+.role-router .role-staff { --role-accent: #087146; --role-ink: white; --role-metal: linear-gradient(115deg, #065a35 0%, #0e7548 25%, #1c8054 43%, #08663f 57%, #19794c 76%, #064c2d 100%); }
+.role-router .role-prospective { --role-accent: #8a6305; --role-ink: var(--navy-950); --role-metal: linear-gradient(115deg, #e8a914 0%, #ffdc66 25%, #fff2a6 43%, #ffc348 57%, #ffdf78 76%, #edaa16 100%); }
+.role-router .role-card { border-bottom: 2px solid transparent; transition: color .4s ease, background .4s ease, border-color .4s ease; }
+.role-router .role-card > svg:first-child, .role-router .role-card .role-signin { color: var(--role-accent); }
+.role-router .role-card:is(:hover, :focus-visible, :active) { border-bottom-color: var(--role-accent); background: var(--role-metal); color: var(--role-ink); }
+.role-router .role-card:is(:hover, :focus-visible, :active) :is(small, svg, .role-signin) { color: var(--role-ink); opacity: 1; }
+.role-router .role-card:focus-visible { outline: 2px solid var(--role-ink); outline-offset: -5px; }
+.home-jubilee { position: relative; isolation: isolate; display: block; overflow: hidden; min-height: 610px; padding-block: 84px; background: #0d203d; border: 0; border-image: none; }
+.home-jubilee .home-jubilee-film { position: absolute; z-index: 0; inset: 0; width: 100%; min-width: 0; margin: 0; }
+.home-jubilee-film .hero-video { width: 100%; height: 100%; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; background: #0d203d; }
+.home-jubilee-film .hero-video::after { content: ''; position: absolute; z-index: 1; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 28%, #0d203de8 55%, #0d203d 76%), linear-gradient(180deg, #0d203d 0%, transparent 18%, transparent 70%, #0d203d 100%); }
+.home-jubilee-film .hero-video-control { left: var(--home-pad); right: auto; bottom: 50px; }
+.home-jubilee-film .hero-video-caption { left: var(--home-pad); bottom: 23px; }
+.home-jubilee .home-jubilee-copy { position: relative; z-index: 2; width: 44%; max-width: 540px; margin-left: auto; }
+.home-jubilee-motto { margin: 16px 0 0; color: var(--gold-500); font: 600 15px/1.5 var(--serif); }
+.home-jubilee .home-jubilee-brand { width: 68px; height: 68px; margin: 4px 0 8px; object-fit: contain; }
+.home-jubilee .home-jubilee-facts strong { font-size: 29px; }
+.primary-button { transition: translate .45s var(--ease-out), filter .45s ease, box-shadow .45s ease; }
+.primary-button:hover { box-shadow: 0 8px 20px #b8862826; }
+@keyframes editorial-arrive { from { opacity: 0; translate: 0 12px; } to { opacity: 1; translate: 0 0; } }
+@media (max-width: 900px) {
+  .hero .hero-school-sketch { right: -20%; width: 140%; height: auto; opacity: .18; }
+  .home-jubilee { min-height: 0; padding-bottom: 0; }
+  .home-jubilee .home-jubilee-copy { width: 100%; max-width: 650px; margin: 0; }
+  .home-jubilee .home-jubilee-film { position: relative; width: calc(100% + 2 * var(--home-pad)); height: clamp(310px, 64vw, 540px); margin: 22px calc(-1 * var(--home-pad)) 0; }
+  .home-jubilee-film .hero-video::after { background: linear-gradient(180deg, #0d203d 0%, transparent 24%, transparent 68%, #0d203d 100%), linear-gradient(90deg, #0d203d55, transparent 25%, transparent 75%, #0d203d55); }
+}
+@media (max-width: 620px) {
+  .home-jubilee { padding-top: 56px; padding-bottom: 0; }
+  .home-jubilee .home-jubilee-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 28px; padding-top: 24px; }
+  .home-jubilee .home-jubilee-facts li { padding: 0; border: 0; }
+  .home-jubilee .home-jubilee-facts strong { font-size: 23px; }
+  .home-jubilee .home-jubilee-facts a, .home-jubilee .home-jubilee-facts span { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero .hero-photo { animation: none; }
+  .role-router .role-card, .primary-button { transition: none; }
+}

@@ -15,6 +15,7 @@ import { workspaceDomain } from "../lib/firebase";
 import { auth } from "../lib/firebase-auth";
 import { db } from "../lib/firebase-firestore";
 import { ROLE_IDS, hubsFor, primaryHub } from "./permissions";
+import { useCookiePreferences } from "../components/CookiePreferences.jsx";
 
 const AuthContext = createContext(null);
 const EMAIL_KEY = "srss.hub.signInEmail";
@@ -24,8 +25,10 @@ const store = { get: (key) => { try { return localStorage.getItem(key); } catch 
 // Roles come only from custom claims set by the setUserRoles Cloud Function (AUTH-001).
 // Scope (children, classes, audience keys) comes from users/{uid}, which only the server writes (AUTH-002).
 export function AuthProvider({ children }) {
+  const { preferences } = useCookiePreferences();
   const [state, setState] = useState({ status: "loading", user: null, roles: [], claims: {}, scope: null });
-  const [activeHub, setActiveHub] = useState(() => store.get(HUB_KEY));
+  const [activeHub, setActiveHub] = useState(() => preferences.functional ? store.get(HUB_KEY) : null);
+  useEffect(() => { if (!preferences.functional) store.remove(HUB_KEY); }, [preferences.functional]);
   // Set on an explicit sign-out so the next person doesn't land on the previous user's last page.
   const userSignedOut = useRef(false);
 
@@ -50,7 +53,7 @@ export function AuthProvider({ children }) {
     hubs,
     currentHub,
     // Role switcher (AUTH-001 AC3): defaults to the highest-privilege hub, remembers the user's choice.
-    switchHub(hub) { setActiveHub(hub); store.set(HUB_KEY, hub); },
+    switchHub(hub) { setActiveHub(hub); if (preferences.functional) store.set(HUB_KEY, hub); },
     async signInWithGoogle() {
       const provider = new GoogleAuthProvider();
       if (workspaceDomain) provider.setCustomParameters({ hd: workspaceDomain, prompt: "select_account" });
@@ -83,7 +86,7 @@ export function AuthProvider({ children }) {
       try { Object.keys(localStorage).filter((key) => key.startsWith("srss.register.") || key.startsWith("srss.roster.")).forEach((key) => localStorage.removeItem(key)); } catch { /* storage unavailable */ }
       window.location.assign("/login");
     },
-  }), [state, hubs, currentHub]);
+  }), [state, hubs, currentHub, preferences.functional]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

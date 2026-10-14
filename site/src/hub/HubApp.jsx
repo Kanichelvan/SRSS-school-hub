@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "../auth/AuthProvider";
 import { MODULES, ROLES, can, canOpen } from "../auth/permissions";
 import { HUB_LABELS, ROUTE_ALIASES, hubIndex, hubRoutes } from "./routes";
 import { Loading, PageHeader, Section } from "./ui";
+import { CookiePreferencesButton } from "../components/CookiePreferences.jsx";
 import "./hub.css";
 
 const lazyNamed = (loader, name) => lazy(() => loader().then((module) => ({ default: module[name] })));
@@ -164,6 +165,7 @@ export function HubFooter() {
   return <footer className="hub-footer">
     <div><strong>Sekolah Rendah Sathya Sai</strong><span>6, Jalan Puchong, Taman Tan Yew Lai, 58200 Kuala Lumpur · <a href="tel:+60126001926">+60 12-600 1926</a> · <a href="mailto:saischoolpuchong@gmail.com">saischoolpuchong@gmail.com</a></span></div>
     <nav aria-label="Hub footer"><a href="/">School website</a><a href="/resources/faq">FAQ</a><a href="/resources/contact">Contact the school</a><a href="/legal/privacy">Privacy Policy</a><a href="/legal/terms">Terms of Use</a><a href="/legal/child-safeguarding#s-4">Child Safeguarding</a><a href="/legal">All Policies →</a></nav>
+    <CookiePreferencesButton />
     <small>© {new Date().getFullYear()} Sekolah Rendah Sathya Sai. All rights reserved. · SRSS Digital Hub — an SSIOM Digital Initiative. Platform software © SSIOM.</small>
   </footer>;
 }
