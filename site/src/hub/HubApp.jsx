@@ -3,7 +3,6 @@ import { BrowserRouter, Link, NavLink, Navigate, Outlet, Route, Routes, useLocat
 import { AuthProvider, useAuth } from "../auth/AuthProvider";
 import { MODULES, ROLES, can, canOpen } from "../auth/permissions";
 import { HUB_LABELS, ROUTE_ALIASES, hubIndex, hubRoutes } from "./routes";
-import { SignIn } from "./SignIn";
 import { Loading, PageHeader, Section } from "./ui";
 import "./hub.css";
 
@@ -27,6 +26,7 @@ const questAdmin = () => import("./screens/quest-admin");
 const nilam = () => import("./screens/nilam");
 
 const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
+const SignIn = lazyNamed(() => import("./SignIn"), "SignIn");
 
 const SCREENS = {
   quest: lazyNamed(quest, "QuestHome"), challenges: lazyNamed(quest, "MyChallenges"), challengePlayer: lazyNamed(quest, "ChallengePlayer"), questBadges: lazyNamed(quest, "QuestBadges"), questJourney: lazyNamed(quest, "QuestJourney"), questLeaderboard: lazyNamed(quest, "QuestLeaderboard"), staffQuest: lazyNamed(quest, "StaffQuest"),
@@ -34,7 +34,7 @@ const SCREENS = {
   nilam: lazyNamed(nilam, "Nilam"), parentReading: lazyNamed(nilam, "ParentReading"),
   adminDashboard: lazyNamed(dashboards, "AdminDashboard"), teacherDashboard: lazyNamed(dashboards, "TeacherDashboard"), parentDashboard: lazyNamed(dashboards, "ParentDashboard"), studentDashboard: lazyNamed(student, "StudentDashboard"),
   studentRegister: lazyNamed(records, "StudentRegister"), student360: lazyNamed(records, "Student360"), staffDirectory: lazyNamed(records, "StaffDirectory"), academics: lazyNamed(records, "Academics"),
-  attendance: lazyNamed(attendance, "AttendanceHome"), attendanceOverview: lazyNamed(attendance, "AttendanceOverview"), childAttendance: lazyNamed(attendance, "ChildAttendance"),
+  attendance: lazyNamed(attendance, "AttendanceHome"), attendanceOverview: lazyNamed(() => import("./screens/attendanceOffice"), "AttendanceOffice"), childAttendance: lazyNamed(attendance, "ChildAttendance"),
   myChildren: lazyNamed(family, "MyChildren"), journey: lazyNamed(family, "Journey"),
   announcements: lazyNamed(comms, "Announcements"), calendar: lazyNamed(comms, "Calendar"), notifications: lazyNamed(comms, "Notifications"), profile: lazyNamed(comms, "Profile"),
   admissions: lazyNamed(admin, "Admissions"), consentOverview: lazyNamed(admin, "ConsentOverview"), showcase: lazyNamed(admin, "Showcase"), audit: lazyNamed(admin, "Audit"),
@@ -42,7 +42,7 @@ const SCREENS = {
   // School setup, people and assignments (Admin hub)
   setupWizard: lazyNamed(wizard, "SetupWizard"), academicYears: lazyNamed(setup, "AcademicYears"), terms: lazyNamed(setup, "Terms"), standards: lazyNamed(setup, "Standards"), classes: lazyNamed(setup, "Classes"), subjects: lazyNamed(setup, "Subjects"),
   teacherAssignments: lazyNamed(setup, "TeacherAssignments"), enrolments: lazyNamed(setup, "Enrolments"),
-  studentsAdmin: lazyNamed(people, "StudentsAdmin"), guardians: lazyNamed(people, "Guardians"), staffAdmin: lazyNamed(people, "StaffAdmin"), guardianLinks: lazyNamed(people, "GuardianLinks"), accounts: lazyNamed(people, "Accounts"),
+  studentsAdmin: lazyNamed(people, "StudentsAdmin"), guardians: lazyNamed(people, "Guardians"), staffAdmin: lazyNamed(people, "StaffAdmin"), guardianLinks: lazyNamed(people, "GuardianLinks"), supportGroups: lazyNamed(people, "SupportGroups"), accounts: lazyNamed(people, "Accounts"),
   rolesMatrix: lazyNamed(system, "RolesMatrix"), settings: lazyNamed(system, "Settings"), announcementsAdmin: lazyNamed(system, "AnnouncementsAdmin"), calendarAdmin: lazyNamed(system, "CalendarAdmin"),
   // Teacher hub
   myClasses: lazyNamed(teaching, "MyClasses"), classDashboard: lazyNamed(teaching, "ClassDashboard"), classRoster: lazyNamed(teaching, "ClassRoster"), teacherPortfolio: lazyNamed(teaching, "TeacherPortfolio"), teacherAnnouncements: lazyNamed(teaching, "TeacherAnnouncements"), teacherEvents: lazyNamed(teaching, "TeacherEvents"),
@@ -145,7 +145,7 @@ export function HubApp() {
   return <AuthProvider>
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<SignIn />} />
+        <Route path="/login" element={<Suspense fallback={<div className="hub-loading" role="status">Loading…</div>}><SignIn /></Suspense>} />
         {ROUTE_ALIASES.map(([from, to]) => <Route key={from} path={from} element={<Navigate to={to} replace />} />)}
         <Route path="/hub" element={<RequireSignIn />}>
           <Route element={<Shell />}>

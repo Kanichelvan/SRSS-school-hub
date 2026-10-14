@@ -74,3 +74,27 @@ test("every hub has a dashboard route and the required pages", () => {
   for (const path of ["/hub/admin", "/hub/teacher", "/hub/parent", "/hub/student"]) assert.ok(hubRoutes.some((route) => route.path === path && route.index), path);
   for (const path of ["/hub/admin/setup", "/hub/admin/classes", "/hub/admin/accounts", "/hub/admin/teacher-assignments", "/hub/admin/enrolments", "/hub/admin/guardian-links", "/hub/admin/calendar", "/hub/admin/roles", "/hub/admin/settings", "/hub/teacher/classes/:classId", "/hub/teacher/classes/:classId/roster", "/hub/teacher/portfolios", "/hub/student/class", "/hub/student/achievements"]) assert.ok(hubRoutes.some((route) => route.path === path && route.screen), path);
 });
+
+import { CODES, codeOf, followUps, minutesAfter, rating, schoolDays, summarise } from "../src/hub/logic/attendance.js";
+
+test("attendance codes follow Appendix A, including older records", () => {
+  assert.deepEqual(CODES.map((item) => item.code), ["/", "R", "L", "M", "S", "P", "O", "T", "X"]);
+  assert.equal(codeOf({ status: "absent" }), "O");
+  assert.equal(codeOf({ status: "medical" }), "M");
+  assert.equal(codeOf({ code: "T", status: "unauthorised" }), "T");
+  assert.equal(minutesAfter("07:52"), 12);
+});
+
+test("rating scale and persistent absence (policy §10–§11)", () => {
+  assert.equal(rating(100).label, "Excellent");
+  assert.equal(rating(95).label, "Good");
+  assert.equal(rating(92).label, "Poor");
+  assert.equal(rating(89).label, "Unsatisfactory");
+  const records = Array.from({ length: 10 }, (_, i) => ({ date: `2026-09-${String(i + 1).padStart(2, "0")}`, code: i === 0 ? "M" : "/" }));
+  assert.equal(summarise(records).rate, 90);
+  assert.equal(followUps({ s1: records }, { month: "2026-10" })[0].kind, "persistent");
+});
+
+test("school days skip weekends and closures, and include listed Saturdays", () => {
+  assert.deepEqual(schoolDays("2027-01-04", "2027-01-10", { closed: ["2027-01-06"], openSaturdays: ["2027-01-09"] }), ["2027-01-04", "2027-01-05", "2027-01-07", "2027-01-08", "2027-01-09"]);
+});

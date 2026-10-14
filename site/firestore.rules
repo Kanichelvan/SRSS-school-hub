@@ -23,11 +23,11 @@ service cloud.firestore {
     function uid() { return request.auth.uid; }
 
     function teaching() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher']); }
-    function isStaff() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher', 'academicCoordinator', 'schoolAdmin', 'admissionsOfficer', 'financeOfficer', 'leadership', 'safeguardingLead', 'privacySteward', 'portfolioModerator', 'contentEditor', 'technicalAdmin', 'librarian', 'auditor', 'superAdmin']); }
+    function isStaff() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher', 'academicCoordinator', 'schoolAdmin', 'admissionsOfficer', 'financeOfficer', 'leadership', 'safeguardingLead', 'privacySteward', 'portfolioModerator', 'contentEditor', 'technicalAdmin', 'librarian', 'auditor', 'superAdmin', 'attendanceManager']); }
     function isAdmin() { return hasAny(['schoolAdmin', 'superAdmin']); }
     function isLeader() { return hasAny(['leadership', 'superAdmin']); }
     // Roles with school-wide read of ordinary (non-restricted) student records.
-    function wideStudentRead() { return hasAny(['academicCoordinator', 'schoolAdmin', 'leadership', 'safeguardingLead', 'privacySteward', 'auditor', 'superAdmin']); }
+    function wideStudentRead() { return hasAny(['academicCoordinator', 'schoolAdmin', 'leadership', 'safeguardingLead', 'privacySteward', 'auditor', 'superAdmin', 'attendanceManager']); }
 
     // ---------- context ----------
     function inClassScope(classId) { return classId in me().get('classIds', []); }
@@ -109,7 +109,7 @@ service cloud.firestore {
 
     match /guardians/{guardianId} {
       allow read: if (hasRole('parent') && me().get('guardianId', '') == guardianId)
-        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin'])
+        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin', 'attendanceManager'])
         || (teaching() && resource.data.get('classIds', []).hasAny(me().get('classIds', [])));
       // `uid` (sign-in account) and `classIds` are set by the server only.
       allow create: if isAdmin() && newStamped() && data().get('uid', null) == null && !('classIds' in data()) && text('name', 120) && optionalText('email', 200) && lifecycle();
@@ -119,7 +119,7 @@ service cloud.firestore {
     // Student ↔ Guardian (PRD §18). Relationship is separate from portal access (hasPortalAccess).
     match /studentGuardianLinks/{linkId} {
       allow read: if (signedIn() && resource.data.get('guardianUid', '') == uid()) || isGuardianOf(resource.data.studentId)
-        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin'])
+        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin', 'attendanceManager'])
         || staffCanSee(resource.data.studentId, resource.data.get('classId', ''));
       // Only the office links a guardian to a child — a parent can never link themselves. The account id and
       // class are copied from the guardian and student records, so a link can't point anywhere else.
@@ -223,11 +223,14 @@ service cloud.firestore {
       allow update: if teacherCanWrite(resource.data.studentId, resource.data.classId) || hasRole('academicCoordinator');
     }
 
+    // Support groups such as Remedial: pupils stay in their Standard class; the office places them in the
+    // group and names the teachers, who then see those pupils only (assignedStudentIds).
     match /studentSupportPlans/{id} {
       allow read: if (hasRole('specialistTeacher') && isAssigned(resource.data.studentId)) || inHomeroom(resource.data.classId)
-        || hasAny(['academicCoordinator', 'leadership', 'safeguardingLead', 'superAdmin'])
+        || (teaching() && isAssigned(resource.data.studentId))
+        || hasAny(['academicCoordinator', 'leadership', 'safeguardingLead', 'schoolAdmin', 'superAdmin'])
         || (familyCanSee(resource.data.studentId) && resource.data.get('familyVisible', false) == true);
-      allow create, update: if (hasRole('specialistTeacher') && isAssigned(data().studentId)) || hasRole('academicCoordinator');
+      allow create, update: if (hasRole('specialistTeacher') && isAssigned(data().studentId)) || hasAny(['academicCoordinator', 'schoolAdmin', 'superAdmin']);
     }
     match /studentSupportSessions/{id} {
       allow read: if (hasRole('specialistTeacher') && isAssigned(resource.data.studentId)) || inHomeroom(resource.data.classId)
@@ -252,24 +255,55 @@ service cloud.firestore {
     // ===================== ATTENDANCE (ATT-001, ATT-002) =====================
     // A session records that attendance was opened/submitted for a class and date, so "not submitted"
     // is distinguishable from "everyone present".
+    // The attendance manager (clerk) and the office keep registers for any class (late sign-ins, paper
+    // registers after a system failure, corrections).
+    function registerKeeper() { return isAdmin() || hasRole('attendanceManager'); }
+    function attendanceCodes() { return ['/', 'R', 'L', 'M', 'S', 'P', 'O', 'T', 'X']; }
+    function attendanceStatuses() { return ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other', 'suspended', 'unauthorised', 'notRequired']; }
+    function markValid() {
+      return data().status in attendanceStatuses() && data().get('code', '/') in attendanceCodes()
+        && (data().get('minutesLate', null) == null || (data().minutesLate is int && data().minutesLate >= 0 && data().minutesLate <= 300))
+        && optionalText('note', 300) && optionalText('reason', 200);
+    }
     match /attendanceSessions/{sessionId} {
       allow read: if wideStudentRead() || (teaching() && inClassScope(resource.data.classId));
-      allow create: if ((teaching() && inClassScope(data().classId)) || isAdmin()) && data().openedBy == uid() && data().status in ['open', 'submitted'];
-      allow update: if ((teaching() && inClassScope(resource.data.classId)) || isAdmin()) && unchanged(['classId', 'date', 'openedBy'])
+      allow create: if ((teaching() && inClassScope(data().classId)) || registerKeeper()) && data().openedBy == uid() && data().status in ['open', 'submitted'];
+      allow update: if ((teaching() && inClassScope(resource.data.classId)) || registerKeeper()) && unchanged(['classId', 'date', 'openedBy'])
         && (data().get('submittedBy', null) == resource.data.get('submittedBy', null) || data().submittedBy == uid())
         && data().status in ['open', 'submitted'];
     }
     match /attendanceRecords/{recordId} {
       allow read: if staffCanSee(resource.data.studentId, resource.data.classId) || familyCanSee(resource.data.studentId);
-      allow create: if ((teaching() && inClassScope(data().classId) && studentIsInClass(data().studentId, data().classId)) || isAdmin())
-        && data().markedBy == uid()
-        && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other'];
-      // Records exist only once a register is submitted, so any later change is a correction: it needs a
-      // reason and names who made it. The audit trigger keeps every version's changed fields.
-      allow update: if ((teaching() && inClassScope(resource.data.classId)) || isAdmin())
-        && unchanged(['studentId', 'classId', 'sessionId', 'date']) && data().markedBy == uid()
-        && data().status in ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other']
-        && (data().status == resource.data.status || (text('correctionReason', 300) && data().correctedBy == uid() && data().correctedAt == request.time));
+      allow create: if ((teaching() && inClassScope(data().classId) && studentIsInClass(data().studentId, data().classId)) || registerKeeper())
+        && data().markedBy == uid() && markValid();
+      // Once a register is submitted any change is a correction: it needs a reason and names who made it.
+      // The audit trigger keeps every version's changed fields.
+      allow update: if ((teaching() && inClassScope(resource.data.classId)) || registerKeeper())
+        && unchanged(['studentId', 'classId', 'sessionId', 'date']) && data().markedBy == uid() && markValid()
+        && ((data().status == resource.data.status && data().get('code', '') == resource.data.get('code', ''))
+          || (text('correctionReason', 300) && data().correctedBy == uid() && data().correctedAt == request.time));
+    }
+    // Parents report an absence for their own child; the office and class staff see it next to the register.
+    match /absenceReports/{id} {
+      allow read: if (signedIn() && resource.data.reporterUid == uid()) || staffCanSee(resource.data.studentId, resource.data.get('classId', ''))
+        || hasRole('attendanceManager');
+      allow create: if isGuardianOf(data().studentId) && data().reporterUid == uid() && data().status == 'reported'
+        && data().get('classId', null) == get(/databases/$(database)/documents/students/$(data().studentId)).data.get('currentClassId', null)
+        && isoDate('from') && isoDate('to') && data().from <= data().to
+        && data().reason in ['illness', 'medical', 'familyEmergency', 'religious', 'other'] && optionalText('note', 1000)
+        && (data().get('evidenceUrl', null) == null || (data().evidenceUrl is string && data().evidenceUrl.matches('https://.+')));
+      allow update: if registerKeeper() && unchanged(['studentId', 'reporterUid', 'from', 'to', 'reason']) && data().status in ['reported', 'acknowledged'];
+    }
+    // Late sign-ins and early departures at the office, and first-day / monthly follow-up with families.
+    match /attendanceMovements/{id} {
+      allow read: if registerKeeper() || isLeader() || staffCanSee(resource.data.studentId, resource.data.get('classId', ''));
+      allow create: if registerKeeper() && newStamped() && data().type in ['lateArrival', 'earlyDeparture'] && isoDate('date') && data().time is string;
+      allow update: if registerKeeper() && stamped() && keepsHistory() && unchanged(['studentId', 'type', 'date']);
+    }
+    match /attendanceFollowUps/{id} {
+      allow read: if registerKeeper() || isLeader() || hasRole('safeguardingLead') || inHomeroom(resource.data.get('classId', ''));
+      allow create: if registerKeeper() && newStamped() && data().kind in ['firstDay', 'late', 'unauthorised', 'persistent', 'approaching', 'other'] && text('outcome', 500);
+      allow update: if registerKeeper() && stamped() && keepsHistory() && unchanged(['studentId', 'kind']);
     }
 
     // ===================== ACADEMICS (phase 2) =====================

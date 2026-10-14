@@ -128,12 +128,15 @@ for (const [i, date] of schoolDays(5).entries()) {
     put(`attendanceSessions/${sessionId}`, meta({ classId: cls, date, sessionType: "am", status: "submitted", openedBy: by, submittedBy: by, submittedAt: now, studentCount: 6 }));
     demo.ROSTER[s].forEach((name, j) => {
       const status = statuses[(i * 7 + j * 3 + s) % statuses.length];
-      const record = { sessionId, classId: cls, date, studentId: studentIds[name], status, reason: status === "absent" ? "Unwell" : status === "late" ? "Traffic" : null, note: null, markedBy: by, markedAt: now };
-      if (i === 4 && s === 4 && j === 1) Object.assign(record, { status: "late", reason: "Arrived 8:10", previousStatus: "absent", correctionReason: "Arrived after the register was taken", correctedBy: by, correctedAt: now });
+      const coded = status === "absent" ? { code: "M", status: "medical", note: "Unwell — parent phoned" } : status === "late" ? { code: "L", status: "late", minutesLate: 10, note: "Traffic" } : { code: "/", status: "present", note: null };
+      const record = { sessionId, classId: cls, date, studentId: studentIds[name], ...coded, reason: null, markedBy: by, markedAt: now };
+      if (i === 4 && s === 4 && j === 1) Object.assign(record, { code: "L", status: "late", minutesLate: 30, note: "Arrived 8:10", previousStatus: "absent", previousCode: "O", correctionReason: "Arrived after the register was taken", correctedBy: by, correctedAt: now });
       put(`attendanceRecords/${sessionId}_${studentIds[name]}`, meta(record));
     });
   }
 }
+// A parent's absence report for today (shown on the register and in First-day response).
+put("absenceReports/ar-anika", { studentId: studentIds["Anika Raman"], classId: classOfStudent("Anika Raman"), reporterUid: uid.parent, from: day(0), to: day(1), reason: "illness", note: "Fever since last night", evidenceUrl: null, status: "reported", createdAt: now });
 put(`attendanceSessions/${demo.classId(YEAR.id, 1)}_${day(0)}_am`, meta({ classId: demo.classId(YEAR.id, 1), date: day(0), sessionType: "am", status: "submitted", openedBy: uid.office, submittedBy: uid.office, submittedAt: now, studentCount: 6 }));
 
 // ---------- configuration lists ----------

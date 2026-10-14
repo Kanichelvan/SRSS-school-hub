@@ -25,6 +25,7 @@ const people = {
   teacher2: { roles: ["teacher"], classIds: ["c5"], homeroomClassIds: [], assignmentKeys: ["c5:bi"], publishKeys: ["class:c5"], audienceKeys: ["school", "role:staff", "role:teachers", "class:c5"] },
   coordinator: { roles: ["academicCoordinator", "teacher"], audienceKeys: ["school", "role:staff"] },
   privacy: { roles: ["privacySteward"], audienceKeys: ["school", "role:staff"] },
+  clerk: { roles: ["attendanceManager"], audienceKeys: ["school", "role:staff"] },
 };
 const as = (name) => env.authenticatedContext(name, { roles: people[name].roles }).firestore();
 const anon = () => env.unauthenticatedContext().firestore();
@@ -427,5 +428,46 @@ describe("Configuration and consent questions", () => {
     await assertSucceeds(updateDoc(doc(as("privacy"), "consentDefinitions/photoVideo"), edit("privacy", { question: "Now may {child}?", version: 2 })));
     await assertSucceeds(updateDoc(doc(as("privacy"), "consentDefinitions/photoVideo"), edit("privacy", { title: "Photos and videos" })));
     await assertFails(updateDoc(doc(as("teacher"), "consentDefinitions/photoVideo"), edit("teacher", { title: "x" })));
+  });
+});
+
+describe("Attendance Policy: codes, clerk, absence reports and support groups", () => {
+  const mark = (who, data) => ({ sessionId: "c4_2027-02-01_am", classId: "c4", date: "2027-02-01", studentId: "stu-a", markedBy: who, ...data });
+  test("marks use the policy codes; L carries whole minutes", async () => {
+    await assertSucceeds(setDoc(doc(as("teacher"), "attendanceRecords/l"), mark("teacher", { code: "L", status: "late", minutesLate: 12 })));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/z"), mark("teacher", { code: "Z", status: "present" })));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/m"), mark("teacher", { code: "L", status: "late", minutesLate: 2.5 })));
+    await assertSucceeds(setDoc(doc(as("teacher"), "attendanceRecords/x"), mark("teacher", { code: "X", status: "notRequired" })));
+  });
+  test("the attendance manager keeps any class's register; corrections still need a reason", async () => {
+    await seed("attendanceRecords/r-c5", { sessionId: "c5_2027-02-01_am", classId: "c5", date: "2027-02-01", studentId: "stu-b", code: "O", status: "absent", markedBy: "x" });
+    await assertFails(updateDoc(doc(as("clerk"), "attendanceRecords/r-c5"), { code: "M", status: "medical", markedBy: "clerk" }));
+    await assertSucceeds(updateDoc(doc(as("clerk"), "attendanceRecords/r-c5"), { code: "M", status: "medical", markedBy: "clerk", correctionReason: "Mother phoned: fever", correctedBy: "clerk", correctedAt: serverTimestamp() }));
+    await assertSucceeds(getDocs(query(collection(as("clerk"), "attendanceRecords"), where("date", "==", "2027-02-01"))));
+    await assertFails(setDoc(doc(as("parent"), "attendanceRecords/p"), mark("parent", { code: "/", status: "present" })));
+  });
+  test("parents report absences for their own child only", async () => {
+    const report = { studentId: "stu-a", classId: "c4", reporterUid: "parent", from: "2027-02-01", to: "2027-02-02", reason: "illness", note: "Fever", status: "reported" };
+    await assertSucceeds(setDoc(doc(as("parent"), "absenceReports/a1"), report));
+    await assertFails(setDoc(doc(as("otherParent"), "absenceReports/a2"), { ...report, reporterUid: "otherParent" }));
+    await assertFails(setDoc(doc(as("parent"), "absenceReports/a3"), { ...report, classId: "c5" }));
+    await assertSucceeds(getDoc(doc(as("teacher"), "absenceReports/a1")));
+    await assertSucceeds(updateDoc(doc(as("clerk"), "absenceReports/a1"), { status: "acknowledged" }));
+    await assertFails(updateDoc(doc(as("parent"), "absenceReports/a1"), { status: "acknowledged" }));
+  });
+  test("late sign-ins and follow-up are written by the office and the clerk, not by teachers", async () => {
+    const movement = (who) => stamped(who, { type: "lateArrival", studentId: "stu-a", classId: "c4", date: "2027-02-01", time: "07:58", minutesLate: 18 });
+    await assertSucceeds(setDoc(doc(as("clerk"), "attendanceMovements/m1"), movement("clerk")));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceMovements/m2"), movement("teacher")));
+    await assertSucceeds(setDoc(doc(as("clerk"), "attendanceFollowUps/f1"), stamped("clerk", { kind: "firstDay", studentId: "stu-a", classId: "c4", date: "2027-02-01", outcome: "Mother phoned: fever" })));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceFollowUps/f2"), stamped("teacher", { kind: "late", studentId: "stu-a", outcome: "x" })));
+    await assertSucceeds(getDoc(doc(as("teacher"), "attendanceFollowUps/f1")));
+    await assertFails(getDoc(doc(as("parent"), "attendanceFollowUps/f1")));
+  });
+  test("the office places pupils in the Remedial group; parents never can", async () => {
+    const plan = stamped("admin", { programme: "remedial", studentId: "stu-b", classId: "c5", assignedStaffUids: ["specialist"], focus: "Reading" });
+    await assertSucceeds(setDoc(doc(as("admin"), "studentSupportPlans/p1"), plan));
+    await assertFails(setDoc(doc(as("parent"), "studentSupportPlans/p2"), { ...plan, createdBy: "parent", updatedBy: "parent" }));
+    await assertFails(setDoc(doc(as("teacher"), "studentSupportPlans/p3"), { ...plan, createdBy: "teacher", updatedBy: "teacher" }));
   });
 });

@@ -10,7 +10,7 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, waitForPendingWrites } from "firebase/firestore";
 import { workspaceDomain } from "../lib/firebase";
 import { auth } from "../lib/firebase-auth";
 import { db } from "../lib/firebase-firestore";
@@ -72,7 +72,17 @@ export function AuthProvider({ children }) {
     },
     async refresh() { await auth.currentUser?.getIdToken(true); },
     get userSignedOut() { return userSignedOut.current; },
-    signOut: () => { userSignedOut.current = true; store.remove(HUB_KEY); setActiveHub(null); return firebaseSignOut(auth); },
+    // Signing out also wipes the registers kept on this device for offline use (shared school computers),
+    // then reloads so the next person starts clean.
+    signOut: async () => {
+      // Marks saved offline and not yet sent would be lost.
+      const sent = await Promise.race([waitForPendingWrites(db).then(() => true), new Promise((resolve) => setTimeout(() => resolve(false), 1500))]);
+      if (!sent && !window.confirm("Some changes saved on this device haven't reached the school system yet (no connection). Signing out now would lose them. Sign out anyway?")) return;
+      userSignedOut.current = true; store.remove(HUB_KEY); setActiveHub(null);
+      await firebaseSignOut(auth);
+      try { Object.keys(localStorage).filter((key) => key.startsWith("srss.register.") || key.startsWith("srss.roster.")).forEach((key) => localStorage.removeItem(key)); } catch { /* storage unavailable */ }
+      window.location.assign("/login");
+    },
   }), [state, hubs, currentHub]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

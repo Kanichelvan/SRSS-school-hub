@@ -163,6 +163,7 @@ export function Classes() {
 }
 
 // ---------- Subjects ----------
+const SUBJECT_CATEGORIES = [["core", "Core subject"], ["nonCore", "Non-core subject"], ["srss", "SRSS subject"]];
 export function Subjects() {
   const { canEdit } = useEditRights();
   return <RecordManager kicker="School setup" title="Subjects" noun="subject" collection="subjects" canEdit={canEdit}
@@ -170,11 +171,15 @@ export function Subjects() {
     fields={[
       { key: "code", label: "Short code", type: "text", required: true, immutable: true, maxLength: 30, pattern: /^[a-z0-9-]{1,30}$/, patternMessage: "Lower-case letters, numbers and hyphens, e.g. math or bm.", help: "Used as the subject's permanent ID." },
       { key: "name", label: "Subject name", type: "text", required: true, maxLength: 80 },
-      { key: "standards", label: "Taught in", type: "checkboxes", options: () => [1, 2, 3, 4, 5, 6].map((level) => [String(level), `Standard ${level}`]), wide: true, help: "Leave empty if taught in every Standard." },
+      { key: "category", label: "Type", type: "select", options: SUBJECT_CATEGORIES, placeholder: "Not set" },
+      { key: "medium", label: "Taught in (language)", type: "text", maxLength: 80, placeholder: "e.g. English" },
+      { key: "standards", label: "Standards", type: "checkboxes", options: () => [1, 2, 3, 4, 5, 6].map((level) => [String(level), `Standard ${level}`]), wide: true, help: "Leave empty if taught in every Standard." },
+      { key: "description", label: "Description", type: "textarea", maxLength: 600, wide: true },
     ]}
     toDraft={(row) => ({ code: row.id })}
     makeId={(values) => values.code}
-    columns={() => [{ key: "name", label: "Subject", render: (row) => <span className="hub-cell-strong">{row.name}</span> }, { key: "id", label: "Code" }, { key: "standards", label: "Taught in", render: (row) => (row.standards?.length ? row.standards.map((level) => `Std ${level}`).join(", ") : "All Standards") }]}
+    columns={() => [{ key: "name", label: "Subject", render: (row) => <span className="hub-cell-strong">{row.name}</span> }, { key: "id", label: "Code" }, { key: "category", label: "Type", render: (row) => SUBJECT_CATEGORIES.find(([value]) => value === row.category)?.[1] || "—" }, { key: "standards", label: "Standards", render: (row) => (row.standards?.length ? row.standards.map((level) => `Std ${level}`).join(", ") : "All Standards") }, { key: "medium", label: "Language" }]}
+    filters={() => [{ key: "category", label: "Type", options: SUBJECT_CATEGORIES }]}
     searchKeys={["name", "id"]} initialSort={{ key: "name", dir: 1 }} />;
 }
 

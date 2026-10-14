@@ -1,17 +1,17 @@
 // Pure dashboard derivations, kept free of Firebase so they can be unit-tested (npm test).
 // Flags prompt human review; nothing here labels a child (PRD §4.8).
+import { CODES, followUps, summarise } from "./attendance.js";
 
-export const ATTENDANCE_STATUSES = ["present", "absent", "late", "excused", "schoolActivity", "medical", "other"];
-export const ATTENDANCE_LABELS = { present: "Present", absent: "Absent", late: "Late", excused: "Excused", schoolActivity: "School activity", medical: "Medical", other: "Other" };
+export const ATTENDANCE_STATUSES = CODES.map((item) => item.status);
+export const ATTENDANCE_LABELS = Object.fromEntries(CODES.map((item) => [item.status, item.label]));
+ATTENDANCE_LABELS.other = "Other authorised absence";
 export const HUMAN_VALUES = { truth: "Truth", rightConduct: "Right Conduct", peace: "Peace", love: "Love", nonViolence: "Non-violence" };
 
-// Attendance rate counts late and authorised absences as attended; only "absent" counts against it.
+// Attendance Policy §11: attended (present, trip, late) ÷ counted sessions (all but X).
+// `counts.absent` is every authorised or unauthorised absence.
 export function attendanceSummary(records) {
-  const counts = Object.fromEntries(ATTENDANCE_STATUSES.map((status) => [status, 0]));
-  for (const record of records) counts[record.status] = (counts[record.status] || 0) + 1;
-  const total = records.length;
-  const attended = total - counts.absent;
-  return { total, counts, rate: total ? Math.round((attended / total) * 1000) / 10 : null };
+  const summary = summarise(records);
+  return { ...summary, counts: { present: summary.byCode["/"], late: summary.late, excused: summary.byCode.P, absent: summary.absences, authorised: summary.authorised, unauthorised: summary.unauthorised } };
 }
 
 // ATT-002: distinguish "not submitted" from "submitted, everyone present".
@@ -22,15 +22,13 @@ export function attendanceByClass(classes, sessions, date) {
   });
 }
 
-// Repeated-absence prompt for human follow-up (srss §41: e.g. 3 unexplained absences within 30 days).
-export function followUpPrompts(records, { threshold = 3, withinDays = 30, today = new Date() } = {}) {
-  const since = new Date(today); since.setDate(since.getDate() - withinDays);
-  const byStudent = new Map();
-  for (const record of records) {
-    if (record.status !== "absent" || new Date(record.date) < since) continue;
-    byStudent.set(record.studentId, (byStudent.get(record.studentId) || 0) + 1);
-  }
-  return [...byStudent].filter(([, count]) => count >= threshold).map(([studentId, count]) => ({ studentId, count, message: `${count} absences in the last ${withinDays} days — review suggested` }));
+// Follow-up prompts from the Attendance Policy (late 5×/month, 3 unauthorised/month, persistent absence,
+// near the 95% minimum). Prompts invite review by staff; they never label a child.
+export function followUpPrompts(records, { today = new Date() } = {}) {
+  const byStudent = {};
+  for (const record of records) (byStudent[record.studentId] ||= []).push(record);
+  const month = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 7);
+  return followUps(byStudent, { month, minSessions: 10 });
 }
 
 // DASH-001: everything a family needs to act on, isolated from announcements, most urgent first.

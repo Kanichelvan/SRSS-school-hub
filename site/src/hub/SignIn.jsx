@@ -7,7 +7,7 @@ import { usingEmulators } from "../lib/firebase";
 
 // Emulator-only demo accounts created by scripts/seed-emulator.mjs (password defined there).
 const DEMO_PASSWORD = "srss-demo-only";
-const DEMO_ACCOUNTS = [["superadmin", "Super admin"], ["office", "Office admin"], ["principal", "Headmistress"], ["coordinator", "Academic coordinator"], ["teacher", "Teacher · Std 4"], ["teacher2", "Teacher · Std 5"], ["specialist", "Learning Studio"], ["admissions", "Admissions"], ["finance", "Finance"], ["moderator", "Portfolio moderator"], ["editor", "Content editor"], ["parent", "Parent (2 children)"], ["parent2", "Parent (Tan family)"], ["student", "Student"]];
+const DEMO_ACCOUNTS = [["superadmin", "Super admin"], ["office", "Office admin"], ["principal", "Headmistress"], ["coordinator", "Academic coordinator"], ["teacher", "Teacher · Std 4"], ["teacher2", "Teacher · Std 5"], ["specialist", "Learning Studio"], ["admissions", "Admissions"], ["clerk", "Attendance clerk"], ["finance", "Finance"], ["moderator", "Portfolio moderator"], ["editor", "Content editor"], ["parent", "Parent (2 children)"], ["parent2", "Parent (Tan family)"], ["student", "Student"]];
 
 export function SignIn() {
   const auth = useAuth();

@@ -83,6 +83,7 @@ export const hubRoutes = [
   { path: "/hub/admin/enrolments", hub: "admin", group: "Assignments", label: "Student enrolments", module: "students", google: [], screen: "enrolments" },
   { path: "/hub/admin/teacher-assignments", hub: "admin", group: "Assignments", label: "Teacher assignments", module: "academics", google: [], screen: "teacherAssignments" },
   { path: "/hub/admin/guardian-links", hub: "admin", group: "Assignments", label: "Guardian links", module: "guardians", google: [], screen: "guardianLinks" },
+  { path: "/hub/admin/support-groups", hub: "admin", group: "Assignments", label: "Remedial group", module: "students", google: [], screen: "supportGroups" },
   { path: "/hub/admin/communications", hub: "admin", group: "Content & communication", label: "Announcements", module: "announcements", google: ["Gmail", "Groups"], screen: "announcementsAdmin" },
   { path: "/hub/admin/calendar", hub: "admin", group: "Content & communication", label: "Calendar", module: "calendar", google: ["Calendar"], screen: "calendarAdmin" },
   { path: "/hub/admin/showcase", hub: "admin", group: "Content & communication", label: "Portfolio moderation", module: "showcase", google: ["Drive"], screen: "showcase" },

@@ -102,3 +102,29 @@ export async function commitInChunks(writes, size = RULE_SAFE_BATCH) {
     await batch.commit();
   }
 }
+
+// Like commitInChunks, but never leaves the teacher waiting when the connection drops: if a batch isn't
+// confirmed within a few seconds (or the device is offline) the remaining batches are queued on the
+// device and sent, in order, when the connection returns. Returns { queued, sent } — `sent` resolves
+// once everything has reached the server.
+export async function commitOrQueue(writes, size = RULE_SAFE_BATCH) {
+  const batches = [];
+  for (let i = 0; i < writes.length; i += size) {
+    const batch = writeBatch(db);
+    for (const write of writes.slice(i, i + size)) write(batch);
+    batches.push(batch);
+  }
+  const started = [];
+  for (const [index, batch] of batches.entries()) {
+    const commit = batch.commit();
+    started.push(commit);
+    const outcome = navigator.onLine === false ? "pending" : await Promise.race([commit.then(() => "sent"), new Promise((resolve) => setTimeout(() => resolve("pending"), 8000))]);
+    if (outcome === "pending") {
+      for (const later of batches.slice(index + 1)) started.push(later.commit());
+      const sent = Promise.all(started);
+      sent.catch(() => {});
+      return { queued: true, sent };
+    }
+  }
+  return { queued: false, sent: Promise.resolve() };
+}

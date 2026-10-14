@@ -257,3 +257,40 @@ function StatusPanel({ user, onDone, onCancel }) {
     <div className="hub-form-actions"><button type="submit" className={`hub-button ${disabling ? "hub-button-danger" : ""}`} disabled={state.busy || !reason.trim()}>{state.busy ? "Saving…" : disabling ? "Disable account" : "Enable account"}</button><button type="button" className="hub-button hub-button-quiet" onClick={onCancel}>Cancel</button></div>
   </form>;
 }
+
+// ---------- Support groups (Remedial) ----------
+// Pupils stay registered in their Standard class; the group's teachers get access to these pupils only.
+const PROGRAMMES = [["remedial", "Remedial"], ["learningStudio", "Learning Studio"]];
+export function SupportGroups() {
+  const auth = useAuth();
+  const canEdit = auth.roles.some((role) => ["schoolAdmin", "superAdmin", "academicCoordinator"].includes(role));
+  const pupil = (lookups, id) => lookups.students.find((item) => item.id === id);
+  return <RecordManager kicker="Assignments" title="Remedial & support groups" noun="placement" collection="studentSupportPlans" canEdit={canEdit}
+    intro="Pupils in the Remedial group stay in their own Standard class for registration. Place a pupil here and choose the Remedial teacher: that teacher can then see the pupil's record and add their work, and nothing else."
+    lookups={async () => { const [students, staff, classes] = await Promise.all([list("students", where("status", "==", "active")), list("staff"), list("classes")]); return { students, staff, classes }; }}
+    nameOf={(row, lookups) => (lookups ? pupil(lookups, row.studentId)?.name || "" : "")}
+    fields={[
+      { key: "programme", label: "Group", type: "select", required: true, options: PROGRAMMES },
+      { key: "studentId", label: "Pupil", type: "select", required: true, immutable: true, options: (lookups) => lookups.students.sort((a, b) => a.name.localeCompare(b.name)).map((item) => [item.id, `${item.name} · ${lookups.classes.find((cls) => cls.id === item.currentClassId)?.name || "no class"}`]) },
+      { key: "assignedStaffUids", label: "Teachers", type: "checkboxes", options: (lookups) => lookups.staff.filter((person) => person.uid && isActive(person)).map((person) => [person.uid, person.name]), wide: true, emptyOptions: "No staff have hub accounts yet." },
+      { key: "focus", label: "Focus", type: "text", maxLength: 120, placeholder: "e.g. Reading fluency" },
+      { key: "goal", label: "Goal", type: "textarea", maxLength: 500, wide: true },
+      { key: "reviewDate", label: "Review by", type: "date" },
+      { key: "familyVisible", label: "Parents can see this placement in the Parents Hub", type: "checkbox", wide: true },
+    ]}
+    defaults={() => ({ programme: "remedial", assignedStaffUids: [], familyVisible: false })}
+    validate={(values, { rows, isNew }) => ({
+      assignedStaffUids: !(values.assignedStaffUids || []).length ? "Choose at least one teacher." : null,
+      _form: isNew && rows.some((row) => isActive(row) && row.studentId === values.studentId && row.programme === values.programme) ? "This pupil is already in this group." : null,
+    })}
+    prepare={(values, { isNew, lookups }) => ({ ...values, ...(isNew ? { classId: pupil(lookups, values.studentId)?.currentClassId || null } : {}) })}
+    columns={(lookups) => [
+      { key: "studentId", label: "Pupil", sortValue: (row) => pupil(lookups, row.studentId)?.name || "", csv: (row) => pupil(lookups, row.studentId)?.name, render: (row) => <Link className="hub-cell-strong" to={`/hub/students/${row.studentId}`}>{pupil(lookups, row.studentId)?.name || "—"}</Link> },
+      { key: "classId", label: "Class", render: (row) => lookups.classes.find((cls) => cls.id === (pupil(lookups, row.studentId)?.currentClassId || row.classId))?.name || "—" },
+      { key: "programme", label: "Group", render: (row) => PROGRAMMES.find(([value]) => value === row.programme)?.[1] || "Support" },
+      { key: "assignedStaffUids", label: "Teachers", sortable: false, csv: (row) => (row.assignedStaffUids || []).map((uid) => lookups.staff.find((person) => person.uid === uid)?.name).join("; "), render: (row) => (row.assignedStaffUids || []).map((uid) => lookups.staff.find((person) => person.uid === uid)?.name).filter(Boolean).join(", ") || "—" },
+      { key: "focus", label: "Focus" },
+    ]}
+    filters={() => [{ key: "programme", label: "Group", options: PROGRAMMES }]}
+    searchKeys={["focus"]} exportName="srss-support-groups" createLabel="Place a pupil" />;
+}

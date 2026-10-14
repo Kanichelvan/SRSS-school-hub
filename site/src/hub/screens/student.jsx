@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { where } from "firebase/firestore";
 import { useAuth } from "../../auth/AuthProvider";
 import { QuestDashboardCard, JourneySummary } from "./quest";
-import { announcementsFor, daysAgo, eventsFor, getMany, list, one, today, useLoad } from "../data";
+import { announcementsFor, daysAgo, eventsFor, getMany, list, one, schoolSettings, today, useLoad } from "../data";
 import { HUMAN_VALUES, attendanceSummary } from "../logic/dashboard";
 import { FAMILY_VISIBLE, categoryOf, humanValuesOf, visibleToFamily } from "../portfolio";
 import { EmptyState, ErrorNote, Loading, PageHeader, formatDate } from "../ui";
@@ -66,13 +66,17 @@ export function MyClass() {
       list("attendanceRecords", where("studentId", "==", mine.me.id), where("date", ">=", daysAgo(30))),
     ]);
     const active = assignments.filter((item) => (item.status ?? "active") === "active");
+    const settings = await schoolSettings();
+    const weekday = new Date().getDay();
+    const ends = (mine.cls.standard === 1 ? settings.timings?.standard1 : settings.timings?.standards2to6)?.[weekday];
     const [staff, classTeacher] = await Promise.all([getMany("staff", active.map((item) => item.staffId)), mine.cls.classTeacherUid ? list("staff", where("uid", "==", mine.cls.classTeacherUid), where("directoryVisible", "==", true)).catch(() => []) : []]);
-    return { ...mine, classTeacher: classTeacher[0]?.name || null, teachers: active.map((item) => ({ ...item, subject: subjects.find((subject) => subject.id === item.subjectId)?.name || item.subjectId, teacher: staff.find((person) => person.id === item.staffId)?.name })), notices, records };
+    return { ...mine, hours: ends ? `${settings.schoolStart || "07:40"} – ${ends}` : null, arriveBy: settings.arriveBy || null, classTeacher: classTeacher[0]?.name || null, teachers: active.map((item) => ({ ...item, subject: subjects.find((subject) => subject.id === item.subjectId)?.name || item.subjectId, teacher: staff.find((person) => person.id === item.staffId)?.name })), notices, records };
   }, [auth.scope?.studentId]);
   return <div className="hub-student">
     <PageHeader kicker="My class" title={data?.cls?.name || "My class"}>{data?.cls ? `Standard ${data.cls.standard}${data.cls.room ? ` · ${data.cls.room}` : ""}` : null}</PageHeader>
     <ErrorNote error={error} />
     {loading ? <Loading /> : !data ? <NotLinked /> : !data.cls ? <EmptyState title="You're not in a class yet.">Your teacher will add you soon.</EmptyState> : <>
+      {data.hours && <section className="hub-student-panel hub-student-hero"><h2>School today</h2><p className="hub-student-big"><strong>{data.hours}</strong>{data.arriveBy ? ` · please arrive by ${data.arriveBy}` : ""}</p></section>}
       {data.classTeacher && <section className="hub-student-panel hub-student-hero"><h2>My class teacher</h2><p className="hub-student-big"><strong>{data.classTeacher}</strong></p></section>}
       <section className="hub-student-panel"><h2>My teachers</h2>{data.teachers.length ? <ul className="hub-student-list">{data.teachers.sort((a, b) => a.subject.localeCompare(b.subject)).map((item) => <li key={item.id}><strong>{item.subject}</strong><span>{item.teacher || "Your teacher"}</span>{item.slots?.length ? <small>{item.slots.map((slot) => WEEKDAYS[slot.day].slice(0, 3)).join(", ")}</small> : null}</li>)}</ul> : <p>Your teachers will appear here.</p>}</section>
       <section className="hub-student-panel"><h2>Class notices</h2>{data.notices.length ? <ul className="hub-student-list">{data.notices.map((item) => <li key={item.id}><strong>{item.title}</strong><span>{item.body}</span></li>)}</ul> : <p>No class notices right now.</p>}</section>

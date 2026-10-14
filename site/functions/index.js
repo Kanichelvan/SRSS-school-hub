@@ -266,6 +266,28 @@ export const notifyAbsencesOnSubmit = onDocumentWritten("attendanceSessions/{id}
   await batch.commit();
 });
 
+// Attendance Policy §6.3: the clerk prompts teachers whose AM register isn't in yet.
+export const remindRegisters = onCall(async (request) => {
+  const roles = request.auth?.token?.roles || [];
+  if (!roles.some((role) => ["schoolAdmin", "superAdmin", "attendanceManager", "leadership"].includes(role))) throw new HttpsError("permission-denied", "Only the attendance manager or the school office can send register reminders.");
+  const { date, classIds = [] } = request.data || {};
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date)) || !Array.isArray(classIds) || !classIds.length) throw new HttpsError("invalid-argument", "Choose a date and at least one class.");
+  const notified = new Set();
+  const batch = db.batch();
+  for (const classId of classIds.slice(0, 50)) {
+    const [cls, assignments, session] = await Promise.all([db.doc(`classes/${classId}`).get(), db.collection("teacherAssignments").where("classId", "==", classId).get(), db.doc(`attendanceSessions/${classId}_${date}_am`).get()]);
+    if (session.exists && session.data().status === "submitted") continue;
+    const teachers = uids(cls.data()?.classTeacherUid, assignments.docs.filter((doc) => (doc.data().status ?? "active") === "active").map((doc) => doc.data().teacherUid));
+    for (const recipientUid of teachers) {
+      batch.set(db.collection("notificationRecords").doc(), { recipientUid, category: "attendance", critical: true, title: `AM register for ${cls.data()?.name || "your class"} isn't submitted yet`, body: `Please complete and submit the register for ${date}.`, link: `/hub/teacher/attendance/${classId}${date ? `?date=${date}` : ""}`, createdAt: FieldValue.serverTimestamp(), readAt: null });
+      notified.add(recipientUid);
+    }
+  }
+  await batch.commit();
+  await audit({ type: "attendance.registerReminder", date, classIds, notified: notified.size, actorUid: request.auth.uid });
+  return { notified: notified.size };
+});
+
 // ---------- Admissions → SIS without re-keying (PRD §33) ----------
 export const enrolApplication = onCall(async (request) => {
   const roles = request.auth?.token?.roles || [];
@@ -338,3 +360,5 @@ export const auditAnnouncementCategories = auditWrite("announcementCategories");
 export const auditPortfolioCategories = auditWrite("portfolioCategories");
 export const auditPortfolioTags = auditWrite("portfolioTags");
 export const auditDownloadCategories = auditWrite("downloadCategories");
+export const auditAttendanceMovements = auditWrite("attendanceMovements");
+export const auditAttendanceFollowUps = auditWrite("attendanceFollowUps");

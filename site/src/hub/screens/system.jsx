@@ -88,6 +88,11 @@ export function SchoolInformation({ onSaved }) {
       <label>Current term<select disabled={!canEdit} value={values.currentTermId || ""} onChange={(event) => set("currentTermId", event.target.value)}><option value="">Not set</option>{yearTerms.map((term) => <option key={term.id} value={term.id}>{term.name}</option>)}</select></label>
       <label>Attendance due by<input type="time" disabled={!canEdit} value={values.attendanceDueTime || "09:00"} onChange={(event) => set("attendanceDueTime", event.target.value)} /></label>
     </div>
+    {(data.settings.timings || data.settings.curriculum) && <dl className="hub-facts">
+      {data.settings.schoolStart && <div><dt>School day</dt><dd>Arrive by {data.settings.arriveBy || "07:35"} · registration {data.settings.schoolStart}{data.settings.week ? ` · ${data.settings.week}` : ""}</dd></div>}
+      {[["standard1", "Standard 1 finishes"], ["standards2to6", "Standards 2–6 finish"]].filter(([key]) => data.settings.timings?.[key]).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => `${day} ${data.settings.timings[key][index + 1]}`).join(" · ")}</dd></div>)}
+      {data.settings.curriculum && <div><dt>Curriculum</dt><dd>Standard 1: {data.settings.curriculum.standard1} · Standards 2–6: {data.settings.curriculum.standards2to6}. {data.settings.curriculum.languages}</dd></div>}
+    </dl>}
     {values.currentAcademicYearId !== data.settings.currentAcademicYearId && <p className="hub-status">Changing the current year moves every teacher, parent and pupil to that year's classes as soon as you save.</p>}
     {state.error && <p className="hub-error" role="alert">{state.error}</p>}
     {state.message && <p className="hub-status" role="status">{state.message}</p>}

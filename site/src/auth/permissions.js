@@ -14,6 +14,7 @@ export const ROLES = {
   academicCoordinator: { label: "Academic Coordinator", hub: "admin" },
   schoolAdmin: { label: "School Administrator", hub: "admin" },
   admissionsOfficer: { label: "Admissions Officer", hub: "admin" },
+  attendanceManager: { label: "School Attendance Manager (Clerk)", hub: "admin" },
   financeOfficer: { label: "Finance Officer", hub: "admin" },
   leadership: { label: "Headmistress / Leadership", hub: "admin" },
   safeguardingLead: { label: "Safeguarding / Welfare Lead", hub: "admin" },
@@ -91,7 +92,7 @@ export const MODULES = {
 //   actions: V view · C create/submit · U update (implies V) · A approve/publish (implies V) · R restricted (exception only)
 //   scope:   all (default) · own · child · assigned · class · selected · relevant · summary · published
 // A role missing from a row has no access.
-const ALL_STAFF = ["superAdmin", "teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
+const ALL_STAFF = ["superAdmin", "attendanceManager", "teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
 const everyone = (cell) => Object.fromEntries([...ROLE_IDS].map((role) => [role, cell]));
 const staffOnly = (cell) => Object.fromEntries(ALL_STAFF.map((role) => [role, cell]));
 
@@ -110,16 +111,16 @@ const MATRIX = {
   students: {
     student: "V own", parent: "V child", teacher: "V class", classTeacher: "V class", specialistTeacher: "V assigned",
     academicCoordinator: "V", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", privacySteward: "V",
-    financeOfficer: "V summary", portfolioModerator: "V summary", auditor: "V",
+    financeOfficer: "V summary", portfolioModerator: "V summary", auditor: "V", attendanceManager: "V",
     admissionsOfficer: "R", // PRD §44: applicants only, enrolled records only if separately authorised
   },
-  guardians: { parent: "V own", classTeacher: "V class", teacher: "V class", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", privacySteward: "V" },
+  guardians: { parent: "V own", classTeacher: "V class", teacher: "V class", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", privacySteward: "V", attendanceManager: "V" },
   staff: { ...staffOnly("V"), schoolAdmin: "U", parent: "V summary" },
   academics: { ...staffOnly("V"), academicCoordinator: "U", schoolAdmin: "U" },
   // PRD ATT-001 overrides the matrix: subject teachers take attendance for their assigned classes.
   attendance: {
     student: "V own", parent: "V child", teacher: "U class", classTeacher: "U class", specialistTeacher: "V assigned",
-    academicCoordinator: "V", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", auditor: "V",
+    academicCoordinator: "V", schoolAdmin: "U", leadership: "V", safeguardingLead: "V", auditor: "V", attendanceManager: "U",
   },
   portfolio: {
     student: "C own", parent: "V child", teacher: "U class", classTeacher: "U class", specialistTeacher: "U assigned",
@@ -143,7 +144,7 @@ const MATRIX = {
   inbox: { schoolAdmin: "U", leadership: "V", admissionsOfficer: "V" },
   content: { contentEditor: "C/U", leadership: "A", schoolAdmin: "V" },
   documents: { ...everyone("V relevant"), schoolAdmin: "U" },
-  reports: { academicCoordinator: "V", schoolAdmin: "V", leadership: "V", financeOfficer: "V summary", auditor: "V" },
+  reports: { academicCoordinator: "V", schoolAdmin: "V", leadership: "V", financeOfficer: "V summary", auditor: "V", attendanceManager: "V" },
   governance: { schoolAdmin: "U", leadership: "A", privacySteward: "U", safeguardingLead: "V summary", technicalAdmin: "V", auditor: "V" },
   settings: { schoolAdmin: "U", technicalAdmin: "U", leadership: "V" },
   // Everyone here sees accounts and the role matrix; what each may change is decided by the server.

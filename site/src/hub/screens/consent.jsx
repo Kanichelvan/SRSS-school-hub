@@ -105,7 +105,7 @@ export function ParentConsent() {
 
 // Staff confidentiality and acceptable-use acknowledgement (framework Part V), asked once per version.
 export const STAFF_ACK_VERSION = 1;
-const STAFF_ROLES = ["teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
+const STAFF_ROLES = ["superAdmin", "attendanceManager", "teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
 
 export function StaffAcknowledgement() {
   const auth = useAuth();

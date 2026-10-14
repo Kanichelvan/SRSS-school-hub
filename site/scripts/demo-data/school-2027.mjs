@@ -18,6 +18,7 @@ export const ACCOUNTS = [
   { key: "teacher2", name: "Mr Daniel Tan (demo)", roles: ["teacher", "classTeacher"], staff: "Class Teacher, Standard 5" },
   { key: "specialist", name: "Ms Kavitha Rao (demo)", roles: ["specialistTeacher"], staff: "Learning Studio Teacher" },
   { key: "admissions", name: "Encik Faizal Omar (demo)", roles: ["admissionsOfficer"], staff: "Admissions Officer" },
+  { key: "clerk", name: "Puan Aminah Said (demo)", roles: ["attendanceManager"], staff: "School Attendance Manager (Clerk)" },
   { key: "finance", name: "Mrs Chong Siew Mei (demo)", roles: ["financeOfficer"], staff: "Finance Officer" },
   { key: "welfare", name: "Ms Devi Krishnan (demo)", roles: ["safeguardingLead"], staff: "Welfare Lead" },
   { key: "privacy", name: "Mr Arif Hassan (demo)", roles: ["privacySteward"], staff: "Privacy & Consent Steward" },

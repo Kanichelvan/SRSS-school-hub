@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { attendanceByClass, attendanceSummary, completeness, followUpPrompts, nextClass, parentActions } from "../src/hub/logic/dashboard.js";
 
-test("attendance rate counts only absences against it", () => {
-  const summary = attendanceSummary([{ status: "present" }, { status: "late" }, { status: "absent" }, { status: "excused" }]);
-  assert.equal(summary.rate, 75);
-  assert.equal(summary.counts.absent, 1);
+test("attendance %: authorised and unauthorised absences both count as missed; X is not counted (policy §11)", () => {
+  const summary = attendanceSummary([{ status: "present" }, { status: "late" }, { status: "absent" }, { status: "excused" }, { code: "X" }]);
+  assert.equal(summary.rate, 50);
+  assert.equal(summary.counts.absent, 2);
+  assert.equal(summary.counted, 4);
   assert.equal(attendanceSummary([]).rate, null);
 });
 
@@ -15,14 +16,14 @@ test("ATT-002: 'not submitted' is distinct from 'submitted, all present'", () =>
   assert.deepEqual(attendanceByClass(classes, sessions, "2026-10-09").map((row) => row.state), ["submitted", "open", "missing"]);
 });
 
-test("follow-up prompts need three absences within 30 days and never label a child", () => {
-  const today = new Date("2026-10-09");
-  const records = ["2026-10-01", "2026-10-03", "2026-10-07", "2026-08-01"].map((date) => ({ studentId: "s1", status: "absent", date }));
-  const prompts = followUpPrompts(records, { today });
-  assert.equal(prompts.length, 1);
-  assert.equal(prompts[0].count, 3);
-  assert.match(prompts[0].message, /review suggested/);
-  assert.equal(followUpPrompts(records.slice(0, 2), { today }).length, 0);
+test("follow-up prompts follow the attendance policy and never label a child", () => {
+  const today = new Date("2026-10-30T12:00:00");
+  const lates = ["01", "02", "05", "06", "07"].map((day) => ({ studentId: "late", code: "L", date: `2026-10-${day}` }));
+  const unauthorised = ["01", "02", "05"].map((day) => ({ studentId: "away", code: "O", date: `2026-10-${day}` }));
+  const kinds = followUpPrompts([...lates, ...unauthorised], { today }).map((prompt) => `${prompt.studentId}:${prompt.kind}`);
+  assert.ok(kinds.includes("late:late"));
+  assert.ok(kinds.includes("away:unauthorised"));
+  assert.equal(followUpPrompts(lates.slice(0, 4), { today }).length, 0);
 });
 
 test("DASH-001: actions cover missing consent, pending forms and outstanding fees, soonest first", () => {

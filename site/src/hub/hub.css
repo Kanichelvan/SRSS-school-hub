@@ -557,3 +557,32 @@ a.hub-stat:hover { border-color: var(--navy-800); }
   .hub-wizard-head .hub-badge { grid-column: 2; justify-self: start; }
   .hub-search input { min-width: 0; width: 100%; }
 }
+
+/* ---------- Attendance codes, office and print sheets (Attendance Policy) ---------- */
+.hub-code { display: inline-grid; place-items: center; min-width: 22px; height: 22px; margin-right: 6px; border-radius: 4px; background: rgba(10, 25, 60, .08); font: 700 13px var(--ui); }
+.hub-roster-choices label.active .hub-code { background: rgba(255, 255, 255, .22); }
+.hub-roster-choices label.active.is-authorised { border-color: var(--hub-info); background: var(--hub-info); }
+.hub-roster-choices label.active.is-unauthorised { border-color: var(--hub-bad); background: var(--hub-bad); }
+.hub-roster-choices label.active.is-present { border-color: var(--navy-950); background: var(--navy-950); }
+.hub-roster-choices select.active { border-color: var(--navy-950); box-shadow: inset 0 0 0 1px var(--navy-950); font-weight: 600; }
+.hub-roster > li.is-unauthorised { border-color: #e7b4b4; background: #fff7f7; }
+.hub-roster > li.is-authorised { border-color: #b9cfe8; background: #f6f9fd; }
+.hub-roster-extra .hub-field-wide { grid-column: 1 / -1; }
+.hub-parent-report { color: var(--hub-info) !important; font-weight: 600 !important; }
+.hub-code-key { margin: 12px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--hub-surface); font: 13px var(--ui); }
+.hub-code-key summary { cursor: pointer; color: var(--navy-800); font-weight: 600; }
+.hub-code-key dl { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 18px; margin: 10px 0 0; }
+.hub-code-key dl div { display: flex; gap: 10px; }
+.hub-code-key dt { min-width: 18px; font-weight: 700; color: var(--navy-950); }
+.hub-code-key dd { margin: 0; }
+.hub-guide { margin: 10px 0; padding-left: 18px; line-height: 1.6; }
+.hub-print-only { display: none; }
+.hub-evacuation h2 { color: var(--navy-950); font: 600 20px var(--serif); }
+.hub-evacuation-page { margin-top: 14px; }
+.hub-evacuation-page h3 { margin: 0 0 8px; font: 600 16px var(--ui); }
+@media print {
+  .hub-print-hide, .hub-tabs, .hub-page-head .hub-page-actions, .hub-filterbar { display: none !important; }
+  .hub-print-only { display: block; }
+  .hub-evacuation-page { break-after: page; }
+  .hub-main { padding: 0; }
+}
