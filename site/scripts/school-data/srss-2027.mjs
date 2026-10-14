@@ -32,7 +32,8 @@ export const TERMS = [
 ];
 
 // One class per Standard. Remedial is a support group (Admin › Remedial group), not a register class.
-export const CLASSES = [1, 2, 3, 4, 5, 6].map((level) => ({ id: `ay2027-standard-${level}`, name: `Standard ${level}`, standard: level }));
+export const CLASS_NAMES = { 1: "Prema", 2: "Sathya", 3: "Dharma", 4: "Shanti", 5: "Ahimsa", 6: "Ananda" };
+export const CLASSES = [1, 2, 3, 4, 5, 6].map((level) => ({ id: `ay2027-standard-${level}`, name: `Standard ${level} ${CLASS_NAMES[level]}`, standard: level }));
 
 const ALL = [];
 const STD1 = [1];

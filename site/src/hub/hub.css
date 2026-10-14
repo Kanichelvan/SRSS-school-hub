@@ -586,3 +586,11 @@ a.hub-stat:hover { border-color: var(--navy-800); }
   .hub-evacuation-page { break-after: page; }
   .hub-main { padding: 0; }
 }
+/* Late: orange metallic (the SRSS25 orange petal tones), dark text for contrast (user decision, 14 Oct 2026). */
+.hub-roster-choices label.active.is-late {
+  border-color: #b34405; color: #2b1200;
+  background: linear-gradient(180deg, #ffe2b8 0%, #ffb15c 18%, #f57d1f 46%, #d8600d 62%, #f99a45 84%, #ffd09a 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .75), inset 0 -2px 3px rgba(122, 44, 0, .35), 0 2px 6px rgba(179, 68, 5, .3);
+  text-shadow: 0 1px 0 rgba(255, 236, 210, .6);
+}
+.hub-roster-choices label.active.is-late .hub-code { color: #2b1200; background: rgba(255, 255, 255, .45); }
