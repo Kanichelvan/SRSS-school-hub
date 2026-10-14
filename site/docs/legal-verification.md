@@ -60,7 +60,11 @@ Sources (secondary summaries):
 - [Nagashima](https://www.nagashima.com/en/publications/publication20250527-2/)
 - [Legal That Works](https://www.legalthatworks.com/blog/pdpa-compliance-malaysia-2024-amendment-act)
 
-## 4. Still to do before the draft banner comes off
+## 4. Approval
+
+**Approved by the School on 14 October 2026**; `LEGAL_STATUS` is now `published` and the draft banner is gone. The checklist below was the pre-approval list and is kept for the record — item 1 (a direct Board contact) is still worth adding when an inbox exists.
+
+### Pre-approval checklist
 
 Kept to the minimum:
 

@@ -4,7 +4,7 @@
 
 // "draft" shows a review banner on every policy. Switch to "published" only after the School and
 // its legal advisers approve the text (see docs/legal-verification.md).
-export const LEGAL_STATUS = "draft";
+export const LEGAL_STATUS = "published"; // approved by the School, 14 Oct 2026
 // One date on every page, shown as “Effective date (last revised date)”, as on the MySAIYa legal pages.
 export const EFFECTIVE_DATE = "23rd November 2026";
 export const COPYRIGHT_YEAR = 2026;
