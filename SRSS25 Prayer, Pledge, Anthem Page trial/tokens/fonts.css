@@ -1,0 +1,17 @@
+/* SRSS25 typefaces.
+   Display: Playfair Display (Google Fonts).
+   Body: Calibri — the brand's confirmed body face. Calibri ships with
+   Microsoft Office and renders locally on most authoring machines, but it is
+   not licensed for web serving, so there is no @font-face for it here: the
+   token points at 'Calibri' and falls back to the system sans for visitors
+   without it. Drop licensed Calibri webfont files into assets/fonts/ and add
+   the @font-face rules below when they are available. */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap");
+
+/* Calibri, resolved from the reader's own machine only — no web binary is
+   shipped or substituted. When licensed webfont files arrive, add url() srcs
+   (assets/fonts/calibri-*.woff2) ahead of the local() entries below. */
+@font-face{font-family:"Calibri";font-style:normal;font-weight:400;src:local("Calibri"),local("Calibri Regular");font-display:swap}
+@font-face{font-family:"Calibri";font-style:italic;font-weight:400;src:local("Calibri Italic");font-display:swap}
+@font-face{font-family:"Calibri";font-style:normal;font-weight:700;src:local("Calibri Bold");font-display:swap}
+@font-face{font-family:"Calibri";font-style:italic;font-weight:700;src:local("Calibri Bold Italic");font-display:swap}

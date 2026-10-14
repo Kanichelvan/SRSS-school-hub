@@ -1,0 +1,15 @@
+:root{
+--shadow-none:none;
+--shadow-xs:0 1px 2px rgba(10,26,60,.06);
+--shadow-sm:0 2px 6px rgba(10,26,60,.08);
+--shadow-md:0 8px 24px rgba(10,26,60,.10);
+--shadow-lg:0 24px 64px rgba(6,15,38,.18);
+--shadow-header:0 1px 0 rgba(255,255,255,.10);
+--shadow-gold:0 8px 22px rgba(201,162,39,.30);
+--shadow-inset-hairline:inset 0 0 0 1px var(--border-hairline);
+--shadow-inset-gold:inset 0 0 0 1px var(--gold-400);
+
+--blur-glass:14px; /* @kind other */
+--glass-navy:rgba(10,26,60,.72); /* @kind other */
+--glass-light:rgba(251,249,244,.82); /* @kind other */
+}

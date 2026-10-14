@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sathya Sai Conference 2025 - Brand Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f4f0 0%, #fff 100%);
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, #673AB7 0%, #3F51B5 100%);
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(103, 58, 183, 0.3);
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .logo-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .logo-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #673AB7;
+        }
+
+        .infinity-display {
+            width: 300px;
+            height: 180px;
+            margin: 30px auto;
+            position: relative;
+            background: linear-gradient(45deg, #FF6B35 0%, #F7931E 25%, #E91E63 50%, #9C27B0 75%, #673AB7 100%);
+            -webkit-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180"><path d="M30 90 C30 30, 90 30, 150 90 C210 150, 270 150, 270 90 C270 150, 210 150, 150 90 C90 30, 30 30, 30 90 Z" fill="black"/></svg>') no-repeat center;
+            mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180"><path d="M30 90 C30 30, 90 30, 150 90 C210 150, 270 150, 270 90 C270 150, 210 150, 150 90 C90 30, 30 30, 30 90 Z" fill="black"/></svg>') no-repeat center;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+        }
+
+        .color-extraction {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .color-extraction h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .color-system {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .color-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .color-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .color-swatch {
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .color-swatch::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-info {
+            padding: 25px;
+        }
+
+        .color-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .color-pillar {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .color-code {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+            letter-spacing: 0.5px;
+        }
+
+        .usage-examples {
+            margin-top: 15px;
+        }
+
+        .usage-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .usage-list {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            color: #777;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        /* Specific color assignments based on infinity logo */
+        .main-purple .color-swatch {
+            background: linear-gradient(135deg, #673AB7 0%, #3F51B5 100%);
+        }
+        .main-purple .color-code {
+            border-left-color: #673AB7;
+        }
+
+        .love-coral .color-swatch {
+            background: linear-gradient(135deg, #FF6B35 0%, #E91E63 100%);
+        }
+        .love-coral .color-code {
+            border-left-color: #FF6B35;
+        }
+
+        .service-teal .color-swatch {
+            background: linear-gradient(135deg, #00BCD4 0%, #009688 100%);
+        }
+        .service-teal .color-code {
+            border-left-color: #00BCD4;
+        }
+
+        .values-gold .color-swatch {
+            background: linear-gradient(135deg, #F7931E 0%, #FFC107 100%);
+        }
+        .values-gold .color-code {
+            border-left-color: #F7931E;
+        }
+
+        .typography-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .typography-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .font-example {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #673AB7;
+        }
+
+        .font-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #673AB7;
+            margin-bottom: 10px;
+        }
+
+        .font-usage {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .playfair-example {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .poppins-example {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .script-example {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #FF6B35;
+            margin: 10px 0;
+        }
+
+        .application-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .application-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .application-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .application-card {
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .application-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .application-card p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .app-love {
+            background: linear-gradient(135deg, #FF6B35 0%, #E91E63 100%);
+        }
+
+        .app-service {
+            background: linear-gradient(135deg, #00BCD4 0%, #009688 100%);
+        }
+
+        .app-values {
+            background: linear-gradient(135deg, #F7931E 0%, #FFC107 100%);
+        }
+
+        .app-main {
+            background: linear-gradient(135deg, #673AB7 0%, #3F51B5 100%);
+        }
+
+        .quick-reference {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 40px;
+            border: 2px solid #673AB7;
+        }
+
+        .quick-reference h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: #673AB7;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .reference-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .reference-color {
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .reference-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .reference-code {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .existing-materials-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .existing-materials-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .dual-system-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .system-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .system-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .system-colors {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .system-color {
+            height: 80px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .system-color span {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .system-color code {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .system-card p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .bridging-colors-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .bridging-colors-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .bridge-colors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .bridge-color-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .bridge-swatch {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .bridge-info {
+            padding: 20px;
+        }
+
+        .bridge-info h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .bridge-info p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .bridge-info code {
+            font-family: 'Poppins', sans-serif;
+            background: #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #333;
+        }
+
+        .dark-colors-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .dark-colors-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .dark-colors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .dark-color-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .dark-swatch {
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .dark-swatch span {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .dark-swatch code {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .dark-info {
+            padding: 20px;
+        }
+
+        .dark-info h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .dark-info p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .dark-gradients {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .dark-gradient-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .dark-gradient-item {
+            text-align: center;
+        }
+
+        .dark-gradient-strip {
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .dark-gradient-item p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            color: #666;
+        }
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .usage-guidelines-expanded h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .usage-scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .scenario-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .scenario-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .color-strip {
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .scenario-card p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .scenario-card strong {
+            color: #673AB7;
+            font-weight: 600;
+        }
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .tints-gradients-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .color-family-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .color-family-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .color-family-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .tint-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tint-swatch {
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .tint-swatch span {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .tint-swatch code {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .gradient-preview {
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .logo-placement-section {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .logo-placement-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .logo-guidelines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .logo-guideline-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .logo-guideline-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .logo-example {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 2px dashed #ddd;
+        }
+
+        .primary-logo {
+            flex-direction: column;
+        }
+
+        .horizontal-logo {
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .vertical-logo {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sssio-logo, .sssio-logo-h, .sssio-logo-v {
+            background: #673AB7;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .infinity-logo, .infinity-logo-h, .infinity-logo-v {
+            font-size: 2rem;
+            color: #FF6B35;
+            font-weight: bold;
+        }
+
+        .clear-space {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border: 1px dashed #673AB7;
+            border-radius: 3px;
+        }
+
+        .size-examples {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .size-example {
+            text-align: center;
+        }
+
+        .size-example span {
+            display: block;
+            color: #FF6B35;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .size-example.large span { font-size: 3rem; }
+        .size-example.medium span { font-size: 2rem; }
+        .size-example.small span { font-size: 1rem; }
+
+        .size-example p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .logo-dos-donts {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .dos-donts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .dos-section, .donts-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .dos-section h3, .donts-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .dos-section ul, .donts-section ul {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding-left: 20px;
+        }
+
+        .gradient-combinations {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .gradient-combinations h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: #673AB7;
+            text-align: center;
+        }
+
+        .gradient-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .gradient-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .gradient-display {
+            height: 100px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+        }
+
+        .gradient-card p {
+            font-family: 'Poppins', sans-serif;
+            margin: 8px 0;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .color-system {
+                grid-template-columns: 1fr;
+            }
+            
+            .infinity-display {
+                width: 250px;
+                height: 150px;
+            }
+            
+            .color-family-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tint-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .dos-donts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dual-system-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .system-colors {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bridge-colors-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dark-colors-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dark-gradient-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sathya Sai Conference 2025</h1>
+            <p>Official Brand Guide - Celebrating 100 Years of Love, Service & Human Values</p>
+        </div>
+
+        <div class="logo-section">
+            <h2>Infinity Logo Color Extraction</h2>
+            <p style="font-family: 'Poppins', sans-serif; color: #666; margin-bottom: 20px;">
+                Our infinity symbol represents the eternal flow of Love, Service, and Human Values. 
+                From this sacred symbol, we extract four distinct colors for our conference branding.
+            </p>
+            
+            <div class="infinity-display"></div>
+            
+            <div class="color-extraction">
+                <h3>Four Sacred Colors Extracted from Our Infinity Logo</h3>
+                <p style="text-align: center; color: #666; font-family: 'Poppins', sans-serif;">
+                    Each color flows naturally from our logo and represents a core pillar of our conference
+                </p>
+            </div>
+        </div>
+
+        <div class="color-system">
+            <div class="color-card main-purple">
+                <div class="color-swatch">
+                    <span>Main Conference Color</span>
+                </div>
+                <div class="color-info">
+                    <h3 class="color-title">Royal Purple</h3>
+                    <p class="color-pillar">Conference Foundation</p>
+                    <div class="color-code">#673AB7</div>
+                    <div class="usage-examples">
+                        <p class="usage-title">Primary Usage:</p>
+                        <p class="usage-list">Main headers, conference logo, primary branding, official materials, name badges, signage backgrounds</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-card love-coral">
+                <div class="color-swatch">
+                    <span>Love Pillar</span>
+                </div>
+                <div class="color-info">
+                    <h3 class="color-title">Warm Coral</h3>
+                    <p class="color-pillar">Love & Devotion</p>
+                    <div class="color-code">#FF6B35</div>
+                    <div class="usage-examples">
+                        <p class="usage-title">Love Sessions:</p>
+                        <p class="usage-list">Bhajans, satsangh, devotional programs, cultural performances, opening/closing ceremonies</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-card service-teal">
+                <div class="color-swatch">
+                    <span>Service Pillar</span>
+                </div>
+                <div class="color-info">
+                    <h3 class="color-title">Vibrant Teal</h3>
+                    <p class="color-pillar">Service & Action</p>
+                    <div class="color-code">#00BCD4</div>
+                    <div class="usage-examples">
+                        <p class="usage-title">Service Sessions:</p>
+                        <p class="usage-list">Community adoption, E.A.S.E workshops, service wing activities, public outreach programs</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-card values-gold">
+                <div class="color-swatch">
+                    <span>Human Values Pillar</span>
+                </div>
+                <div class="color-info">
+                    <h3 class="color-title">Golden Amber</h3>
+                    <p class="color-pillar">Human Values & Education</p>
+                    <div class="color-code">#F7931E</div>
+                    <div class="usage-examples">
+                        <p class="usage-title">Values Sessions:</p>
+                        <p class="usage-list">APSSIEHV launch, educational workshops, study circles, SSE convocation, spiritual discussions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="typography-section">
+            <h2>Typography System</h2>
+            
+            <div class="font-example">
+                <div class="font-name">Playfair Display - Headlines</div>
+                <div class="font-usage">Use for: Main titles, conference headers, section titles, important announcements</div>
+                <div class="playfair-example">Celebrating 100 Years</div>
+            </div>
+
+            <div class="font-example">
+                <div class="font-name">Poppins - Body Text</div>
+                <div class="font-usage">Use for: Subtitles, body text, descriptions, information, speaker names</div>
+                <div class="poppins-example">Join us for this historic gathering of devotees, leaders, and changemakers from across Zone 4 and beyond to celebrate Love, Service & Human Values.</div>
+            </div>
+
+            <div class="font-example">
+                <div class="font-name">Dancing Script - Accent Style</div>
+                <div class="font-usage">Use for: Decorative elements, quotes, special highlights, spiritual emphasis</div>
+                <div class="script-example">Love, Service & Human Values</div>
+            </div>
+        </div>
+
+        <div class="application-section">
+            <h2>Color Application by Conference Areas</h2>
+            
+            <div class="application-grid">
+                <div class="application-card app-love">
+                    <h3>Love Sessions</h3>
+                    <p>Devotional bhajans, satsangh sessions, "Celebrating Life With Swami", cultural performances, opening and closing ceremonies. Use warm coral gradients and flowing designs.</p>
+                </div>
+
+                <div class="application-card app-service">
+                    <h3>Service Sessions</h3>
+                    <p>SAI 100 Community Adoption, service wing workshops, E.A.S.E programs, public outreach initiatives. Use vibrant teal with dynamic, action-oriented designs.</p>
+                </div>
+
+                <div class="application-card app-values">
+                    <h3>Human Values Sessions</h3>
+                    <p>APSSIEHV launch, educational workshops, study circles, spiritual sadhana sessions, SSE convocation. Use golden amber with wisdom and enlightenment motifs.</p>
+                </div>
+
+                <div class="application-card app-main">
+                    <h3>Main Conference</h3>
+                    <p>Overall branding, keynote speeches, general materials, name badges, signage, official communications. Use royal purple as the primary foundation color.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="existing-materials-section">
+            <h2>Accommodation for Existing Materials</h2>
+            
+            <div class="existing-explanation">
+                <p style="background: #f8f9fa; padding: 20px; border-radius: 10px; color: #666; font-family: 'Poppins', sans-serif; margin-bottom: 30px;">
+                    <strong>Note:</strong> Some conference materials are already in circulation with a pink/purple gradient system. 
+                    Our brand guide expands to accommodate both the primary 4-color system and the existing pink gradient variations 
+                    to ensure consistency across all conference touchpoints.
+                </p>
+            </div>
+
+            <div class="dual-system-grid">
+                <div class="system-card primary-system">
+                    <h3>Primary System (New Materials)</h3>
+                    <div class="system-colors">
+                        <div class="system-color" style="background: #673AB7;">
+                            <span>Purple</span>
+                            <code>#673AB7</code>
+                        </div>
+                        <div class="system-color" style="background: #FF6B35;">
+                            <span>Coral</span>
+                            <code>#FF6B35</code>
+                        </div>
+                        <div class="system-color" style="background: #00BCD4;">
+                            <span>Teal</span>
+                            <code>#00BCD4</code>
+                        </div>
+                        <div class="system-color" style="background: #F7931E;">
+                            <span>Amber</span>
+                            <code>#F7931E</code>
+                        </div>
+                    </div>
+                    <p><strong>Use for:</strong> New posters, fresh social media content, workshop materials, signage</p>
+                </div>
+
+                <div class="system-card existing-system">
+                    <h3>Existing System (Maintain Consistency)</h3>
+                    <div class="system-colors">
+                        <div class="system-color" style="background: linear-gradient(135deg, #E91E63, #9C27B0);">
+                            <span>Pink-Purple</span>
+                            <code>Gradient</code>
+                        </div>
+                        <div class="system-color" style="background: #673AB7;">
+                            <span>Deep Purple</span>
+                            <code>#673AB7</code>
+                        </div>
+                        <div class="system-color" style="background: #F7931E;">
+                            <span>Gold</span>
+                            <code>#F7931E</code>
+                        </div>
+                        <div class="system-color" style="background: #ffffff; border: 2px solid #ddd;">
+                            <span style="color: #333;">White</span>
+                            <code>#FFFFFF</code>
+                        </div>
+                    </div>
+                    <p><strong>Use for:</strong> Registration forms, existing promotional materials, continuity pieces</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bridging-colors-section">
+            <h2>Bridging Color Palette</h2>
+            <p style="text-align: center; color: #666; font-family: 'Poppins', sans-serif; margin-bottom: 30px;">
+                These transitional colors create harmony between both systems, allowing flexible mixing
+            </p>
+            
+            <div class="bridge-colors-grid">
+                <div class="bridge-color-card">
+                    <div class="bridge-swatch" style="background: linear-gradient(135deg, #E91E63 0%, #FF6B35 100%);">
+                        <span>Pink to Coral Bridge</span>
+                    </div>
+                    <div class="bridge-info">
+                        <h4>Love Harmony</h4>
+                        <p>Connects existing pink materials with new coral system</p>
+                        <code>#E91E63 → #FF6B35</code>
+                    </div>
+                </div>
+
+                <div class="bridge-color-card">
+                    <div class="bridge-swatch" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">
+                        <span>Purple Consistency</span>
+                    </div>
+                    <div class="bridge-info">
+                        <h4>Royal Foundation</h4>
+                        <p>Maintains purple continuity across both systems</p>
+                        <code>#9C27B0 → #673AB7</code>
+                    </div>
+                </div>
+
+                <div class="bridge-color-card">
+                    <div class="bridge-swatch" style="background: linear-gradient(135deg, #673AB7 0%, #1A1A2E 100%);">
+                        <span>Dark Foundation</span>
+                    </div>
+                    <div class="bridge-info">
+                        <h4>Professional Depth</h4>
+                        <p>Dark gradient for elegant backgrounds and premium materials</p>
+                        <code>#673AB7 → #1A1A2E</code>
+                    </div>
+                </div>
+
+                <div class="bridge-color-card">
+                    <div class="bridge-swatch" style="background: linear-gradient(135deg, #FF6B35 0%, #9C27B0 100%);">
+                        <span>Love-Values Unity</span>
+                    </div>
+                    <div class="bridge-info">
+                        <h4>Spiritual Journey</h4>
+                        <p>Connects warmth of love with depth of values</p>
+                        <code>#FF6B35 → #9C27B0</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dark-colors-section">
+            <h2>Dark Color Options</h2>
+            <p style="text-align: center; color: #666; font-family: 'Poppins', sans-serif; margin-bottom: 30px;">
+                Essential dark colors for elegant backgrounds, premium materials, and high contrast needs
+            </p>
+            
+            <div class="dark-colors-grid">
+                <div class="dark-color-card">
+                    <div class="dark-swatch" style="background: #1A1A2E;">
+                        <span>Deep Navy</span>
+                        <code>#1A1A2E</code>
+                    </div>
+                    <div class="dark-info">
+                        <h4>Elegant Backgrounds</h4>
+                        <p>Perfect for premium posters, VIP materials, evening event graphics</p>
+                    </div>
+                </div>
+
+                <div class="dark-color-card">
+                    <div class="dark-swatch" style="background: #2D1B47;">
+                        <span>Royal Deep</span>
+                        <code>#2D1B47</code>
+                    </div>
+                    <div class="dark-info">
+                        <h4>Spiritual Depth</h4>
+                        <p>Darker purple for meditation content, spiritual quotes, sacred materials</p>
+                    </div>
+                </div>
+
+                <div class="dark-color-card">
+                    <div class="dark-swatch" style="background: #1A3B36;">
+                        <span>Service Green</span>
+                        <code>#1A3B36</code>
+                    </div>
+                    <div class="dark-info">
+                        <h4>Service Elegance</h4>
+                        <p>Dark teal for service-focused materials with sophisticated appeal</p>
+                    </div>
+                </div>
+
+                <div class="dark-color-card">
+                    <div class="dark-swatch" style="background: #2C1810;">
+                        <span>Warm Earth</span>
+                        <code>#2C1810</code>
+                    </div>
+                    <div class="dark-info">
+                        <h4>Grounded Wisdom</h4>
+                        <p>Dark brown for educational content, wisdom quotes, traditional elements</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dark-gradients">
+                <h3 style="font-family: 'Playfair Display', serif; color: #333; margin: 30px 0 20px 0; text-align: center;">Dark Gradient Combinations</h3>
+                
+                <div class="dark-gradient-grid">
+                    <div class="dark-gradient-item">
+                        <div class="dark-gradient-strip" style="background: linear-gradient(135deg, #673AB7 0%, #1A1A2E 100%);">
+                            <span>Royal to Navy</span>
+                        </div>
+                        <p>Premium conference materials</p>
+                    </div>
+
+                    <div class="dark-gradient-item">
+                        <div class="dark-gradient-strip" style="background: linear-gradient(135deg, #FF6B35 0%, #2D1B47 100%);">
+                            <span>Love to Deep</span>
+                        </div>
+                        <p>Devotional evening events</p>
+                    </div>
+
+                    <div class="dark-gradient-item">
+                        <div class="dark-gradient-strip" style="background: linear-gradient(135deg, #00BCD4 0%, #1A3B36 100%);">
+                            <span>Service Depth</span>
+                        </div>
+                        <p>Professional service materials</p>
+                    </div>
+
+                    <div class="dark-gradient-item">
+                        <div class="dark-gradient-strip" style="background: linear-gradient(135deg, #F7931E 0%, #2C1810 100%);">
+                            <span>Wisdom Earth</span>
+                        </div>
+                        <p>Educational depth content</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <h2>Expanded Usage Guidelines</h2>
+            
+            <div class="usage-scenarios">
+                <div class="scenario-card">
+                    <h3>🎯 New Campaign Materials</h3>
+                    <div class="color-strip" style="background: linear-gradient(90deg, #673AB7, #FF6B35, #00BCD4, #F7931E);"></div>
+                    <p><strong>Primary 4-Color System</strong><br>
+                    Use for fresh posters, new social media campaigns, workshop signage, and materials created after brand guide implementation.</p>
+                </div>
+
+                <div class="scenario-card">
+                    <h3>📋 Registration & Official Forms</h3>
+                    <div class="color-strip" style="background: linear-gradient(90deg, #E91E63, #9C27B0, #673AB7, #F7931E);"></div>
+                    <p><strong>Existing Pink System</strong><br>
+                    Maintain for registration forms, official certificates, and materials already in circulation to avoid confusion.</p>
+                </div>
+
+                <div class="scenario-card">
+                    <h3>🌈 Transitional Materials</h3>
+                    <div class="color-strip" style="background: linear-gradient(90deg, #E91E63, #FF6B35, #9C27B0, #00BCD4);"></div>
+                    <p><strong>Bridging Palette</strong><br>
+                    Use bridging colors for materials that need to connect existing and new systems, like event programs or welcome banners.</p>
+                </div>
+
+                <div class="scenario-card">
+                    <h3>🎨 Social Media Content</h3>
+                    <div class="color-strip" style="background: linear-gradient(90deg, #FF6B35, #673AB7, #00BCD4, #E91E63);"></div>
+                    <p><strong>Flexible Mix</strong><br>
+                    Can combine both systems for dynamic social media content, using bridging gradients to create visual continuity.</p>
+                </div>
+            </div>
+        </div>
+            <h2>Color Tints & Gradients</h2>
+            
+            <div class="color-family-grid">
+                <!-- Royal Purple Family -->
+                <div class="color-family-card">
+                    <h3>Royal Purple Family</h3>
+                    <div class="tint-row">
+                        <div class="tint-swatch" style="background: #673AB7;">
+                            <span>Primary</span>
+                            <code>#673AB7</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #8A6BC7;">
+                            <span>Light</span>
+                            <code>#8A6BC7</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #AD9BD7;">
+                            <span>Lighter</span>
+                            <code>#AD9BD7</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #D1CBE7;">
+                            <span>Lightest</span>
+                            <code>#D1CBE7</code>
+                        </div>
+                    </div>
+                    <div class="gradient-preview" style="background: linear-gradient(135deg, #673AB7 0%, #D1CBE7 100%);">
+                        <span>Gradient Example</span>
+                    </div>
+                </div>
+
+                <!-- Warm Coral Family -->
+                <div class="color-family-card">
+                    <h3>Warm Coral Family</h3>
+                    <div class="tint-row">
+                        <div class="tint-swatch" style="background: #FF6B35;">
+                            <span>Primary</span>
+                            <code>#FF6B35</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #FF8B65;">
+                            <span>Light</span>
+                            <code>#FF8B65</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #FFAB95;">
+                            <span>Lighter</span>
+                            <code>#FFAB95</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #FFCBC5;">
+                            <span>Lightest</span>
+                            <code>#FFCBC5</code>
+                        </div>
+                    </div>
+                    <div class="gradient-preview" style="background: linear-gradient(135deg, #FF6B35 0%, #E91E63 100%);">
+                        <span>Love Gradient</span>
+                    </div>
+                </div>
+
+                <!-- Vibrant Teal Family -->
+                <div class="color-family-card">
+                    <h3>Vibrant Teal Family</h3>
+                    <div class="tint-row">
+                        <div class="tint-swatch" style="background: #00BCD4;">
+                            <span>Primary</span>
+                            <code>#00BCD4</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #33CCDC;">
+                            <span>Light</span>
+                            <code>#33CCDC</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #66DCE4;">
+                            <span>Lighter</span>
+                            <code>#66DCE4</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #99ECEC;">
+                            <span>Lightest</span>
+                            <code>#99ECEC</code>
+                        </div>
+                    </div>
+                    <div class="gradient-preview" style="background: linear-gradient(135deg, #00BCD4 0%, #009688 100%);">
+                        <span>Service Gradient</span>
+                    </div>
+                </div>
+
+                <!-- Golden Amber Family -->
+                <div class="color-family-card">
+                    <h3>Golden Amber Family</h3>
+                    <div class="tint-row">
+                        <div class="tint-swatch" style="background: #F7931E;">
+                            <span>Primary</span>
+                            <code>#F7931E</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #FBA94E;">
+                            <span>Light</span>
+                            <code>#FBA94E</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #FFBF7E;">
+                            <span>Lighter</span>
+                            <code>#FFBF7E</code>
+                        </div>
+                        <div class="tint-swatch" style="background: #FFD5AE;">
+                            <span>Lightest</span>
+                            <code>#FFD5AE</code>
+                        </div>
+                    </div>
+                    <div class="gradient-preview" style="background: linear-gradient(135deg, #F7931E 0%, #FFC107 100%);">
+                        <span>Values Gradient</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="logo-placement-section">
+            <h2>Logo Placement Guidelines</h2>
+            
+            <div class="logo-guidelines-grid">
+                <div class="logo-guideline-card">
+                    <h3>Primary Logo Placement</h3>
+                    <div class="logo-example primary-logo">
+                        <div class="sssio-logo">SSSIO Logo</div>
+                        <div class="infinity-logo">∞</div>
+                        <div class="clear-space"></div>
+                    </div>
+                    <p><strong>Rule:</strong> Minimum clear space equals the height of the infinity symbol on all sides</p>
+                </div>
+
+                <div class="logo-guideline-card">
+                    <h3>Horizontal Layout</h3>
+                    <div class="logo-example horizontal-logo">
+                        <div class="sssio-logo-h">SSSIO</div>
+                        <div class="infinity-logo-h">∞</div>
+                    </div>
+                    <p><strong>Use for:</strong> Letterheads, website headers, wide banner formats</p>
+                </div>
+
+                <div class="logo-guideline-card">
+                    <h3>Vertical Layout</h3>
+                    <div class="logo-example vertical-logo">
+                        <div class="sssio-logo-v">SSSIO</div>
+                        <div class="infinity-logo-v">∞</div>
+                    </div>
+                    <p><strong>Use for:</strong> Posters, social media posts, tall banner formats</p>
+                </div>
+
+                <div class="logo-guideline-card">
+                    <h3>Minimum Sizes</h3>
+                    <div class="size-examples">
+                        <div class="size-example large">
+                            <span>∞</span>
+                            <p>Large: 100px+ width</p>
+                        </div>
+                        <div class="size-example medium">
+                            <span>∞</span>
+                            <p>Medium: 50px width</p>
+                        </div>
+                        <div class="size-example small">
+                            <span>∞</span>
+                            <p>Small: 24px minimum</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="logo-dos-donts">
+                <div class="dos-donts-grid">
+                    <div class="dos-section">
+                        <h3 style="color: #009688;">✓ DO</h3>
+                        <ul>
+                            <li>Maintain clear space around logos</li>
+                            <li>Use on high contrast backgrounds</li>
+                            <li>Keep proportions intact</li>
+                            <li>Use approved color combinations</li>
+                            <li>Ensure readability at all sizes</li>
+                        </ul>
+                    </div>
+                    <div class="donts-section">
+                        <h3 style="color: #E91E63;">✗ DON'T</h3>
+                        <ul>
+                            <li>Stretch or distort the logo</li>
+                            <li>Use on busy backgrounds</li>
+                            <li>Change colors without approval</li>
+                            <li>Rotate or skew the elements</li>
+                            <li>Use below minimum sizes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gradient-combinations">
+            <h2>Recommended Gradient Combinations</h2>
+            
+            <div class="gradient-showcase">
+                <div class="gradient-card">
+                    <div class="gradient-display" style="background: linear-gradient(135deg, #673AB7 0%, #FF6B35 100%);">
+                        <span>Conference Main</span>
+                    </div>
+                    <p><strong>Purple to Coral:</strong> #673AB7 → #FF6B35</p>
+                    <p>Use for main conference materials and general branding</p>
+                </div>
+
+                <div class="gradient-card">
+                    <div class="gradient-display" style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);">
+                        <span>Love & Values</span>
+                    </div>
+                    <p><strong>Coral to Amber:</strong> #FF6B35 → #F7931E</p>
+                    <p>Perfect for devotional and educational sessions</p>
+                </div>
+
+                <div class="gradient-card">
+                    <div class="gradient-display" style="background: linear-gradient(135deg, #00BCD4 0%, #673AB7 100%);">
+                        <span>Service Foundation</span>
+                    </div>
+                    <p><strong>Teal to Purple:</strong> #00BCD4 → #673AB7</p>
+                    <p>Ideal for service workshops and activities</p>
+                </div>
+
+                <div class="gradient-card">
+                    <div class="gradient-display" style="background: linear-gradient(135deg, #F7931E 0%, #00BCD4 100%);">
+                        <span>Values & Service</span>
+                    </div>
+                    <p><strong>Amber to Teal:</strong> #F7931E → #00BCD4</p>
+                    <p>Great for educational service initiatives</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-reference">
+            <h3>Quick Color Reference</h3>
+            <div class="reference-grid">
+                <div class="reference-item">
+                    <div class="reference-color" style="background: #673AB7;"></div>
+                    <div class="reference-name">Royal Purple</div>
+                    <div class="reference-code">#673AB7</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-color" style="background: #FF6B35;"></div>
+                    <div class="reference-name">Warm Coral</div>
+                    <div class="reference-code">#FF6B35</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-color" style="background: #00BCD4;"></div>
+                    <div class="reference-name">Vibrant Teal</div>
+                    <div class="reference-code">#00BCD4</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-color" style="background: #F7931E;"></div>
+                    <div class="reference-name">Golden Amber</div>
+                    <div class="reference-code">#F7931E</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

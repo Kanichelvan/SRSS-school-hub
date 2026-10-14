@@ -2,6 +2,11 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { availability, eligible, grade, publicQuestions, validateDefinition, validateQuestions, validateResources } from '../functions/quest-engine.js';
 import { questionTemplate } from '../src/hub/quest-templates.js';
+test('attendance managers may join optional staff quests', () => {
+  for (const audience of ['allStaff', 'nonTeachingStaff', 'wholeSchool']) {
+    assert.equal(eligible({ audiences: [audience], standards: [], classIds: [], teamIds: [], userIds: [] }, { roles: ['attendanceManager'], mode: 'staff', uid: 'clerk', scope: { status: 'active' } }), true);
+  }
+});
 const base = { title: 'Discovery', description: '', instructions: 'Try this.', type: 'mcq', category: 'Our School', campaignId: 'srss25', academicYearId: 'ay2027', audiences: ['students'], standards: [], classIds: [], teamIds: [], userIds: [], startAt: '2027-01-01T00:00:00+08:00', endAt: '2028-01-01T00:00:00+08:00', participationPoints: 2, completionPoints: 10, accuracyBonus: 8, maxPoints: 20, passPercent: 50 };
 const student = { uid: 's', roles: ['student'], scope: { studentId: 'stu' }, student: { currentClassId: 'c4', currentStandard: 4 } };
 test('server eligibility covers all audiences and conjunctive Standard/class limits', () => {

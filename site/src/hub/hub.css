@@ -74,7 +74,8 @@
 .hub-nav a:hover { background: var(--cream); }
 .hub-nav a.active { color: var(--navy-950); background: var(--navy-100); font-weight: 600; box-shadow: inset 3px 0 0 var(--navy-950); }
 .hub-phase { padding: 1px 6px; border-radius: 99px; color: var(--muted); background: var(--cream); font-size: 10px; font-weight: 600; }
-.hub-main { min-width: 0; padding: clamp(20px, 3.5vw, 40px); }
+.hub-main { min-width: 0; padding: clamp(20px, 3.5vw, 40px); overflow-wrap: anywhere; }
+.hub-main :is(input, select, textarea, fieldset), .hub-page-head > div, .hub-section > div { min-width: 0; max-width: 100%; }
 
 /* Page structure */
 .hub-page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
@@ -264,6 +265,8 @@ a.hub-stat:hover { border-color: var(--navy-800); }
 }
 @media (max-width: 760px) {
   .hub-body { grid-template-columns: 1fr; }
+  .hub-filterbar > label { display: grid; gap: 6px; width: 100%; }
+  .hub-filterbar > label > :is(select, input) { width: 100%; }
   .hub-nav { position: static; max-height: none; padding: 10px 12px; border-right: 0; border-bottom: 1px solid var(--line); display: flex; gap: 6px; overflow-x: auto; }
   .hub-nav > div { display: contents; }
   .hub-nav p { display: none; }

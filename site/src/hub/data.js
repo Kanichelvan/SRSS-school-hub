@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, where, writeBatch } from "firebase/firestore";
 import { db } from "../lib/firebase-firestore";
 import { mergeConsentItems } from "./consentForm";
+import { sendInOrder } from "./logic/orderedWrites";
 
 export const withId = (snap) => ({ id: snap.id, ...snap.data() });
 const chunks = (values, size = 30) => Array.from({ length: Math.ceil(values.length / size) }, (_, i) => values.slice(i * size, i * size + size));
@@ -104,8 +105,8 @@ export async function commitInChunks(writes, size = RULE_SAFE_BATCH) {
 }
 
 // Like commitInChunks, but never leaves the teacher waiting when the connection drops: if a batch isn't
-// confirmed within a few seconds (or the device is offline) the remaining batches are queued on the
-// device and sent, in order, when the connection returns. Returns { queued, sent } — `sent` resolves
+// confirmed within a few seconds (or the device is offline) the UI returns while the remaining
+// batches wait for each preceding acknowledgement. Returns { queued, sent } — `sent` resolves
 // once everything has reached the server.
 export async function commitOrQueue(writes, size = RULE_SAFE_BATCH) {
   const batches = [];
@@ -114,17 +115,5 @@ export async function commitOrQueue(writes, size = RULE_SAFE_BATCH) {
     for (const write of writes.slice(i, i + size)) write(batch);
     batches.push(batch);
   }
-  const started = [];
-  for (const [index, batch] of batches.entries()) {
-    const commit = batch.commit();
-    started.push(commit);
-    const outcome = navigator.onLine === false ? "pending" : await Promise.race([commit.then(() => "sent"), new Promise((resolve) => setTimeout(() => resolve("pending"), 8000))]);
-    if (outcome === "pending") {
-      for (const later of batches.slice(index + 1)) started.push(later.commit());
-      const sent = Promise.all(started);
-      sent.catch(() => {});
-      return { queued: true, sent };
-    }
-  }
-  return { queued: false, sent: Promise.resolve() };
+  return sendInOrder(batches.map((batch) => () => batch.commit()), { online: navigator.onLine !== false });
 }

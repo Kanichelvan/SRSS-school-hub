@@ -1,0 +1,22 @@
+<!-- @dsCard group="Brand" viewport="700x170" name="Interaction states" subtitle="Gold lightens on hover, deepens on press; arrows nudge, rules grow, photos scale 3.5%" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css"><style>html,body{margin:0}#c{box-sizing:border-box}#c{height:170px;display:grid;grid-template-columns:1fr 1fr}
+.p{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:4px;font:600 14px/1 var(--font-body);color:var(--navy-800);width:fit-content}
+.k{font:400 9px/1 var(--font-mono);color:var(--gold-300)}
+.al{display:inline-flex;flex-direction:column;gap:6px;width:fit-content}
+.alt{font:600 14px/1 var(--font-body);color:#fff}</style></head><body>
+<div id="c">
+<div class="p" style="background:var(--navy-800)">
+  <span class="k">rest → hover → active</span>
+  <span class="btn" style="background:#D9B341">Explore SRSS</span>
+  <span class="btn" style="background:#E6C65C;box-shadow:var(--shadow-gold)">Explore SRSS</span>
+  <span class="btn" style="background:#C9A227;transform:scale(.985)">Explore SRSS</span>
+</div>
+<div class="p" style="background:var(--navy-800);border-left:1px solid rgba(255,255,255,.16)">
+  <span class="k">ArrowLink rule: 72% → 100%</span>
+  <span class="al"><span class="alt">Arrange a visit →</span><span style="height:2px;width:72%;background:var(--gold-400)"></span></span>
+  <span class="al"><span class="alt">Arrange a visit →</span><span style="height:2px;width:100%;background:var(--gold-400)"></span></span>
+  <span class="k">focus: 2px gold ring, 2px offset</span>
+  <span class="btn" style="background:#D9B341;outline:2px solid var(--gold-300);outline-offset:2px">Focused</span>
+</div>
+</div></body></html>

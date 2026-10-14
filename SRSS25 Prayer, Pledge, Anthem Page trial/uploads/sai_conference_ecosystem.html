@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sathya Sai International Conference 2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-purple: #673AB7;
+            --love-coral: #FF6B35;
+            --service-teal: #00BCD4;
+            --values-gold: #F7931E;
+            --deep-navy: #1A1A2E;
+            --light-bg: #f8f4f0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, var(--deep-navy) 0%, var(--primary-purple) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header & Navigation */
+        .header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--deep-navy) 100%);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .infinity-logo {
+            font-size: 3rem;
+            color: var(--love-coral);
+            font-weight: bold;
+        }
+
+        .conference-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .conference-subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.2rem;
+            color: var(--values-gold);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--love-coral);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,53,0.4);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .section {
+            display: none;
+            padding: 40px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Welcome Section */
+        .welcome-hero {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--love-coral) 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 40px;
+            margin: -40px -40px 40px -40px;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .hero-subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .hero-details {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+
+        /* Countdown Timer */
+        .countdown-section {
+            background: linear-gradient(135deg, var(--values-gold) 0%, #FFC107 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            color: #000;
+        }
+
+        .countdown-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .countdown-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            background: var(--deep-navy);
+            color: var(--values-gold);
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 100px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .countdown-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+            line-height: 1;
+        }
+
+        .countdown-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Program Schedule */
+        .program-day {
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .day-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--service-teal) 100%);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .day-toggle {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .day-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .day-content.active {
+            max-height: 2000px;
+        }
+
+        .program-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s ease;
+        }
+
+        .program-item:hover {
+            background: rgba(103,58,183,0.05);
+        }
+
+        .program-item:last-child {
+            border-bottom: none;
+        }
+
+        .program-time {
+            background: var(--values-gold);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            min-width: 120px;
+            text-align: center;
+            margin-right: 20px;
+        }
+
+        .program-details {
+            flex: 1;
+        }
+
+        .program-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary-purple);
+        }
+
+        .program-speaker {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .program-type {
+            background: var(--love-coral);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        /* Registration Section */
+        .registration-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .reg-card {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--love-coral) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(103,58,183,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .reg-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .reg-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .reg-price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 20px 0;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .reg-btn {
+            background: white;
+            color: var(--primary-purple);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .reg-btn:hover {
+            background: var(--values-gold);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Speakers Section */
+        .speakers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .speaker-card {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .speaker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(103,58,183,0.2);
+        }
+
+        .speaker-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--love-coral) 0%, var(--values-gold) 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .speaker-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--primary-purple);
+        }
+
+        .speaker-title {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Venue Section */
+        .venue-info {
+            background: linear-gradient(135deg, var(--service-teal) 0%, var(--primary-purple) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+        }
+
+        .venue-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .venue-address {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .contact-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 5px solid var(--love-coral);
+        }
+
+        .contact-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-menu {
+                gap: 10px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .countdown-display {
+                gap: 10px;
+            }
+
+            .countdown-item {
+                min-width: 80px;
+                padding: 15px;
+            }
+
+            .countdown-number {
+                font-size: 2rem;
+            }
+
+            .program-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .program-time {
+                margin-right: 0;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Additional Enhancements */
+        .highlight-text {
+            background: linear-gradient(45deg, var(--love-coral), var(--values-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .cultural-badge {
+            background: var(--service-teal);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .workshop-badge {
+            background: var(--values-gold);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .spiritual-badge {
+            background: var(--love-coral);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .footer {
+            background: var(--deep-navy);
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-top: 40px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .footer-content {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.3rem;
+            color: var(--values-gold);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo-section">
+                <div class="infinity-logo">∞</div>
+                <div>
+                    <div class="conference-title">Sathya Sai International Conference 2025</div>
+                    <div class="conference-subtitle">Celebrating 100 Years of Love, Service & Human Values</div>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item active" onclick="showSection('welcome')">Welcome</li>
+                    <li class="nav-item" onclick="showSection('program')">Program</li>
+                    <li class="nav-item" onclick="showSection('speakers')">Speakers</li>
+                    <li class="nav-item" onclick="showSection('registration')">Registration</li>
+                    <li class="nav-item" onclick="showSection('venue')">Venue</li>
+                    <li class="nav-item" onclick="showSection('contact')">Contact</li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Welcome Section -->
+            <section class="section active" id="welcome">
+                <div class="welcome-hero">
+                    <h1 class="hero-title">Welcome to Our Sacred Gathering</h1>
+                    <p class="hero-subtitle">A Historic Centenary Celebration</p>
+                    <div class="hero-details">
+                        <strong>September 5-7, 2025</strong><br>
+                        IDCC Ideal Convention Centre, Shah Alam, Selangor, Malaysia<br>
+                        Zone 4 Countries • International Speakers • Cultural Performances
+                    </div>
+                </div>
+
+                <div class="countdown-section">
+                    <h2 class="countdown-title">Conference Begins In</h2>
+                    <div class="countdown-display">
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="days">000</span>
+                            <span class="countdown-label">Days</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="hours">00</span>
+                            <span class="countdown-label">Hours</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="minutes">00</span>
+                            <span class="countdown-label">Minutes</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="seconds">00</span>
+                            <span class="countdown-label">Seconds</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 30px; background: #f8f9fa; border-radius: 15px; margin: 30px 0;">
+                    <h2 style="font-family: 'Playfair Display', serif; color: var(--primary-purple); margin-bottom: 20px;">Conference Purpose</h2>
+                    <p style="font-size: 1.1rem; line-height: 1.8; color: #666;">
+                        To offer a three-day spiritually uplifting global platform for members, devotees, leaders, educators, and changemakers across Zone 4 and beyond, celebrating <span class="highlight-text">100 years of the divine advent of Bhagawan Sri Sathya Sai Baba</span> through interactive learning, empowering workshops, enduring fellowships, meaningful connections, heartfelt devotion, vibrant cultural expressions, and a profound commitment to living with values.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Program Section -->
+            <section class="section" id="program">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Conference Program</h2>
+
+                <!-- Day 1 -->
+                <div class="program-day">
+                    <div class="day-header" onclick="toggleDay('day1')">
+                        <div>
+                            <div class="day-title">Day 1 - Friday, September 5, 2025</div>
+                            <div style="font-size: 1rem; opacity: 0.9;">Opening Ceremony & Celebrating Life</div>
+                        </div>
+                        <div class="day-toggle" id="day1-toggle">+</div>
+                    </div>
+                    <div class="day-content" id="day1-content">
+                        <div class="program-item">
+                            <div class="program-time">8:00 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Registration & Breakfast</div>
+                                <div class="program-speaker">Welcome delegates and morning refreshments</div>
+                            </div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">10:00 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Vedam & Paduka Procession</div>
+                                <div class="program-speaker">Sacred opening rituals</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">10:15 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Bhajans</div>
+                                <div class="program-speaker">Devotional singing</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">10:50 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Welcome Address</div>
+                                <div class="program-speaker">Bro V Sugumaran, President SSIOM</div>
+                            </div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">11:00 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Zone 4 Chairman's Address</div>
+                                <div class="program-speaker">Bro Manoj Kumar, Chairman of Zone 4</div>
+                            </div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">11:15 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Keynote Address</div>
+                                <div class="program-speaker">Dr Narendranath Reddy, Chairman SSSIO</div>
+                            </div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">2:35 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Living With Swami – What does it mean?</div>
+                                <div class="program-speaker">Dr. Sunder Iyer</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">3:20 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Celebrating Life (Plenary)</div>
+                                <div class="program-speaker">Multiple speakers on different aspects of life celebration</div>
+                            </div>
+                            <div class="workshop-badge">Workshop</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">5:30 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Celebrating Life With Swami</div>
+                                <div class="program-speaker">Bro Leonardo Gutter</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">6:30 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Debates</div>
+                                <div class="program-speaker">"Social Media Is A Hindrance To Progress"</div>
+                            </div>
+                            <div class="workshop-badge">Interactive</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">8:30 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Satsangh Sessions</div>
+                                <div class="program-speaker">Dr Sunder Iyer, Bro George Bebedelis, Bro Suwitra</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 2 -->
+                <div class="program-day">
+                    <div class="day-header" onclick="toggleDay('day2')">
+                        <div>
+                            <div class="day-title">Day 2 - Saturday, September 6, 2025</div>
+                            <div style="font-size: 1rem; opacity: 0.9;">Workshops & Cultural Programs</div>
+                        </div>
+                        <div class="day-toggle" id="day2-toggle">+</div>
+                    </div>
+                    <div class="day-content" id="day2-content">
+                        <div class="program-item">
+                            <div class="program-time">6:30 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Morning Meditation</div>
+                                <div class="program-speaker">Omkar, Gayathri mantra & Sohum Meditation - Bro James Kon</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">9:10 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">The Relevance of Sai's Teachings</div>
+                                <div class="program-speaker">Dr Sunder Iyer</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">9:40 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">SAI 100 – Community Adoption</div>
+                                <div class="program-speaker">Bro Manoharan (Sri Lanka)</div>
+                            </div>
+                            <div class="workshop-badge">Service</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">10:10 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">SAI 100 - SSE Expansion</div>
+                                <div class="program-speaker">Sis Deepa (Thailand)</div>
+                            </div>
+                            <div class="workshop-badge">Education</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">11:00 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Wing Workshops</div>
+                                <div class="program-speaker">Spiritual, Education, Service, Young Adults</div>
+                            </div>
+                            <div class="workshop-badge">Workshop</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">2:00 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">APSSIEHV Roundtable Discussion</div>
+                                <div class="program-speaker">Human Values Education experts</div>
+                            </div>
+                            <div class="workshop-badge">Education</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">4:15 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">SSE Convocation</div>
+                                <div class="program-speaker">22nd SSIOM SSE/SSEHV Convocation</div>
+                            </div>
+                            <div class="workshop-badge">Education</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">8:30 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">International Cultural Program</div>
+                                <div class="program-speaker">Performances from Zone 4 countries</div>
+                            </div>
+                            <div class="cultural-badge">Cultural</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day 3 -->
+                <div class="program-day">
+                    <div class="day-header" onclick="toggleDay('day3')">
+                        <div>
+                            <div class="day-title">Day 3 - Sunday, September 7, 2025</div>
+                            <div style="font-size: 1rem; opacity: 0.9;">E.A.S.E. Program & Closing Ceremony</div>
+                        </div>
+                        <div class="day-toggle" id="day3-toggle">+</div>
+                    </div>
+                    <div class="day-content" id="day3-content">
+                        <div class="program-item">
+                            <div class="program-time">6:30 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Morning Meditation</div>
+                                <div class="program-speaker">Light Meditation & Gratitude Practice</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">9:10 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">The E.A.S.E. Program Launch</div>
+                                <div class="program-speaker">Launching Ambassadors of EASE program and online programs</div>
+                            </div>
+                            <div class="workshop-badge">Health</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">10:10 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Panel Session – Q & A</div>
+                                <div class="program-speaker">Dr Reddy, Bro Leonardo, Sis Loraine Burrows, Bro Manoj, Dr Sunder Iyer</div>
+                            </div>
+                            <div class="workshop-badge">Interactive</div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">11:40 AM</div>
+                            <div class="program-details">
+                                <div class="program-title">Summary of Wings Report</div>
+                                <div class="program-speaker">Bro Billy Fong</div>
+                            </div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">12:00 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Valedictory Address</div>
+                                <div class="program-speaker">Dr Narendranath Reddy</div>
+                            </div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">12:30 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Thank You Note</div>
+                                <div class="program-speaker">Bro Anil Kumar, Organising Chairman</div>
+                            </div>
+                        </div>
+                        <div class="program-item">
+                            <div class="program-time">1:00 PM</div>
+                            <div class="program-details">
+                                <div class="program-title">Closing Bhajans & Aarthi</div>
+                                <div class="program-speaker">Final devotional ceremony</div>
+                            </div>
+                            <div class="spiritual-badge">Spiritual</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speakers Section -->
+            <section class="section" id="speakers">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Distinguished Speakers</h2>
+                
+                <div class="speakers-grid">
+                    <div class="speaker-card">
+                        <div class="speaker-avatar">DR</div>
+                        <div class="speaker-name">Dr Narendranath Reddy</div>
+                        <div class="speaker-title">Chairman, SSSIO</div>
+                        <p>Leading the global Sai organization with wisdom and dedication to Swami's mission.</p>
+                    </div>
+                    
+                    <div class="speaker-card">
+                        <div class="speaker-avatar">MK</div>
+                        <div class="speaker-name">Bro Manoj Kumar</div>
+                        <div class="speaker-title">Chairman, Zone 4</div>
+                        <p>Guiding Zone 4 countries in their spiritual and service journey.</p>
+                    </div>
+                    
+                    <div class="speaker-card">
+                        <div class="speaker-avatar">SI</div>
+                        <div class="speaker-name">Dr Sunder Iyer</div>
+                        <div class="speaker-title">International Speaker</div>
+                        <p>Renowned for his insights on living with Swami and spiritual practices.</p>
+                    </div>
+                    
+                    <div class="speaker-card">
+                        <div class="speaker-avatar">LG</div>
+                        <div class="speaker-name">Bro Leonardo Gutter</div>
+                        <div class="speaker-title">International Speaker</div>
+                        <p>Sharing experiences of celebrating life with Swami's divine presence.</p>
+                    </div>
+                    
+                    <div class="speaker-card">
+                        <div class="speaker-avatar">GB</div>
+                        <div class="speaker-name">Bro George Bebedelis</div>
+                        <div class="speaker-title">International Speaker</div>
+                        <p>Expert in human values education and spiritual development.</p>
+                    </div>
+                    
+                    <div class="speaker-card">
+                        <div class="speaker-avatar">DS</div>
+                        <div class="speaker-name">Dr Sabbitan</div>
+                        <div class="speaker-title">Wellness Expert</div>
+                        <p>Leading sessions on celebrating life with a happy mind and meditation practices.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Registration Section -->
+            <section class="section" id="registration">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Conference Registration</h2>
+                
+                <div class="registration-cards">
+                    <div class="reg-card">
+                        <h3>Malaysian Delegates</h3>
+                        <div class="reg-price">RM 150</div>
+                        <ul style="text-align: left; margin: 20px 0;">
+                            <li>3 days complete access</li>
+                            <li>All meals included</li>
+                            <li>Conference materials</li>
+                            <li>Certificates & souvenirs</li>
+                            <li>Cultural programs</li>
+                        </ul>
+                        <p><strong>FREE for under 18 years</strong></p>
+                        <button class="reg-btn">Register Now</button>
+                    </div>
+                    
+                    <div class="reg-card">
+                        <h3>International Delegates</h3>
+                        <div class="reg-price">FREE</div>
+                        <ul style="text-align: left; margin: 20px 0;">
+                            <li>3 days complete access</li>
+                            <li>All meals included</li>
+                            <li>Conference materials</li>
+                            <li>Certificates & souvenirs</li>
+                            <li>Cultural programs</li>
+                            <li>Visa support letters</li>
+                        </ul>
+                        <button class="reg-btn">Register Now</button>
+                    </div>
+                    
+                    <div class="reg-card">
+                        <h3>Day 2 Special Guests</h3>
+                        <div class="reg-price">FREE</div>
+                        <ul style="text-align: left; margin: 20px 0;">
+                            <li>Day 2 access</li>
+                            <li>Cultural performances</li>
+                            <li>APSSIEHV launch</li>
+                            <li>SSE Convocation</li>
+                            <li>Refreshments included</li>
+                        </ul>
+                        <p><strong>SSE graduates & parents</strong></p>
+                        <button class="reg-btn">Register Now</button>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 30px; border-radius: 15px; margin: 30px 0; text-align: center;">
+                    <h3 style="color: var(--primary-purple); margin-bottom: 15px;">Registration Deadline</h3>
+                    <p style="font-size: 1.2rem; color: #666; margin-bottom: 20px;">
+                        <strong>August 15, 2025</strong> - Online registration closes
+                    </p>
+                    <p style="color: #e74c3c;">
+                        <strong>Important:</strong> Onsite registration is not available. Please register early for proper planning and logistics.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Venue Section -->
+            <section class="section" id="venue">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Conference Venue</h2>
+                
+                <div class="venue-info">
+                    <h3 class="venue-title">IDCC Ideal Convention Centre</h3>
+                    <div class="venue-address">
+                        Level 7, Jalan Pahat L 15/L, Seksyen 15<br>
+                        40200 Shah Alam, Selangor, Malaysia
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 30px;">
+                        <div>
+                            <h4 style="margin-bottom: 15px;">Facilities</h4>
+                            <ul>
+                                <li>Modern convention halls</li>
+                                <li>Air-conditioned spaces</li>
+                                <li>Audio-visual equipment</li>
+                                <li>Prayer/meditation areas</li>
+                                <li>Dining facilities</li>
+                                <li>Parking available</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 15px;">Accessibility</h4>
+                            <ul>
+                                <li>Wheelchair accessible</li>
+                                <li>Elevator access</li>
+                                <li>Public transportation nearby</li>
+                                <li>Taxi/Grab services</li>
+                                <li>Airport connectivity</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 30px; border-radius: 15px; margin: 30px 0;">
+                    <h3 style="color: var(--primary-purple); margin-bottom: 20px;">Accommodation Recommendations</h3>
+                    <p style="margin-bottom: 15px;">For international delegates and outstation participants, we recommend booking accommodation in Shah Alam or nearby Subang Jaya area. The venue is well-connected and easily accessible from major hotels in the region.</p>
+                    <p style="color: #666;"><strong>Note:</strong> Please make your accommodation arrangements early as September is a busy period in the Klang Valley.</p>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="section" id="contact">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 40px; color: var(--primary-purple);">Contact Information</h2>
+                
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-title">General Inquiries</div>
+                        <p><strong>Email:</strong> saizone4conference25@ssiomya.com</p>
+                        <p style="margin-top: 10px;">For all conference-related questions, program details, and general information.</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-title">Registration Support</div>
+                        <p><strong>Sis Sumithra:</strong> +60 16-339 9411</p>
+                        <p><strong>Sis Suseela:</strong> +60 19-601 1958</p>
+                        <p style="margin-top: 10px;">For registration assistance and payment guidance.</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-title">International Delegates</div>
+                        <p><strong>Bro Gunasegaran Reddy:</strong> +60 12 235 7336</p>
+                        <p><strong>Email:</strong> reddy@shanu.com.my</p>
+                        <p style="margin-top: 10px;">Visa support, travel assistance, and international delegate services.</p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-title">Organizing Committee</div>
+                        <p><strong>Bro Anil Kumar (Chairman):</strong> +60 17-884 9027</p>
+                        <p><strong>Sis Nalini (Co-Chair):</strong> +60 12 631 1062</p>
+                        <p><strong>Bro Yoga Mithran (Co-Chair):</strong> +60 12 671 6521</p>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, var(--values-gold) 0%, var(--love-coral) 100%); color: white; padding: 40px; border-radius: 20px; margin: 40px 0; text-align: center;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 20px;">Join Us in This Historic Celebration</h3>
+                    <p style="font-size: 1.1rem; line-height: 1.8;">
+                        This conference represents a unique opportunity to participate in the centenary celebration of Bhagawan Sri Sathya Sai Baba's divine mission while contributing to the future of His teachings of Love, Service & Human Values. Whether you've been closely connected to the Sai community or are seeking spiritual growth, this gathering offers a transformative experience where love, devotion, and unity take center stage.
+                    </p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            "Love is My form, Truth is My breath, Bliss is My food"<br>
+            — Bhagawan Sri Sathya Sai Baba
+        </div>
+        <p style="margin-top: 20px; color: #ccc; font-family: 'Poppins', sans-serif; font-size: 0.9rem;">
+            Sathya Sai International Conference 2025 • Zone 4 Countries • Celebrating 100 Years of Divine Love
+        </p>
+    </footer>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.classList.add('active');
+            
+            // Scroll to top of main content
+            document.querySelector('.main-content').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Program day toggle functionality
+        function toggleDay(dayId) {
+            const content = document.getElementById(dayId + '-content');
+            const toggle = document.getElementById(dayId + '-toggle');
+            
+            content.classList.toggle('active');
+            toggle.textContent = content.classList.contains('active') ? '−' : '+';
+            toggle.style.transform = content.classList.contains('active') ? 'rotate(45deg)' : 'rotate(0deg)';
+        }
+
+        // Countdown timer functionality
+        function updateCountdown() {
+            const conferenceDate = new Date('September 5, 2025 08:00:00').getTime();
+            const now = new Date().getTime();
+            const distance = conferenceDate - now;
+
+            if (distance > 0) {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = String(days).padStart(3, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            } else {
+                document.getElementById('days').textContent = '000';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                
+                document.querySelector('.countdown-title').textContent = 'Conference is Live!';
+            }
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start countdown timer
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            
+            // Auto-open first program day for better UX
+            setTimeout(() => {
+                toggleDay('day1');
+            }, 1000);
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Add a small delay to allow section switching
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
+            });
+        });
+
+        // Add some interactivity to speaker cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const speakerCards = document.querySelectorAll('.speaker-card');
+            speakerCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

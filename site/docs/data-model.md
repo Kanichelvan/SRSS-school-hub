@@ -34,7 +34,8 @@ Launch phase (1) unless marked. ✱ = audited by the `audit*` triggers (PRD §42
 | Identity | `users` ✱ (server-derived scope) · `roles` · `userRoles` (role-change history) · `staff` ✱ (+ `staff/{id}/private` for employment data) · `guardians` · `studentGuardianLinks` ✱ |
 | Academic structure | `academicYears` · `terms` · `standards` · `classes` · `subjects` · `classSubjects` · `teacherAssignments` (with weekly `slots` until the timetable module) · `enrollments` ✱ |
 | Students | `students` ✱ (+ `students/{id}/restricted` for medical data) · `studentDocuments` · `studentAchievements` · `studentSupportPlans` (P2) · `studentSupportSessions` (P2) · `studentIncidents` ✱ (P2; `classification: restricted` for safeguarding) |
-| Attendance | `attendanceSessions` (one per class/date/session — "not submitted" vs "all present", ATT-002) · `attendanceRecords` ✱ |
+| Attendance | `attendanceSessions` (one per class/date/session — "not submitted" vs "all present", ATT-002) · `attendanceRecords` ✱ · `absenceReports` · `attendanceMovements` ✱ · `attendanceFollowUps` ✱ |
+| Quest / reading | Reusable campaigns, challenge definitions, private attempts, rewards, badges and NILAM records; collection names, ownership and audit events are documented in [SRSS25-QUEST.md](SRSS25-QUEST.md). Access uses the callable rather than direct client queries. |
 | Academics (P2) | `assessmentPeriods` · `assessments` · `assessmentComponents` · `studentResults` ✱ · `reportCards` ✱ |
 | Learning (P2) | `curriculumPlans` · `lessonPlans` · `learningTasks` · `classUpdates` |
 | Portfolio / Human Excellence | `portfolioEntries` ✱ (student, academic year, class, subject, category, title, description, learningObjective, `humanValues[]`, `achievementTags[]`, teacherObservation, studentReflection, `mediaReferences[]` Drive links, visibility, consentStatus, moderationStatus) · `showcaseItems` (server-written public copy of approved showcase entries: first name, Standard, title, description, values — no media) · `portfolioMedia` · `humanValuesObservations` · `studentReflections` |
@@ -72,7 +73,7 @@ Library collections are intentionally absent until the Library & Resource Centre
 
 ## Files
 
-Institutional documents and media live in Google Shared Drives; the hub stores metadata and Drive references (`evidenceUrl`, `driveFileId`). Firebase Storage (`storage.rules`) covers only public website media, register-backed documents, small portfolio uploads and admissions documents.
+Institutional documents and media live in Google Shared Drives; the hub stores metadata and Drive references (`evidenceUrl`, `driveFileId`). Firebase Storage (`storage.rules`) covers public website media, register-backed documents, small portfolio uploads, admissions documents and private creative Quest uploads at `quest/{ownerUid}/{attemptId}/{filename}`. Quest files are immutable and readable only by their owner and authorised reviewers.
 
 ## Indexes
 

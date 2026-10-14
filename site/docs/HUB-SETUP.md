@@ -44,9 +44,9 @@ No Firebase account is needed; everything runs against the offline `demo-srss` p
    export JAVA_HOME="$HOME/.local/jdk-21/Contents/Home" PATH="$HOME/.local/jdk-21/Contents/Home/bin:$PATH"
    ```
 2. Terminal 1: `npm run emulators` (Auth, Firestore, Functions, Storage; UI at http://localhost:4000).
-3. Terminal 2: `npm run seed` — the fictional 2027 demo school from `scripts/demo-data/school-2027.mjs`: 16 demo accounts (super admin, office, two teachers, two families, a pupil and the other roles), 36 fictional pupils with 2026 history, a week of attendance with one correction, portfolio entries, announcements and events. Re-running restores the same records; `npm run seed -- --reset` wipes the emulators first. The script refuses to run against anything but the local emulators.
+3. Terminal 2: `npm run seed` — the fictional 2027 demo school from `scripts/demo-data/school-2027.mjs`: 17 demo accounts (super admin, office, attendance clerk, two teachers, two families, a pupil and the other roles), 36 fictional pupils with 2026 history, a week of attendance with one correction, portfolio entries, announcements and events. Re-running restores the same records; `npm run seed -- --reset` wipes the emulators first. The script refuses to run against anything but the local emulators.
 4. Terminal 3: `npm run dev`, open `/sign-in` and use **Local demo accounts**.
-5. Tests: `npm test` (unit), `npm run test:e2e` (the admin → teacher → parent journey and the access denials, against Auth, Firestore and Functions emulators) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records). `scripts/test-rules.mjs` runs the emulators with `HTTPS_PROXY`/`HTTP_PROXY` removed, because firebase-tools would otherwise send the Storage emulator's registry lookups to the Firestore emulator through the proxy (it ignores `NO_PROXY`) and treat the failure as a missing record.
+5. Tests: `npm test` (unit), `npm run test:e2e` (the admin → teacher → parent journey, Quest workflows and access denials, against isolated Auth, Firestore, Functions and Storage emulators) and `npm run test:rules` (security rules against an isolated `demo-srss-tests` emulator project; the rule tests run sequentially because Storage rules consult Firestore media-registry records). `scripts/test-rules.mjs` runs the emulators with `HTTPS_PROXY`/`HTTP_PROXY` removed, because firebase-tools would otherwise send the Storage emulator's registry lookups to the Firestore emulator through the proxy (it ignores `NO_PROXY`) and treat the failure as a missing record.
 
 ### This Mac: iCloud "Optimize Mac Storage"
 
@@ -96,3 +96,9 @@ Clean and assign IDs to student, guardian and staff master lists; define guardia
 ## Each new academic year
 
 Admin › School setup wizard: add the year and its terms → copy last year's classes → choose class teachers and carry teacher assignments forward → promote pupils (Standard 6 graduate) → check guardian links → make the year current. Earlier years' enrolments and assignments stay as history; activating the year moves every account to its new classes within a minute (`scopeOnSchoolYear`).
+
+## School year setup import
+
+`scripts/import-school-setup.mjs` imports the configured school year from `scripts/school-data/srss-2027.mjs`. With Application Default Credentials configured, run `node scripts/import-school-setup.mjs --project <project-id> --actor <super-admin-email>` for a dry run; adding `--apply` writes the listed records. Inspect the dry run before applying it to production. Existing records retain their creation stamps, while fields listed by the import are overwritten. The import covers school structure, categories, holidays and a staff-only curriculum draft; people and accounts are managed separately in the Hub.
+
+For reusable challenges, reading records and their isolated test command, see [SRSS25 Quest](SRSS25-QUEST.md) and [validation](SRSS25-QUEST-VALIDATION.md).

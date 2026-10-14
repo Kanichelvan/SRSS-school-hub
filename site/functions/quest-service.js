@@ -77,7 +77,13 @@ export async function handleQuest(db, request) {
   switch (action) {
     case 'catalog': {
       const definitions = await rows(db.collection('challengeDefinitions'));
-      result = { serverNow: new Date().toISOString(), challenges: definitions.filter((c) => eligible(c, actor) && availability(c) !== 'unpublished' && c.status !== 'archived').map((c) => ({ ...c, availability: availability(c) })), campaigns: await rows(db.collection('challengeCampaigns').where('active', '==', true)), attempts: (await rows(db.collection('challengeAttempts').where('uid', '==', actor.uid))).map(attemptView) };
+      const attempts = await rows(db.collection('challengeAttempts').where('uid', '==', actor.uid));
+      const challenges = definitions.filter((c) => eligible(c, actor) && availability(c) !== 'unpublished' && c.status !== 'archived').map((c) => ({ ...c, availability: availability(c) }));
+      // Archiving removes a release from discovery, but must not erase the owner's memories.
+      for (const a of [...attempts].sort((a, b) => b.number - a.number)) {
+        if (!challenges.some((c) => c.id === a.challengeId) && a.definition) challenges.push({ id: a.challengeId, ...a.definition, availability: 'archived', ownHistoryOnly: true });
+      }
+      result = { serverNow: new Date().toISOString(), challenges, campaigns: await rows(db.collection('challengeCampaigns').where('active', '==', true)), attempts: attempts.map(attemptView) };
       break;
     }
     case 'start': {
@@ -238,6 +244,17 @@ export async function handleQuest(db, request) {
       const nilam = nilamHistory.filter((r) => r.status === 'submitted');
       const participation = (await rows(db.collection('challengeAttempts'))).filter((r) => mayReview(actor, r)).map(attemptView);
       const verified = nilamHistory.filter((r) => r.status === 'verified');
+      // Give reviewers familiar SIS names, without returning any additional profile fields.
+      const all = [...submissions, ...nilamHistory, ...participation];
+      const studentIds = [...new Set(all.map((r) => r.studentId).filter(Boolean))];
+      const classIds = [...new Set(all.map((r) => r.classId).filter(Boolean))];
+      const names = new Map();
+      const refs = [...studentIds.map((id) => db.doc(`students/${id}`)), ...classIds.map((id) => db.doc(`classes/${id}`))];
+      for (let i = 0; i < refs.length; i += 100) {
+        const docs = await db.getAll(...refs.slice(i, i + 100));
+        docs.forEach((snap) => names.set(snap.ref.path, snap.data()?.name || snap.id));
+      }
+      all.forEach((r) => { r.studentName = r.studentId ? names.get(`students/${r.studentId}`) || 'Student' : 'Staff'; r.className = r.classId ? names.get(`classes/${r.classId}`) || 'Class' : ''; });
       result = { submissions, nilam, nilamHistory, verifiedBooks: verified.length, verifiedPages: verified.reduce((n, r) => n + r.pages, 0), participation }; break;
     }
     case 'reviewSubmission': {
@@ -286,6 +303,7 @@ export async function handleQuest(db, request) {
         }
         const a = attemptSnap.data();
         if (!a || a.status !== 'completed') fail('Select a completed attempt for correction.');
+        if (delta !== 0 && ['Human Excellence', 'Service & Sustainability'].includes(a.definition.category)) fail('Values and service participation cannot receive competitive points corrections.');
         const summaryRef = db.doc(`studentAchievementSummaries/${a.uid}`);
         const summary = (await tx.get(summaryRef)).data();
         if (!summary || summary.points + delta < 0) fail('The correction cannot make the points total negative.');

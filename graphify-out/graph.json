@@ -1,0 +1,393 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "App.jsx",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app",
+      "community": 0,
+      "norm_label": "app.jsx"
+    },
+    {
+      "label": "navItems",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "app_navitems",
+      "community": 0,
+      "norm_label": "navitems"
+    },
+    {
+      "label": "values",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "app_values",
+      "community": 0,
+      "norm_label": "values"
+    },
+    {
+      "label": "galleryItems",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "app_galleryitems",
+      "community": 0,
+      "norm_label": "galleryitems"
+    },
+    {
+      "label": "learningTabs",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "app_learningtabs",
+      "community": 0,
+      "norm_label": "learningtabs"
+    },
+    {
+      "label": "hubs",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L80",
+      "_origin": "ast",
+      "id": "app_hubs",
+      "community": 0,
+      "norm_label": "hubs"
+    },
+    {
+      "label": "aboutMilestones",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L87",
+      "_origin": "ast",
+      "id": "app_aboutmilestones",
+      "community": 0,
+      "norm_label": "aboutmilestones"
+    },
+    {
+      "label": "humanValues",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L89",
+      "_origin": "ast",
+      "id": "app_humanvalues",
+      "community": 0,
+      "norm_label": "humanvalues"
+    },
+    {
+      "label": "AboutPage()",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L91",
+      "_origin": "ast",
+      "id": "app_aboutpage",
+      "community": 0,
+      "norm_label": "aboutpage()"
+    },
+    {
+      "label": "admissionSteps",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L107",
+      "_origin": "ast",
+      "id": "app_admissionsteps",
+      "community": 0,
+      "norm_label": "admissionsteps"
+    },
+    {
+      "label": "newsItems",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L108",
+      "_origin": "ast",
+      "id": "app_newsitems",
+      "community": 0,
+      "norm_label": "newsitems"
+    },
+    {
+      "label": "events",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L113",
+      "_origin": "ast",
+      "id": "app_events",
+      "community": 0,
+      "norm_label": "events"
+    },
+    {
+      "label": "faqs",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L118",
+      "_origin": "ast",
+      "id": "app_faqs",
+      "community": 0,
+      "norm_label": "faqs"
+    },
+    {
+      "label": "parentNotices",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L125",
+      "_origin": "ast",
+      "id": "app_parentnotices",
+      "community": 0,
+      "norm_label": "parentnotices"
+    },
+    {
+      "label": "parentEvents",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L131",
+      "_origin": "ast",
+      "id": "app_parentevents",
+      "community": 0,
+      "norm_label": "parentevents"
+    },
+    {
+      "label": "ParentHub()",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L137",
+      "_origin": "ast",
+      "id": "app_parenthub",
+      "community": 0,
+      "norm_label": "parenthub()"
+    },
+    {
+      "label": "HubSection()",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L199",
+      "_origin": "ast",
+      "id": "app_hubsection",
+      "community": 0,
+      "norm_label": "hubsection()"
+    },
+    {
+      "label": "App()",
+      "file_type": "code",
+      "source_file": "App.jsx",
+      "source_location": "L207",
+      "_origin": "ast",
+      "id": "app_app",
+      "community": 1,
+      "norm_label": "app()"
+    },
+    {
+      "label": "main.jsx",
+      "file_type": "code",
+      "source_file": "main.jsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "main",
+      "community": 1,
+      "norm_label": "main.jsx"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_aboutmilestones",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L91",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_aboutpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_admissionsteps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L207",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_events",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L118",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_faqs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_galleryitems",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_hubs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L199",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_hubsection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_humanvalues",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_learningtabs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_navitems",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_newsitems",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_parentevents",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L137",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_parenthub",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L125",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_parentnotices",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "App.jsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "app",
+      "target": "app_values",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "main.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "main",
+      "target": "app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "main.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "main",
+      "target": "app_app",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "0117346cb95705ed9fe5530b91bbff5438e23a00"
+}

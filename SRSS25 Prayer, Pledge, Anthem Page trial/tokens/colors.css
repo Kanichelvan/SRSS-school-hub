@@ -1,0 +1,72 @@
+:root{
+/* ---------- Navy: the brand ground ---------- */
+--navy-950:#07152F;--navy-900:#060F26;--navy-800:#0A1A3C;--navy-700:#0F2350;--navy-600:#16315F;--navy-500:#1E4079;--navy-400:#3C5F9E;--navy-200:#8DA2C6;
+
+/* ---------- Gold: accent, CTA, jubilee ---------- */
+--gold-700:#7E5C12;--gold-600:#A67C1A;--gold-500:#C9A227;--gold-400:#D9B341;--gold-300:#E6C65C;--gold-200:#F2DE9E;--gold-100:#FAF3DC;
+
+/* ---------- Cream & ink: light surfaces and type ---------- */
+--cream-50:#FBF9F4;--cream-100:#F6F2E9;--cream-200:#EDE7D9;--cream-300:#DED7C7;
+--ink-900:#14161A;--ink-800:#23272E;--ink-700:#3A3F47;--ink-600:#606671;--ink-500:#6B7280;--ink-400:#8A909B;--ink-300:#A8AEB8;--ink-100:#E4E7EC;
+--white:#FFFFFF;
+
+/* ---------- Silver: 25th-year / jubilee metal ---------- */
+--silver-500:#9BA3AE;--silver-400:#C9CED6;--silver-300:#DEE2E8;--silver-200:#EFF2F6;
+
+/* ---------- Human Values spectrum (from the school crest petals) ---------- */
+--value-truth:#D42128;          /* Kebenaran  · Truth */
+--value-conduct:#F07020;        /* Kesucian   · Right Conduct */
+--value-peace:#1B4FA8;          /* Keamanan   · Peace */
+--value-love:#0C7A3F;           /* Cinta      · Love */
+--value-nonviolence:#5C2D91;    /* Tanpa Kekerasan · Non-Violence */
+--value-amber:#F9A825;          /* petal gold between the five */
+
+/* ---------- Uniform purple (school dress, photography accent) ---------- */
+--uniform-purple:#5B2A7E;--uniform-lilac:#C9A7D6;
+
+/* ---------- Status ---------- */
+--status-success:#0C7A3F;--status-warning:#C9821A;--status-danger:#C0202A;--status-info:#1B4FA8;
+
+/* ================= Semantic aliases ================= */
+--bg-page:var(--navy-800);
+--bg-page-light:var(--cream-50);
+--bg-band:var(--cream-100);
+--surface-navy:var(--navy-800);
+--surface-navy-raised:var(--navy-700);
+--surface-card:var(--white);
+--surface-inset:var(--cream-100);
+--surface-inset-navy:rgba(255,255,255,.06);
+
+--text-heading:var(--navy-950);
+--text-body:var(--ink-600);
+--text-muted:var(--ink-500);
+--text-accent:var(--gold-600);
+--text-on-navy:var(--white);
+--text-on-navy-body:var(--silver-400);
+--text-on-navy-muted:var(--silver-500);
+--text-on-navy-accent:var(--gold-300);
+--text-link:var(--navy-600);
+--text-link-hover:var(--gold-600);
+
+--border-hairline:var(--cream-300);
+--border-hairline-navy:rgba(255,255,255,.16);
+--border-gold:var(--gold-400);
+
+--action-primary-bg:var(--gold-400);
+--action-primary-fg:var(--navy-800);
+--action-primary-bg-hover:var(--gold-300);
+--action-primary-bg-active:var(--gold-500);
+--action-secondary-fg:var(--gold-300);
+--action-secondary-border:var(--gold-400);
+--action-quiet-fg:var(--navy-700);
+
+--focus-ring:var(--gold-300);
+
+/* ---------- Gradients ---------- */
+--gradient-hero-scrim:linear-gradient(90deg,#0A1A3C 0%,#0A1A3C 34%,rgba(10,26,60,.90) 52%,rgba(10,26,60,.35) 76%,rgba(10,26,60,.10) 100%); /* @kind other */
+--gradient-photo-foot:linear-gradient(180deg,rgba(6,15,38,0) 40%,rgba(6,15,38,.82) 100%); /* @kind other */
+--gradient-gold-foil:linear-gradient(135deg,#F2DE9E 0%,#D9B341 28%,#A67C1A 58%,#E6C65C 82%,#C9A227 100%); /* @kind other */
+--gradient-silver-foil:linear-gradient(135deg,#EFF2F6 0%,#C9CED6 32%,#9BA3AE 62%,#DEE2E8 100%); /* @kind other */
+--gradient-navy-depth:linear-gradient(160deg,#0F2350 0%,#0A1A3C 55%,#060F26 100%); /* @kind other */
+--gradient-values-spectrum:linear-gradient(90deg,#D42128 0%,#F07020 25%,#F9A825 45%,#0C7A3F 68%,#1B4FA8 86%,#5C2D91 100%); /* @kind other */
+}

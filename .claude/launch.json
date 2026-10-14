@@ -1,0 +1,64 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "srss-site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "site",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5174"
+      ],
+      "port": 5174
+    },
+    {
+      "name": "srss-hub-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "site",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5174",
+        "--strictPort"
+      ],
+      "port": 5174
+    },
+    {
+      "name": "srss-hub-check",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--prefix",
+        "site",
+        "vite",
+        "--config",
+        "/private/tmp/claude-501/-Users-macintoshhd-Documents-SRSS-School-Hub/3ac604b3-322d-4f8d-a24e-670203394aec/scratchpad/vite.hub-check.config.mjs",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
+      "port": 5175
+    },
+    {
+      "name": "srss-hub-production",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "site",
+        "run",
+        "dev:production",
+        "--",
+        "--port",
+        "5176",
+        "--strictPort"
+      ],
+      "port": 5176
+    }
+  ]
+}

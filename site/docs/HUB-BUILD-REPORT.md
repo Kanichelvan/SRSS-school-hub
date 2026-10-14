@@ -1,5 +1,7 @@
 # SRSS Digital Hub — Build report, 14 October 2026
 
+This report is an earlier build snapshot. Current combined checks and review repairs are recorded in [Mobile release validation](MOBILE-RELEASE-VALIDATION.md) and [Quest validation](SRSS25-QUEST-VALIDATION.md).
+
 Scope: role-based application, school master data, the Admin, Teacher, Parent and Student hubs, attendance, announcements, portfolios, calendar, the School Setup Wizard, development demo data and end-to-end testing.
 
 “Functional” below means the feature loads authorised data, performs its actions, persists them in Firestore, is enforced by the security rules or server functions, handles errors, and passes tests. Everything was verified against the Firebase emulators (Auth, Firestore, Functions); **nothing in this report has been deployed to the real `srssdigitalhub` project yet.**

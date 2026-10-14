@@ -9,7 +9,7 @@ import { db } from "../../lib/firebase-firestore";
 import { functions } from "../../lib/firebase-functions";
 import { useAuth } from "../../auth/AuthProvider";
 import { currentYearId, daysAgo, getMany, list, listIn, one, schoolSettings, staffNames, today, useLoad } from "../data";
-import { CODE, CODES, KIND_LABELS, SCHOOL_START, codeOf, followUps, kindOf, minutesAfter, rating, schoolDays, summarise } from "../logic/attendance";
+import { CODE, CODES, KIND_LABELS, LATE_AFTER_MINUTES, SCHOOL_START, codeOf, followUps, kindOf, minutesAfter, rating, schoolDays, summarise } from "../logic/attendance";
 import { attendanceByClass } from "../logic/dashboard";
 import { saveErrorMessage } from "../manage";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, formatDate } from "../ui";
@@ -147,6 +147,8 @@ function Movements() {
   async function save(event) {
     event.preventDefault();
     if (!student) return setNotice({ tone: "bad", text: "Choose the pupil." });
+    if (form.type === "lateArrival" && (!Number.isInteger(minutes) || minutes < LATE_AFTER_MINUTES || minutes > 300))
+      return setNotice({ tone: "bad", text: `Late sign-ins must be ${LATE_AFTER_MINUTES}–300 minutes after the school start time. Check the arrival time before saving.` });
     setBusy(true); setNotice(null);
     try {
       const stamp = serverTimestamp(); const date = today();

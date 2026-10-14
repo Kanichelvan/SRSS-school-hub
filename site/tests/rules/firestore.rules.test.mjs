@@ -438,6 +438,11 @@ describe("Attendance Policy: codes, clerk, absence reports and support groups", 
     await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/z"), mark("teacher", { code: "Z", status: "present" })));
     await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/m"), mark("teacher", { code: "L", status: "late", minutesLate: 2.5 })));
     await assertSucceeds(setDoc(doc(as("teacher"), "attendanceRecords/x"), mark("teacher", { code: "X", status: "notRequired" })));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/mismatch"), mark("teacher", { code: "/", status: "absent" })));
+    await assertFails(setDoc(doc(as("clerk"), "attendanceRecords/mismatch2"), mark("clerk", { code: "O", status: "present" })));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/no-minutes"), mark("teacher", { code: "L", status: "late" })));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/too-early"), mark("teacher", { code: "L", status: "late", minutesLate: 2 })));
+    await assertFails(setDoc(doc(as("teacher"), "attendanceRecords/non-late"), mark("teacher", { code: "/", status: "present", minutesLate: 10 })));
   });
   test("the attendance manager keeps any class's register; corrections still need a reason", async () => {
     await seed("attendanceRecords/r-c5", { sessionId: "c5_2027-02-01_am", classId: "c5", date: "2027-02-01", studentId: "stu-b", code: "O", status: "absent", markedBy: "x" });
@@ -445,6 +450,16 @@ describe("Attendance Policy: codes, clerk, absence reports and support groups", 
     await assertSucceeds(updateDoc(doc(as("clerk"), "attendanceRecords/r-c5"), { code: "M", status: "medical", markedBy: "clerk", correctionReason: "Mother phoned: fever", correctedBy: "clerk", correctedAt: serverTimestamp() }));
     await assertSucceeds(getDocs(query(collection(as("clerk"), "attendanceRecords"), where("date", "==", "2027-02-01"))));
     await assertFails(setDoc(doc(as("parent"), "attendanceRecords/p"), mark("parent", { code: "/", status: "present" })));
+  });
+  test("the attendance manager sees register context but no confidential learning records", async () => {
+    await seed("enrollments/clerk-context", { studentId: "stu-a", classId: "c4" });
+    await seed("studentDocuments/private", { studentId: "stu-a", classId: "c4", classification: "confidential" });
+    await seed("studentReflections/private", { studentId: "stu-a", classId: "c4" });
+    await seed("humanValuesObservations/private", { studentId: "stu-a", classId: "c4" });
+    await assertSucceeds(getDoc(doc(as("clerk"), "students/stu-a")));
+    await assertSucceeds(getDoc(doc(as("clerk"), "enrollments/clerk-context")));
+    for (const path of ["studentDocuments/private", "studentReflections/private", "humanValuesObservations/private", "portfolioEntries/p-int", "students/stu-a/restricted/medical"])
+      await assertFails(getDoc(doc(as("clerk"), path)));
   });
   test("parents report absences for their own child only", async () => {
     const report = { studentId: "stu-a", classId: "c4", reporterUid: "parent", from: "2027-02-01", to: "2027-02-02", reason: "illness", note: "Fever", status: "reported" };

@@ -298,7 +298,18 @@ function SchoolCalendar({ items, onAdd }) {
 }
 
 export function App() {
+  const headerRef = useRef(null);
   const [route, setRoute] = useState(currentRoute);
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    // Anchor offsets follow the actual header, including font loading and text zoom.
+    const measure = () => header.parentElement.style.setProperty('--public-header-height', `${header.getBoundingClientRect().height}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
   // School-written content for editable addresses: undefined while loading, null when none is published.
   const [sitePage, setSitePage] = useState({ path: null, content: undefined });
   const [searchOpen, setSearchOpen] = useState(false);
@@ -719,7 +730,7 @@ export function App() {
     <div className="site-shell">
       <a className="skip-link" href="#main">Skip to content</a>
 
-      <header className="site-header" onMouseLeave={() => setNavOpen(null)}>
+      <header ref={headerRef} className="site-header" onMouseLeave={() => setNavOpen(null)}>
         <div className={`updates-bar${tickerPaused ? " is-paused" : ""}`} role="region" aria-label="Announcements">
           <div className="header-wrap updates-inner">
             <span className="updates-label">Updates</span>

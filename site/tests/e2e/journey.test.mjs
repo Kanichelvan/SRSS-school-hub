@@ -21,6 +21,7 @@ import { getFirestore as adminDb } from "firebase-admin/firestore";
 
 const PROJECT = process.env.GCLOUD_PROJECT || "demo-srss-e2e";
 const PASSWORD = "e2e-emulator-only";
+const emulatorAddress = (value, port) => { const [host, configuredPort = port] = (value || `127.0.0.1:${port}`).split(':'); return [host, Number(configuredPort)]; };
 const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 const admin = initAdmin({ projectId: PROJECT }, "admin");
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -33,9 +34,9 @@ async function waitFor(check, label, timeout = 20000) {
 const sessions = [];
 async function signIn(email) {
   const app = initClient({ projectId: PROJECT, apiKey: "demo-key", authDomain: `${PROJECT}.firebaseapp.com` }, `s${sessions.length}-${email}`);
-  const auth = clientAuth(app); connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
-  const db = initializeFirestore(app, { experimentalForceLongPolling: true }); connectFirestoreEmulator(db, "127.0.0.1", 8080);
-  const functions = getFunctions(app, "asia-southeast1"); connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+  const auth = clientAuth(app); connectAuthEmulator(auth, `http://${emulatorAddress(process.env.FIREBASE_AUTH_EMULATOR_HOST, 9099).join(':')}`, { disableWarnings: true });
+  const db = initializeFirestore(app, { experimentalForceLongPolling: true }); connectFirestoreEmulator(db, ...emulatorAddress(process.env.FIRESTORE_EMULATOR_HOST, 8080));
+  const functions = getFunctions(app, "asia-southeast1"); connectFunctionsEmulator(functions, ...emulatorAddress(process.env.QUEST_FUNCTIONS_EMULATOR_HOST, 5001));
   const credential = await signInWithEmailAndPassword(auth, email, PASSWORD);
   await credential.user.getIdToken(true);
   const session = { app, auth, db, uid: credential.user.uid, call: (name, data) => httpsCallable(functions, name)(data).then((result) => result.data) };
@@ -207,7 +208,7 @@ describe("Access is enforced by the data layer", () => {
   test("portfolio visibility: internal entries are hidden from families; entries are never public", async () => {
     await denied(getDoc(doc(parent.db, "portfolioEntries/pe-internal")));
     const anon = initClient({ projectId: PROJECT, apiKey: "demo-key" }, "anon");
-    const anonDb = initializeFirestore(anon, { experimentalForceLongPolling: true }); connectFirestoreEmulator(anonDb, "127.0.0.1", 8080);
+    const anonDb = initializeFirestore(anon, { experimentalForceLongPolling: true }); connectFirestoreEmulator(anonDb, ...emulatorAddress(process.env.FIRESTORE_EMULATOR_HOST, 8080));
     sessions.push({ app: anon, auth: clientAuth(anon), db: anonDb });
     await denied(getDoc(doc(anonDb, "portfolioEntries/pe-e2e")));
     ids.anonDb = anonDb;

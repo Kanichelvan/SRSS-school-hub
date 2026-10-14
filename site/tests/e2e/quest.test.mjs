@@ -100,6 +100,7 @@ test('creative review is restricted to assigned teachers and awards only after a
   const resumed = await student.call('start', { challengeId }); assert.equal(resumed.id, a.id);
   await student.call('submit', { attemptId: a.id, reflection: 'Helping others takes patience.' });
   await teacher.call('reviewSubmission', { attemptId: a.id, decision: 'accepted', feedback: 'Thank you for reflecting.' });
+  await assert.rejects(office.call('correctReward', { attemptId: a.id, correctionId: `values-${RUN}`, delta: 1, reason: 'Test protected category.' }), /cannot receive competitive/);
   assert.equal((await db.doc(`challengeAttempts/${a.id}`).get()).data().points, 0);
   await teacher.call('portfolioCandidate', { kind: 'quest', sourceId: a.id });
   const portfolio = (await db.doc(`portfolioEntries/engagement-quest-${a.id}`).get()).data(); assert.equal(portfolio.visibility, 'internal'); assert.deepEqual(portfolio.humanValues, []);
@@ -110,6 +111,8 @@ test('NILAM draft, parent assistance, assigned-teacher verification, duplicates 
   const r = { title: 'A fictional story', author: 'Demo Author', language: 'English', materialType: 'Book', classification: 'Fiction', pages: 32, completionDate: '2026-10-01', summary: 'A story about a shared garden.', reflection: 'Everyone can help.', takeaway: 'Be patient.' };
   const saved = await student.call('saveNilam', { record: r });
   await student.call('saveNilam', { recordId: saved.recordId, record: r, submit: true });
+  const queue = await teacher.call('reviewQueue'); assert.equal(queue.nilam.find((r) => r.id === saved.recordId).studentName, 'Fictional pupil');
+  assert.equal((await otherTeacher.call('reviewQueue')).nilamHistory.length, 0);
   await denied(otherParent.call('nilam', { studentId: STUDENT_ID }));
   await denied(otherTeacher.call('reviewNilam', { recordId: saved.recordId, decision: 'verified' }));
   await teacher.call('reviewNilam', { recordId: saved.recordId, decision: 'verified', feedback: 'Well read.' });
@@ -164,4 +167,14 @@ test('each puzzle format uses the shared callable and authoritative grading', as
     const result = await student.call('submit', { attemptId: a.id, answers: [question.answer] }).catch((e) => { throw new Error(`Submitting ${type}: ${e.message}`, { cause: e }); });
     assert.equal(result.percentage, 100, type); assert.equal(result.points, 20, type);
   }
+});
+test('archiving a release preserves private results and achievements without reopening gameplay', async () => {
+  await office.call('transition', { challengeId: ids.quiz, status: 'closed' });
+  await office.call('transition', { challengeId: ids.quiz, status: 'archived' });
+  const catalog = await student.call('catalog');
+  const history = catalog.challenges.find((c) => c.id === ids.quiz);
+  assert.equal(history.ownHistoryOnly, true); assert.equal(history.availability, 'archived');
+  assert.ok(catalog.attempts.some((a) => a.id === ids.attempt && a.status === 'completed'));
+  assert.equal('questionsJson' in catalog.attempts.find((a) => a.id === ids.attempt), false);
+  await assert.rejects(student.call('start', { challengeId: ids.quiz }), /not open/);
 });

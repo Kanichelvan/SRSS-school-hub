@@ -140,6 +140,7 @@ function TakeAttendance({ classId }) {
 
   if (loading) return <Loading />;
   if (error?.code === "permission-denied" || (data && !data.cls)) return <div className="hub-message"><h1>This class isn't assigned to you</h1><p>You can take attendance only for your assigned classes.</p><Link className="hub-button" to={back}>My classes</Link></div>;
+  if (error || !data) return <ErrorNote error={error || new Error("The register could not be loaded.")} />;
   const exceptions = data.students.filter((student) => marks[student.id]?.code && marks[student.id].code !== "/");
   return <>
     <PageHeader kicker={<Link to={back}>← Attendance</Link>} title={data.cls.name}

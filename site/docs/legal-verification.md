@@ -1,6 +1,6 @@
 # SRSS Digital Hub — legal pages: verification before commit and merge
 
-Last updated 13 October 2026. **Status: draft.** Every policy shows a “Draft for review” banner while `LEGAL_STATUS = "draft"` in `src/legal/registry.js`. Change it to `"published"` once the short list in section 4 is done.
+Last updated 14 October 2026. **Status: approved by the School.** `LEGAL_STATUS = "published"` in `src/legal/registry.js`; the draft banner has been removed. Section 4 records approval and preserves the pre-approval checklist.
 
 **Guiding rule (user decision): keep digitalisation simple.** The school admin should never face a tiresome process. Prefer one clear step over several, reuse what the School already holds (enrolment records, existing parent emails), and do not add approvals or forms unless the law requires them.
 

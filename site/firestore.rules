@@ -27,7 +27,7 @@ service cloud.firestore {
     function isAdmin() { return hasAny(['schoolAdmin', 'superAdmin']); }
     function isLeader() { return hasAny(['leadership', 'superAdmin']); }
     // Roles with school-wide read of ordinary (non-restricted) student records.
-    function wideStudentRead() { return hasAny(['academicCoordinator', 'schoolAdmin', 'leadership', 'safeguardingLead', 'privacySteward', 'auditor', 'superAdmin', 'attendanceManager']); }
+    function wideStudentRead() { return hasAny(['academicCoordinator', 'schoolAdmin', 'leadership', 'safeguardingLead', 'privacySteward', 'auditor', 'superAdmin']); }
 
     // ---------- context ----------
     function inClassScope(classId) { return classId in me().get('classIds', []); }
@@ -182,7 +182,7 @@ service cloud.firestore {
     // Historical enrolment is authoritative; students.currentClassId is only a cache (PRD §19). Moving class
     // ends the old enrolment (transferred) and starts a new one; nothing is overwritten or deleted.
     match /enrollments/{id} {
-      allow read: if familyCanSee(resource.data.studentId) || staffCanSee(resource.data.studentId, resource.data.classId);
+      allow read: if hasRole('attendanceManager') || familyCanSee(resource.data.studentId) || staffCanSee(resource.data.studentId, resource.data.classId);
       allow create: if isAdmin() && newStamped() && data().status == 'active' && isoDate('startDate')
         && existsAfter(/databases/$(database)/documents/students/$(data().studentId))
         && classRecord(data().classId).academicYearId == data().academicYearId
@@ -195,7 +195,7 @@ service cloud.firestore {
     match /students/{studentId} {
       allow read: if familyCanSee(studentId)
         || staffCanSee(studentId, resource.data.get('currentClassId', ''))
-        || hasAny(['financeOfficer', 'portfolioModerator']);
+        || hasAny(['financeOfficer', 'portfolioModerator', 'attendanceManager']);
       // The current class is a cache kept by the server from enrolments; the account link is server-only too.
       allow create: if isAdmin() && newStamped() && text('name', 120) && data().get('uid', null) == null && data().get('currentClassId', null) == null
         && data().status in ['active', 'withdrawn', 'graduated', 'archived'];
@@ -261,19 +261,23 @@ service cloud.firestore {
     function attendanceCodes() { return ['/', 'R', 'L', 'M', 'S', 'P', 'O', 'T', 'X']; }
     function attendanceStatuses() { return ['present', 'absent', 'late', 'excused', 'schoolActivity', 'medical', 'other', 'suspended', 'unauthorised', 'notRequired']; }
     function markValid() {
-      return data().status in attendanceStatuses() && data().get('code', '/') in attendanceCodes()
-        && (data().get('minutesLate', null) == null || (data().minutesLate is int && data().minutesLate >= 0 && data().minutesLate <= 300))
+      let mapping = {'/': 'present', 'R': 'schoolActivity', 'L': 'late', 'M': 'medical', 'S': 'suspended', 'P': 'excused', 'O': 'absent', 'T': 'unauthorised', 'X': 'notRequired'};
+      return data().status in attendanceStatuses()
+        && (!('code' in data()) || (data().code in attendanceCodes() && mapping[data().code] == data().status))
+        && ((!('code' in data()) && data().get('minutesLate', null) == null)
+          || (data().get('code', '') == 'L' && data().minutesLate is int && data().minutesLate >= 5 && data().minutesLate <= 300)
+          || (data().get('code', '') != 'L' && data().get('minutesLate', null) == null))
         && optionalText('note', 300) && optionalText('reason', 200);
     }
     match /attendanceSessions/{sessionId} {
-      allow read: if wideStudentRead() || (teaching() && inClassScope(resource.data.classId));
+      allow read: if hasRole('attendanceManager') || wideStudentRead() || (teaching() && inClassScope(resource.data.classId));
       allow create: if ((teaching() && inClassScope(data().classId)) || registerKeeper()) && data().openedBy == uid() && data().status in ['open', 'submitted'];
       allow update: if ((teaching() && inClassScope(resource.data.classId)) || registerKeeper()) && unchanged(['classId', 'date', 'openedBy'])
         && (data().get('submittedBy', null) == resource.data.get('submittedBy', null) || data().submittedBy == uid())
         && data().status in ['open', 'submitted'];
     }
     match /attendanceRecords/{recordId} {
-      allow read: if staffCanSee(resource.data.studentId, resource.data.classId) || familyCanSee(resource.data.studentId);
+      allow read: if hasRole('attendanceManager') || staffCanSee(resource.data.studentId, resource.data.classId) || familyCanSee(resource.data.studentId);
       allow create: if ((teaching() && inClassScope(data().classId) && studentIsInClass(data().studentId, data().classId)) || registerKeeper())
         && data().markedBy == uid() && markValid();
       // Once a register is submitted any change is a correction: it needs a reason and names who made it.

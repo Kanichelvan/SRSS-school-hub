@@ -27,3 +27,7 @@ Additional PRD capabilities in place: audit trail triggers (§42), absence notif
 2. The generic Forms & Actions renderer.
 5. ~~CMS editor and wiring public News/Events to Firestore; role router → `/sign-in`~~ (done 10 Oct 2026). Image library hardened 12 Oct 2026 (Content → Image library: browser-side resize to WebP, consent-checked staging registry, matching Storage object, anonymous read only after approval, picker on every image field). Next: publicAchievements editor.
 6. Messages (threads), event registration, Google Calendar sync decision.
+
+## SRSS Quest and Buku NILAM (14 Oct 2026)
+
+The initial integrated engagement release is documented in `SRSS25-QUEST.md`, with verified checks in `SRSS25-QUEST-VALIDATION.md`. It adds the reusable ten-format engine, role/audience enforcement, CMS/release lifecycle, rewards, safe class/campaign rankings, student/staff passports, assigned-teacher creative and NILAM review, linked-parent reading and governed portfolio selection. Native Workspace Picker/Sheets synchronisation, collection/reading badge rules, optional staff rankings/gallery, advanced collective goals and large-report pagination remain extensions; do not mark those as delivered.

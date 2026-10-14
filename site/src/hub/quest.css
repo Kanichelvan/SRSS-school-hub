@@ -1,5 +1,5 @@
 .quest-page { max-width: 1100px; color: var(--ink); }
-.quest-hero { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: clamp(24px,4vw,44px); margin-bottom: 28px; background: linear-gradient(110deg,#092b49,#173e65 65%,#4a1e6b); color: white; border-radius: 14px; border-bottom: 4px solid #d2ac47; }
+.quest-hero { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: clamp(24px,4vw,44px); margin-bottom: 28px; background: var(--purple-metal); color: white; border-radius: 14px; border-bottom: 4px solid #d2ac47; }
 .quest-hero h1 { margin: 6px 0 12px; font-family: var(--serif); font-size: clamp(30px,4vw,44px); color: white; }
 .quest-hero p { max-width: 600px; line-height: 1.7; }
 .quest-hero .hub-kicker { color: #fbe7a6; }
@@ -90,3 +90,4 @@
 .quest-region-image { position: relative; margin: 0; overflow: hidden; }
 .quest-region-marker { position: absolute; translate: -50% -50%; width: 38px; height: 38px; border: 2px solid white; border-radius: 50%; background: #092b49; color: white; cursor: pointer; }
 .quest-region-marker[aria-pressed=true] { background: #5f176c; }
+.quest-private-file { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0; }
