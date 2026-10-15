@@ -291,7 +291,7 @@ export const remindRegisters = onCall(async (request) => {
 // ---------- Admissions → SIS without re-keying (PRD §33) ----------
 export const enrolApplication = onCall(async (request) => {
   const roles = request.auth?.token?.roles || [];
-  if (!roles.some((role) => ["admissionsOfficer", "schoolAdmin"].includes(role))) throw new HttpsError("permission-denied", "Only admissions staff can enrol applicants.");
+  if (!roles.some((role) => ["admissionsOfficer", "schoolAdmin", "superAdmin"].includes(role))) throw new HttpsError("permission-denied", "Only admissions staff can enrol applicants.");
   const { applicationId, classId } = request.data || {};
   const appRef = db.doc(`applications/${applicationId}`);
   return db.runTransaction(async (tx) => {
@@ -340,6 +340,15 @@ export const auditResults = auditWrite("studentResults");
 export const auditReportCards = auditWrite("reportCards");
 export const auditConsent = auditWrite("consentRecords");
 export const auditPortfolio = auditWrite("portfolioEntries");
+export const auditWelcomeProgress = auditWrite("onboardingProgress");
+export const auditFamilyPreferences = auditWrite("familyPreferences");
+export const auditActivityForms = auditWrite("activityForms");
+export const auditStaffDevelopment = auditWrite("staffAppraisals");
+export const auditLessonPlans = auditWrite("lessonPlans");
+export const auditCurriculumPlans = auditWrite("curriculumPlans");
+export const auditApplications = auditWrite("applications");
+export const auditApplicationReviews = auditWrite("applicationReviews");
+export const auditDownloads = auditWrite("documents");
 export const auditIncidents = auditWrite("studentIncidents");
 export const auditPayments = auditWrite("payments");
 export const auditConcessions = auditWrite("concessions");

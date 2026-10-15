@@ -1,5 +1,6 @@
 // SRSS Manage / Govern screens: admissions pipeline, consent overview, showcase moderation, audit log.
 // Website content and the website inbox live in content.jsx.
+import { ApplicationReview } from "./applications";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, limit, orderBy, serverTimestamp, updateDoc, where } from "firebase/firestore";
@@ -21,10 +22,11 @@ export function Admissions() {
   const auth = useAuth();
   const canEnrol = can(auth.roles, "admissions", "U") === "all";
   const [message, setMessage] = useState(null);
+  const [reviewing,setReviewing]=useState(null);
   const { data, loading, error, reload } = useLoad(async () => {
     const yearId = await currentYearId();
-    const [enquiries, applications, classes] = await Promise.all([list("admissionEnquiries"), list("applications"), list("classes", where("academicYearId", "==", yearId || ""))]);
-    return { enquiries, applications, classes: classes.sort((a, b) => a.standard - b.standard) };
+    const [enquiries, applications, classes, reviews] = await Promise.all([list("admissionEnquiries"), list("applications"), list("classes", where("academicYearId", "==", yearId || "")), list("applicationReviews")]);
+    return { enquiries, applications: applications.map(a=>({...a,meritRank:reviews.find(r=>r.id===a.id)?.meritRank})), classes: classes.sort((a, b) => a.standard - b.standard) };
   }, []);
   async function enrol(application, classId) {
     setMessage(null);
@@ -40,9 +42,10 @@ export function Admissions() {
       <ol className="hub-pipeline">{PIPELINE.map(([status, label]) => <li key={status}><strong>{counts(status)}</strong><span>{label}</span></li>)}</ol>
       <Section title="Applications">
         <DataTable rows={data.applications.map((app) => ({ ...app, childName: app.child?.name, guardianName: app.guardians?.[0]?.name }))} searchKeys={["childName", "guardianName"]} exportName="srss-applications"
-          columns={[{ key: "childName", label: "Child" }, { key: "enteringStandard", label: "Entering", render: (row) => `Std ${row.enteringStandard}` }, { key: "guardianName", label: "Guardian" }, { key: "status", label: "Status", render: (row) => <StatusBadge status={row.status} label={PIPELINE.find(([status]) => status === row.status)?.[1]} /> },
-            { key: "action", label: "Action", sortable: false, render: (row) => row.status === "accepted" && canEnrol ? <EnrolControl application={row} classes={data.classes} onEnrol={enrol} /> : row.status === "enrolled" ? <Link to={`/hub/students/${row.studentId}`}>View student</Link> : "—" }]} />
+          columns={[{ key: "childName", label: "Child" }, { key: "enteringStandard", label: "Entering", render: (row) => `Std ${row.enteringStandard}` }, { key: "guardianName", label: "Guardian" }, {key:"meritRank",label:"Reviewed merit position"}, { key: "status", label: "Status", render: (row) => <StatusBadge status={row.status} label={PIPELINE.find(([status]) => status === row.status)?.[1]} /> },
+            { key: "action", label: "Action", sortable: false, render: (row) => row.status === "accepted" && canEnrol ? <EnrolControl application={row} classes={data.classes} onEnrol={enrol} /> : row.status === "enrolled" ? <Link to={`/hub/students/${row.studentId}`}>View student</Link> : canEnrol ? <button className="hub-link-button" onClick={()=>setReviewing(row)}>Review application</button> : "—" }]} />
       </Section>
+      {reviewing&&<ApplicationReview key={reviewing.id} application={reviewing} onSaved={()=>{setReviewing(null);reload();}}/>}
       <Section title="Enquiries">
         <DataTable rows={data.enquiries} searchKeys={["parentName", "childName", "email"]} exportName="srss-enquiries"
           columns={[{ key: "parentName", label: "Parent" }, { key: "childName", label: "Child" }, { key: "enteringStandard", label: "Standard", render: (row) => (row.enteringStandard ? `Std ${row.enteringStandard}` : "—") }, { key: "createdAt", label: "Received", sortValue: (row) => row.createdAt?.seconds || 0, render: (row) => formatDate(row.createdAt) }, { key: "status", label: "Status", render: (row) => <StatusBadge status={row.status} /> }]} />

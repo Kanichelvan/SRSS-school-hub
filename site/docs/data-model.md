@@ -78,3 +78,15 @@ Institutional documents and media live in Google Shared Drives; the hub stores m
 ## Indexes
 
 Composite indexes for the built screens are in [`firestore.indexes.json`](../firestore.indexes.json). Add new ones per screen → query → index as modules are built (srss PRD §20).
+
+## Registered-user packs and development (16 October 2026)
+
+- `onboardingProgress/{uid}_{role}`: own role/version, completed step IDs, agreed check-in date and updated timestamp. The office/leadership may review progress. It contains no consent acknowledgement.
+- `familyPreferences/{uid}`: communication needs/channel/language, optional private family voice and permission to contact about that voice. No publication flag exists.
+- `activityForms/{id}`: versioned template ID, activity/date/venue/contact fields, optional verified own-child reference, answers, submitter and immutable submission timestamp. Office/privacy may read; safeguarding leads may read incident forms. Changes require a new submission.
+- `staffAppraisals/{id}`: teacher UID, year/stage, goals, five evidence domains and descriptive bands, supervisor review, teacher reflection and follow-up. Leadership assesses; the named teacher can change only their own reflection.
+- `announcementReads/{uid}_{announcementId}`: explicit audience-checked acknowledgement, immutable after creation. It is not delivery telemetry.
+- `applicationReviews/{applicationId}`: private human-recorded merit position, school criteria reference and notes. Admissions/office may write; leadership may read; applicants cannot read.
+- `portfolioEvidence/{entryId}/{file}` (Storage): create/read permissions follow the actual portfolio entry. Store authenticated paths in `portfolioEntries.mediaFiles`, never public download tokens. Images are resized and camera metadata stripped before upload; supported document/audio/video files are size/type checked.
+
+New Firestore composite indexes cover internal document audiences, family published academic records and application document lookups. Deploy rules/indexes/Storage/Functions with Hosting. Audit triggers record changes to welcome progress, preferences, activity forms, appraisals, plans, applications, private selection notes and downloads.

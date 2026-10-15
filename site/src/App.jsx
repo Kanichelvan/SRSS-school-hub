@@ -39,6 +39,7 @@ import { loadPublicContent, loadSitePage, submitPublicForm } from "./lib/publicC
 import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
+import OurPeople from "./pages/OurPeople.jsx";
 import { signInLink, siteNav } from "./data/navigation.js";
 import { pageContent, resolvePath, siteEntry, sitePageId } from "./data/siteMap.js";
 import { storyCategory } from "./data/stories.js";
@@ -51,6 +52,11 @@ const LegalPage = lazy(() => import("./legal/LegalPage.jsx"));
 // Current route from the address bar; old addresses are swapped for their canonical URL in place.
 function currentRoute() {
   const { pathname, hash } = window.location;
+  if (pathname === "/about/our-people" && ["#principal", "#academics", "#alumni"].includes(hash)) {
+    const destination = hash === "#principal" ? "/about#principal-welcome" : `/about/voices${hash}`;
+    window.history.replaceState({}, "", destination);
+    return resolvePath(destination.split("#")[0]).entry;
+  }
   const resolved = resolvePath(pathname);
   if (resolved.redirect) {
     window.history.replaceState({}, "", `${resolved.redirect}${hash}`);
@@ -156,50 +162,23 @@ function AboutPage({ onVisit, content, faqs }) {
   const about = { ...defaultAboutContent, ...content };
   const defaultHero = !content?.heroImage || content.heroImage === defaultAboutContent.heroImage;
   return <main id="main" className="about-page about-refresh">
-    <section className="about-hero" id="top"><div className="about-inner about-hero-grid"><div><p className="eyebrow">ABOUT SRSS · EDUCATION FOR LIFE</p><h1>Education for Life,<br/>Not Mere Living.</h1><p>Sekolah Rendah Sathya Sai is a Malaysian primary school dedicated to helping every child grow into the fullest and finest expression of who they can become.</p><a className="primary-button" href="/about/our-story">Discover Our Story</a></div><figure className="about-hero-photo">{defaultHero ? <HeroPhoto image={HERO_PHOTOS.friends} priority /> : <img src={about.heroImage} alt={about.heroAlt}/>}</figure></div></section>
+    <section className="about-hero" id="top"><img className="about-school-sketch" src="/assets/heritage/hero-school-sketch-v2-1536.webp" srcSet="/assets/heritage/hero-school-sketch-v2-640.webp 640w, /assets/heritage/hero-school-sketch-v2-960.webp 960w, /assets/heritage/hero-school-sketch-v2-1536.webp 1536w" sizes="(max-width: 900px) 120vw, 76vw" width="1536" height="1024" alt="" aria-hidden="true" decoding="async"/><div className="about-inner about-hero-grid"><div><p className="eyebrow">ABOUT SRSS · EDUCATION FOR LIFE</p><h1>Education for Life,<br/><em>Not Mere Living.</em></h1><p>Sekolah Rendah Sathya Sai is a Malaysian primary school dedicated to helping every child grow into the fullest and finest expression of who they can become.</p><a className="primary-button" href="/about/our-story">Discover Our Story</a></div><figure className="about-hero-photo">{defaultHero ? <HeroPhoto image={HERO_PHOTOS.friends} priority /> : <img src={about.heroImage} alt={about.heroAlt}/>}</figure></div></section>
     <nav className="about-directory about-inner" aria-label="About SRSS sections">{aboutLinks.map(([label, href]) => <a key={label} href={href}>{label}<ArrowRight size={15}/></a>)}</nav>
+    <section className="principal-welcome about-inner" id="principal-welcome"><p className="eyebrow">A welcome from our Principal</p><h2>Learning with love, leading with character.</h2><blockquote>“{srssVoices[0].excerpt}”</blockquote><p className="principal-welcome-source">{srssVoices[0].name} · Principal</p><details><summary>Read the Principal’s welcome <CaretDown size={18} aria-hidden="true" /></summary><VoiceStory voice={srssVoices[0]} /></details></section>
     <section className="about-intro about-inner" id="who-we-are"><div><p className="eyebrow">Who we are</p><h2>A school for the mind, heart and character.</h2></div><div className="about-rich-copy"><p>At SRSS, education is more than the acquisition of knowledge or preparation for examinations. We believe a truly educated child develops an intelligent mind, a strong character, a compassionate heart, practical abilities and responsibility towards others.</p><p>Inspired by the educational philosophy of Sri Sathya Sai Baba, we combine the Malaysian National Curriculum with an integral approach that nurtures body, mind, heart and spirit.</p><a className="text-link" href="/about/our-story">Explore Our Story <ArrowRight size={17}/></a></div></section>
     <section className="about-profile about-inner" id="school-profile"><div><p className="eyebrow">School profile</p><h2>SRSS at a glance.</h2><p>Key facts about the school. Families can find more in the <a className="text-link" href="/resources/faq">FAQs</a>.</p></div><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="profile" firstOpen /></section>
-    <section className="purpose-refresh" id="vision-mission"><div className="about-inner"><div className="purpose-refresh-heading"><p className="eyebrow">Our purpose</p><h2>Human Excellence, lived with purpose.</h2><p><strong>Vision</strong> — to nurture young people of character, confidence and compassion who contribute to a more peaceful world.</p><p><strong>Mission</strong> — to integrate Malaysia’s national curriculum with an education that develops intellect, integrity, wellbeing and service.</p></div><div className="mission-pillars">{missionPillars.map(([title, copy], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div><a className="text-link" href="/about/vision-mission">Discover Our Vision &amp; Mission <ArrowRight size={17}/></a></div></section>
+    <section className="purpose-refresh" id="vision-mission"><div className="about-inner"><div className="purpose-refresh-heading"><div className="purpose-title"><p className="eyebrow">Our purpose</p><h2>Human Excellence,<br/><em>lived with purpose.</em></h2></div><div className="purpose-statements"><article><h3>Vision</h3><p>To nurture young people of character, confidence and compassion who contribute to a more peaceful world.</p></article><article><h3>Mission</h3><p>To integrate Malaysia’s national curriculum with an education that develops intellect, integrity, wellbeing and service.</p></article></div></div><div className="mission-pillars">{missionPillars.map(([title, copy], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div></div></section>
     <section className="educare-refresh" id="educare"><div className="about-inner educare-grid"><div><p className="eyebrow">Sathya Sai Education &amp; Educare</p><h2>Drawing out what is already within.</h2><p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p><p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p></div><IntegralFramework /></div><div className="about-inner global-line"><p><strong>A global educational movement.</strong> Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p><a className="text-link" href="/about/sathya-sai-education">Discover Sathya Sai Education <ArrowRight size={17}/></a></div></section>
     <section className="community-refresh" id="our-people"><div className="about-inner"><p className="eyebrow">It takes a community to educate a child</p><h2>Every day is an opportunity to grow.</h2><div className="partnership"><strong>CHILD</strong><span>TEACHERS</span><span>PARENTS</span><span>VOLUNTEERS</span></div><p>Teachers, parents and volunteers each bring something essential to the child’s learning. Together, they create the conditions in which confidence, character and capability can flourish.</p><a className="text-link" href="/join/get-involved">Discover how you can be part of SRSS <ArrowRight size={17}/></a></div></section>
-    <section className="people-refresh about-inner"><figure><img src={about.principal?.image || defaultAboutContent.principal.image} alt={about.principal?.alt || defaultAboutContent.principal.alt}/></figure><div><p className="eyebrow">Our people</p><h2>Leadership, teachers and family partnership.</h2><p>Our people include the Board of Directors, school leadership, teachers, administrators, support staff and Teacher-Parent Association — each contributing to a school community in which every child is known and encouraged.</p><a className="text-link" href="/about/our-people">Read the voices of SRSS <ArrowRight size={17}/></a></div></section>
+    <section className="people-refresh about-inner"><figure><img src={about.principal?.image || defaultAboutContent.principal.image} alt={about.principal?.alt || defaultAboutContent.principal.alt}/></figure><div><p className="eyebrow">Our people</p><h2>Leadership, teachers and family partnership.</h2><p>Our people include the Board of Directors, school leadership, teachers, administrators, support staff and Teacher-Parent Association — each contributing to a school community in which every child is known and encouraged.</p><a className="text-link" href="/about/our-people">Meet the people of SRSS <ArrowRight size={17}/></a></div></section>
     <LearningSpaces id="campus" eyebrow="Our campus" />
     <section className="anniversary-refresh" id="srss25"><div className="about-inner"><p className="eyebrow">SRSS25 · 25 years of educating the heart</p><h2>2002 <span>—</span> 2027</h2><div>{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((item) => <article key={item}><i>↓</i><strong>{item}</strong></article>)}</div><p>Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS.</p><a className="primary-button" href="/about/silver-jubilee">Celebrating 25 Years</a></div></section>
     <section className="about-closing" id="about-closing"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">About SRSS</p><h2>Discover who we are and what shapes our approach to education.</h2><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit</button></div></section>
   </main>;
 }
 
-function VoicesPage({ extra }) {
-  return <main id="main" className="voices-page">
-    <section className="voices-hero" id="top" aria-labelledby="voices-title">
-      <div className="voices-shell voices-hero-grid">
-        <div>
-          <p className="eyebrow">SRSS25 · In their own words</p>
-          <h1 id="voices-title">Many voices.<br/><em>One enduring purpose.</em></h1>
-        </div>
-        <p>From school leaders, teachers and alumni, these reflections tell one connected story: education at SRSS is measured not only by what children know, but by who they become.</p>
-      </div>
-    </section>
-
-    <nav className="voices-directory voices-shell" aria-label="Messages on this page">
-      {srssVoices.map((voice) => <a key={voice.id} href={`#${voice.id}`}>
-        <span>{voice.sequence}</span>
-        <img src={voice.image} alt=""/>
-        <strong>{voice.name}</strong>
-        <small>{voice.role}</small>
-        <ArrowRight size={17}/>
-</a>)}
-    </nav>
-
-    <section className="voices-introduction voices-shell" aria-labelledby="voices-intro-title">
-      <p className="eyebrow">A living school story</p>
-      <h2 id="voices-intro-title">From the people who lead it, shape it and carry it forward.</h2>
-      <p>Read each message in full, from a principal’s welcome and an educator’s renewed purpose to the memories of a pupil from SRSS’s pioneer batch.</p>
-    </section>
-
-    <div className="voices-list">
-      {srssVoices.map((voice, index) => <article className={`voice-story voice-story-${index + 1}`} id={voice.id} key={voice.id}>
+function VoiceStory({ voice }) {
+  return <article className="voice-story" id={voice.id}>
         <div className="voices-shell voice-story-grid">
           <aside className="voice-profile">
             <div className="voice-sequence" aria-hidden="true"><span>{voice.sequence}</span><i/></div>
@@ -228,9 +207,44 @@ function VoicesPage({ extra }) {
             {voice.closingQuote ? <blockquote className="voice-closing-quote">“{voice.closingQuote}”</blockquote> : null}
           </div>
         </div>
-      </article>)}
+      </article>;
+}
+
+const communityVoices = srssVoices.filter(voice => voice.id !== "principal");
+
+function VoicesPage({ extra }) {
+  return <main id="main" className="voices-page">
+    <section className="voices-hero" id="top" aria-labelledby="voices-title">
+      <div className="voices-shell voices-hero-grid">
+        <div>
+          <p className="eyebrow">SRSS25 · In their own words</p>
+          <h1 id="voices-title">Many voices.<br/><em>One enduring purpose.</em></h1>
+        </div>
+        <p>From educators, alumni and the wider community, these reflections tell one connected story: education at SRSS is measured not only by what children know, but by who they become.</p>
+      </div>
+    </section>
+
+    <nav className="voices-directory voices-shell" aria-label="Messages on this page">
+      {communityVoices.map((voice) => <a key={voice.id} href={`#${voice.id}`}>
+        <span>{voice.sequence}</span>
+        <img src={voice.image} alt=""/>
+        <strong>{voice.name}</strong>
+        <small>{voice.role}</small>
+        <ArrowRight size={17}/>
+</a>)}
+    </nav>
+
+    <section className="voices-introduction voices-shell" aria-labelledby="voices-intro-title">
+      <p className="eyebrow">A living school story</p>
+      <h2 id="voices-intro-title">From the people who lead it, shape it and carry it forward.</h2>
+      <p>Read an educator’s reflection and memories from SRSS’s pioneer batch. Former parents and volunteers are invited to contribute their own experiences.</p>
+    </section>
+
+    <div className="voices-list">
+      {communityVoices.map((voice) => <VoiceStory voice={voice} key={voice.id} />)}
     </div>
 
+    <section className="community-voices-invitation voices-shell"><p className="eyebrow">Former parents · Volunteers · Alumni</p><h2>Your experience belongs in this story.</h2><p>Help us remember the people, moments and values that shaped your time with SRSS.</p><a className="text-link" href="/about/silver-jubilee#memories">Share a school memory <ArrowRight size={17}/></a></section>
     {extra && <div id="staff" className="voices-directory-extra">{extra.title && <div className="page-inner content-intro"><p className="eyebrow">Our people</p><h2 className="content-heading">{extra.title}</h2>{extra.intro && <p>{extra.intro}</p>}</div>}<ContentBody content={extra} /></div>}
     <section className="voices-closing">
       <div className="voices-shell"><p className="eyebrow">25 years of human excellence</p><h2>The story continues with every child.</h2><p>Discover the educational philosophy and community that connect these reflections.</p><a className="primary-button" href="/about">Explore About SRSS</a></div>
@@ -569,7 +583,8 @@ export function App() {
     sathyaSai: () => <SathyaSaiEducationPage values={values} quote={inspirationQuote} faqs={pageFaqs} />,
     jubilee: () => <JubileePage blocks={blocks} motto={managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto} />,
     governance: () => <GovernancePage />,
-    ourPeople: () => <VoicesPage extra={sitePage.path === route.path ? sitePage.content : null} />,
+    ourPeople: () => <OurPeople extra={sitePage.path === route.path ? sitePage.content : null} />,
+    voices: () => <VoicesPage extra={sitePage.path === route.path ? sitePage.content : null} />,
     learning: () => <LearningPage blocks={blocks} faqs={pageFaqs} />,
     studentLife: () => <StudentLifePage blocks={blocks} faqs={pageFaqs} entry={route} />,
     join: () => <JoinPage />,

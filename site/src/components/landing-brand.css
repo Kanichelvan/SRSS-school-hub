@@ -1,0 +1,107 @@
+/* Shared public landing-page language; the masthead remains the common anchor. */
+:root {
+  --landing-navy: radial-gradient(ellipse at 84% 65%, #254c77 0, transparent 57%), linear-gradient(115deg, #06162e 12%, #112e53 100%);
+}
+.landing-hero, .voices-hero, .faq-page-hero, .ppa-page-hero { background: var(--landing-navy); }
+.landing-hero .landing-hero-grid,
+.landing-hero:has(.hero-photo) .landing-hero-grid,
+.landing-hero .jubilee-hero-grid {
+  min-height: 510px;
+  padding-block: 76px 82px;
+  gap: clamp(32px, 5vw, 72px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.landing-hero-plain .landing-hero-grid { grid-template-columns: minmax(0, 820px); min-height: 0; }
+.landing-hero h1, .voices-hero h1, .faq-page-hero h1 {
+  font: 600 clamp(44px, 4.6vw, 66px)/1.12 var(--serif);
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.landing-hero h1::after, .voices-hero h1::after, .faq-page-hero h1::after,
+.ppa-page-hero h1::after, .legal-hero h1::after {
+  content: "";
+  display: block;
+  width: 76px;
+  height: 3px;
+  margin-top: 28px;
+  background: var(--gold-foil);
+}
+.voices-hero h1 em, .faq-page-hero h1 em {
+  color: #efd585;
+  background: var(--gold-foil);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: normal;
+}
+.landing-hero .eyebrow, .voices-hero .eyebrow, .faq-page-hero .eyebrow { margin: 0 0 24px; color: #efd585; }
+.landing-hero-copy, .voices-hero-grid > p, .faq-page-hero > div > p:last-child { color: #dbe4ef; font-size: 16px; line-height: 1.85; }
+.landing-hero figure, .landing-hero figure:has(.hero-photo) {
+  min-width: 0;
+  align-self: center;
+  margin: 0;
+  overflow: visible;
+}
+.landing-hero figure::before { display: none; }
+.landing-hero figure > img:not(.hero-photo) {
+  height: clamp(300px, 33vw, 450px);
+  min-height: 0;
+  object-fit: cover;
+}
+.landing-hero figure > img, .landing-hero .hero-video-poster, .landing-hero .hero-video-footage {
+  mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 96%, transparent 100%), linear-gradient(180deg, transparent 0, #000 10%, #000 87%, transparent 100%);
+  mask-composite: intersect;
+}
+.landing-hero figure > .hero-photo {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  object-fit: contain;
+  mask-image: linear-gradient(180deg, #000 91%, transparent 100%);
+}
+.landing-hero figure > .hero-photo-portrait { width: min(100%, 360px); }
+.landing-hero .hero-video, .jubilee-hero-video .hero-video {
+  background: transparent;
+  border-radius: 0;
+  min-height: 0;
+  height: clamp(300px, 33vw, 450px);
+  overflow: visible;
+}
+.landing-hero .hero-video .hero-video-poster { height: 100%; min-height: 0; max-height: none; }
+.landing-hero .hero-video-control { bottom: 24px; }
+.voices-hero-grid { min-height: 0; padding-block: 76px 82px; align-items: center; gap: clamp(40px, 7vw, 100px); }
+.faq-page-hero { padding-block: 76px 82px; align-items: center; }
+.ppa-page-hero-inner { padding-block: 76px 82px; }
+.ppa-page-hero > img {
+  mask-image: linear-gradient(90deg, transparent, #000 38%), linear-gradient(180deg, #000 75%, transparent);
+  mask-composite: intersect;
+}
+.ppa-page-hero-scrim { background: linear-gradient(90deg, #06162ee8 0, #06162ed9 38%, #06162e33 100%); }
+.legal-hero h1::after { margin-inline: auto; }
+@media (max-width: 900px) {
+  .landing-hero .landing-hero-grid,
+  .landing-hero:has(.hero-photo) .landing-hero-grid,
+  .landing-hero .jubilee-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+    padding-block: 54px 44px;
+    gap: 34px;
+  }
+  .landing-hero h1, .voices-hero h1, .faq-page-hero h1 { font-size: clamp(38px, 7vw, 58px); }
+  .landing-hero figure, .landing-hero figure:has(.hero-photo), .jubilee-hero .jubilee-hero-video {
+    width: 100%; max-width: 720px; margin: 0 auto;
+  }
+  .landing-hero figure > img:not(.hero-photo), .landing-hero .hero-video, .jubilee-hero-video .hero-video { height: clamp(240px, 55vw, 400px); }
+  .voices-hero-grid { padding-block: 54px 60px; gap: 30px; }
+  .faq-page-hero { padding-block: 54px 60px; gap: 32px; }
+  .ppa-page-hero-inner { padding-block: 54px 60px; }
+}
+@media (max-width: 540px) {
+  .landing-hero h1, .voices-hero h1, .faq-page-hero h1 { font-size: clamp(35px, 8.2vw, 44px); }
+  .landing-hero .eyebrow, .voices-hero .eyebrow, .faq-page-hero .eyebrow { font-size: 10px; letter-spacing: .13em; }
+  .landing-hero h1::after, .voices-hero h1::after, .faq-page-hero h1::after, .ppa-page-hero h1::after { margin-top: 24px; }
+}
+@media (forced-colors: active) {
+  .voices-hero h1 em, .faq-page-hero h1 em { background: none; -webkit-text-fill-color: currentColor; }
+}

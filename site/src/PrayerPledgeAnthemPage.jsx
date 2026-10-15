@@ -111,25 +111,14 @@ const PLEDGE = [
   ["We are the children of SRSS", "We shall be the best that we can be!"],
 ];
 
-// Words highlighted in the pledge: the five Ds in gold, each human value in its own colour.
-const PLEDGE_ACCENTS = [["Devotion", "d"], ["Duty", "d"], ["Discipline", "d"], ["Discrimination", "d"], ["Determination", "d"], ["Truth", "truth"], ["Right Conduct", "conduct"], ["Peace", "peace"], ["Love", "love"], ["Non-violence", "nonviolence"]];
-function accentLine(line) {
-  // The value colours belong to the line that names the Five Human Values, not to verbs like "Love and serve".
-  const accents = line.startsWith("Truth,") ? PLEDGE_ACCENTS : PLEDGE_ACCENTS.filter(([, kind]) => kind === "d");
-  const pattern = new RegExp(`\\b(${accents.map(([word]) => word).join("|")})\\b`, "g");
-  return line.split(pattern).map((part, index) => {
-    const match = accents.find(([word]) => word === part);
-    return match ? <span key={index} className={match[1] === "d" ? "ppa-pledge-d" : `ppa-value-${match[1]}`}>{part}</span> : part;
-  });
-}
 
 const PRAYERS = [
   {
     id: "morning", tab: "Morning", title: "Universal Prayer", when: "Morning assembly", Icon: Sun, accent: "nonviolence",
     stanzas: [
       ["Dear God, as this new day begins,", "be the light that shines within."],
-      ["Be in my mind, and make my thinking clear.", "Be in my eyes, and let me see the good in all.", "Be in my ears, and let me listen with care.", "Be in my mouth, and let my words be true and kind.", "Be in my hands, and let them help and serve.", "Be in my feet, and guide me on the right path.", "Be in my heart, and let me love all."],
-      ["Make me a light for someone today."],
+      ["Be in our minds, and make our thinking clear.", "Be in our eyes, and let us see the good in all.", "Be in our ears, and let us listen with care.", "Be in our mouths, and let our words be true and kind.", "Be in our hands, and let them help and serve.", "Be in our feet, and guide us on the right path.", "Be in our hearts, and let us love all."],
+      ["Make us a light for someone today."],
     ],
   },
   {
@@ -137,21 +126,19 @@ const PRAYERS = [
     stanzas: [
       ["Thank You, God, for this food,", "for sun and rain that made it grow,", "for farmers’ hands and cooks’ kind care,", "for all the love that brought it here."],
       ["Thank you dear parents, teachers, and uncles and aunties", "who have prepared this food for us today.", "Thank you, God, for the food."],
-      ["I offer this food to You with gratitude.", "May it give me strength to learn, to serve, and to love.", "May all beings everywhere have enough to eat."],
+      ["We offer this food to You with gratitude.", "May it give us strength to learn, to serve, and to love.", "May all beings everywhere have enough to eat."],
     ],
   },
   {
     id: "closing", tab: "Closing", title: "Peace Prayer", when: "End of the school day", Icon: Moon, accent: "peace",
     stanzas: [
-      ["For the lessons I have learnt today,", "for friends who shared my work and play,", "for teachers who have shown the way,", "thank You, God, for this day."],
-      ["Let there be Peace in my heart,", "Peace in my home,", "Peace in my country,", "and Peace in all the world."],
-      ["Let there be Joy in my heart,", "Joy in my home,", "Joy in my country,", "and Joy in all the world."],
-      ["Let there be Love in my heart,", "Love in my home,", "Love in my country,", "and Love in all the world."],
+      ["For the lessons we have learnt today,", "for friends who shared our work and play,", "for teachers who have shown the way,", "thank You, God, for this day."],
+      ["Let there be Peace in our hearts,", "Peace in our homes,", "Peace in our country,", "and Peace in all the world."],
+      ["Let there be Joy in our hearts,", "Joy in our homes,", "Joy in our country,", "and Joy in all the world."],
+      ["Let there be Love in our hearts,", "Love in our homes,", "Love in our country,", "and Love in all the world."],
     ],
   },
 ];
-const PRAYER_WORDS = { Peace: "peace", Joy: "nonviolence", Love: "love" };
-const prayerLine = (line) => line.split(/\b(Peace|Joy|Love)\b/).map((part, index) => PRAYER_WORDS[part] ? <span key={index} className={`ppa-prayer-word ppa-tint-${PRAYER_WORDS[part]}`}>{part}</span> : part);
 
 function SectionHero({ image, imagePosition, eyebrow, title, subtitle, children, align = "left" }) {
   return <section className={`ppa-section-hero ppa-align-${align}`}>
@@ -235,7 +222,11 @@ function PrayersPanel() {
     <SectionHero image="prayer-at-microphone.jpg" imagePosition="35% 30%" align="right" eyebrow="02 · After the silence" title="School Prayers">
       After Silent Sitting, the school prays together. Three prayers mark the day: one to open it, one before lunch and one to close it.
     </SectionHero>
-    <section className="ppa-prayers-section"><div className="ppa-wrap ppa-prayer-reader"><div className="ppa-prayer-tabs" role="tablist" aria-label="School prayers">{PRAYERS.map(({ id, tab, title, Icon, accent }) => <button type="button" role="tab" aria-selected={activeId === id} className={`ppa-tint-${accent}`} onClick={() => setActiveId(id)} key={id}><Icon size={20} /><span><strong>{tab}</strong><small>{title}</small></span></button>)}</div><article className={`ppa-prayer-text ppa-tint-${active.accent}`} key={active.id}><p className="eyebrow">{active.when}</p><h3>{active.title}</h3><span className="ppa-spectrum-rule" aria-hidden="true" />{active.stanzas.map((stanza, index) => <p className="ppa-prayer-stanza" key={index}>{stanza.map((line) => <span key={line}>{prayerLine(line)}</span>)}</p>)}</article></div></section>
+    <section className="ppa-prayers-section"><div className="ppa-wrap ppa-prayer-reader"><div className="ppa-prayer-tabs" role="tablist" aria-label="School prayers">{PRAYERS.map(({ id, tab, title, Icon, accent }) => <button type="button" role="tab" aria-selected={activeId === id} id={`ppa-prayer-tab-${id}`} aria-controls={`ppa-prayer-${id}`} tabIndex={activeId === id ? 0 : -1} className={`ppa-tint-${accent}`} onKeyDown={event => {
+      const current=PRAYERS.findIndex(p=>p.id===id);
+      const next=event.key==='Home'?0:event.key==='End'?PRAYERS.length-1:['ArrowRight','ArrowDown'].includes(event.key)?(current+1)%PRAYERS.length:['ArrowLeft','ArrowUp'].includes(event.key)?(current+PRAYERS.length-1)%PRAYERS.length:null;
+      if(next!==null){event.preventDefault();setActiveId(PRAYERS[next].id);event.currentTarget.parentElement.querySelectorAll('button')[next].focus();}
+    }} onClick={() => setActiveId(id)} key={id}><Icon size={20} /><span><strong>{tab}</strong><small>{title}</small></span></button>)}</div><article role="tabpanel" aria-labelledby={`ppa-prayer-tab-${active.id}`} id={`ppa-prayer-${active.id}`} className={`ppa-prayer-text ppa-tint-${active.accent}`} key={active.id}><p className="eyebrow">{active.when}</p><h3>{active.title}</h3><span className="ppa-spectrum-rule" aria-hidden="true" />{active.stanzas.map((stanza, index) => <p className="ppa-prayer-stanza" key={index}>{stanza.map((line) => <span key={line}>{line}</span>)}</p>)}</article></div></section>
   </>;
 }
 
@@ -264,15 +255,16 @@ function NegarakuPanel() {
 }
 
 function RukunPanel() {
+  const [meaning, setMeaning] = useState(false);
   return <>
     <SectionHero image="assembly-rows.jpg" imagePosition="50% 55%" eyebrow="04 · Recited together" title="Rukun Negara">
       The five national principles are recited by the whole school after the anthem: one community, speaking with shared purpose.
     </SectionHero>
-    <section className="ppa-rukun-section"><div className="ppa-wrap">
-      <div className="ppa-rukun-preamble">
-        <p className="ppa-rukun-lead">Maka kami, rakyat Malaysia, berikrar akan menumpukan seluruh tenaga dan usaha kami untuk mencapai cita-cita tersebut berdasarkan atas prinsip-prinsip yang berikut:</p>
-      </div>
-      <div className="ppa-rukun-grid">{RUKUN.map(([ms, en, value], index) => <article className={`ppa-value-${value}`} key={ms}><strong>{index + 1}</strong><h3>{ms}</h3><p>{en}</p></article>)}</div>
+    <section className="ppa-anthem-section ppa-rukun-reading"><div className="ppa-wrap">
+      <div className="ppa-anthem-heading"><div><p className="eyebrow">Recited together in Bahasa Melayu</p><h3>Rukun Negara</h3></div><div className="ppa-gloss-tabs"><button type="button" aria-pressed={meaning} onClick={() => setMeaning(!meaning)}>English meaning</button></div></div>
+      <p className="ppa-rukun-flow-lead" lang="ms">Maka kami, rakyat Malaysia, berikrar akan menumpukan seluruh tenaga dan usaha kami untuk mencapai cita-cita tersebut berdasarkan atas prinsip-prinsip yang berikut:</p>
+      <span className="ppa-spectrum-rule" aria-hidden="true" />
+      <div className={`ppa-anthem-verses${meaning ? ' has-gloss' : ''}`}><article>{RUKUN.map(([ms, en, value]) => <div className={`ppa-anthem-line ppa-rukun-line ppa-value-${value}`} key={ms}><strong lang="ms">{ms}</strong>{meaning && <p lang="en">{en}</p>}</div>)}</article></div>
     </div></section>
   </>;
 }
@@ -296,7 +288,7 @@ function PledgePanel() {
     <SectionHero image="pledge-hand-raised.jpg" imagePosition="45% 35%" eyebrow="06 · Right hand raised" title="SRSS School Pledge">
       Said aloud each morning, the pledge helps every child name the values they practise, and promise them in their own voice.
     </SectionHero>
-    <section className="ppa-pledge-section"><div className="ppa-wrap ppa-pledge-text">{PLEDGE.map((stanza, index) => <p key={index} className={index === PLEDGE.length - 1 ? "ppa-pledge-final" : ""}>{stanza.map((line) => <span key={line}>{accentLine(line)}</span>)}</p>)}</div></section>
+    <section className="ppa-pledge-section"><div className="ppa-wrap ppa-pledge-text">{PLEDGE.map((stanza, index) => <p key={index} className={index === PLEDGE.length - 1 ? "ppa-pledge-final" : ""}>{stanza.map((line) => <span key={line}>{line}</span>)}</p>)}</div></section>
   </>;
 }
 
@@ -328,7 +320,7 @@ export function PrayerPledgeAnthemPage() {
       <div className="ppa-wrap ppa-page-hero-inner"><p className="eyebrow">Silence · Prayer · Anthem · Pledge</p><h1>Before the<br/><em>First Bell</em></h1><p>Silence. Prayer. Anthem. Pledge. This is how an SRSS morning begins — and why it stays with a child for life. Learn the words, practise them at home and carry their meaning into the day.</p></div>
     </section>
 
-    <section className="ppa-order-section" aria-label="Assembly order"><div className="ppa-wrap ppa-order" role="tablist" aria-label="Choose an assembly practice">{ORDER.map(({ id, label, note, Icon }, index) => <button type="button" role="tab" aria-selected={active === id} aria-controls={`ppa-panel-${id}`} key={id} onClick={() => selectPanel(id)}><span><Icon size={18} /><b>{String(index + 1).padStart(2, "0")}</b></span><strong>{label}</strong><small>{note}</small></button>)}</div></section>
+    <section className="ppa-order-section" aria-label="Assembly order"><div className="ppa-wrap ppa-order" role="tablist" aria-label="Choose an assembly practice">{ORDER.map(({ id, label, note, Icon }, index) => <button type="button" role="tab" aria-selected={active === id} aria-controls={`ppa-panel-${id}`} key={id} onClick={() => selectPanel(id)} className={`ppa-choice-${["peace", "nonviolence", "truth", "conduct", "love", "gold"][index]}`}><span><Icon size={18} /><b>{String(index + 1).padStart(2, "0")}</b></span><strong>{label}</strong><small>{note}</small></button>)}</div></section>
     <div className="ppa-spectrum" aria-hidden="true" />
 
     <div className="ppa-active-panel" id={`ppa-panel-${active}`} role="tabpanel"><ActivePanel /></div>

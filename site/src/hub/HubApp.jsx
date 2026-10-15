@@ -29,7 +29,16 @@ const nilam = () => import("./screens/nilam");
 const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
 const SignIn = lazyNamed(() => import("./SignIn"), "SignIn");
 
+const community = () => import("./screens/community");
 const SCREENS = {
+  requestedForm: lazyNamed(() => import("./screens/requestedForms"), "RequestedForm"),
+  academicRecords: lazyNamed(() => import("./screens/academicRecords"), "AcademicRecords"),
+  familyApplications: lazyNamed(() => import("./screens/applications"), "FamilyApplications"),
+  downloadsManager: lazyNamed(() => import("./screens/downloads"), "DownloadsManager"),
+  onboarding: lazyNamed(() => import("./screens/onboarding"), "Onboarding"), onboardingOffice: lazyNamed(() => import("./screens/onboarding"), "OnboardingOffice"),
+  teacherDevelopment: lazyNamed(() => import("./screens/development"), "TeacherDevelopment"),
+  activityForms: lazyNamed(() => import("./screens/activityForms"), "ActivityForms"),
+  planning: lazyNamed(community, "Planning"), messages: lazyNamed(community, "Messages"), communityReports: lazyNamed(community, "CommunityReports"),
   quest: lazyNamed(quest, "QuestHome"), challenges: lazyNamed(quest, "MyChallenges"), challengePlayer: lazyNamed(quest, "ChallengePlayer"), questBadges: lazyNamed(quest, "QuestBadges"), questJourney: lazyNamed(quest, "QuestJourney"), questLeaderboard: lazyNamed(quest, "QuestLeaderboard"), staffQuest: lazyNamed(quest, "StaffQuest"),
   challengeCms: lazyNamed(questAdmin, "ChallengeCMS"), questReleases: lazyNamed(questAdmin, "ReleaseCalendar"), badgeCms: lazyNamed(questAdmin, "BadgeCMS"), questReview: lazyNamed(questAdmin, "QuestReview"), questSettings: lazyNamed(questAdmin, "EngagementSettings"),
   nilam: lazyNamed(nilam, "Nilam"), parentReading: lazyNamed(nilam, "ParentReading"),
@@ -52,6 +61,8 @@ const SCREENS = {
 };
 
 function routeAllowed(route, auth) {
+  if(route.officeOnly && !auth.roles.some(r=>["superAdmin","schoolAdmin"].includes(r))) return false;
+  if (route.publisherOnlyDevelopment && !auth.roles.some(r => ["leadership", "superAdmin"].includes(r))) return false;
   if (route.editorOnly && !can(auth.roles, "engagement", "C")) return false;
   if (route.publisherOnly && !can(auth.roles, "engagement", "A")) return false;
   if (route.staffOnly && !auth.roles.some((role) => !["parent", "student"].includes(role))) return false;
@@ -88,7 +99,7 @@ function Shell() {
   const nav = [
     { hub: "dashboard", routes: [hubIndex(auth.currentHub)].filter(Boolean) },
     ...groups,
-    ...(auth.currentHub === "student" ? [] : [{ hub: "shared", label: HUB_LABELS.shared, routes: hubRoutes.filter((route) => route.hub === "shared" && !route.hidden && routeAllowed(route, auth)) }]),
+    ...(auth.currentHub === "student" ? [{hub:"shared",label:"My SRSS",routes:hubRoutes.filter(route=>["/hub/welcome","/hub/forms"].includes(route.path)&&routeAllowed(route,auth))}] : [{ hub: "shared", label: HUB_LABELS.shared, routes: hubRoutes.filter((route) => route.hub === "shared" && !route.hidden && routeAllowed(route, auth)) }]),
   ].filter((group) => group.routes.length);
   const switchTo = (hub) => { auth.switchHub(hub); navigate(hubIndex(hub)?.path || "/hub"); };
 

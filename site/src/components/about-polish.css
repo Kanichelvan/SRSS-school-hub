@@ -1,0 +1,128 @@
+/* About: generous editorial spacing, authentic pupils and the SRSS gold foil. */
+.about-refresh .about-hero {
+  background: radial-gradient(ellipse at 84% 65%, #254c77 0, transparent 57%), linear-gradient(115deg, #06162e 12%, #112e53 100%);
+}
+.about-refresh .about-hero-grid {
+  grid-template-columns: 1.05fr 1fr;
+  gap: 36px;
+  min-height: 570px;
+  padding-block: 76px 82px;
+}
+.about-refresh .about-hero h1 {
+  font-size: clamp(46px, 4.5vw, 66px);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+.about-refresh .about-hero h1 em,
+.about-refresh .purpose-title h2 em {
+  color: #efd585;
+  background: var(--gold-foil);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: normal;
+}
+.about-refresh .about-hero .eyebrow { margin: 0 0 24px; }
+.about-refresh .about-hero-grid > div > p:not(.eyebrow) {
+  max-width: 470px;
+  margin-block: 28px 32px;
+  color: #dbe4ef;
+  line-height: 1.85;
+}
+.about-refresh .about-hero-photo {
+  align-self: center;
+  min-width: 0;
+  min-height: 0;
+  margin: 24px -24px 0 -20px;
+}
+.about-refresh .about-hero-photo .hero-photo {
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  filter: drop-shadow(0 18px 20px #020c2250);
+  mask-image: linear-gradient(to bottom, #000 91%, transparent 100%);
+}
+.about-refresh .about-hero-photo:has(.hero-photo)::before { display: none; }
+.about-refresh .purpose-refresh {
+  padding-block: 88px 72px;
+  color: #dbe4ef;
+  background: radial-gradient(ellipse at 0 0, #234b74, transparent 65%), linear-gradient(120deg, #102d50, #06162e);
+  border-block: 1px solid #d2ac4770;
+}
+.about-refresh .purpose-refresh-heading {
+  max-width: none;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 7vw, 110px);
+  align-items: start;
+}
+.about-refresh .purpose-title .eyebrow { color: #efd585; margin: 0 0 26px; }
+.about-refresh .purpose-title h2 { color: #fff; margin: 0; font-size: clamp(36px, 3.5vw, 50px); line-height: 1.2; letter-spacing: -.025em; }
+.about-refresh .purpose-statements { display: grid; gap: 30px; padding-top: 6px; }
+.about-refresh .purpose-statements article { padding-left: 24px; border-left: 2px solid #d2ac47; }
+.about-refresh .purpose-statements h3 { margin: 0 0 10px; color: #efd585; font: 600 11px var(--ui); letter-spacing: .16em; text-transform: uppercase; }
+.about-refresh .purpose-statements p { margin: 0; color: #dbe4ef; font-size: 16px; line-height: 1.8; }
+.about-refresh .mission-pillars { margin: 56px 0 0; border-color: #d5bd7a50; }
+.about-refresh .mission-pillars article { min-height: 0; padding: 28px 24px 0; border-color: #d5bd7a40; }
+.about-refresh .mission-pillars article:first-child { padding-left: 0; }
+.about-refresh .mission-pillars span { color: #efd585; }
+.about-refresh .mission-pillars h3 { color: #fff; margin-top: 20px; font-size: 23px; line-height: 1.3; }
+.about-refresh .mission-pillars p { color: #cbd7e7; font-size: 13px; }
+@media (max-width: 1000px) {
+  .about-refresh .about-hero-grid { gap: 24px; }
+  .about-refresh .about-hero-photo { margin-right: -24px; }
+  .about-refresh .mission-pillars { grid-template-columns: repeat(2, 1fr); gap: 28px 0; }
+  .about-refresh .mission-pillars article:nth-child(odd) { padding-left: 0; border-left: 0; }
+}
+@media (max-width: 900px) {
+  .about-refresh .about-hero-grid, .about-refresh .about-hero-grid:has(.hero-photo) { grid-template-columns: 1fr; gap: 32px; padding-block: 54px 44px; min-height: 0; }
+  .about-refresh .about-hero h1 { font-size: clamp(40px, 7vw, 62px); }
+  .about-refresh .about-hero-grid > div > p:not(.eyebrow) { max-width: 600px; }
+  .about-refresh .about-hero-photo, .about-refresh .about-hero-photo:has(.hero-photo) { width: 100%; max-width: 720px; margin: 0 auto; min-height: 0; }
+  .about-refresh .purpose-refresh-heading { grid-template-columns: 1fr; gap: 36px; }
+  .about-refresh .purpose-refresh { padding-block: 64px; }
+}
+@media (max-width: 540px) {
+  .about-refresh .about-hero h1 { font-size: clamp(35px, 8.2vw, 44px); }
+  .about-refresh .about-hero .eyebrow { font-size: 9px; letter-spacing: .13em; }
+  .about-refresh .purpose-title h2 { font-size: 35px; }
+  .about-refresh .mission-pillars { grid-template-columns: 1fr; margin-top: 40px; gap: 24px; }
+  .about-refresh .mission-pillars article, .about-refresh .mission-pillars article:nth-child(odd) { padding: 24px 0 0; border-left: 0; border-top: 1px solid #d5bd7a40; }
+  .about-refresh .mission-pillars article:first-child { border-top: 0; }
+}
+@media (forced-colors: active) {
+  .about-refresh .about-hero h1 em, .about-refresh .purpose-title h2 em { background: none; -webkit-text-fill-color: currentColor; }
+}
+
+/* About composition: the school behind, pupils grounded at the lower edge. */
+.about-refresh .about-hero { position: relative; isolation: isolate; }
+.about-refresh .about-school-sketch {
+  position: absolute; z-index: -1; right: -4%; bottom: 0;
+  width: 78%; height: 100%; max-width: none;
+  object-fit: contain; object-position: right bottom;
+  opacity: .25; filter: sepia(1) saturate(2.5) hue-rotate(355deg);
+  mix-blend-mode: screen; pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent, #000 30%), linear-gradient(180deg, transparent, #000 15%, #000 92%, transparent);
+  mask-composite: intersect;
+}
+.about-refresh .about-hero-grid { position: relative; min-height: 620px; padding-bottom: 128px; }
+.about-refresh .about-hero-grid > div { position: relative; z-index: 2; }
+.about-refresh .about-hero-photo:has(.hero-photo) {
+  position: absolute; z-index: 1; right: -3%; bottom: -1px;
+  width: 70%; max-width: none; margin: 0;
+}
+.about-refresh .about-hero-photo .hero-photo {
+  display: block; width: 100%; filter: drop-shadow(0 10px 16px #020c2240);
+  mask-image: linear-gradient(90deg, transparent, #000 9%), linear-gradient(180deg, #000 97%, transparent);
+  mask-composite: intersect;
+}
+@media (max-width: 1100px) and (min-width: 901px) {
+  .about-refresh .about-hero-grid { min-height: 630px; }
+  .about-refresh .about-hero-photo:has(.hero-photo) { width: 76%; right: -5%; }
+  .about-refresh .about-school-sketch { width: 86%; opacity: .24; }
+}
+@media (max-width: 900px) {
+  .about-refresh .about-hero-grid, .about-refresh .about-hero-grid:has(.hero-photo) { min-height: 0; padding-block: 54px 0; gap: 24px; }
+  .about-refresh .about-hero-grid > div { padding-bottom: 24px; }
+  .about-refresh .about-hero-photo:has(.hero-photo) { position: relative; right: auto; bottom: auto; width: 110%; max-width: none; margin: 0 -5%; }
+  .about-refresh .about-school-sketch { right: -12%; width: 120%; height: 68%; opacity: .23; }
+}

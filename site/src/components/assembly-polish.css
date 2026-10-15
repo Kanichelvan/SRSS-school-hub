@@ -1,0 +1,338 @@
+/* Vibrant logo petals for controls; gold foil for reading emphasis. */
+.ppa-page {
+  --ppa-reading-foil: linear-gradient(
+    112deg,
+    #daa938 0%,
+    #fff0a1 22%,
+    #dab043 39%,
+    #ffe69a 56%,
+    #c69830 73%,
+    #f7db76 100%
+  );
+}
+.ppa-page-hero h1 em {
+  color: #f3d77d;
+  background: var(--ppa-reading-foil);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ppa-page .ppa-tint-truth,
+.ppa-choice-truth {
+  --ppa-choice: var(--petal-truth);
+}
+.ppa-page .ppa-tint-conduct,
+.ppa-choice-conduct {
+  --ppa-choice: var(--petal-conduct);
+}
+.ppa-page .ppa-tint-peace,
+.ppa-choice-peace {
+  --ppa-choice: var(--petal-peace);
+}
+.ppa-page .ppa-tint-love,
+.ppa-choice-love {
+  --ppa-choice: var(--petal-love);
+}
+.ppa-page .ppa-tint-nonviolence,
+.ppa-choice-nonviolence {
+  --ppa-choice: var(--petal-nonviolence);
+}
+.ppa-choice-gold {
+  --ppa-choice: var(--gold-foil);
+}
+.ppa-page .ppa-order button[aria-selected="true"],
+.ppa-page .ppa-prayer-tabs button[aria-selected="true"] {
+  background: var(--ppa-choice);
+  border-color: #f1d37a;
+  color: white;
+  box-shadow: inset 0 1px 0 #ffffff50;
+}
+.ppa-page .ppa-order button[aria-selected="true"] :is(span, small),
+.ppa-page .ppa-prayer-tabs button[aria-selected="true"] :is(svg, small) {
+  color: inherit;
+}
+.ppa-page .ppa-order button.ppa-choice-gold[aria-selected="true"],
+.ppa-page .ppa-prayer-tabs button.ppa-tint-nonviolence[aria-selected="true"] {
+  color: #07152f;
+}
+.ppa-page .ppa-gloss-tabs button:nth-child(1) {
+  --ppa-choice: var(--petal-conduct);
+}
+.ppa-page .ppa-gloss-tabs button:nth-child(2) {
+  --ppa-choice: var(--petal-nonviolence);
+}
+.ppa-page .ppa-gloss-tabs button:nth-child(3) {
+  --ppa-choice: var(--petal-love);
+}
+.ppa-page .ppa-gloss-tabs button:nth-child(4) {
+  --ppa-choice: var(--petal-peace);
+}
+.ppa-page .ppa-gloss-tabs button[aria-pressed="true"] {
+  color: white;
+  border-color: #f1d37a;
+  background: var(--ppa-choice);
+}
+.ppa-page .ppa-gloss-tabs button:nth-child(2)[aria-pressed="true"] {
+  color: #07152f;
+}
+.ppa-page .ppa-spectrum-rule {
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    #ed1231 0 20%,
+    #075ac5 20% 40%,
+    #7024ba 40% 60%,
+    #00844a 60% 80%,
+    #ff7600 80%
+  );
+}
+.ppa-page .ppa-prayer-text .eyebrow {
+  color: #f3d77d !important;
+}
+.ppa-page .ppa-prayer-tabs button:not([aria-selected="true"]) svg {
+  color: #f3d77d;
+}
+.ppa-rukun-flow-lead {
+  max-width: 950px;
+  margin: 30px 0 24px;
+  color: white;
+  font: 600 clamp(21px, 2.3vw, 27px)/1.65 var(--serif);
+}
+.ppa-rukun-reading .ppa-anthem-verses {
+  border: 0;
+}
+.ppa-rukun-reading .ppa-anthem-verses > article {
+  padding: 10px 0 0;
+  border: 0;
+}
+.ppa-rukun-reading .ppa-rukun-line {
+  position: relative;
+  padding: 13px 0 13px 20px;
+  color: white;
+}
+.ppa-rukun-line::before {
+  content: "";
+  position: absolute;
+  width: 4px;
+  top: 16px;
+  bottom: 16px;
+  left: 0;
+  border-radius: 3px;
+  background: var(--petal);
+}
+.ppa-rukun-line strong {
+  color: white;
+}
+.ppa-rukun-reading .ppa-anthem-heading h3 {
+  color: white;
+}
+.ppa-pledge-d {
+  color: #926712;
+  background: linear-gradient(
+    110deg,
+    #735010,
+    #bf922c,
+    #866018,
+    #bd922f,
+    #765317
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+@media (max-width: 620px) {
+  .ppa-rukun-reading .ppa-anthem-line {
+    gap: 8px;
+  }
+}
+@media print {
+  .ppa-page-hero h1 em,
+  .ppa-prayer-text .ppa-prayer-stanza > span:first-child,
+  .ppa-prayer-word,
+  .ppa-pledge-d {
+    color: #07152f;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+  }
+  .ppa-rukun-flow-lead,
+  .ppa-rukun-line strong,
+  .ppa-rukun-reading .ppa-anthem-heading h3 {
+    color: #07152f;
+  }
+  .ppa-rukun-line::before {
+    background: #735010;
+  }
+}
+.ppa-page .ppa-accent-truth {
+  --ppa-choice: var(--petal-truth);
+}
+.ppa-page .ppa-accent-conduct {
+  --ppa-choice: var(--petal-conduct);
+}
+.ppa-page .ppa-accent-peace {
+  --ppa-choice: var(--petal-peace);
+}
+.ppa-page .ppa-accent-love {
+  --ppa-choice: var(--petal-love);
+}
+.ppa-page .ppa-accent-nonviolence {
+  --ppa-choice: var(--petal-nonviolence);
+}
+.ppa-page .ppa-media-cover {
+  background: var(--ppa-choice);
+}
+.ppa-page .ppa-accent-nonviolence .ppa-media-cover,
+.ppa-page .ppa-accent-nonviolence .ppa-media-text small {
+  color: #07152f;
+}
+.ppa-page .ppa-prayer-tabs button[aria-selected="true"] strong {
+  color: inherit;
+}
+
+/* One reading hierarchy: decoration never interrupts a prayer, lyric or pledge. */
+.ppa-page {
+  --ppa-reading-size: clamp(20px, 1.8vw, 25px);
+  --ppa-reading-leading: 1.8;
+}
+.ppa-prayers-section,
+.ppa-anthem-section,
+.ppa-pledge-section {
+  padding-block: clamp(52px, 7vw, 100px);
+}
+.ppa-prayer-reader {
+  align-items: start;
+  gap: clamp(32px, 5vw, 80px);
+}
+.ppa-prayer-text {
+  max-width: 800px;
+  padding: 0;
+}
+.ppa-prayer-text h3,
+.ppa-anthem-heading h3 {
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.ppa-page .ppa-prayer-stanza {
+  margin: 0 0 1.65em;
+  font: 500 var(--ppa-reading-size)/var(--ppa-reading-leading) var(--serif);
+  color: #f7f5ef;
+}
+.ppa-page .ppa-prayer-stanza > span {
+  display: block;
+  color: inherit;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+.ppa-page .ppa-prayer-stanza:last-child {
+  margin-bottom: 0;
+}
+.ppa-page .ppa-spectrum-rule {
+  width: 92px;
+  height: 3px;
+  margin-block: 26px 36px;
+  border-radius: 0;
+}
+.ppa-page .ppa-prayer-text .eyebrow,
+.ppa-page .ppa-anthem-heading .eyebrow {
+  color: #f0d183 !important;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+.ppa-page .ppa-anthem-section > .ppa-wrap {
+  max-width: 1050px;
+}
+.ppa-page .ppa-anthem-verses {
+  border-color: #ffffff26;
+}
+.ppa-page .ppa-anthem-verses > article {
+  padding-block: 30px;
+  border-color: #ffffff20;
+}
+.ppa-page .ppa-anthem-line strong,
+.ppa-page .ppa-anthem-verses:not(.has-gloss) .ppa-anthem-line strong {
+  font: 500 var(--ppa-reading-size)/var(--ppa-reading-leading) var(--serif);
+  color: #f7f5ef;
+}
+.ppa-page .ppa-anthem-line p {
+  color: #c6d1df;
+  font: 400 15px/1.8 var(--body);
+}
+.ppa-page .ppa-anthem-line {
+  column-gap: 48px;
+  padding-block: 3px;
+}
+.ppa-page .ppa-rukun-flow-lead {
+  color: #f7f5ef;
+  font: 500 var(--ppa-reading-size)/var(--ppa-reading-leading) var(--serif);
+}
+.ppa-page .ppa-rukun-line {
+  padding: 10px 0 10px 20px;
+}
+.ppa-page .ppa-rukun-line::before {
+  width: 3px;
+}
+.ppa-page .ppa-pledge-text {
+  max-width: 850px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+.ppa-page .ppa-pledge-text p,
+.ppa-page .ppa-pledge-text p:first-child,
+.ppa-page .ppa-pledge-text .ppa-pledge-final {
+  color: var(--navy-950);
+  font: 500 var(--ppa-reading-size)/var(--ppa-reading-leading) var(--serif);
+}
+.ppa-page .ppa-pledge-final {
+  border-top: 1px solid #b9913e70;
+  padding-top: 32px;
+}
+.ppa-page .ppa-pledge-text .ppa-pledge-final span:last-child {
+  color: inherit;
+}
+.ppa-page .ppa-lyrics-layout article p,
+.ppa-page .ppa-lyrics-layout article p.lead {
+  font: 500 var(--ppa-reading-size)/var(--ppa-reading-leading) var(--serif);
+}
+.ppa-page :is(button, a):focus-visible {
+  outline: 3px solid #e6bd52;
+  outline-offset: 5px;
+}
+@media (max-width: 700px) {
+  .ppa-page .ppa-anthem-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .ppa-page .ppa-anthem-line {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+  .ppa-page .ppa-prayer-reader {
+    gap: 34px;
+  }
+  .ppa-page .ppa-prayer-tabs {
+    gap: 8px;
+  }
+  .ppa-page .ppa-prayer-tabs button {
+    min-width: 0;
+    padding: 14px 10px;
+  }
+}
+@media print {
+  .ppa-page .ppa-prayer-stanza,
+  .ppa-page .ppa-prayer-stanza > span,
+  .ppa-page .ppa-anthem-line strong,
+  .ppa-page .ppa-anthem-line p,
+  .ppa-page .ppa-rukun-flow-lead {
+    color: #07152f;
+  }
+  .ppa-page .ppa-pledge-text {
+    gap: 15px;
+  }
+}
+.ppa-page .ppa-prayer-text .ppa-prayer-stanza > span:first-child {
+  color: inherit;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}

@@ -64,7 +64,8 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/about/vision-mission` | Vision & Mission | Section of `/about#vision-mission` | Leadership |
 | `/about/sathya-sai-education` | Sathya Sai Education | Own page | Leadership |
 | `/about/leadership-governance` | Leadership & Governance | Own page | Leadership |
-| `/about/our-people` | Our People | Own page | Leadership |
+| `/about/our-people` | Our People: Board, school team, PTA | Own page | Leadership |
+| `/about/voices` | Community Voices | Own page | Leadership |
 | `/about/school-profile` | School Profile | Section of `/about#school-profile` | School office |
 | `/about/campus` | Campus | Section of `/about#campus` | School office |
 | `/about/silver-jubilee` | Silver Jubilee | Own page | Content editor |
@@ -110,7 +111,7 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 
 The secure hub uses `/login` (with `/sign-in` kept as an alias) and `/hub/student`, `/hub/parent`, `/hub/teacher` and `/hub/admin`; see the next section. Legal pages are `/legal`, `/legal/privacy`, `/legal/terms`, `/legal/cookies`, `/legal/acceptable-use`, `/legal/child-safeguarding` and the other policies in `src/legal/registry.js`.
 
-**Redirects:** old addresses redirect permanently to their canonical URL, in the browser and as 301s in `firebase.json`: `/about/voices`, `/about/inspiration`, `/about/governance`, `/faq`, `/admissions`, `/news`, `/contact`, the four renamed legal pages and `/sign-in`. `tests/siteMap.test.mjs` checks that every menu link and redirect resolves.
+**Redirects:** old addresses redirect permanently to their canonical URL, in the browser and as 301s in `firebase.json`: `/about/inspiration`, `/about/governance`, `/faq`, `/admissions`, `/news`, `/contact`, the four renamed legal pages and `/sign-in`. `tests/siteMap.test.mjs` checks that every menu link and redirect resolves.
 
 ### URL rules
 
@@ -150,7 +151,8 @@ The welcome names the school, not the platform: the Digital Hub is the platform,
 | Learning spaces | `/about/campus` and `/learning/learning-environment` | One shared component |
 | Sathya Sai Baba and SSIOM page (`/about/inspiration`) | `/about/sathya-sai-education` | Redirected. Its duplicated governance chart was removed. |
 | Organisation chart (was on two pages) | `/about/leadership-governance` | One copy, with SSIOM, Sekolah Rendah Sathya Berhad and escalation |
-| Voices: Principal, teachers, alumni (`/about/voices`) | `/about/our-people` | Redirected |
+| Community voices: educators, alumni, former parents, volunteers | `/about/voices` | Own page |
+| Principal’s welcome | `/about#principal-welcome` | About section with full-address disclosure |
 | FAQ page (`/faq`) | `/resources/faq` | Redirected. Topic subsets appear on Learning, Admissions, About and Student Life. |
 | Stories & Happenings, calendar | `/resources/news`, `/resources/calendar`, `/student-life/stories`, `/student-life/events` | One feed, shown in each place |
 | Admissions pathway and forms | `/join/admissions` | Moved. The homepage keeps a short invitation. |

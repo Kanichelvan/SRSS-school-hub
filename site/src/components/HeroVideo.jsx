@@ -72,7 +72,6 @@ export default function HeroVideo({ clip, className = '', priority = false, auto
       onLoadedMetadata={() => { video.current.playbackRate = playbackRate; }}
       onLoadedData={() => setHasFrame(true)} onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)}
       onError={() => { setFailed(true); setPlaying(false); }} />
-    <span className="hero-video-caption">Illustrative school scene</span>
     {!failed && <button type="button" className="hero-video-control" onClick={toggle} aria-label={playing ? 'Pause background video' : 'Play background video'} aria-pressed={playing}>
       {playing ? <Pause size={15} weight="fill" aria-hidden="true" /> : <Play size={15} weight="fill" aria-hidden="true" />}
       <span>{playing ? 'Pause' : 'Play'}</span>

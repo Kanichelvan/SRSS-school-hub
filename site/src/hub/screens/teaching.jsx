@@ -1,12 +1,15 @@
 // Teacher hub: My classes → class dashboard → roster, plus portfolio entries, class notices and class
 // events. Everything a teacher sees comes from their active assignments for the current academic year
 // (users/{uid}.classIds and assignmentKeys, derived on the server); firestore.rules checks the same scope.
+import { useState } from "react";
+import { BulkPortfolio } from "../BulkPortfolio";
 import { Link, useParams } from "react-router-dom";
 import { where } from "firebase/firestore";
 import { useAuth } from "../../auth/AuthProvider";
 import { announcementsFor, configList, currentYearId, daysAgo, getMany, list, listIn, today, useLoad } from "../data";
 import { HUMAN_VALUES, attendanceByClass, attendanceSummary } from "../logic/dashboard";
 import { EVENT_CATEGORIES, linksError, linksText, parseLinks } from "../audience";
+import { AttachEvidence } from "../PortfolioEvidence";
 import { PORTFOLIO_CATEGORIES, TEACHER_VISIBILITY, VISIBILITY, categoryLabel, humanValuesOf, moderationFor, showcaseConsent } from "../portfolio";
 import { RecordManager } from "../manage";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, formatDate } from "../ui";
@@ -87,6 +90,7 @@ export function ClassDashboard() {
       <StatCard label="Pupils" value={pupils.length} to={`/hub/teacher/classes/${classId}/roster`} detail="View roster" />
       <StatCard label="Attendance today" value={state === "submitted" ? "Submitted" : state === "open" ? "In progress" : "Not taken"} tone={state === "submitted" ? "good" : "warn"} to={`/hub/teacher/attendance/${classId}`} />
       <StatCard label="Attendance (30 days)" value={summary.rate != null ? `${summary.rate}%` : "—"} detail={`${summary.counts.absent} absences · ${summary.counts.late} late`} />
+      <StatCard label="Weekly plans" value="Open" to={`/hub/teacher/teaching?class=${classId}`} />
       <StatCard label="Portfolio entries" value={data.entries.length} to={`/hub/teacher/portfolios?class=${classId}`} />
     </div>
     <div className="hub-grid-2">
@@ -153,11 +157,14 @@ async function portfolioLookups(auth) {
 
 export function TeacherPortfolio() {
   const auth = useAuth();
+  const [bulk,setBulk]=useState(false);
   const params = new URLSearchParams(window.location.search);
   const startClass = params.get("class");
   const pupilName = (lookups, id) => lookups.students?.find((student) => student.id === id)?.name || "Pupil";
   return <RecordManager kicker="Teaching" title="Portfolio entries" noun="portfolio entry" collection="portfolioEntries" nameOf={(row) => row.title}
     canEdit={(auth.scope?.classIds || []).length > 0}
+    headerActions={()=><button className="hub-button hub-button-quiet" onClick={()=>setBulk(!bulk)}>Class activity entries</button>}
+    banner={({lookups,reload})=>bulk && lookups.classes && <BulkPortfolio lookups={lookups} onSaved={reload}/>}
     intro="Record a pupil's work and growth. Parent-visible entries appear in the family's My SRSS Journey; nominate outstanding work as a showcase candidate — it reaches the public website only after a moderator approves it and the family has given consent."
     load={() => listIn("portfolioEntries", "classId", auth.scope?.classIds || [])}
     lookups={() => portfolioLookups(auth)}
@@ -180,6 +187,7 @@ export function TeacherPortfolio() {
     defaults={(lookups) => ({ classId: startClass && lookups.classes.some((cls) => cls.id === startClass) ? startClass : lookups.classes[0]?.id, date: today(), category: "academic", visibility: "family", humanValues: [], achievementTags: [] })}
     toDraft={(row) => ({ humanValues: humanValuesOf(row), mediaText: linksText(row.mediaReferences || (row.evidenceUrl ? [{ label: "Evidence", url: row.evidenceUrl }] : [])) })}
     editable={(row) => row.visibility !== "publicShowcase"}
+    rowActions={(row, {reload}) => row.visibility !== "publicShowcase" && row.status !== "archived" ? <AttachEvidence entry={row} onSaved={reload} /> : null}
     validate={(values) => ({ mediaText: linksError(values.mediaText), visibility: values.visibility === "publicShowcase" ? "Only a moderator can publish to the public showcase." : null })}
     prepare={(values, { isNew, original, lookups }) => {
       const { mediaText, ...rest } = values;
