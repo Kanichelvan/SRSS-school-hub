@@ -33,11 +33,6 @@
     ],
     "redirects": [
       {
-        "source": "/about/voices",
-        "destination": "/about/our-people",
-        "type": 301
-      },
-      {
         "source": "/about/inspiration",
         "destination": "/about/sathya-sai-education",
         "type": 301

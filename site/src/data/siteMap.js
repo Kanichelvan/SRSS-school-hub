@@ -17,7 +17,8 @@ export const SITE = [
   { path: "/about/vision-mission", label: "Vision & Mission", parent: "/about", page: "about", anchor: "vision-mission", status: "section", owner: "Leadership", summary: "Our purpose, our promise and the four mission pillars." },
   { path: "/about/sathya-sai-education", label: "Sathya Sai Education", parent: "/about", page: "sathyaSai", status: "page", owner: "Leadership", summary: "The philosophy of Sathya Sai Educare and the five human values." },
   { path: "/about/leadership-governance", label: "Leadership & Governance", parent: "/about", page: "governance", status: "page", owner: "Leadership", summary: "How the school is governed and led, and its relationship with SSIOM." },
-  { path: "/about/our-people", label: "Our People", parent: "/about", page: "ourPeople", status: "page", editable: "append", owner: "Leadership", summary: "The Principal’s welcome and the voices of our teachers and alumni." },
+  { path: "/about/our-people", label: "Our People", parent: "/about", page: "ourPeople", status: "page", editable: "append", owner: "Leadership", summary: "Our Board, school administration, teachers, support staff, volunteers and PTA." },
+  { path: "/about/voices", label: "Community Voices", parent: "/about", page: "voices", status: "page", editable: "append", owner: "Leadership", summary: "Reflections from educators, alumni, former parents and volunteers." },
   { path: "/about/school-profile", label: "School Profile", parent: "/about", page: "about", anchor: "school-profile", status: "section", editable: true, owner: "School office", summary: "Key facts: registration, levels, curriculum, hours and location." },
   { path: "/about/campus", label: "Campus", parent: "/about", page: "about", anchor: "campus", status: "section", editable: true, owner: "School office", summary: "The spaces where children learn, play and grow." },
   { path: "/about/silver-jubilee", label: "Silver Jubilee", parent: "/about", page: "jubilee", status: "page", owner: "Content editor", summary: "SRSS25 — 25 years of education for life." },
@@ -102,7 +103,6 @@ export function pageContent(content) {
 
 // Old addresses → canonical ones. Also mirrored as permanent (301) redirects in firebase.json.
 export const REDIRECTS = {
-  "/about/voices": "/about/our-people",
   "/about/inspiration": "/about/sathya-sai-education",
   "/about/governance": "/about/leadership-governance",
   "/faq": "/resources/faq",

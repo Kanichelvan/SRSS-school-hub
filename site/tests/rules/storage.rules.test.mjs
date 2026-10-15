@@ -45,3 +45,27 @@ describe("Website image library storage", () => {
     await assertSucceeds(getBytes(ref(env.unauthenticatedContext().storage(), "media/public/g")));
   });
 });
+
+describe('Entry-bound private portfolio evidence',()=>{
+ test('visibility withdrawal protects bytes immediately, and teachers cannot spoof another class',async()=>{
+  await env.withSecurityRulesDisabled(async c=>{
+   await setDoc(doc(c.firestore(),'users/teacher'),{classIds:['c4']});
+   await setDoc(doc(c.firestore(),'users/parent'),{childIds:['s1']});
+   await setDoc(doc(c.firestore(),'portfolioEntries/e1'),{studentId:'s1',classId:'c4',visibility:'family',status:'active'});
+   await setDoc(doc(c.firestore(),'portfolioEntries/e2'),{studentId:'s2',classId:'c5',visibility:'internal',status:'active'});
+  });
+  await assertSucceeds(uploadBytes(ref(as('teacher',['teacher']),'portfolioEvidence/e1/photo'),bytes(32),{contentType:'image/jpeg'}));
+  await assertSucceeds(getBytes(ref(as('parent',['parent']),'portfolioEvidence/e1/photo')));
+  await assertFails(getBytes(ref(env.unauthenticatedContext().storage(),'portfolioEvidence/e1/photo')));
+  await assertFails(uploadBytes(ref(as('teacher',['teacher']),'portfolioEvidence/e2/photo'),bytes(32),{contentType:'image/jpeg',customMetadata:{classId:'c4'}}));
+  await env.withSecurityRulesDisabled(c=>setDoc(doc(c.firestore(),'portfolioEntries/e1'),{studentId:'s1',classId:'c4',visibility:'internal',status:'active'}));
+  await assertFails(getBytes(ref(as('parent',['parent']),'portfolioEvidence/e1/photo')));
+  await assertSucceeds(getBytes(ref(as('teacher',['teacher']),'portfolioEvidence/e1/photo')));
+ });
+ test('evidence type and entry existence are enforced',async()=>{
+  await env.withSecurityRulesDisabled(async c=>{await setDoc(doc(c.firestore(),'users/teacher'),{classIds:['c4']});await setDoc(doc(c.firestore(),'portfolioEntries/e1'),{studentId:'s1',classId:'c4',visibility:'family'});});
+  await assertSucceeds(uploadBytes(ref(as('teacher',['teacher']),'portfolioEvidence/e1/clip'),bytes(32),{contentType:'video/mp4'}));
+  await assertFails(uploadBytes(ref(as('teacher',['teacher']),'portfolioEvidence/e1/script'),bytes(32),{contentType:'text/html'}));
+  await assertFails(uploadBytes(ref(as('teacher',['teacher']),'portfolioEvidence/missing/photo'),bytes(32),{contentType:'image/jpeg'}));
+ });
+});

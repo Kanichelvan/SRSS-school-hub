@@ -19,7 +19,6 @@
 .home-jubilee-film .hero-video { width: 100%; height: 100%; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; background: #0d203d; }
 .home-jubilee-film .hero-video::after { content: ''; position: absolute; z-index: 1; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent 28%, #0d203de8 55%, #0d203d 76%), linear-gradient(180deg, #0d203d 0%, transparent 18%, transparent 70%, #0d203d 100%); }
 .home-jubilee-film .hero-video-control { left: var(--home-pad); right: auto; bottom: 50px; }
-.home-jubilee-film .hero-video-caption { left: var(--home-pad); bottom: 23px; }
 .home-jubilee .home-jubilee-copy { position: relative; z-index: 2; width: 44%; max-width: 540px; margin-left: auto; }
 .home-jubilee-motto { margin: 16px 0 0; color: var(--gold-500); font: 600 15px/1.5 var(--serif); }
 .home-jubilee .home-jubilee-brand { width: 68px; height: 68px; margin: 4px 0 8px; object-fit: contain; }

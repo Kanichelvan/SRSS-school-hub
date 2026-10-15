@@ -50,6 +50,20 @@ service firebase.storage {
         && request.resource.contentType.matches('application/pdf|image/(jpeg|png|webp)');
     }
 
+    // New evidence is bound to a real entry, so withdrawing family visibility immediately protects bytes.
+    match /portfolioEvidence/{entryId}/{fileName} {
+      function entry() { return firestore.get(/databases/(default)/documents/portfolioEntries/$(entryId)).data; }
+      function teacher() { return roles().hasAny(['teacher','classTeacher','specialistTeacher'])
+        && (entry().classId in me().get('classIds',[]) || entry().studentId in me().get('assignedStudentIds',[])); }
+      function family() { return (('student' in roles() && me().get('studentId','') == entry().studentId)
+        || ('parent' in roles() && entry().studentId in me().get('childIds',[])))
+        && entry().visibility in ['family','showcaseCandidate','publicShowcase'] && entry().get('status','active') != 'archived'; }
+      allow read: if signedIn() && (family() || teacher() || roles().hasAny(['superAdmin','schoolAdmin','academicCoordinator','leadership'])
+        || ('portfolioModerator' in roles() && entry().visibility in ['showcaseCandidate','publicShowcase']));
+      allow create: if signedIn() && teacher() && entry().visibility != 'publicShowcase' && entry().get('status','active') != 'archived'
+        && sizeUnder(15) && request.resource.contentType.matches('application/pdf|image/(jpeg|png|webp)|audio/(mpeg|mp4|wav|x-wav)|video/mp4');
+    }
+
     match /portfolio/{studentId}/{fileName} {
       function teaches() { return roles().hasAny(['teacher', 'classTeacher', 'specialistTeacher']) && (studentId in me().get('assignedStudentIds', []) || request.resource.metadata.get('classId', '') in me().get('classIds', [])); }
       function family() { return ('student' in roles() && me().get('studentId', '') == studentId) || ('parent' in roles() && studentId in me().get('childIds', [])); }

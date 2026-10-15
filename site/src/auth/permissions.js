@@ -83,6 +83,8 @@ export const MODULES = {
   incidents: { label: "Incidents & behaviour", phase: 2 },
   meetings: { label: "Parent–teacher meetings", phase: 2 },
   fees: { label: "Fees-lite", phase: 2 },
+  familyAdmissions: {label:"Family admissions applications",phase:1},
+  teacherDevelopment: { label: "Teacher development", phase: 1 },
   staffHR: { label: "Staff HR (leave, training, appraisal)", phase: 2 },
   assets: { label: "Assets", phase: 3 },
   library: { label: "Library & Resource Centre", phase: 3 },
@@ -165,6 +167,8 @@ const MATRIX = {
   meetings: { parent: "C/U own", teacher: "C/U own", classTeacher: "C/U own", specialistTeacher: "C/U own", schoolAdmin: "U", leadership: "V" },
   // PRD §17/§33: financial permissions are separated from ordinary teacher access.
   fees: { parent: "V child", financeOfficer: "U", schoolAdmin: "V", leadership: "V", auditor: "V" },
+  familyAdmissions: {parent:"C/U own"},
+  teacherDevelopment: { teacher: "C/U own", classTeacher: "C/U own", specialistTeacher: "C/U own", leadership: "A", superAdmin: "A" },
   staffHR: { schoolAdmin: "U", leadership: "A" },
   assets: { schoolAdmin: "U", technicalAdmin: "U", leadership: "V" },
   library: { librarian: "U", student: "V own", parent: "V child", teacher: "V own", classTeacher: "V own" },

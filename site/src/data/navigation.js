@@ -10,7 +10,7 @@ export const siteNav = [
     groups: [
       { title: "Our School", links: [["Our Story", "/about/our-story"], ["School Profile", "/about/school-profile"], ["Campus", "/about/campus"]] },
       { title: "Our Philosophy", links: [["Vision & Mission", "/about/vision-mission"], ["Sathya Sai Education", "/about/sathya-sai-education"]] },
-      { title: "Our Community", links: [["Leadership & Governance", "/about/leadership-governance"], ["Our People", "/about/our-people"]] },
+      { title: "Our Community", links: [["Leadership & Governance", "/about/leadership-governance"], ["Our People", "/about/our-people"], ["Community Voices", "/about/voices"]] },
       { title: "Our Legacy", links: [["Silver Jubilee", "/about/silver-jubilee"]] },
     ],
   },

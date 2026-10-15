@@ -45,6 +45,6 @@ export default function SchoolMoments({ extra = [] }) {
 export function EducationQuote() {
   return <section className="education-quote" id="education-for-life" aria-label="Words from Sathya Sai Baba"><div className="education-quote-inner">
     <img src="/assets/photos/processed/2026-10-15-sathya-sai-orange-illustration-724.webp" srcSet="/assets/photos/processed/2026-10-15-sathya-sai-orange-illustration-480.webp 480w, /assets/photos/processed/2026-10-15-sathya-sai-orange-illustration-724.webp 724w" sizes="(max-width: 600px) 150px, 320px" width="724" height="1086" alt="Illustration of Sathya Sai Baba in an orange robe" loading="lazy" />
-    <div><span className="education-quote-mark" aria-hidden="true">“</span><blockquote>Education for life,<br />not mere living.</blockquote><p className="education-quote-source">Sathya Sai Baba</p><a className="text-link" href="/about/our-people#principal">Read our Principal’s welcome</a></div>
+    <div><span className="education-quote-mark" aria-hidden="true">“</span><blockquote>Education for life,<br />not mere living.</blockquote><p className="education-quote-source">Sathya Sai Baba</p><a className="text-link" href="/about#principal-welcome">Read our Principal’s welcome</a></div>
   </div></section>;
 }

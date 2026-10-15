@@ -325,23 +325,35 @@ service cloud.firestore {
     match /studentResults/{id} {
       allow read: if staffCanSee(resource.data.studentId, resource.data.classId)
         || (familyCanSee(resource.data.studentId) && resource.data.status in ['published', 'locked']);
-      allow create: if teacherCanWrite(data().studentId, data().classId) && data().status in ['draft', 'submitted'] && createdByMe();
-      allow update: if (teacherCanWrite(resource.data.studentId, resource.data.classId) && resource.data.status in ['draft', 'submitted'] && data().status in ['draft', 'submitted'])
-        || (hasRole('academicCoordinator') && resource.data.status in ['submitted', 'reviewed', 'approved'] && data().status in ['submitted', 'reviewed', 'approved', 'published'])
-        || isLeader();
+      allow create: if teacherCanWrite(data().studentId, data().classId) && studentIsInClass(data().studentId,data().classId) && subjectAllowed(data().studentId,data().classId) && data().status in ['draft', 'submitted'] && createdByMe();
+      allow update: if unchanged(['studentId','classId','subjectId','termId','createdBy','createdAt']) && ((teacherCanWrite(resource.data.studentId, resource.data.classId) && subjectAllowed(resource.data.studentId,resource.data.classId) && resource.data.status in ['draft', 'submitted'] && data().status in ['draft', 'submitted'])
+        || (hasRole('academicCoordinator') && resource.data.status in ['submitted', 'reviewed', 'approved'] && data().status in ['submitted', 'reviewed', 'approved', 'published']) || isLeader());
     }
     // Teacher Entry → Review → Academic Approval → Headmistress Approval → Publish (srss §10).
     match /reportCards/{id} {
       allow read: if staffCanSee(resource.data.studentId, resource.data.classId)
         || (familyCanSee(resource.data.studentId) && resource.data.status in ['published', 'locked']);
-      allow create, update: if (teacherCanWrite(data().studentId, data().classId) && data().status in ['draft', 'submitted'])
-        || (hasRole('academicCoordinator') && data().status in ['submitted', 'reviewed', 'academicApproved'])
-        || isLeader();
+      allow create: if createdByMe() && studentIsInClass(data().studentId,data().classId) && ((teacherCanWrite(data().studentId,data().classId) && data().status in ['draft','submitted']) || isLeader());
+      allow update: if unchanged(['studentId','classId','termId','createdBy','createdAt'])
+        && ((teacherCanWrite(resource.data.studentId,resource.data.classId) && resource.data.status in ['draft','submitted'] && data().status in ['draft','submitted'])
+          || (hasRole('academicCoordinator') && resource.data.status in ['submitted','reviewed','academicApproved'] && data().status in ['submitted','reviewed','academicApproved']) || isLeader());
     }
 
     // ===================== LEARNING (phase 2) =====================
-    match /curriculumPlans/{id} { allow read: if isStaff(); allow create, update: if hasRole('academicCoordinator') || (teaching() && data().ownerUid == uid()); }
-    match /lessonPlans/{id} { allow read: if isStaff(); allow create, update: if teaching() && data().ownerUid == uid(); }
+    function validPlan() {
+      return text('title',140) && isoDate('weekOf') && text('syllabus',4000) && text('learning',4000)
+        && inClassScope(data().classId) && (inHomeroom(data().classId) || (data().classId + ':' + data().subjectId) in me().get('assignmentKeys',[]));
+    }
+    match /curriculumPlans/{id} {
+      allow read: if isStaff();
+      allow create: if teaching() && data().ownerUid == uid() && newStamped() && validPlan();
+      allow update: if teaching() && resource.data.ownerUid == uid() && unchanged(['ownerUid','classId','subjectId']) && keepsHistory() && stamped() && validPlan();
+    }
+    match /lessonPlans/{id} {
+      allow read: if isStaff();
+      allow create: if teaching() && data().ownerUid == uid() && newStamped() && validPlan();
+      allow update: if teaching() && resource.data.ownerUid == uid() && unchanged(['ownerUid','classId','subjectId']) && keepsHistory() && stamped() && validPlan();
+    }
     match /learningTasks/{id} {
       allow read: if isStaff() || resource.data.classId in me().get('familyClassIds', []);
       allow create, update: if teaching() && inClassScope(data().classId);
@@ -364,6 +376,7 @@ service cloud.firestore {
       return text('title', 140) && optionalText('description', 4000)
         && data().get('humanValues', []) is list && data().get('humanValues', []).hasOnly(fiveValues())
         && data().get('achievementTags', []) is list && data().get('achievementTags', []).size() <= 10
+        && data().get('mediaFiles', []) is list && data().get('mediaFiles', []).size() <= 10
         && data().get('mediaReferences', []) is list && data().get('mediaReferences', []).size() <= 10
         && data().get('moderationStatus', null) in [null, 'pending', 'approved', 'returned']
         && (data().get('moderationStatus', null) != 'approved' || hasAny(['portfolioModerator', 'leadership', 'superAdmin']));
@@ -435,12 +448,16 @@ service cloud.firestore {
     }
     match /messageThreads/{threadId} {
       allow read: if signedIn() && uid() in resource.data.participantUids;
-      allow create: if (isStaff() || hasRole('parent')) && createdByMe() && uid() in data().participantUids;
+      function target() { return get(/databases/$(database)/documents/users/$(data().participantUids[1])).data; }
+      function staffTarget() { return target().get('roles',[]).hasAny(['teacher','classTeacher','specialistTeacher','schoolAdmin','superAdmin','leadership','safeguardingLead','privacySteward','contentEditor','academicCoordinator','admissionsOfficer','attendanceManager']); }
+      allow create: if (isStaff() || hasRole('parent')) && createdByMe() && data().participantUids is list && data().participantUids.size() == 2
+        && data().participantUids[0] == uid() && data().participantUids[1] != uid() && text('subject',140) && data().createdAt == request.time
+        && (staffTarget() || ((isAdmin() || isLeader() || (teaching() && target().get('familyClassIds',[]).hasAny(me().get('classIds',[])))) && target().get('roles',[]).hasAny(['parent'])));
       allow update: if signedIn() && uid() in resource.data.participantUids && onlyChanges(['lastMessageAt', 'lastMessagePreview', 'updatedAt']);
       match /messageItems/{itemId} {
         function thread() { return get(/databases/$(database)/documents/messageThreads/$(threadId)).data; }
         allow read: if signedIn() && uid() in thread().participantUids;
-        allow create: if signedIn() && uid() in thread().participantUids && data().senderUid == uid();
+        allow create: if signedIn() && uid() in thread().participantUids && data().senderUid == uid() && text('body',5000) && data().createdAt == request.time && data().keys().hasOnly(['senderUid','body','createdAt']);
       }
     }
 
@@ -473,6 +490,54 @@ service cloud.firestore {
       allow update: if signedIn() && uid() in resource.data.participantUids && unchanged(['participantUids', 'studentId']);
     }
 
+    // Registered-user welcome packs contain progress only; consent is kept in the governed records.
+    match /onboardingProgress/{id} {
+      allow read: if signedIn() && (id in [uid() + '_parent',uid() + '_student',uid() + '_teacher',uid() + '_staff'] || resource.data.ownerUid == uid() || isAdmin() || isLeader());
+      allow create, update: if signedIn() && data().ownerUid == uid()
+        && id == uid() + '_' + data().role
+        && data().keys().hasOnly(['ownerUid', 'role', 'version', 'completed', 'checkInDate', 'updatedAt'])
+        && data().version == 1 && data().completed is list && data().completed.size() <= 8
+        && data().checkInDate is string && data().checkInDate.size() <= 10 && data().updatedAt == request.time
+        && ((data().role == 'student' && hasRole('student')) || (data().role == 'parent' && hasRole('parent'))
+          || (data().role == 'teacher' && teaching()) || (data().role == 'staff' && isStaff()));
+    }
+    match /familyPreferences/{id} {
+      allow read: if signedIn() && (id == uid() || isAdmin() || isLeader() || hasRole('privacySteward'));
+      allow create, update: if hasRole('parent') && id == uid() && data().ownerUid == uid()
+        && data().keys().hasOnly(['ownerUid', 'needs', 'language', 'contact', 'voice', 'allowContact', 'updatedAt'])
+        && data().needs is list && data().needs.hasOnly(['announcements', 'forms', 'calendar', 'teacherUpdates'])
+        && optionalText('language', 200) && optionalText('voice', 2000)
+        && data().contact in ['hub', 'email', 'phone'] && data().allowContact is bool && data().updatedAt == request.time;
+    }
+    match /announcementReads/{id} {
+      allow read: if signedIn() && (resource.data.ownerUid == uid() || hasAny(['schoolAdmin','superAdmin','leadership','academicCoordinator','auditor']));
+      function readableNotice() { let n = get(/databases/$(database)/documents/announcements/$(data().announcementId)).data;
+        return n.status == 'published' && n.audienceKeys.hasAny(me().get('audienceKeys', [])); }
+      allow create: if signedIn() && data().ownerUid == uid() && id == uid() + '_' + data().announcementId
+        && data().keys().hasOnly(['ownerUid','announcementId','readAt']) && data().readAt == request.time && readableNotice();
+    }
+    // Submitted activity forms are append-only. Medical and incident details are never in a shared class feed.
+    match /activityForms/{id} {
+      allow read: if signedIn() && (resource.data.ownerUid == uid() || isAdmin() || isLeader() || hasRole('privacySteward'));
+      function validForm() {
+        return data().keys().hasOnly(['ownerUid','formId','title','version','status','createdAt','studentId','classId','studentName',
+          'activity','date','venue','staffLead','escalation','parentContact','signature','participation','medical','collection','mediaChoice',
+          'emergencyName','emergencyPhone','supervision','attendance','incident','reflection','volunteer'])
+          && data().ownerUid == uid() && data().version == 1 && data().status == 'submitted' && data().createdAt == request.time
+          && text('title',140) && text('activity',250) && isoDate('date') && text('signature',250)
+          && optionalText('venue',250) && optionalText('staffLead',250) && optionalText('escalation',250) && optionalText('parentContact',250)
+          && optionalText('medical',4000) && optionalText('collection',250) && optionalText('emergencyName',250) && optionalText('emergencyPhone',250)
+          && optionalText('supervision',4000) && optionalText('attendance',4000) && optionalText('incident',4000) && optionalText('reflection',4000) && optionalText('volunteer',4000)
+          && data().get('participation','No') in ['Yes','No'] && data().get('mediaChoice','No') in ['Yes','No'];
+      }
+      allow create: if signedIn() && validForm()
+        && ((isStaff() && data().formId in ['registration','permission','medical','media','emergency','supervision','attendance','incident','reflection','volunteer'])
+          || (hasRole('parent') && data().formId in ['registration','permission','medical','media','emergency','volunteer']))
+        && ((data().studentId == null && (isStaff() || data().formId == 'volunteer'))
+          || (data().studentId is string && studentIsInClass(data().studentId,data().classId)
+            && (isGuardianOf(data().studentId) || teacherCanWrite(data().studentId,data().classId) || isAdmin())));
+    }
+
     // ===================== FORMS & CONSENT (DASH-001, CON-001) =====================
     match /formDefinitions/{id} {
       allow read: if (signedIn() && resource.data.status == 'published' && audienceMatches()) || hasAny(['schoolAdmin', 'privacySteward', 'leadership', 'superAdmin']);
@@ -487,7 +552,8 @@ service cloud.firestore {
         || ((isAdmin() || hasRole('privacySteward') || teaching()) && data().status == 'pending' && createdByMe());
       allow update: if unchanged(['formId', 'studentId', 'requestedFromUid', 'createdBy'])
         && ((signedIn() && uid() in [resource.data.get('requestedFromUid', ''), resource.data.get('submittedByUid', '')]
-             && resource.data.status in ['pending', 'draft'] && data().status in ['draft', 'submitted'])
+             && resource.data.status in ['pending', 'draft'] && data().status in ['draft', 'submitted']
+             && data().submittedByUid == uid() && onlyChanges(['answers','status','submittedByUid','submittedAt','updatedBy','updatedAt']))
           || (signedIn() && resource.data.get('assignedToUid', '') == uid()) || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']));
     }
     match /workflowActions/{id} {
@@ -563,9 +629,18 @@ service cloud.firestore {
       allow read: if (signedIn() && resource.data.applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin', 'leadership', 'superAdmin']);
       allow create: if (signedIn() && data().applicantUid == uid() && data().status in ['started', 'submitted'])
         || (hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']) && createdByMe());
-      allow update: if (signedIn() && resource.data.applicantUid == uid() && resource.data.status in ['started', 'documentsPending']
+      allow update: if (signedIn() && resource.data.applicantUid == uid() && resource.data.status == 'offer' && data().status == 'accepted'
+          && onlyChanges(['status','acceptedAt','acceptedBy','updatedAt','updatedBy']) && data().acceptedBy == uid() && data().acceptedAt == request.time && stamped())
+        || (signedIn() && resource.data.applicantUid == uid() && resource.data.status in ['started', 'documentsPending']
           && data().status in ['started', 'submitted', 'documentsPending'] && unchanged(['applicantUid', 'decision', 'reviewerUid']))
         || (hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']) && unchanged(['applicantUid']) && data().status != 'enrolled');
+    }
+    match /applicationReviews/{id} {
+      allow read: if hasAny(['admissionsOfficer','schoolAdmin','superAdmin','leadership']);
+      allow create, update: if hasAny(['admissionsOfficer','schoolAdmin','superAdmin']) && stamped()
+        && data().applicationId == id && data().keys().hasOnly(['applicationId','meritRank','criteriaReference','notes','updatedAt','updatedBy'])
+        && text('criteriaReference',500) && optionalText('notes',4000)
+        && (data().meritRank == null || (data().meritRank is int && data().meritRank >= 1 && data().meritRank <= 10000));
     }
     match /applicationDocuments/{id} {
       allow read: if (signedIn() && resource.data.applicantUid == uid()) || hasAny(['admissionsOfficer', 'schoolAdmin', 'superAdmin']);
@@ -606,7 +681,20 @@ service cloud.firestore {
     }
     match /staffAppraisals/{id} {
       allow read: if signedIn() && (resource.data.staffUid == uid() || isLeader());
-      allow create, update: if isLeader();
+      function reviewValid() {
+        return text('staffUid',128) && data().year is int && data().year >= 2020 && data().year <= 2100
+          && data().stage in ['goals','midyear','yearend'] && text('goals',4000) && isoDate('meetingDate')
+          && optionalText('selfReflection',4000) && optionalText('supervisorReview',4000)
+          && data().get('deliveryBand',null) in [null,'meets','strong','support']
+          && data().get('planningBand',null) in [null,'meets','strong','support']
+          && data().get('growthBand',null) in [null,'meets','strong','support']
+          && data().get('pastoralBand',null) in [null,'meets','strong','support']
+          && data().get('contributionBand',null) in [null,'meets','strong','support'];
+      }
+      allow create: if isLeader() && reviewValid() && newStamped();
+      allow update: if stamped() && keepsHistory() && unchanged(['staffUid','year','stage'])
+        && ((isLeader() && reviewValid()) || (teaching() && resource.data.staffUid == uid()
+          && onlyChanges(['selfReflection','updatedAt','updatedBy']) && optionalText('selfReflection',4000)));
     }
 
     // ===================== ASSETS (later) =====================
