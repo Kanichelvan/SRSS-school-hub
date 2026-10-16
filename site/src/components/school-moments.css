@@ -4,7 +4,7 @@
 .school-moments .section-head-row { gap: 24px; align-items: end; }
 .moments-track { display: flex; gap: 18px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x mandatory; margin: 36px 0 0; overscroll-behavior-x: contain; }
 .moments-track::-webkit-scrollbar { display: none; }
-.moments-track figure { flex: 0 0 calc((100% - 36px) / 3); min-width: 0; margin: 0; overflow: hidden; border-radius: 5px; scroll-snap-align: start; background: #eee9df; }
+.moments-track figure { flex: 0 0 calc((100% - 36px) / 3); min-width: 0; margin: 0; overflow: hidden; border-radius: 5px; scroll-snap-align: start; background: #eef1f5; }
 .moments-track img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
 .moments-track:focus-visible { outline: 2px solid var(--purple-700); outline-offset: 5px; }
 .moments-links { display: flex; flex-wrap: wrap; gap: 18px 32px; margin-top: 24px; }
