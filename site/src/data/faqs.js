@@ -1,3 +1,9 @@
+import { schoolHoursAnswer } from './academics.js';
+import { contact } from '../legal/registry.js';
+
+// The confirmed timetable has one owner; a stale saved FAQ must not publish older hours.
+export const verifiedFaqs = items => items.map(item => item.question === schoolHoursAnswer.question ? schoolHoursAnswer : item);
+
 export const defaultFaqs = [
   {
     question: "What year levels are offered at SRSS?",
@@ -100,17 +106,12 @@ export const defaultFaqs = [
       "Parents considering a mid-year transfer are encouraged to contact the Admissions Team to discuss availability, placement and the most suitable transition arrangements for their child.",
     ],
   },
-  {
-    question: "What are the school hours at SRSS?",
-    paragraphs: ["School begins at 7:00 AM."],
-    bullets: ["Monday to Thursday: 7:00 AM – 1:30 PM", "Friday: 7:00 AM – 12:30 PM"],
-    closing: "Parents are encouraged to ensure that students arrive punctually so that they can settle in comfortably and participate fully in the school day.",
-  },
+  schoolHoursAnswer,
   {
     question: "Where is SRSS located?",
     paragraphs: [
-      "Sekolah Rendah Sathya Sai is located at 6th Mile, Jalan Puchong, 58200 Kuala Lumpur. The school is situated adjacent to the Pure Life Society.",
-      "Telephone: 03-7785 1945",
+      `Sekolah Rendah Sathya Sai is located at ${contact.address.join(' ')} The school is situated adjacent to the Pure Life Society.`,
+      `Telephone: ${contact.phone}`,
     ],
   },
   {

@@ -8,6 +8,13 @@ export const schoolHours = [
   { days: 'Friday', standard1: '12.30 pm', standards2to6: '12.30 pm' },
 ];
 
+export const schoolHoursAnswer = {
+  question: 'What are the school hours at SRSS?',
+  paragraphs: ['All classes start at 7.40 am, Monday–Friday. Finishing times vary by day and cohort.'],
+  bullets: schoolHours.map(({ days, standard1, standards2to6 }) => `${days}: Standard 1 finishes at ${standard1}; Standards 2–6 finish at ${standards2to6}.`),
+  closing: 'Occasional weekend events offer further enrichment. Please arrive punctually for the start of the school day.',
+};
+
 export const academicSubjects = {
   standard1: ['Alam dan Manusia', 'Mathematics', 'Malay', 'English'],
   core: ['Malay', 'English', 'Mathematics', 'Science', 'Moral Education'],

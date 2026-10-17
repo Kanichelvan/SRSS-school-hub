@@ -9,6 +9,7 @@ import { OFFICE_ASSIGNABLE_ROLES, ROLE_IDS } from "./roles.js";
 import { recomputeAllScopes, recomputeConsentStatus, recomputeUserScope, refreshCurrentClass, refreshGuardianClasses } from "./scope.js";
 import { handleQuest } from "./quest-service.js";
 import { QuestError } from "./quest-engine.js";
+import { malaysiaDate, syncAnnouncement } from "./announcement-service.js";
 
 initializeApp();
 setGlobalOptions({ region: "asia-southeast1", maxInstances: 5 });
@@ -222,6 +223,11 @@ export const showcaseOnModeration = onDocumentWritten("portfolioEntries/{id}", a
 });
 
 // ---------- Announcements: scheduled publication and expiry ----------
+export const deliverAnnouncement = onDocumentWritten({ document: 'announcements/{id}', retry: true }, async event => {
+  const notify = event.data?.before.data()?.status !== 'published' && event.data?.after.data()?.status === 'published';
+  await syncAnnouncement(db, event.params.id, { stamp: () => FieldValue.serverTimestamp(), notify });
+});
+
 export async function publishDueAnnouncements(now = new Date()) {
   const [due, live] = await Promise.all([db.collection("announcements").where("status", "==", "scheduled").get(), db.collection("announcements").where("status", "==", "published").get()]);
   const batch = db.batch(); let published = 0; let expired = 0;
@@ -230,8 +236,8 @@ export async function publishDueAnnouncements(now = new Date()) {
     if (at && at <= now) { batch.update(item.ref, { status: "published", publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: "scheduler" }); published++; }
   }
   for (const item of live.docs) {
-    const until = item.data().expiresAt ? new Date(item.data().expiresAt) : null;
-    if (until && until < now) { batch.update(item.ref, { status: "archived", archivedReason: "expired", archivedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: "scheduler" }); expired++; }
+    const until = item.data().expiresAt;
+    if (until && until < malaysiaDate(now)) { batch.update(item.ref, { status: "archived", archivedReason: "expired", archivedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: "scheduler" }); expired++; }
   }
   if (published || expired) await batch.commit();
   return { published, expired };

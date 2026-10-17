@@ -38,7 +38,7 @@ function PageHero({ eyebrow, title, children, actions, image, alt, video, photo 
           <div className="landing-hero-copy">{children}</div>
           {actions && <div className="landing-hero-actions">{actions}</div>}
         </div>
-        {photo ? <figure><HeroPhoto image={photo} priority /></figure> : video ? <figure><HeroVideo clip={video} priority /></figure> : image && <figure><img src={image} alt={alt} /></figure>}
+        {photo ? <figure><HeroPhoto image={photo} priority /></figure> : video ? <figure><HeroVideo clip={video} priority autoPlay playbackRate={.65} /></figure> : image && <figure><img src={image} alt={alt} /></figure>}
       </div>
     </section>
   );
@@ -48,7 +48,7 @@ function PageHero({ eyebrow, title, children, actions, image, alt, video, photo 
 function Directory({ path, title = "Explore this section" }) {
   const items = childrenOf(path);
   return (
-    <nav className="page-directory page-inner" aria-label={title}>
+    <nav className={`page-directory page-inner${path === '/student-life' ? ' student-life-directory' : ''}`} aria-label={title}>
       {items.map((item) => <a key={item.path} href={item.path}><strong>{item.label}</strong><span>{item.summary}</span><ArrowRight size={16} aria-hidden="true" /></a>)}
     </nav>
   );
@@ -87,7 +87,7 @@ export function OrganisationChart() {
 // ---------- 02 Learning ----------
 export function LearningPage({ blocks, faqs }) {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Learning at SRSS" title="Every Child. Every Possibility." photo={HERO_PHOTOS.science}
+    <PageHero eyebrow="Learning at SRSS" title={<>Every Child.<br /><em>Every Possibility.</em></>} photo={HERO_PHOTOS.reflection}
       actions={<><a className="primary-button" href="/learning/curriculum">Explore the Curriculum</a><a className="text-button" href="/student-life">Discover Student Life</a></>}>
       <p>At SRSS, learning develops knowledge, curiosity, confidence, character and the ability to contribute meaningfully to the world.</p>
     </PageHero>
@@ -118,7 +118,7 @@ export function StoryFilters({ current }) {
 
 export function StudentLifePage({ blocks, faqs, entry }) {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Student Life" title="Growing Together. Learning for Life." video={HERO_CLIPS.malaysia}
+    <PageHero eyebrow="Student Life" title={<>Growing Together.<br /><em>Learning for Life.</em></>} video={HERO_CLIPS.assembly}
       actions={<><a className="primary-button" href="/student-life/gallery">See school life</a><a className="text-button" href="/student-life/stories">Read our stories</a></>}>
       <p>Beyond lessons and examinations, SRSS offers children opportunities to discover their talents, build friendships, develop confidence and practise human values through meaningful experiences.</p>
     </PageHero>
@@ -133,7 +133,7 @@ export function StudentLifePage({ blocks, faqs, entry }) {
     <div id="stories" className="anchor-block">{blocks.news({ category: entry?.category })}</div>
     <div id="events" className="anchor-block">{blocks.calendar()}</div>
     <Closing title="Come and see a school day for yourself.">
-      <button type="button" className="primary-button" onClick={blocks.openVisit}>Arrange a visit</button>
+      <button type="button" className="primary-button" onClick={blocks.openVisit}>Book a visit</button>
       <a className="text-button" href="/join">Join SRSS</a>
     </Closing>
   </main>;
@@ -194,7 +194,7 @@ function CommunityCard({ item }) {
 
 export function JoinPage() {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Join SRSS" title="Be Part of Something Meaningful." photo={HERO_PHOTOS.friends}>
+    <PageHero eyebrow="Join SRSS" title={<>Be Part of<br /><em>Something Meaningful.</em></>} photo={HERO_PHOTOS.pledge}>
       <p>Whether you are choosing a school for your child, reconnecting as an alumnus or contributing your time and talents, there is a place for you in the SRSS community.</p>
     </PageHero>
     <section className="page-pathways page-inner" aria-label="Two ways to join SRSS">
@@ -209,7 +209,7 @@ export function JoinPage() {
 
 export function AdmissionsPage({ blocks, faqs, pillars }) {
   return <main id="main" className="site-page">
-    <PageHero eyebrow="Admissions" title="Begin the journey." photo={HERO_PHOTOS.friends}
+    <PageHero eyebrow="Admissions" title={<>Begin <em>the journey.</em></>} photo={HERO_PHOTOS.welcome}
       actions={<><a className="primary-button" href="#enquiry">Make an enquiry</a><button type="button" className="text-button" onClick={blocks.openVisit}>Book a visit</button></>}>
       <p>SRSS welcomes primary-age children, Standard 1 to Standard 6, from families of every background who share a values-based approach to education.</p>
     </PageHero>

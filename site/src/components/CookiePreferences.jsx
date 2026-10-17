@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ShieldCheck } from '@phosphor-icons/react/dist/csr/ShieldCheck';
 import { X } from '@phosphor-icons/react/dist/csr/X';
 import { COOKIE_PREFERENCES_KEY, parsePreferences, preferenceRecord } from '../lib/cookiePreferences.js';
 
@@ -41,6 +40,13 @@ export function CookiePreferencesProvider({ children }) {
     return () => { if (appRoot) appRoot.inert = wasInert; document.body.style.overflow = overflow; if (previousFocus?.isConnected) previousFocus.focus(); };
   }, [open, preferences, step]);
 
+  useEffect(() => {
+    if (!open || !dialog.current || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(([entry]) => document.documentElement.style.setProperty('--cookie-sheet-height', `${entry.target.getBoundingClientRect().height}px`));
+    observer.observe(dialog.current);
+    return () => { observer.disconnect(); document.documentElement.style.removeProperty('--cookie-sheet-height'); };
+  }, [open, step]);
+
   const close = () => record ? setOpen(false) : save({ functional: false, externalMedia: false });
   const trap = (event) => {
     if (event.key === 'Escape') { event.preventDefault(); close(); }
@@ -55,15 +61,16 @@ export function CookiePreferencesProvider({ children }) {
     {children}
     {open && createPortal(<div className={`cookie-overlay cookie-${step}`}><section ref={dialog} className="cookie-dialog" role="dialog" aria-modal={step === 'details' ? true : undefined} aria-labelledby="cookie-title" aria-describedby="cookie-intro" tabIndex={-1} onKeyDown={trap}>
       <button type="button" className="cookie-dismiss" onClick={close} aria-label="Close cookie choices"><X size={20} /></button>
-      <div className="cookie-heading"><span className="cookie-shield" aria-hidden="true"><ShieldCheck size={25} /></span><div><p className="eyebrow">{step === 'notice' ? 'Cookie choices' : 'Privacy preferences'}</p><h2 id="cookie-title">{step === 'notice' ? 'Your privacy, your choice' : 'Cookie preferences'}</h2></div></div>
-      <p id="cookie-intro">{step === 'notice' ? 'Essential storage keeps SRSS secure and reliable. Accept optional services, decline, or choose your preferences.' : 'Essential services stay on. Choose which optional features to allow.'}</p>
+      <div className="cookie-heading"><div><p className="eyebrow">{step === 'notice' ? 'A little welcome' : 'Make yourself at home'}</p><h2 id="cookie-title">{step === 'notice' ? 'Cookies? Sadly, not the chocolate-chip kind 🍪' : 'Let me choose'}</h2></div></div>
+      <p id="cookie-intro">{step === 'notice' ? 'Ours just help the site remember you and run smoothly, so every visit feels a little more like home. Pick what you’re comfortable with.' : 'A few small choices. You can change them any time in the footer.'}</p>
       {step === 'details' && <div className="cookie-options">
-        <div className="cookie-option"><div><strong>Essential</strong><p>Security, sign-in and core school services.</p></div><span className="cookie-required">Always on</span></div>
-        <label className="cookie-option"><div><strong>Remember my hub</strong><p>Remember your hub on this device.</p></div><input type="checkbox" checked={draft.functional} onChange={(event) => setDraft((current) => ({ ...current, functional: event.target.checked }))} /></label>
-        <label className="cookie-option"><div><strong>External maps and videos</strong><p>Allow Google Maps and YouTube embeds.</p></div><input type="checkbox" checked={draft.externalMedia} onChange={(event) => setDraft((current) => ({ ...current, externalMedia: event.target.checked }))} /></label>
+        <div className="cookie-option"><div><strong>Essentials</strong><p>Keep the site working. Always on.</p></div><span className="cookie-required">Always on</span></div>
+        <div className="cookie-option"><div><strong>Analytics</strong><p>Help us see which pages families find useful.</p><p>No analytics tools are installed.</p></div><span className="cookie-required">Not in use</span></div>
+        <label className="cookie-option"><div><strong>Media</strong><p>Let videos and maps load from YouTube and Google.</p></div><input aria-label="Allow media" type="checkbox" checked={draft.externalMedia} onChange={(event) => setDraft((current) => ({ ...current, externalMedia: event.target.checked }))} /></label>
+        <label className="cookie-option"><div><strong>Remember my hub</strong><p>Open your usual school hub on this device.</p></div><input aria-label="Remember my hub" type="checkbox" checked={draft.functional} onChange={(event) => setDraft((current) => ({ ...current, functional: event.target.checked }))} /></label>
       </div>}
-      <div className="cookie-buttons"><button type="button" className="cookie-accept" onClick={() => save({ functional: true, externalMedia: true })}>Accept</button><button type="button" className="cookie-decline" onClick={() => save({ functional: false, externalMedia: false })}>Decline</button>{step === 'notice' ? <button type="button" className="cookie-manage" onClick={() => setStep('details')}>Manage preferences</button> : <button type="button" className="cookie-manage" onClick={() => save(draft)}>Save preferences</button>}</div>
-      <p className="cookie-note">{step === 'details' && <>No advertising or analytics trackers. Change your choices in the footer. </>}<a href="/legal/cookies">Read our Cookies Policy</a>.</p>
+      <div className="cookie-buttons">{step === 'notice' ? <><button type="button" className="cookie-accept" onClick={() => save({ functional: true, externalMedia: true })}>Sounds good!</button><button type="button" className="cookie-decline" onClick={() => save({ functional: false, externalMedia: false })}>Just the essentials</button><button type="button" className="cookie-manage" onClick={() => setStep('details')}>Let me choose</button></> : <button type="button" className="cookie-accept cookie-save" onClick={() => save(draft)}>Save my choices</button>}</div>
+      <p className="cookie-note"><a href="/legal/cookies">Read our cookie policy</a></p>
     </section></div>, document.body)}
   </CookieContext.Provider>;
 }

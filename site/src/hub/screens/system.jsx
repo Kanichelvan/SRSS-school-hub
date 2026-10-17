@@ -203,13 +203,14 @@ export function AnnouncementsAdmin() {
     catch (error) { setNotice({ tone: "bad", text: error.message }); }
   };
   return <RecordManager kicker="Content & communication" title="Announcements" noun="announcement" collection="announcements" nameOf={(row) => row.title} canEdit={canEdit}
-    intro="Internal notices for the hub. Public website news is written separately in Website content. Teachers can also post routine notices to their own classes."
+    intro="Publishing sends an in-hub notification to the selected audience. For a whole-school notice, you can also show the message on the public website. Private attachments stay inside the hub."
     lookups={communicationLookups}
     fields={[
       { key: "title", label: "Headline", type: "text", required: true, maxLength: 140, wide: true },
       { key: "body", label: "Message", type: "textarea", required: true, maxLength: 5000, rows: 5, wide: true },
       { key: "category", label: "Category", type: "select", required: true, options: (lookups) => lookups.categories },
       ...audienceFields({ classOptions: (lookups) => classOptions(lookups), userOptions }),
+      { key: "publicListing", label: "Also show this message on the public website", type: "checkbox", wide: true, help: "Only for whole-school notices. The headline and message become public; attachments and recipient details stay private." },
       { key: "status", label: "Publishing", type: "select", required: true, options: ANNOUNCEMENT_STATUSES },
       { key: "publishAtLocal", label: "Publish at", type: "datetime-local", show: (draft) => draft.status === "scheduled", help: "Published automatically within 15 minutes of this time." },
       { key: "expiresAt", label: "Remove after", type: "date", help: "Optional. Archived automatically after this day." },
@@ -220,13 +221,14 @@ export function AnnouncementsAdmin() {
     toDraft={(row) => ({ ...draftFromKeys(row.audienceKeys), attachmentsText: linksText(row.attachments), publishAtLocal: toLocalInput(row.publishAt) })}
     validate={(values) => ({
       audienceType: audienceError(values), attachmentsText: linksError(values.attachmentsText),
+      publicListing: values.publicListing && values.audienceType !== 'school' ? 'Public notices must be addressed to everyone (whole school).' : null,
       publishAtLocal: values.status === "scheduled" && !values.publishAtLocal ? "Choose when to publish." : values.status === "scheduled" && new Date(values.publishAtLocal) <= new Date() ? "Choose a time in the future, or publish now." : null,
     })}
     prepare={(values, { original }) => {
       const { audienceType, audienceStandards, audienceClasses, audienceUsers, attachmentsText, publishAtLocal, ...rest } = values;
       const audienceKeys = keysFromDraft({ audienceType, audienceStandards, audienceClasses, audienceUsers });
       const publishing = rest.status === "published" && original?.status !== "published";
-      return { ...rest, pinned: Boolean(rest.pinned), audienceKeys, attachments: parseLinks(attachmentsText), publishAt: rest.status === "scheduled" ? new Date(publishAtLocal) : original?.publishAt ?? null, ...(publishing ? { publishedAt: serverTimestamp() } : {}), ...(!original ? { createdBy: auth.user.uid } : {}) };
+      return { ...rest, publicListing: Boolean(rest.publicListing), pinned: Boolean(rest.pinned), audienceKeys, attachments: parseLinks(attachmentsText), publishAt: rest.status === "scheduled" ? new Date(publishAtLocal) : original?.publishAt ?? null, ...(publishing ? { publishedAt: serverTimestamp() } : {}), ...(!original ? { createdBy: auth.user.uid } : {}) };
     }}
     columns={(lookups) => [
       { key: "title", label: "Announcement", render: (row) => <span><span className="hub-cell-strong">{row.title}</span>{row.pinned && <> <StatusBadge status="pending" label="Pinned" /></>}<br /><small>{describeAudience(row.audienceKeys, lookups)}</small></span> },

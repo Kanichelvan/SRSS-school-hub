@@ -1,0 +1,185 @@
+[
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-2b5f2f74-8d60-4f70-ba81-e3bb90f35bbb.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "866ec87db8907747d701ebd65c005ca539df1bdcd0c1d5e07fa854fa8e9df84b",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": true,
+    "alt": "Pupils at assembly.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-01-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-01-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-01-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "About hero",
+    "aspectRatio": "1672:941"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-0dcd2864-d27d-4f5e-bd7b-b663719a40a1.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "866ec87db8907747d701ebd65c005ca539df1bdcd0c1d5e07fa854fa8e9df84b",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": true,
+    "alt": "Pupils at assembly.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-01-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-01-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-01-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "About hero",
+    "aspectRatio": "1672:941",
+    "duplicateOf": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-2b5f2f74-8d60-4f70-ba81-e3bb90f35bbb.png"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-34b67c91-fb84-44fd-9eb8-b1903d21df40.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "5d321cb43990758119ddf74decedfc6cdc2c7549c84672b3f772a3bd17ef77ba",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": true,
+    "alt": "Pupils in silent sitting.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-03-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-03-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-03-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "Learning hero",
+    "aspectRatio": "1672:941"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-e0c1679d-0c44-49e0-a91c-07814054485d.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "5d321cb43990758119ddf74decedfc6cdc2c7549c84672b3f772a3bd17ef77ba",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": true,
+    "alt": "Pupils in silent sitting.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-03-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-03-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-03-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "Learning hero (duplicate original)",
+    "aspectRatio": "1672:941",
+    "duplicateOf": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-34b67c91-fb84-44fd-9eb8-b1903d21df40.png"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-ba87b1eb-eb86-4c0a-9445-c1b0d9b4d207.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "cea3a6f2c635911b492f9826a316d86e390ac63423e5b42a010a36688c38d321",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": false,
+    "alt": "School flag above the courtyard.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-05-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-05-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-05-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "Available school-life hero image",
+    "aspectRatio": "1672:941"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-24ec481d-40e9-4586-a0a6-d2bb73801166.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "cea3a6f2c635911b492f9826a316d86e390ac63423e5b42a010a36688c38d321",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": false,
+    "alt": "School flag above the courtyard.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-05-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-05-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-05-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "Available school-life hero image",
+    "aspectRatio": "1672:941",
+    "duplicateOf": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-ba87b1eb-eb86-4c0a-9445-c1b0d9b4d207.png"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-7a793d49-afe5-4240-a008-e3060c345c81.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "21c5782bbb54199181a8cc1c28600a204f352d09ed983f0d87f0c5f0dca0fcc9",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": true,
+    "alt": "Pupil leading a pledge.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-07-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-07-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-07-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "Join SRSS hero",
+    "aspectRatio": "1672:941"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-5a627b0a-7b17-4c2c-91df-47ff1fdda1d5.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "cff09ef85fe3224c13b55ee623ec537a8727c44ce67b6c07045e0cb2d483fbe8",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": true,
+    "alt": "Pupil raising the Malaysian flag.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-08-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-08-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-08-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "Available school-life hero image",
+    "aspectRatio": "1672:941"
+  },
+  {
+    "original": "public/assets/photos/originals/2026-10-16-hero-set/codex-clipboard-14c7c8f7-d9bd-4334-baad-e1c9d68b37d0.png",
+    "dimensions": [
+      1672,
+      941
+    ],
+    "sha256": "bb6e76d4f3178a58f719261ab3b6cb19e0c1983ea1eb0f2898eb3541242c7257",
+    "approvedUse": "User selected these images for website heroes on 16 October 2026",
+    "containsPupils": true,
+    "alt": "Pupil beside the school flag.",
+    "processed": [
+      "/assets/photos/processed/2026-10-16-hero-09-640.webp",
+      "/assets/photos/processed/2026-10-16-hero-09-960.webp",
+      "/assets/photos/processed/2026-10-16-hero-09-1672.webp"
+    ],
+    "edits": "Responsive resizing and WebP compression only; original bytes preserved. Blending is applied in the page layout.",
+    "focalPoint": "55% 50%",
+    "placement": "Admissions hero",
+    "aspectRatio": "1672:941"
+  }
+]

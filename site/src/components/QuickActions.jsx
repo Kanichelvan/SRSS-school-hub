@@ -18,7 +18,7 @@ const links = [
   { label: 'Parent Hub', href: '/hub/parent', Icon: UsersThree, tone: 'rose', hub: true },
   { label: 'Teacher Hub', href: '/hub/teacher', Icon: ChalkboardTeacher, tone: 'blue', hub: true },
   { label: 'Administration Hub', href: '/hub/admin', Icon: Buildings, tone: 'purple', hub: true },
-  { label: 'Arrange a visit', Icon: CalendarBlank, tone: 'green' },
+  { label: 'Book a visit', Icon: CalendarBlank, tone: 'green' },
   { label: 'Contact the school', href: '/resources/contact', Icon: Phone, tone: 'navy' },
 ];
 

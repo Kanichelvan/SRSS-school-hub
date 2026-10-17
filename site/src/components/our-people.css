@@ -14,7 +14,7 @@
 .people-photo-pending span { display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid #c3cbd7; border-radius: 50%; color: #53647d; font: 500 22px var(--serif); }
 .people-photo-pending small { color: #53647d; font: 500 9px var(--ui); letter-spacing: .09em; text-transform: uppercase; }
 .people-profile > img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-.people-team-band { background: #f5f3ed; }
+.people-team-band { background: var(--cream); }
 .people-group-title { margin: 52px 0 24px; font: 600 28px var(--serif); color: var(--navy-950); }
 .people-group-intro { margin: -10px 0 24px; }
 .people-leadership { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 32px; }
@@ -23,7 +23,7 @@
 .people-leader .eyebrow { margin: 0 0 12px; font-size: 9px; }
 .people-leader h3 { margin: 0; font: 600 25px/1.2 var(--serif); color: var(--navy-950); }
 .people-leader p:not(.eyebrow) { font-size: 13px; }
-.people-pta-pending { padding: 30px; border-left: 3px solid #d2ac47; background: #f5f3ed; }
+.people-pta-pending { padding: 30px; border-left: 3px solid #d2ac47; background: var(--cream); }
 .people-pta-pending h3 { margin-top: 0; color: var(--navy-950); font: 600 26px var(--serif); }
 .people-pta-pending p { margin-bottom: 0; }
 .people-voices-link { padding-block: 70px; color: #dbe4ef; background: var(--landing-navy); }
