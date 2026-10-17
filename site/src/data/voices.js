@@ -10,9 +10,9 @@ export const srssVoices = [
     image: "/assets/photos/processed/principal-uma-devi-1086x1358.jpg",
     alt: "Portrait of Uma Devi Jenes Nayagam, Principal of Sekolah Rendah Sathya Sai",
     excerpt: "The real magic of SRSS lies in our teachers and staff, who teach by example every day.",
-    salutation: "Dear students, parents, guardians and friends of Sekolah Rendah Sathya Sai (SRSS),",
+    salutation: "Sai Ram and warm greetings to everyone at Sekolah Rendah Sathya Sai,",
     introduction: [
-      "Welcome to the SRSS25 Digital Hub!",
+      "As we welcome the 2027 school year at SRSS, I extend my heartfelt greetings to all members of our school community — students, parents, teachers, staff and volunteers. Sai School is more than a place of learning; it is a community where academic growth, character development, and human values come together to shape young minds and hearts.",
       "The year 2002 witnessed our commitment deeply rooting to reflect a simple conviction of Bhagawan Sri Sathya Sai Baba that a school should shape not only bright minds but also good hearts. Today, as we celebrate this jubilee, I invite you to look at what that seed has become, and at where we are going next.",
     ],
     sections: [

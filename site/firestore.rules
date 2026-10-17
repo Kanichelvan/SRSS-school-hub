@@ -429,7 +429,9 @@ service cloud.firestore {
       return text('title', 140) && data().get('body', '') is string && data().get('body', '').size() <= 5000
         && data().status in ['draft', 'scheduled', 'published', 'archived']
         && data().audienceKeys is list && data().audienceKeys.size() > 0 && data().audienceKeys.size() <= 30
-        && data().get('pinned', false) is bool && data().get('attachments', []) is list && data().get('attachments', []).size() <= 5;
+        && data().get('pinned', false) is bool && data().get('attachments', []) is list && data().get('attachments', []).size() <= 5
+        && data().get('publicListing', false) is bool
+        && (data().get('publicListing', false) == false || ((isAdmin() || isLeader()) && data().audienceKeys == ['school']));
     }
     function teacherNotice() {
       return teaching() && data().audienceKeys.size() == 1 && data().audienceKeys[0] in me().get('publishKeys', [])
@@ -446,6 +448,8 @@ service cloud.firestore {
       allow update: if signedIn() && resource.data.recipientUid == uid() && onlyChanges(['readAt']);
       allow create: if false; // system-generated
     }
+    // Server-written, explicitly approved public copies contain no private attachments or recipients.
+    match /publicAnnouncements/{id} { allow read: if resource.data.status == 'published'; allow write: if false; }
     match /messageThreads/{threadId} {
       allow read: if signedIn() && uid() in resource.data.participantUids;
       function target() { return get(/databases/$(database)/documents/users/$(data().participantUids[1])).data; }

@@ -49,7 +49,7 @@ export function PreFooter({ onVisit }) {
         </div>
         <div className="prefooter-actions">
           <a className="prefooter-primary" href="/about">Discover SRSS</a>
-          <button type="button" className="prefooter-secondary" onClick={onVisit}>Arrange a School Visit</button>
+          <button type="button" className="prefooter-secondary" onClick={onVisit}>Book a visit</button>
         </div>
       </div>
     </section>
@@ -61,7 +61,7 @@ export function SiteFooter({ onVisit }) {
   const year = new Date().getFullYear();
   const support = <>
     <a href="/join/admissions">Admissions</a>
-    <button type="button" onClick={onVisit}>Visit SRSS</button>
+    <button type="button" onClick={onVisit}>Book a visit</button>
     <a href="/resources/faq">FAQ</a>
     <a href="/resources">Resources &amp; Downloads</a>
     <a href="/resources/contact">Contact the School</a>
@@ -73,7 +73,7 @@ export function SiteFooter({ onVisit }) {
         <div className="site-footer-identity">
           <div className="footer-brand">
             <img src="/assets/srss-logo.png" alt="" />
-            <div><strong>Sekolah Rendah Sathya Sai</strong><span>Shaping Minds. Nurturing Hearts. Inspiring Lives.</span></div>
+            <div><strong>Sekolah Rendah Sathya Sai</strong><span>Human Excellence, life lived with purpose.</span></div>
           </div>
           <p><strong>Sekolah Rendah Sathya Sai</strong> is a human value-based primary school dedicated to nurturing academic excellence, character, and compassionate leadership. Guided by the philosophy of Sathya Sai Educare, we inspire every child to discover the human values of Truth, Right Conduct, Peace, Love, and Nonviolence, empowering them to become confident learners and responsible global citizens.</p>
           {narrow && <div className="site-footer-quick" aria-label="Contact the school">

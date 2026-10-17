@@ -59,12 +59,13 @@ export async function loadSitePage(id) {
 // Returns only the parts that loaded, so the caller keeps its built-in defaults for anything missing.
 export async function loadPublicContent() {
   if (typeof window !== "undefined" && window.__SRSS_EXPORTED_CONTENT__) return window.__SRSS_EXPORTED_CONTENT__;
-  const [news, events, homepage, about, faqs] = await Promise.allSettled([
+  const [news, events, homepage, about, faqs, notices] = await Promise.allSettled([
     runQuery("newsPosts", [equals("status", "published")]),
     runQuery("events", [equals("status", "published"), equals("publicListing", true)], 100),
     getPage("homepage"),
     getPage("about"),
     getPage("faqs"),
+    runQuery('publicAnnouncements', [equals('status', 'published')]),
   ]);
   const content = {};
   if (news.status === "fulfilled") content.news = news.value.sort((a, b) => String(b.date).localeCompare(String(a.date)));
@@ -72,6 +73,7 @@ export async function loadPublicContent() {
   if (homepage.value) content.homepage = homepage.value;
   if (about.value) content.about = about.value;
   if (faqs.value?.items?.length) content.faqs = faqs.value.items;
+  if (notices.status === 'fulfilled') content.notices = notices.value;
   return content;
 }
 

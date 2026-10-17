@@ -3,8 +3,17 @@ const photo = (name, width, height, alt) => ({
   srcSet: [640, 960, 1536].map((size) => `/assets/photos/hero/${name}-cutout-v1-${size}.webp ${Math.min(size, width)}w`).join(', '),
   width, height, alt,
 });
+const suppliedHero = (number, alt) => ({
+  src: `/assets/photos/processed/2026-10-16-hero-${number}-1672.webp`,
+  srcSet: [640, 960, 1672].map(width => `/assets/photos/processed/2026-10-16-hero-${number}-${width}.webp ${width}w`).join(', '),
+  width: 1672, height: 941, alt, className: 'hero-photo-documentary',
+});
 
 export const HERO_PHOTOS = {
+  assembly: suppliedHero('01', 'Pupils in lavender and purple uniforms gathered in front of the school for assembly.'),
+  reflection: suppliedHero('03', 'Pupils practising silent sitting together in the school courtyard.'),
+  pledge: suppliedHero('07', 'A pupil leading a pledge at a microphone in the school courtyard.'),
+  welcome: suppliedHero('09', 'A pupil beside a school flag in the school courtyard.'),
   reading: photo('reading', 1536, 1024, 'Illustrative scene of a teacher and three pupils reading a book together.'),
   science: photo('science', 1452, 1083, 'A teacher demonstrating a science experiment to pupils wearing safety goggles.'),
   friends: photo('friends', 1536, 526, 'SRSS pupils sitting together, smiling and making playful hand gestures.'),

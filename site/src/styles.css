@@ -1873,7 +1873,7 @@ html.nav-locked { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .mega-panel, .nav-drawer, .nav-acc-panel { animation: none; } }
 
 /* Scroll reveal (enabled by App only when motion is allowed) */
-.reveal-ready [data-reveal], .reveal-ready [data-reveal-stagger] > * { opacity: 0; translate: 0 22px; transition: opacity .9s var(--ease-out), translate .9s var(--ease-out); }
+.reveal-ready [data-reveal].reveal-pending, .reveal-ready [data-reveal-stagger].reveal-pending > * { opacity: 0; translate: 0 22px; transition: opacity .9s var(--ease-out), translate .9s var(--ease-out); }
 .reveal-ready [data-reveal="image"] { translate: 0 0; transition-duration: 1.2s; }
 .reveal-ready [data-reveal="image"] > img, .reveal-ready [data-reveal="image"] > iframe { scale: 1.06; transition: scale 1.8s var(--ease-out); }
 .reveal-ready [data-reveal-stagger] > :nth-child(2) { transition-delay: .09s; }

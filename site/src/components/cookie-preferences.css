@@ -36,3 +36,21 @@
 @media (prefers-reduced-motion: reduce) { .cookie-option input, .cookie-option input::before { transition: none; } }
 @media print { .cookie-overlay { display: none; } }
 .hub-footer .cookie-preferences-link { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
+
+/* Friendly first encounter. Keep quick links clear of the phone sheet. */
+.cookie-dialog { background:#fffaf0; border-radius:20px; }
+.cookie-heading { margin-bottom:16px; }.cookie-dialog h2 { font-size:26px; line-height:1.3; }
+.cookie-buttons button { text-transform:none; letter-spacing:0; font-size:12px; border-radius:6px; }
+.cookie-buttons .cookie-decline { color:#10375c; background:transparent; }
+.cookie-buttons .cookie-manage { border:0; background:transparent; text-decoration:underline; text-underline-offset:4px; min-height:36px; }
+.cookie-buttons .cookie-save { grid-column:1/-1; }
+@media(max-width:620px) {
+ .cookie-notice { left:0; bottom:0; width:100%; }
+ .cookie-dialog { padding:24px 22px max(18px,env(safe-area-inset-bottom)); border-radius:24px 24px 0 0; max-height:calc(100dvh - 32px); }
+ .cookie-dialog h2 { font-size:24px; }.cookie-details { place-items:end center; padding:0; }
+ .cookie-details .cookie-dialog { width:100%; max-height:calc(100dvh - 24px); }
+ body:has(.cookie-notice) .quick-actions { bottom:calc(var(--cookie-sheet-height,360px) + 12px); }
+ body:has(.cookie-notice) .quick-actions-top,body:has(.cookie-details) .quick-actions { visibility:hidden; }
+ body:has(.cookie-notice) .quick-actions-links { max-height:calc(100dvh - var(--cookie-sheet-height,360px) - var(--public-header-height,130px) - 100px); }
+}
+@media(max-height:650px) and (max-width:620px) { body:has(.cookie-overlay) .quick-actions { visibility:hidden; } }

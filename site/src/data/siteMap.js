@@ -14,7 +14,7 @@ export const SITE = [
   // 01 About SRSS — who we are
   { path: "/about", label: "About SRSS", page: "about", status: "page", owner: "Leadership", summary: "Our identity, philosophy, history and people." },
   { path: "/about/our-story", label: "Our Story", parent: "/about", page: "about", anchor: "who-we-are", status: "section", editable: true, owner: "Leadership", summary: "How SRSS began and grew since 2002." },
-  { path: "/about/vision-mission", label: "Vision & Mission", parent: "/about", page: "about", anchor: "vision-mission", status: "section", owner: "Leadership", summary: "Our purpose, our promise and the four mission pillars." },
+  { path: "/about/vision-mission", label: "Vision & Mission", parent: "/about", page: "about", anchor: "vision-mission", status: "section", owner: "Leadership", summary: "Our purpose, vision, mission, eleven aims and five universal values." },
   { path: "/about/sathya-sai-education", label: "Sathya Sai Education", parent: "/about", page: "sathyaSai", status: "page", owner: "Leadership", summary: "The philosophy of Sathya Sai Educare and the five human values." },
   { path: "/about/leadership-governance", label: "Leadership & Governance", parent: "/about", page: "governance", status: "page", owner: "Leadership", summary: "How the school is governed and led, and its relationship with SSIOM." },
   { path: "/about/our-people", label: "Our People", parent: "/about", page: "ourPeople", status: "page", editable: "append", owner: "Leadership", summary: "Our Board, school administration, teachers, support staff, volunteers and PTA." },

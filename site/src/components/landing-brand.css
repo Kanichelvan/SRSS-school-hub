@@ -26,7 +26,7 @@
   margin-top: 28px;
   background: var(--gold-foil);
 }
-.voices-hero h1 em, .faq-page-hero h1 em {
+.landing-hero h1 em, .voices-hero h1 em, .faq-page-hero h1 em {
   color: #efd585;
   background: var(--gold-foil);
   background-clip: text;
@@ -58,9 +58,11 @@
   min-height: 0;
   max-height: none;
   object-fit: contain;
-  mask-image: linear-gradient(180deg, #000 91%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent), linear-gradient(180deg, #000 84%, transparent 100%);
+  mask-composite: intersect;
 }
 .landing-hero figure > .hero-photo-portrait { width: min(100%, 360px); }
+.landing-hero figure > .hero-photo-documentary { height: clamp(330px, 32vw, 460px); object-fit: cover; object-position: 55% center; mask-image: linear-gradient(90deg, transparent, #000 15%, #000 82%, transparent), linear-gradient(180deg, transparent, #000 14%, #000 82%, transparent); mask-composite: intersect; }
 .landing-hero .hero-video, .jubilee-hero-video .hero-video {
   background: transparent;
   border-radius: 0;
@@ -70,6 +72,27 @@
 }
 .landing-hero .hero-video .hero-video-poster { height: 100%; min-height: 0; max-height: none; }
 .landing-hero .hero-video-control { bottom: 24px; }
+.landing-hero figure:has(.hero-video) { align-self: stretch; display: flex; }
+.landing-hero figure .hero-video { width: 100%; height: 100%; min-height: 390px; }
+.landing-hero .hero-video-poster, .landing-hero .hero-video-footage {
+  mask-image: linear-gradient(90deg, transparent, #000 20%, #000 78%, transparent), linear-gradient(180deg, transparent, #000 15%, #000 78%, transparent);
+}
+.student-life-directory { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding-block: 30px; }
+.student-life-directory a { --category-metal: var(--petal-nonviolence); color: white; background: linear-gradient(115deg, #06162f80, #06162f22), var(--category-metal); border: 1px solid #ffffff40; border-radius: 9px; padding: 23px 21px; min-height: 148px; box-shadow: inset 0 1px 0 #ffffff40; }
+.student-life-directory a:first-child { color: var(--navy-950); background: var(--category-metal); }
+.student-life-directory a:nth-child(2), .student-life-directory a:nth-child(7) { --category-metal: var(--petal-conduct); }
+.student-life-directory a:nth-child(3), .student-life-directory a:nth-child(8) { --category-metal: var(--petal-peace); }
+.student-life-directory a:nth-child(4) { --category-metal: var(--petal-love); }
+.student-life-directory a:nth-child(5) { --category-metal: var(--petal-truth); }
+.student-life-directory a:nth-child(6) { --category-metal: var(--purple-metal); }
+.student-life-directory a strong, .student-life-directory a span, .student-life-directory a svg { color: inherit; }
+.student-life-directory a span { opacity: .94; }
+.student-life-directory a:hover, .student-life-directory a:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; }
+.public-notices { padding: 20px max(24px, calc((100% - 1180px) / 2)); color: var(--navy-950); background: #fff4cd; border-bottom: 2px solid var(--gold-700); }
+.public-notices article + article { margin-top: 16px; padding-top: 16px; border-top: 1px solid #d2ac4770; }
+.public-notices h2 { margin: 0 0 7px; font: 600 20px/1.4 var(--ui); }
+.public-notices p { margin: 0; font: 400 14px/1.7 var(--body); white-space: pre-line; }
+.public-notices .eyebrow { margin-bottom: 6px; color: #61480a; }
 .voices-hero-grid { min-height: 0; padding-block: 76px 82px; align-items: center; gap: clamp(40px, 7vw, 100px); }
 .faq-page-hero { padding-block: 76px 82px; align-items: center; }
 .ppa-page-hero-inner { padding-block: 76px 82px; }
@@ -93,15 +116,19 @@
     width: 100%; max-width: 720px; margin: 0 auto;
   }
   .landing-hero figure > img:not(.hero-photo), .landing-hero .hero-video, .jubilee-hero-video .hero-video { height: clamp(240px, 55vw, 400px); }
+  .landing-hero figure .hero-video { min-height: 0; height: clamp(260px, 55vw, 400px); }
+  .student-life-directory { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .voices-hero-grid { padding-block: 54px 60px; gap: 30px; }
   .faq-page-hero { padding-block: 54px 60px; gap: 32px; }
   .ppa-page-hero-inner { padding-block: 54px 60px; }
 }
 @media (max-width: 540px) {
+  .student-life-directory { gap: 10px; }
+  .student-life-directory a { min-height: 150px; padding: 18px 14px; }
   .landing-hero h1, .voices-hero h1, .faq-page-hero h1 { font-size: clamp(35px, 8.2vw, 44px); }
   .landing-hero .eyebrow, .voices-hero .eyebrow, .faq-page-hero .eyebrow { font-size: 10px; letter-spacing: .13em; }
   .landing-hero h1::after, .voices-hero h1::after, .faq-page-hero h1::after, .ppa-page-hero h1::after { margin-top: 24px; }
 }
 @media (forced-colors: active) {
-  .voices-hero h1 em, .faq-page-hero h1 em { background: none; -webkit-text-fill-color: currentColor; }
+  .landing-hero h1 em, .voices-hero h1 em, .faq-page-hero h1 em { background: none; -webkit-text-fill-color: currentColor; }
 }

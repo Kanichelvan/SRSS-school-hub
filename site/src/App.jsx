@@ -37,7 +37,7 @@ import { Play } from "@phosphor-icons/react/dist/csr/Play";
 import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
 import { loadPublicContent, loadSitePage, submitPublicForm } from "./lib/publicContent.js";
 import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
-import { defaultFaqs } from "./data/faqs.js";
+import { defaultFaqs, verifiedFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
 import OurPeople from "./pages/OurPeople.jsx";
 import { signInLink, siteNav } from "./data/navigation.js";
@@ -48,6 +48,7 @@ import { AdmissionsPage, Breadcrumbs, ContentBody, ContentPage, GovernancePage, 
 import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
 
 // Policy pages load on demand so their text never weighs on the homepage.
+const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
 const LegalPage = lazy(() => import("./legal/LegalPage.jsx"));
 // Current route from the address bar; old addresses are swapped for their canonical URL in place.
 function currentRoute() {
@@ -146,36 +147,6 @@ const inspirationQuote = "Education is not for mere living; it is for life, a fu
 
 // Pictures for events published without their own image.
 const eventFallbackImages = ["/assets/photos/processed/sports-day-march-1600.jpg", "/assets/photos/processed/assembly-achievements-1280.jpg", "/assets/photos/processed/values-signs-graduation-1600.jpg", "/assets/photos/processed/field-friends-1052.jpg"];
-
-const aboutMilestones = [["2001", "A shared vision", "A values-based primary school is envisioned for families in Kuala Lumpur."], ["2002", "SRSS begins", "The first cohort begins a learning journey rooted in human excellence."], ["2007", "Growing together", "The school community expands its learning spaces and co-curricular life."], ["2017", "Service in action", "Seva and community partnerships become an even more visible part of school life."], ["2026", "Looking forward", "SRSS celebrates a quarter-century of nurturing minds, hearts and character."]];
-
-const humanValues = [["Sathya", "Truth", "Integrity in thought, word and action.", "Speaking honestly in a classroom discussion", "Owning a mistake and making it right", "Bringing sincere effort to each task"], ["Dharma", "Right Conduct", "Doing what is right with care and responsibility.", "Arriving prepared and on time", "Taking care of shared spaces", "Offering a helping hand without being asked"], ["Shanti", "Peace", "Finding steadiness within and respect around us.", "Beginning with a quiet moment", "Choosing calm words in a disagreement", "Reflecting before responding"], ["Prema", "Love", "Seeing and serving the good in every person.", "Including a classmate at play", "Encouraging a friend who is trying", "Showing gratitude to those who care for us"], ["Ahimsa", "Non-Violence", "Gentleness towards people, animals and the earth.", "Solving conflict without hurtful words", "Caring for the school garden", "Making choices that protect our shared world"]];
-
-const defaultAboutContent = {
-  heroEyebrow: "About SRSS · 25th year", heroTitle: "Our Story", heroBody: "At SRSS, education begins with a simple belief: every child carries within them the capacity for wisdom, kindness and purposeful action.", heroImage: "/assets/photos/processed/assembly-achievements-1280.jpg", heroAlt: "SRSS pupils gathered at a school assembly", foundingTitle: "A school built on what matters most.", foundingBody: "Sekolah Rendah Sathya Sai was established to offer an education in which strong learning and strong character belong together. Inspired by the education vision of Sathya Sai Baba, the school seeks to draw out the human values already present in every child.", foundingSupport: "SRSS is part of a worldwide family of Sathya Sai schools: locally rooted, globally connected, and united by a commitment to academic confidence, compassionate leadership and service to society.", milestones: aboutMilestones.map(([year, title, copy]) => ({ year, title, copy })), valueWeek: { title: "Love in action", prompt: "Notice one thoughtful way you can make someone’s day lighter.", route: "#students" }, principal: { heading: "Learning with love, leading with character.", quote: "The real magic of SRSS lies in our teachers and staff, who teach by example every day.", body: "After twenty-five years, our vision is brighter than ever: to nurture young people who meet challenges with courage, embrace opportunities with wisdom, and become champions of peace, unity and care for our planet.", image: "/assets/photos/processed/principal-uma-devi-1086x1358.jpg", alt: "Portrait of Uma Devi Jenes Nayagam, Principal of Sekolah Rendah Sathya Sai" }, updatedAt: null,
-};
-
-const missionPillars = [["Academic Excellence", "Developing knowledgeable, confident and capable lifelong learners."], ["Character Excellence", "Nurturing integrity, self-awareness, compassion, responsibility and strength of character."], ["Civic Stewardship", "Developing responsible Malaysians who respect their nation, its diversity and the wider human family."], ["Altruistic Responsibility", "Inspiring children to recognise their responsibility to serve society and care for the world around them."]];
-const aboutLinks = [["Our Story", "/about/our-story"], ["Vision & Mission", "/about/vision-mission"], ["Sathya Sai Education", "/about/sathya-sai-education"], ["Leadership & Governance", "/about/leadership-governance"], ["Our People", "/about/our-people"], ["School Profile", "/about/school-profile"], ["Campus", "/about/campus"], ["Silver Jubilee", "/about/silver-jubilee"]];
-
-function AboutPage({ onVisit, content, faqs }) {
-  const about = { ...defaultAboutContent, ...content };
-  const defaultHero = !content?.heroImage || content.heroImage === defaultAboutContent.heroImage;
-  return <main id="main" className="about-page about-refresh">
-    <section className="about-hero" id="top"><img className="about-school-sketch" src="/assets/heritage/hero-school-sketch-v2-1536.webp" srcSet="/assets/heritage/hero-school-sketch-v2-640.webp 640w, /assets/heritage/hero-school-sketch-v2-960.webp 960w, /assets/heritage/hero-school-sketch-v2-1536.webp 1536w" sizes="(max-width: 900px) 120vw, 76vw" width="1536" height="1024" alt="" aria-hidden="true" decoding="async"/><div className="about-inner about-hero-grid"><div><p className="eyebrow">ABOUT SRSS · EDUCATION FOR LIFE</p><h1>Education for Life,<br/><em>Not Mere Living.</em></h1><p>Sekolah Rendah Sathya Sai is a Malaysian primary school dedicated to helping every child grow into the fullest and finest expression of who they can become.</p><a className="primary-button" href="/about/our-story">Discover Our Story</a></div><figure className="about-hero-photo">{defaultHero ? <HeroPhoto image={HERO_PHOTOS.friends} priority /> : <img src={about.heroImage} alt={about.heroAlt}/>}</figure></div></section>
-    <nav className="about-directory about-inner" aria-label="About SRSS sections">{aboutLinks.map(([label, href]) => <a key={label} href={href}>{label}<ArrowRight size={15}/></a>)}</nav>
-    <section className="principal-welcome about-inner" id="principal-welcome"><p className="eyebrow">A welcome from our Principal</p><h2>Learning with love, leading with character.</h2><blockquote>“{srssVoices[0].excerpt}”</blockquote><p className="principal-welcome-source">{srssVoices[0].name} · Principal</p><details><summary>Read the Principal’s welcome <CaretDown size={18} aria-hidden="true" /></summary><VoiceStory voice={srssVoices[0]} /></details></section>
-    <section className="about-intro about-inner" id="who-we-are"><div><p className="eyebrow">Who we are</p><h2>A school for the mind, heart and character.</h2></div><div className="about-rich-copy"><p>At SRSS, education is more than the acquisition of knowledge or preparation for examinations. We believe a truly educated child develops an intelligent mind, a strong character, a compassionate heart, practical abilities and responsibility towards others.</p><p>Inspired by the educational philosophy of Sri Sathya Sai Baba, we combine the Malaysian National Curriculum with an integral approach that nurtures body, mind, heart and spirit.</p><a className="text-link" href="/about/our-story">Explore Our Story <ArrowRight size={17}/></a></div></section>
-    <section className="about-profile about-inner" id="school-profile"><div><p className="eyebrow">School profile</p><h2>SRSS at a glance.</h2><p>Key facts about the school. Families can find more in the <a className="text-link" href="/resources/faq">FAQs</a>.</p></div><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="profile" firstOpen /></section>
-    <section className="purpose-refresh" id="vision-mission"><div className="about-inner"><div className="purpose-refresh-heading"><div className="purpose-title"><p className="eyebrow">Our purpose</p><h2>Human Excellence,<br/><em>lived with purpose.</em></h2></div><div className="purpose-statements"><article><h3>Vision</h3><p>To nurture young people of character, confidence and compassion who contribute to a more peaceful world.</p></article><article><h3>Mission</h3><p>To integrate Malaysia’s national curriculum with an education that develops intellect, integrity, wellbeing and service.</p></article></div></div><div className="mission-pillars">{missionPillars.map(([title, copy], index) => <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{copy}</p></article>)}</div></div></section>
-    <section className="educare-refresh" id="educare"><div className="about-inner educare-grid"><div><p className="eyebrow">Sathya Sai Education &amp; Educare</p><h2>Drawing out what is already within.</h2><p>Education provides knowledge from the outside. <strong>Educare seeks to draw out the values and human potential already within the child.</strong></p><p>Truth, Right Conduct, Peace, Love and Non-Violence are not separate subjects or decorative slogans. They are practised in lessons, relationships, reflection and service.</p></div><IntegralFramework /></div><div className="about-inner global-line"><p><strong>A global educational movement.</strong> Sathya Sai Schools are locally rooted, inclusive and non-denominational, sharing a commitment to academic excellence and universal human values.</p><a className="text-link" href="/about/sathya-sai-education">Discover Sathya Sai Education <ArrowRight size={17}/></a></div></section>
-    <section className="community-refresh" id="our-people"><div className="about-inner"><p className="eyebrow">It takes a community to educate a child</p><h2>Every day is an opportunity to grow.</h2><div className="partnership"><strong>CHILD</strong><span>TEACHERS</span><span>PARENTS</span><span>VOLUNTEERS</span></div><p>Teachers, parents and volunteers each bring something essential to the child’s learning. Together, they create the conditions in which confidence, character and capability can flourish.</p><a className="text-link" href="/join/get-involved">Discover how you can be part of SRSS <ArrowRight size={17}/></a></div></section>
-    <section className="people-refresh about-inner"><figure><img src={about.principal?.image || defaultAboutContent.principal.image} alt={about.principal?.alt || defaultAboutContent.principal.alt}/></figure><div><p className="eyebrow">Our people</p><h2>Leadership, teachers and family partnership.</h2><p>Our people include the Board of Directors, school leadership, teachers, administrators, support staff and Teacher-Parent Association — each contributing to a school community in which every child is known and encouraged.</p><a className="text-link" href="/about/our-people">Meet the people of SRSS <ArrowRight size={17}/></a></div></section>
-    <LearningSpaces id="campus" eyebrow="Our campus" />
-    <section className="anniversary-refresh" id="srss25"><div className="about-inner"><p className="eyebrow">SRSS25 · 25 years of educating the heart</p><h2>2002 <span>—</span> 2027</h2><div>{["Our beginning", "Our journey", "Our people", "Our impact", "Our future"].map((item) => <article key={item}><i>↓</i><strong>{item}</strong></article>)}</div><p>Our Silver Jubilee will honour founders and pioneers, former teachers, alumni stories, anniversary projects and the next chapter of SRSS.</p><a className="primary-button" href="/about/silver-jubilee">Celebrating 25 Years</a></div></section>
-    <section className="about-closing" id="about-closing"><div className="about-inner"><TreeStructure size={32}/><p className="eyebrow">About SRSS</p><h2>Discover who we are and what shapes our approach to education.</h2><button className="primary-button" type="button" onClick={onVisit}>Arrange a visit</button></div></section>
-  </main>;
-}
 
 function VoiceStory({ voice }) {
   return <article className="voice-story" id={voice.id}>
@@ -306,6 +277,7 @@ function SchoolCalendar({ items, onAdd, embedded = false }) {
 export function App() {
   const headerRef = useRef(null);
   const [route, setRoute] = useState(currentRoute);
+  const [aboutReady, setAboutReady] = useState(false);
   useEffect(() => {
     const header = headerRef.current;
     if (!header) return;
@@ -338,7 +310,7 @@ export function App() {
   const [managedContent, setManagedContent] = useState({
     news: newsItems.map(([category, title, date, image], index) => ({ id: `fallback-news-${index}`, category, title, date: `2026-${date.slice(3, 6) === "Jul" ? "07" : "07"}-${date.slice(0, 2)}`, image })),
     events: events.map(([date, title, category, time], index) => ({ id: `fallback-event-${index}`, date: `2026-${date.endsWith("JUL") ? "07" : "08"}-${date.slice(0, 2)}`, title, category, time })),
-    about: defaultAboutContent,
+    about: {},
     homepage: defaultHomepageContent,
     faqs: defaultFaqs,
   });
@@ -397,7 +369,7 @@ export function App() {
     }, { threshold: 0.3 });
     observer.observe(node);
     return () => observer.disconnect();
-  }, [statsVisible]);
+  }, [statsVisible, pageReady, route, aboutReady]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("nav-locked", menuOpen);
@@ -407,14 +379,16 @@ export function App() {
   // Scroll reveal: sections fade up once as they enter the viewport. Content stays visible when motion
   // is reduced or IntersectionObserver is unavailable, because `reveal-ready` is never added then.
   useEffect(() => {
+    if (!pageReady) return undefined;
     if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     document.documentElement.classList.add("reveal-ready");
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add("is-revealed"); observer.unobserve(entry.target); }
     }, { rootMargin: "0px 0px -6% 0px", threshold: 0.08 });
-    document.querySelectorAll("[data-reveal]:not(.is-revealed), [data-reveal-stagger]:not(.is-revealed)").forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
-  }, [route]);
+    const nodes = [...document.querySelectorAll("[data-reveal]:not(.is-revealed), [data-reveal-stagger]:not(.is-revealed)")];
+    nodes.forEach(node => { node.classList.add('reveal-pending'); observer.observe(node); });
+    return () => { observer.disconnect(); nodes.forEach(node => node.classList.remove('reveal-pending')); };
+  }, [route, pageReady, standalone, managedContent, aboutReady]);
 
   useEffect(() => {
     if (!statsVisible) return undefined;
@@ -431,7 +405,11 @@ export function App() {
     ...(managedContent.events || []).map((item, index) => ({ ...item, type: "Event", image: item.image || eventFallbackImages[index % eventFallbackImages.length], Icon: CalendarBlank })),
   ].filter((item) => item.date).sort((a, b) => String(b.date).localeCompare(String(a.date))), [managedContent.news, managedContent.events]);
   const storyItems = useMemo(() => allStories.slice(0, 8), [allStories]);
-  const tickerItems = useMemo(() => storyItems.slice(0, 6).map((item) => ({ id: `${item.type}-${item.id}`, date: item.date, title: item.title })), [storyItems]);
+  const publicNotices = useMemo(() => {
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    return (managedContent.notices || []).filter(item => !item.expiresAt || item.expiresAt >= today).sort((a, b) => Number(b.pinned) - Number(a.pinned) || String(b.date).localeCompare(String(a.date)));
+  }, [managedContent.notices]);
+  const tickerItems = useMemo(() => [...publicNotices, ...storyItems].slice(0, 6).map(item => ({ id: `${item.type || 'notice'}-${item.id}`, date: item.date, title: item.title })), [publicNotices, storyItems]);
 
   // The homepage journey contains its visit invitation; the pre-footer invitation is for other pages.
   const isHome = route.page === "home";
@@ -454,6 +432,8 @@ export function App() {
   const blocks = {
     openVisit: () => { setSent(false); setVisitOpen(true); },
     hero: () => (
+      <>
+        {!!publicNotices.length && <aside className="public-notices" id="school-notices" aria-label="School announcements">{publicNotices.map(item => <article key={item.id}><p className="eyebrow">School announcement</p><h2>{item.title}</h2><p>{item.body}</p></article>)}</aside>}
           <section className="hero" id="top" aria-labelledby="hero-title">
             <img className="hero-school-sketch" src="/assets/heritage/hero-school-sketch-v2-1536.webp" srcSet="/assets/heritage/hero-school-sketch-v2-640.webp 640w, /assets/heritage/hero-school-sketch-v2-960.webp 960w, /assets/heritage/hero-school-sketch-v2-1536.webp 1536w" sizes="(max-width: 900px) 140vw, 78vw" width="1536" height="1024" alt="" aria-hidden="true" decoding="async" fetchPriority="low" onError={(event) => { event.currentTarget.hidden = true; }} onLoad={(event) => { event.currentTarget.hidden = false; }} />
             <div className="hero-copy">
@@ -462,11 +442,12 @@ export function App() {
               <p className="hero-description">At <strong>Sekolah Rendah Sathya Sai</strong>, we go beyond grades, uniting Head, Heart and Hands to nurture values, shape character and bring out the best in every child.</p>
               <div className="hero-actions">
                 <a className="primary-button" href="/about">Explore SRSS</a>
-                <button className="text-button" type="button" onClick={() => { setSent(false); setVisitOpen(true); }}>Arrange a visit</button>
+                <button className="text-button" type="button" onClick={() => { setSent(false); setVisitOpen(true); }}>Book a visit</button>
               </div>
             </div>
             <HeroPhoto className="hero-image" image={HERO_PHOTOS.reading} priority />
           </section>
+      </>
     ),
     welcome: () => (<>
           <section className="home-welcome" id="purpose" aria-labelledby="welcome-title">
@@ -507,14 +488,14 @@ export function App() {
     activeBodies: () => <ActiveBodies />,
     values: () => <ValuesGarden values={values} />,
     faq: () => (
-      <section className="home-faq-dropdown" id="faq"><details><summary><span><span className="eyebrow">Helpful answers</span><span className="faq-dropdown-title" role="heading" aria-level="2">Questions, welcomed.</span></span><CaretDown size={24} aria-hidden="true" /></summary><div className="faq-dropdown-content"><p>Find answers to the questions families ask most often.</p><FaqAccordion items={(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, 5)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /><a className="text-link" href="/resources/faq">View all frequently asked questions</a></div></details></section>
+      <section className="home-faq-dropdown" id="faq"><details><summary><span><span className="eyebrow">Helpful answers</span><span className="faq-dropdown-title" role="heading" aria-level="2">Questions, welcomed.</span></span><CaretDown size={24} aria-hidden="true" /></summary><div className="faq-dropdown-content"><p>Find answers to the questions families ask most often.</p><FaqAccordion items={verifiedFaqs(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, 5)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /><a className="text-link" href="/resources/faq">View all frequently asked questions</a></div></details></section>
     ),
     // A category shows only that kind of story (Student Life pages, SRSS25 updates); otherwise the latest eight.
     news: ({ category, homeUpdates = false } = {}) => {
       const list = category ? allStories.filter((item) => storyCategory(item) === category) : storyItems;
       return (
           <section className={`news-section${homeUpdates ? " news-home-updates" : ""}`} id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">{category ? <>{category} <em>stories.</em></> : <>Stories &amp; <em>Happenings.</em></>}</h2></div>{route.page === "studentLife" && <StoryFilters current={category} />}<a href={route.page === "home" ? "/resources/news" : "#events-title"}>{route.page === "home" ? "View all news" : "See the calendar"} <ArrowRight size={16} /></a></div>
-            {homeUpdates && blocks.jubilee()}
+            {(homeUpdates || route.page === 'studentLife' && !category) && blocks.jubilee()}
             {list.length ? <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`} data-reveal-stagger>{list.map((item) => <li key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" /><div><span><item.Icon size={14} aria-hidden="true" />{item.type}</span><time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time><h3>{item.title}</h3>{item.excerpt && <p>{item.excerpt}</p>}</div></li>)}</ul> : <p className="calendar-empty">{category ? "No stories in this category have been published yet. They appear here as soon as the school publishes them." : "News and events will appear here once they are published."}</p>}
             {list.length > 4 && <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>{storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} /></button>}
             {homeUpdates && <SchoolCalendar items={managedContent.events || []} onAdd={addToCalendar} embedded />}
@@ -576,10 +557,10 @@ export function App() {
       </section>
     ),
   };
-  const pageFaqs = managedContent.faqs?.length ? managedContent.faqs : defaultFaqs;
+  const pageFaqs = verifiedFaqs(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs);
   const pages = {
     legal: () => <Suspense fallback={<main id="main" className="legal-page" />}><LegalPage slug={route.slug || ""} /></Suspense>,
-    about: () => <AboutPage content={managedContent.about} faqs={pageFaqs} onVisit={blocks.openVisit} />,
+    about: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutPage content={managedContent.about} faqs={pageFaqs} onVisit={blocks.openVisit} jubilee={blocks.jubilee} onReady={setAboutReady} anchor={window.location.hash.slice(1) || route.anchor} /></Suspense>,
     sathyaSai: () => <SathyaSaiEducationPage values={values} quote={inspirationQuote} faqs={pageFaqs} />,
     jubilee: () => <JubileePage blocks={blocks} motto={managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto} />,
     governance: () => <GovernancePage />,
@@ -678,7 +659,7 @@ export function App() {
                 <button type="button" className="nav-acc" aria-expanded={mobileSection === item.label} onClick={() => setMobileSection(mobileSection === item.label ? null : item.label)}>{item.label}<CaretDown size={16} weight="bold" aria-hidden="true" /></button>
                 {mobileSection === item.label && <div className="nav-acc-panel"><a className="nav-acc-overview" href={item.href} onClick={closeMenus}>Explore {item.label} <ArrowRight size={14} /></a>{menuBody(item)}</div>}
               </section>)}</div>
-              <div className="nav-drawer-foot"><button type="button" className="primary-button" onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>Arrange a visit</button><a href="/join/admissions#enquiry" onClick={closeMenus}>Make an enquiry</a><a className="nav-drawer-signin" href={signInLink.href} onClick={closeMenus}><SignIn size={16} aria-hidden="true" /> {signInLink.label}</a></div>
+              <div className="nav-drawer-foot"><button type="button" className="primary-button" onClick={() => { closeMenus(); setSent(false); setVisitOpen(true); }}>Book a visit</button><a href="/join/admissions#enquiry" onClick={closeMenus}>Make an enquiry</a><a className="nav-drawer-signin" href={signInLink.href} onClick={closeMenus}><SignIn size={16} aria-hidden="true" /> {signInLink.label}</a></div>
             </nav>
           )}
         </div>
