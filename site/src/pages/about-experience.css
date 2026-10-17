@@ -51,3 +51,50 @@ html:has(.about-experience) { scroll-behavior:auto; }
  .about-experience .about-hero-photo::after { background:linear-gradient(180deg,#0b203c 0%,#0b203c70 14%,#0b203c00 40%); }
  .about-principal { padding:28px; }.principal-card-layout { grid-template-columns:1fr; gap:26px; }.principal-stat-column { border-left:0; border-top:1px solid #d5dce5; padding:25px 0 0; }.principal-stat>strong { font-size:62px; }.principal-stat>strong>span { display:inline; margin-left:9px; font-size:28px; }.principal-stat-column .about-expand { align-self:start; padding:12px 18px; }.principal-person { margin-top:0; }
 }
+/* Final About structure: welcome dropdown, three statements and an integrated Mission reveal. */
+.about-principal blockquote { margin:18px 0 30px; font:400 clamp(25px,2.4vw,34px)/1.5 var(--serif); }
+.about-principal>.principal-person { margin:0 0 26px; }.about-principal>.about-expand { margin-top:24px; }
+.about-identity .about-expand { margin-top:26px; }
+.welcome-framework { grid-column:1/-1; min-width:0; }
+.welcome-framework .about-framework { padding:40px 0 10px; }
+.welcome-framework>.about-framework { width:100%; }
+.framework-tree .tree-pillars a { display:block; padding:26px 20px; text-align:left; }
+.framework-tree .tree-pillars svg { margin-left:0; }.framework-tree .tree-pillars strong { display:block; font-size:23px; }
+.tree-pillars ul { margin:20px 0 0; padding:18px 0 0; border-top:1px solid #cad4df; list-style:none; }
+.tree-pillars li { font:400 13px/1.75 var(--body); margin-block:8px; }
+.framework-flower .home-values-garden { padding:22px; border:0; background:transparent; }.framework-flower .home-values-inner { grid-template-columns:1fr 1fr; gap:35px; text-align:left; }
+.framework-flower .home-values-art { max-width:350px; }.framework-flower .home-values-copy h2 { font-size:30px; }.framework-flower .home-values-copy>p { font-size:13px; }
+.framework-flower .home-value-explanation { padding:16px; }
+.tree-roots.layer-seen .home-values-art { animation:about-flower-bloom .7s ease both; }
+@keyframes about-flower-bloom { from { scale:.9; opacity:.4; } to { scale:1; opacity:1; } }
+.about-purpose-card .purpose-statement { font:400 clamp(27px,2.7vw,37px)/1.5 var(--serif); margin-bottom:0; }
+.purpose-statement em { color:#efd585; background:var(--gold-foil); background-clip:text; -webkit-text-fill-color:transparent; font-style:normal; }
+.about-purpose-grid { align-items:stretch; }.about-purpose-grid #mission { display:flex; flex-direction:column; align-items:start; }.about-purpose-grid #mission .about-expand { margin-top:30px; }
+.mission-pillar-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.mission-pillar { min-width:0; background:#fff; color:var(--navy-950); border-radius:12px; border-top:4px solid var(--pillar-accent); }
+.mission-pillar-head { --pillar-accent:#b8912d; }.mission-pillar-heart { --pillar-accent:#73448f; }.mission-pillar-hands { --pillar-accent:#21745a; }
+.mission-pillar>summary { display:flex; gap:14px; align-items:center; list-style:none; padding:25px 22px; cursor:pointer; font:500 25px/1.25 var(--serif); }
+.mission-pillar>summary svg { flex-shrink:0; color:var(--pillar-accent); }.mission-pillar>summary small { display:block; color:var(--pillar-accent); font:600 10px var(--ui); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+.mission-pillar-content { padding:0 22px 25px; }.mission-pillar-content p { color:#4d6072; font-size:14px; line-height:1.8; }
+.mission-pillar-content h4 { color:var(--navy-950); font:500 24px var(--serif); margin:28px 0 16px; }
+.pillar-commitments { list-style:none; padding:0; margin:0; }.pillar-commitments li { padding-block:14px; border-top:1px solid #d6dfe6; }.pillar-commitments strong { font:600 13px/1.6 var(--ui); }.pillar-commitments p { margin:6px 0 0; font-size:13px; }
+.learning-labs>div { display:grid; grid-template-columns:1fr 1fr; gap:10px; }.learning-labs details { padding:12px; background:#f5f7fa; border:1px solid #d4dde4; border-radius:8px; }.learning-labs summary { font:600 12px/1.7 var(--ui); cursor:pointer; list-style:none; }.learning-labs summary span { color:#b08828; margin-right:6px; }.learning-labs details p { font-size:12px; }
+.pillar-values .home-values-garden { padding:8px 0; border:0; background:none; }.pillar-values .home-values-inner { grid-template-columns:1fr; gap:20px; }.pillar-values .home-values-art { max-width:320px; }.pillar-values .home-values-copy h2 { font-size:27px; }.pillar-values .home-values-copy>p { font-size:13px; }.pillar-values .home-values-copy .home-values-cue { font-size:11px; }.pillar-values .home-value-explanation { padding:16px; background:#f5f7fa; }.pillar-values .home-value-explanation h3 { font-size:24px; }
+.pillar-values .home-value-practice { display:none; }.mission-day { padding:30px; margin-top:25px; border:1px solid #c1d4e438; border-radius:12px; }.mission-day p { color:#dbe5ef; font-size:15px; line-height:1.85; }.mission-day .eyebrow { color:#ecd180; }
+@media(min-width:901px) { .mission-pillar>summary { cursor:default; } }
+.about-parent-faq { padding-block:75px; }.about-parent-faq h2 { font:500 clamp(30px,3.7vw,46px)/1.3 var(--serif); }
+.about-faq-tabs { display:flex; gap:8px; overflow-x:auto; padding:6px 3px 16px; margin:28px 0 10px; }.about-faq-tabs button { flex-shrink:0; min-height:44px; padding:12px 18px; border:1px solid #c2ced9; border-radius:24px; color:var(--navy-950); background:white; font:500 12px var(--ui); cursor:pointer; }.about-faq-tabs button[aria-selected=true] { color:white; background:var(--purple-metal); border-color:#73448f; }
+.about-parent-faq .faq-list { max-width:none; }.about-faq-actions { display:flex; gap:24px; flex-wrap:wrap; align-items:center; margin-top:28px; }
+.testimonial-heading { display:flex; justify-content:space-between; align-items:center; gap:25px; }.testimonial-heading h2 { margin-bottom:0; }.testimonial-arrows { display:flex; gap:10px; }.testimonial-arrows button { width:44px; height:44px; border:1px solid #c9d2dc; border-radius:50%; font:400 28px var(--body); background:white; color:var(--navy-950); cursor:pointer; }
+.testimonials-track { display:flex; gap:24px; overflow-x:auto; scroll-snap-type:x mandatory; padding:5px 2px 22px; scrollbar-width:thin; }
+.community-quote-card { display:flex; flex-direction:column; flex:0 0 calc(50% - 12px); min-width:0; margin:0; padding:34px; border:1px solid #d5dde5; border-radius:22px; background:white; scroll-snap-align:start; }
+.community-quote-card .quote-mark { font:600 68px/.9 var(--serif); color:#b18d2e; }.community-quote-card blockquote { margin:25px 0 38px; font:400 clamp(23px,2.3vw,30px)/1.6 var(--serif); }.community-quote-card figcaption { margin-top:auto; display:flex; gap:14px; align-items:center; }.community-quote-card figcaption p { margin:0; }.community-quote-card figcaption strong { display:block; font:600 14px var(--ui); }.community-quote-card figcaption p>span { display:block; color:#596f80; font-size:13px; line-height:1.6; margin-top:5px; }.quote-monogram { display:grid; place-items:center; width:56px; height:56px; border-radius:50%; background:#edf1f5; color:#74488c; font:500 18px var(--ui); flex-shrink:0; }
+.about-parent-voice { background:var(--about-paper); padding-block:56px; }.about-parent-voice .community-quote-card { border:0; border-left:3px solid #be9b43; border-radius:0 16px 16px 0; max-width:980px; background:transparent; }
+@media(max-width:900px) {
+ .mission-pillar-grid { grid-template-columns:1fr; }.mission-pillar>summary { padding:22px; }.mission-pillar>summary::after { content:'+'; margin-left:auto; font:400 26px var(--ui); }.mission-pillar[open]>summary::after { content:'−'; }
+ .mission-pillar-content { padding-inline:22px; }.learning-labs>div { grid-template-columns:1fr; }.framework-flower .home-values-inner { grid-template-columns:1fr; }.framework-tree .tree-pillars { grid-template-columns:1fr; }
+ .about-parent-faq { padding-block:48px; }.testimonials-track { gap:16px; }.community-quote-card { flex-basis:100%; padding:28px; }.testimonial-heading { align-items:start; }.testimonial-heading h2 { max-width:75%; }.testimonial-arrows { gap:6px; }.testimonial-arrows button { width:38px; height:38px; }.testimonial-filters { gap:7px; }.testimonial-filters button { padding-inline:12px; }
+}
+@media(prefers-reduced-motion:reduce) { .tree-roots.layer-seen .home-values-art { animation:none; } }
+/* Avoid a fractional-pixel seam where the photo meets the solid blue. */
+@media(min-width:901px) { .about-experience.about-refresh .about-hero .about-hero-photo:has(.hero-photo-documentary) { mask-image:linear-gradient(90deg,transparent,#000 3px); } }
