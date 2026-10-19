@@ -13,14 +13,17 @@ export const SITE = [
 
   // 01 About SRSS — who we are
   { path: "/about", label: "About SRSS", page: "about", status: "page", owner: "Leadership", summary: "Our identity, philosophy, history and people." },
-  { path: "/about/our-story", label: "Our Story", parent: "/about", page: "about", anchor: "who-we-are", status: "section", editable: true, owner: "Leadership", summary: "How SRSS began and grew since 2002." },
-  { path: "/about/vision-mission", label: "Vision & Mission", parent: "/about", page: "about", anchor: "vision-mission", status: "section", owner: "Leadership", summary: "Our purpose, vision, mission, eleven aims and five universal values." },
-  { path: "/about/sathya-sai-education", label: "Sathya Sai Education", parent: "/about", page: "sathyaSai", status: "page", owner: "Leadership", summary: "The philosophy of Sathya Sai Educare and the five human values." },
-  { path: "/about/leadership-governance", label: "Leadership & Governance", parent: "/about", page: "governance", status: "page", owner: "Leadership", summary: "How the school is governed and led, and its relationship with SSIOM." },
+  { path: "/about/our-story", label: "Our Story", parent: "/about", page: "aboutStory", status: "page", editable: "append", owner: "Leadership", summary: "How SRSS began and grew since 2002." },
+  { path: "/about/vision-mission", label: "Our Vision & Mission", parent: "/about", page: "aboutPurpose", status: "page", editable: "append", owner: "Leadership", summary: "Our purpose, vision, mission, eleven aims and five universal values." },
+  { path: "/about/human-excellence", label: "Human Excellence", parent: "/about", page: "aboutExcellence", status: "page", editable: "append", owner: "Leadership", summary: "Developing the whole child through Head, Heart and Hands, values and purposeful action." },
+  { path: "/about/why-srss", label: "Why SRSS?", parent: "/about", page: "aboutWhy", status: "page", editable: "append", owner: "Admissions officer", summary: "Academic foundations, character, languages and opportunities to grow." },
+  { path: "/about/our-educators", label: "Our Educators", parent: "/about", page: "aboutEducators", status: "page", editable: "append", owner: "Leadership", summary: "Teachers as educators, mentors and examples of human values." },
+  { path: "/about/sathya-sai-education", label: "The Sathya Sai Educare Philosophy", parent: "/about", page: "aboutEducare", status: "page", editable: "append", owner: "Leadership", summary: "The philosophy of Sathya Sai Educare and the five human values." },
+  { path: "/about/leadership-governance", label: "Our Leadership", parent: "/about", page: "aboutLeadership", status: "page", editable: "append", owner: "Leadership", summary: "How the school is governed and led, and its relationship with SSIOM." },
   { path: "/about/our-people", label: "Our People", parent: "/about", page: "ourPeople", status: "page", editable: "append", owner: "Leadership", summary: "Our Board, school administration, teachers, support staff, volunteers and PTA." },
   { path: "/about/voices", label: "Community Voices", parent: "/about", page: "voices", status: "page", editable: "append", owner: "Leadership", summary: "Reflections from educators, alumni, former parents and volunteers." },
-  { path: "/about/school-profile", label: "School Profile", parent: "/about", page: "about", anchor: "school-profile", status: "section", editable: true, owner: "School office", summary: "Key facts: registration, levels, curriculum, hours and location." },
-  { path: "/about/campus", label: "Campus", parent: "/about", page: "about", anchor: "campus", status: "section", editable: true, owner: "School office", summary: "The spaces where children learn, play and grow." },
+  { path: "/about/school-profile", label: "School Profile", parent: "/about", page: "aboutProfile", status: "page", editable: "append", owner: "School office", summary: "Key facts: registration, levels, curriculum, hours and location." },
+  { path: "/about/campus", label: "Campus", parent: "/about", page: "aboutCampus", status: "page", editable: "append", owner: "School office", summary: "The spaces where children learn, play and grow." },
   { path: "/about/silver-jubilee", label: "Silver Jubilee", parent: "/about", page: "jubilee", status: "page", owner: "Content editor", summary: "SRSS25 — 25 years of education for life." },
 
   // 02 Learning — how we educate
@@ -47,7 +50,6 @@ export const SITE = [
   // 04 Join SRSS — admissions and community
   { path: "/join", label: "Join SRSS", page: "join", status: "page", owner: "Admissions officer", summary: "Admissions, alumni, volunteering and support." },
   { path: "/join/admissions", label: "Admissions", parent: "/join", page: "admissions", status: "page", owner: "Admissions officer", summary: "Who can apply, the process, fees and enquiries." },
-  { path: "/join/why-srss", label: "Why SRSS?", parent: "/join/admissions", page: "admissions", anchor: "why-srss", status: "section", owner: "Admissions officer", summary: "What makes an SRSS education distinctive." },
   { path: "/join/how-to-apply", label: "How to Apply", parent: "/join/admissions", page: "admissions", anchor: "how-to-apply", status: "section", editable: true, owner: "Admissions officer", summary: "The admissions process, step by step." },
   { path: "/join/fees", label: "Fees", parent: "/join/admissions", page: "admissions", anchor: "fees", status: "section", owner: "Admissions officer", summary: "Fees and how to request fee information." },
   { path: "/join/book-a-visit", label: "Book a Visit", parent: "/join/admissions", page: "admissions", anchor: "how-to-apply", status: "section", owner: "Admissions officer", openVisit: true, summary: "Request a school tour." },
@@ -103,6 +105,7 @@ export function pageContent(content) {
 
 // Old addresses → canonical ones. Also mirrored as permanent (301) redirects in firebase.json.
 export const REDIRECTS = {
+  "/join/why-srss": "/about/why-srss",
   "/about/inspiration": "/about/sathya-sai-education",
   "/about/governance": "/about/leadership-governance",
   "/faq": "/resources/faq",

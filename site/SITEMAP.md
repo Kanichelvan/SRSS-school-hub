@@ -44,7 +44,7 @@ Menu data lives in `src/data/navigation.js`.
 
 | Menu | Groups (→ pages) |
 |---|---|
-| About SRSS | **Our School:** Our Story · School Profile · Campus. **Our Philosophy:** Vision & Mission · Sathya Sai Education. **Our Community:** Leadership & Governance · Our People. **Our Legacy:** Silver Jubilee |
+| About SRSS | **Our School:** Our Story · School Profile · Campus. **Our Philosophy:** Our Vision & Mission · Human Excellence · The Sathya Sai Educare Philosophy. **Our Community:** Our Leadership · Our Educators · Our People · Community Voices. **Discover More:** Why SRSS? · Silver Jubilee |
 | Learning | **Learning Foundations:** Curriculum · Learning Journey. **Our Programmes:** Human Values · Enrichment · Learning Environment. **Supporting Every Child:** Learning Support · Reading & Library |
 | Student Life | **Experiences:** Events · Sports · Arts & Culture. **Growth & Achievement:** Student Leadership · Achievements · Service. **Explore:** Stories · Gallery |
 | Join SRSS | **Admissions:** Why SRSS? · How to Apply · Fees · Book a Visit · Admissions FAQs. **Get Involved:** Alumni · Volunteer · Support SRSS · Parents & Community |
@@ -60,14 +60,17 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 |---|---|---|---|
 | `/` | Home | Own page | Content editor |
 | `/about` | About SRSS | Own page | Leadership |
-| `/about/our-story` | Our Story | Section of `/about#who-we-are` | Leadership |
-| `/about/vision-mission` | Vision & Mission | Section of `/about#vision-mission` | Leadership |
-| `/about/sathya-sai-education` | Sathya Sai Education | Own page | Leadership |
-| `/about/leadership-governance` | Leadership & Governance | Own page | Leadership |
+| `/about/our-story` | Our Story | Own page | Leadership |
+| `/about/vision-mission` | Our Vision & Mission | Own page | Leadership |
+| `/about/human-excellence` | Human Excellence | Own page | Leadership |
+| `/about/why-srss` | Why SRSS? | Own page | Admissions officer |
+| `/about/our-educators` | Our Educators | Own page | Leadership |
+| `/about/sathya-sai-education` | The Sathya Sai Educare Philosophy | Own page | Leadership |
+| `/about/leadership-governance` | Our Leadership | Own page | Leadership |
 | `/about/our-people` | Our People: Board, school team, PTA | Own page | Leadership |
 | `/about/voices` | Community Voices | Own page | Leadership |
-| `/about/school-profile` | School Profile | Section of `/about#school-profile` | School office |
-| `/about/campus` | Campus | Section of `/about#campus` | School office |
+| `/about/school-profile` | School Profile | Own page | School office |
+| `/about/campus` | Campus | Own page | School office |
 | `/about/silver-jubilee` | Silver Jubilee | Own page | Content editor |
 | `/learning` | Learning | Own page | Academic coordinator |
 | `/learning/curriculum` | Curriculum | Section of `/learning#curriculum` | Academic coordinator |
@@ -88,7 +91,6 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/student-life/gallery` | Gallery | Section of `/student-life#gallery` | Content editor |
 | `/join` | Join SRSS | Own page | Admissions officer |
 | `/join/admissions` | Admissions | Own page | Admissions officer |
-| `/join/why-srss` | Why SRSS? | Section of `/join/admissions#why-srss` | Admissions officer |
 | `/join/how-to-apply` | How to Apply | Section of `/join/admissions#how-to-apply` | Admissions officer |
 | `/join/fees` | Fees | Section of `/join/admissions#fees` | Admissions officer |
 | `/join/book-a-visit` | Book a Visit | Section of `/join/admissions#how-to-apply` | Admissions officer |
@@ -231,3 +233,7 @@ Named audience and content owner · canonical route and navigation parent · app
 ### Homepage refinement — 15 October 2026
 
 After open academics and Active bodies: the supplied-photo Small moments carousel → the spacious gold founder quote with Principal welcome link → Stories & Happenings with SRSS25 invitation, reports and its integrated calendar → Begin the journey / Find your way, with compact contact disclosure → collapsed FAQ. Cookie preferences appear on first encounter and reopen from both public and Hub footers. Existing page URLs remain stable.
+
+### About page network (school brief, 19 October 2026)
+
+`/about` retains its Education for Life hero and introduces seven linked pages. Each page has an About journey navigation and a suggested next destination; no prescribed reading sequence. Existing Story, Vision & Mission, Educare and Leadership URLs are preserved. Why SRSS moves to `/about/why-srss`; `/join/why-srss` permanently redirects there. School Profile and Campus remain directly accessible as separate pages. Legacy `/about#…` bookmarks are mapped to their new destination by `aboutAnchorDestination`. These pages accept school-published additions through Content › Website pages. Verified profiles and documentary photos are reused; fictional growth examples are explicitly labelled.

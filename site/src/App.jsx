@@ -40,21 +40,28 @@ import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs, verifiedFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
 import OurPeople from "./pages/OurPeople.jsx";
+import { aboutAnchorDestination } from './data/aboutNetwork.js';
 import { signInLink, siteNav } from "./data/navigation.js";
 import { pageContent, resolvePath, siteEntry, sitePageId } from "./data/siteMap.js";
 import { storyCategory } from "./data/stories.js";
 import { FaqAccordion, FaqList, FAQ_TOPICS } from "./components/Faq.jsx";
-import { AdmissionsPage, Breadcrumbs, ContentBody, ContentPage, GovernancePage, IntegralFramework, JoinPage, JubileePage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SathyaSaiEducationPage, SiteSearch, StoryFilters, StudentLifePage } from "./pages/SitePages.jsx";
+import { AdmissionsPage, Breadcrumbs, ContentBody, ContentPage, GovernancePage, IntegralFramework, JoinPage, JubileePage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SiteSearch, StoryFilters, StudentLifePage } from "./pages/SitePages.jsx";
 import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
 
 // Policy pages load on demand so their text never weighs on the homepage.
+const AboutNetwork = lazy(() => import('./pages/AboutNetwork.jsx'));
 const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
 const LegalPage = lazy(() => import("./legal/LegalPage.jsx"));
 // Current route from the address bar; old addresses are swapped for their canonical URL in place.
 function currentRoute() {
   const { pathname, hash } = window.location;
+  const aboutDestination = aboutAnchorDestination(pathname, hash);
+  if (aboutDestination) {
+    window.history.replaceState({}, "", aboutDestination);
+    return resolvePath(aboutDestination.split('#')[0]).entry;
+  }
   if (pathname === "/about/our-people" && ["#principal", "#academics", "#alumni"].includes(hash)) {
-    const destination = hash === "#principal" ? "/about#principal-welcome" : `/about/voices${hash}`;
+    const destination = hash === "#principal" ? "/about/leadership-governance#principal-welcome" : `/about/voices${hash}`;
     window.history.replaceState({}, "", destination);
     return resolvePath(destination.split("#")[0]).entry;
   }
@@ -351,7 +358,7 @@ export function App() {
     loadSitePage(sitePageId(route.path)).then((content) => { if (live) setSitePage({ path: route.path, content: pageContent(content) }); }).catch(() => { if (live) setSitePage({ path: route.path, content: null }); });
     return () => { live = false; };
   }, [route]);
-  const pageReady = !route.editable || sitePage.path === route.path && sitePage.content !== undefined;
+  const pageReady = route.editable === "append" || !route.editable || sitePage.path === route.path && sitePage.content !== undefined;
   const standalone = route.editable === true && pageReady && Boolean(sitePage.content);
 
   useEffect(() => {
@@ -560,8 +567,16 @@ export function App() {
   const pageFaqs = verifiedFaqs(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs);
   const pages = {
     legal: () => <Suspense fallback={<main id="main" className="legal-page" />}><LegalPage slug={route.slug || ""} /></Suspense>,
-    about: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutPage content={managedContent.about} faqs={pageFaqs} onVisit={blocks.openVisit} jubilee={blocks.jubilee} onReady={setAboutReady} anchor={window.location.hash.slice(1) || route.anchor} /></Suspense>,
-    sathyaSai: () => <SathyaSaiEducationPage values={values} quote={inspirationQuote} faqs={pageFaqs} />,
+    about: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutPage content={managedContent.about} onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1) || route.anchor} /></Suspense>,
+    aboutStory: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="story" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutPurpose: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="purpose" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutExcellence: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="excellence" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutEducare: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="educare" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutWhy: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="why" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutLeadership: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="leadership" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutEducators: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="educators" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutProfile: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="profile" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
+    aboutCampus: () => <Suspense fallback={<main id="main" aria-busy="true" />}><AboutNetwork key={route.path} page="campus" onVisit={blocks.openVisit} onReady={setAboutReady} anchor={window.location.hash.slice(1)} faqs={pageFaqs} extra={sitePage.path === route.path ? sitePage.content : null} /></Suspense>,
     jubilee: () => <JubileePage blocks={blocks} motto={managedContent.homepage?.stats?.motto || defaultHomepageContent.stats.motto} />,
     governance: () => <GovernancePage />,
     ourPeople: () => <OurPeople extra={sitePage.path === route.path ? sitePage.content : null} />,
