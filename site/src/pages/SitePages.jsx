@@ -273,11 +273,12 @@ export function ResourcesPage({ blocks }) {
 }
 
 // ---------- 01D Leadership & Governance ----------
-export function GovernancePage() {
-  return <main id="main" className="site-page">
-    <PageHero eyebrow="Leadership & Governance" title="One school community, many hands in service.">
+export function GovernancePage({ embedded = false }) {
+  const Container = embedded ? 'div' : 'main';
+  return <Container id={embedded ? undefined : 'main'} className={embedded ? 'embedded-governance' : 'site-page'}>
+    {!embedded && <PageHero eyebrow="Leadership & Governance" title="One school community, many hands in service.">
       <p>How Sekolah Rendah Sathya Sai is governed and led, and where to turn when you need the School to act.</p>
-    </PageHero>
+    </PageHero>}
     <PageSection id="structure" eyebrow="Governance" title="Who is responsible for SRSS.">
       <div className="governance-grid">
         <article><h3>Sathya Sai International Organisation of Malaysia (SSIOM)</h3><p>The parent organisation of SRSS — a Malaysian non-profit organisation registered with the Registrar of Societies (PPM-001-14-10081983). SSIOM supports the School’s mission and owns the SRSS Digital Hub platform.</p></article>
@@ -294,10 +295,10 @@ export function GovernancePage() {
       </ul>
       <p className="page-note">The Principal is the first point of contact through the school office on <a href={contact.phoneHref}>{contact.phone}</a>. Concerns about the Principal go to the Chair of the Board of Governors, Dr Maniam.</p>
     </PageSection>
-    <Closing title="Meet the people who make SRSS.">
+    {!embedded && <Closing title="Meet the people who make SRSS.">
       <a className="primary-button" href="/about/our-people">Our People</a>
-    </Closing>
-  </main>;
+    </Closing>}
+  </Container>;
 }
 
 export function NotFoundPage() {

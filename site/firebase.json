@@ -86,6 +86,11 @@
         "source": "/sign-in",
         "destination": "/login",
         "type": 301
+      },
+      {
+        "source": "/join/why-srss",
+        "destination": "/about/why-srss",
+        "type": 301
       }
     ]
   },
