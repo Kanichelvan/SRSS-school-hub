@@ -2,6 +2,7 @@
 // with 2026 kept as last year's history. Every person here is invented — no real pupil, parent or staff
 // member. Used only by scripts/seed-emulator.mjs, which refuses to run anywhere except the local emulators.
 // Dates for attendance, notices and events are relative to the day the seed runs, so dashboards have data.
+import { CLASS_NAMES as SCHOOL_CLASS_NAMES } from "../school-data/srss-2027.mjs";
 
 export const DEMO_PASSWORD = "srss-demo-only"; // emulator-only; shared with the demo buttons in src/hub/SignIn.jsx
 export const YEAR = { id: "ay2027", name: "2027", startDate: "2027-01-11", endDate: "2027-11-26" };
@@ -31,7 +32,8 @@ export const ACCOUNTS = [
 // A staff member without an account yet (shows the "Create account" step).
 export const STAFF_WITHOUT_ACCOUNT = [["staff-noraini", "Puan Noraini Yusof (demo)", "Music Teacher"]];
 
-export const CLASS_NAMES = ["Amanah", "Bakti", "Cekal", "Dedikasi", "Ehsan", "Fikrah"];
+// The School's real class names (scripts/school-data/srss-2027.mjs), so the demo hub shows Standard 1 Prema … Standard 6 Ananda.
+export const CLASS_NAMES = [1, 2, 3, 4, 5, 6].map((level) => SCHOOL_CLASS_NAMES[level]);
 export const classId = (yearId, standard) => `${yearId}-${standard}-${CLASS_NAMES[standard - 1].toLowerCase()}`;
 export const CLASS_TEACHERS = { 4: "teacher", 5: "teacher2" };
 

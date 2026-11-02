@@ -30,7 +30,11 @@ const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
 const SignIn = lazyNamed(() => import("./SignIn"), "SignIn");
 
 const community = () => import("./screens/community");
+const forms = () => import("./screens/forms");
+const fees = () => import("./screens/fees");
 const SCREENS = {
+  familyFees: lazyNamed(fees, "FamilyFees"), feesOffice: lazyNamed(fees, "FeesOffice"),
+  formsCentre: lazyNamed(forms, "FormsCentre"), formsCase: lazyNamed(forms, "CaseView"), myRequests: lazyNamed(forms, "MyRequests"), startRequest: lazyNamed(forms, "StartRequest"), requestView: lazyNamed(forms, "RequestView"),
   requestedForm: lazyNamed(() => import("./screens/requestedForms"), "RequestedForm"),
   academicRecords: lazyNamed(() => import("./screens/academicRecords"), "AcademicRecords"),
   familyApplications: lazyNamed(() => import("./screens/applications"), "FamilyApplications"),

@@ -11,6 +11,7 @@ import { recomputeConsentStatus, recomputeUserScope, refreshGuardianClasses } fr
 import { CONSENT_FORM_VERSION, CONSENT_ITEMS } from "../src/hub/consentForm.js";
 import { importLegacyContent } from "./import-legacy-content.mjs";
 import * as demo from "./demo-data/school-2027.mjs";
+import * as fees from "../src/data/fees.js";
 import { seedQuest } from "./seed-quest-emulator.mjs";
 
 const PROJECT = "demo-srss";
@@ -67,7 +68,7 @@ for (let s = 1; s <= 6; s++) {
   put(`standards/std${s}`, { level: s, order: s, name: `Standard ${s}`, status: "active", ...stamp });
   for (const year of [PREVIOUS_YEAR, YEAR]) {
     const teacherKey = year === YEAR ? demo.CLASS_TEACHERS[s] : null;
-    put(`classes/${demo.classId(year.id, s)}`, { ...meta({ academicYearId: year.id }), name: `${s} ${demo.CLASS_NAMES[s - 1]}`, standard: s, classTeacherUid: teacherKey ? uid[teacherKey] : null, room: `Block A · Room ${s}`, capacity: 30 });
+    put(`classes/${demo.classId(year.id, s)}`, { ...meta({ academicYearId: year.id }), name: `Standard ${s} ${demo.CLASS_NAMES[s - 1]}`, standard: s, classTeacherUid: teacherKey ? uid[teacherKey] : null, room: `Block A · Room ${s}`, capacity: 30 });
   }
 }
 demo.SUBJECTS.forEach(([id, name]) => put(`subjects/${id}`, { name, code: id, standards: [], status: "active", ...stamp }));
@@ -201,9 +202,16 @@ put("admissionEnquiries/enq-1", { parentName: "Farah Aziz (demo)", email: "farah
 put("admissionEnquiries/enq-2", { parentName: "Kevin Ong (demo)", email: "kevin.demo@example.com", childName: "Ethan", enteringStandard: 3, source: "website", status: "visitBooked", createdAt: now, consentToContact: true });
 put("applications/app-1", meta({ applicantUid: null, status: "underReview", child: { name: "Zara Aziz", dateOfBirth: "2021-03-14" }, guardians: [{ name: "Farah Aziz (demo)", email: "farah.demo@example.com", relationship: "mother" }], enteringStandard: 1, submittedAt: now, createdBy: uid.admissions }));
 put("applications/app-2", meta({ applicantUid: null, status: "accepted", child: { name: "Hannah Lee", dateOfBirth: "2020-07-02" }, guardians: [{ name: "Grace Lee (demo)", email: "grace.demo@example.com", relationship: "mother" }], enteringStandard: 2, startDate: YEAR.startDate, submittedAt: now, createdBy: uid.admissions }));
-put("feeStructures/fs-2027", meta({ name: "2027 tuition (demo)", amount: 1800, currency: "MYR", instalments: 3 }));
-put("studentFeeAssignments/sfa-aarav", meta({ studentId: studentIds["Aarav Raman"], feeStructureId: "fs-2027", amountDue: 1800, amountPaid: 1200, outstanding: 600, nextDueDate: day(14) }));
-put("studentFeeAssignments/sfa-anika", meta({ studentId: studentIds["Anika Raman"], feeStructureId: "fs-2027", amountDue: 1800, amountPaid: 1800, outstanding: 0 }));
+// Fees-Lite: the real fee schedule (src/data/fees.js) on fictional pupils. Aarav (Standard 4) is the Raman
+// family's first child; Anika (Standard 2) the second, with the 20% sibling discount. Meals are a separate line.
+for (const [name, position, paid] of [["Aarav Raman", 1, [["tuition", 385, "2027-01-08"], ["meals", 70, "2027-01-08"]]], ["Anika Raman", 2, []]]) {
+  const studentId = studentIds[name];
+  const assignment = { studentId, studentName: name.split(" ")[0], academicYearId: YEAR.id, year: 2027, familyKey: studentIds["Aarav Raman"], familySize: 2, siblingPosition: position, siblingDiscount: fees.siblingDiscount(position), meals: true, mealSponsored: false, concessionKey: "none", concessionRate: 0, concessionLabel: null, plan: "monthly" };
+  const payments = paid.map(([line, amount, date], index) => ({ id: `pay-${studentId}-${index}`, studentId, academicYearId: YEAR.id, line, amount, date, reference: `DEMO-${index + 1}`, method: "Bank transfer" }));
+  const result = fees.statement(assignment, payments, localDate(new Date()));
+  for (const { id, ...payment } of payments) put(`payments/${id}`, { ...payment, recordedBy: uid.finance, createdAt: now });
+  put(`studentFeeAssignments/${studentId}_${YEAR.id}`, meta({ ...assignment, tuitionMonthly: result.tuition.monthly, mealMonthly: result.meals.monthly, tuitionCharged: result.tuition.charged, mealsCharged: result.meals.charged, amountDue: result.tuition.charged + result.meals.charged, paidTuition: result.tuition.paid, paidMeals: result.meals.paid, outstanding: result.outstanding, status: "issued" }));
+}
 put("newsPosts/np-1", meta({ title: "Standard 4 recycling corner wins zone award", category: "Achievements", date: day(-3), image: "/assets/photos/processed/sports-day-podium-1600.jpg", excerpt: "Our Standard 4 pupils turned a quiet corner into a working recycling station.", status: "published", ownerRole: "contentEditor", reviewDate: day(60), publishedAt: now }));
 put("newsPosts/np-2", meta({ title: "SRSS25: call for alumni stories", category: "School News", date: day(2), excerpt: "Share how SRSS shaped your journey.", status: "review", ownerRole: "contentEditor", reviewDate: day(30) }));
 

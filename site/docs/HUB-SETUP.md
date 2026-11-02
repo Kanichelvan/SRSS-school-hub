@@ -81,6 +81,7 @@ The production project is **SRSSDigitalHub** (project ID `srssdigitalhub`, numbe
 6. Create `settings/school` with `currentAcademicYearId`, then academic years, terms, standards, classes, subjects and teacher assignments.
 7. Schedule daily Firestore exports to Cloud Storage and test a restore each term.
 8. Consider App Check for the web app (PRD §46).
+9. Forms & Response Centre emails: install the *Trigger Email from Firestore* extension on the `mail` collection with the school's SMTP account. Until then, notifications stay in the hub and emails wait in `mail` (see [`FORMS-SYSTEM.md`](FORMS-SYSTEM.md)).
 
 ### C. Data and governance (Phase 0)
 

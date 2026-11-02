@@ -22,6 +22,7 @@ export const ROLES = {
   portfolioModerator: { label: "Portfolio Moderator", hub: "admin" },
   contentEditor: { label: "Content Editor", hub: "admin" },
   technicalAdmin: { label: "Technical Administrator", hub: "admin" },
+  alumniCoordinator: { label: "Alumni / SRSS25 Coordinator", hub: "admin" },
   // Future roles (PRD §6) — defined now so data and rules stay stable when their modules ship.
   librarian: { label: "Librarian", hub: "admin", future: true },
   auditor: { label: "Auditor / Read-only Reviewer", hub: "admin", future: true },
@@ -54,6 +55,7 @@ export const MODULES = {
   messages: { label: "Messages", phase: 1 },
   notifications: { label: "Notifications", phase: 1 },
   forms: { label: "Forms & Actions", phase: 1 },
+  formsCentre: { label: "Forms & Response Centre", phase: 1 },
   search: { label: "Search", phase: 1 },
   profile: { label: "Profile", phase: 1 },
   students: { label: "Student records (SIS)", phase: 1 },
@@ -82,7 +84,7 @@ export const MODULES = {
   support: { label: "Learning support", phase: 2 },
   incidents: { label: "Incidents & behaviour", phase: 2 },
   meetings: { label: "Parent–teacher meetings", phase: 2 },
-  fees: { label: "Fees-lite", phase: 2 },
+  fees: { label: "Fees-lite", phase: 1 }, // built Nov 2026 with the School Fees and Payment Policy
   familyAdmissions: {label:"Family admissions applications",phase:1},
   teacherDevelopment: { label: "Teacher development", phase: 1 },
   staffHR: { label: "Staff HR (leave, training, appraisal)", phase: 2 },
@@ -94,7 +96,7 @@ export const MODULES = {
 //   actions: V view · C create/submit · U update (implies V) · A approve/publish (implies V) · R restricted (exception only)
 //   scope:   all (default) · own · child · assigned · class · selected · relevant · summary · published
 // A role missing from a row has no access.
-const ALL_STAFF = ["superAdmin", "attendanceManager", "teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "librarian", "auditor"];
+const ALL_STAFF = ["superAdmin", "attendanceManager", "teacher", "classTeacher", "specialistTeacher", "academicCoordinator", "schoolAdmin", "admissionsOfficer", "financeOfficer", "leadership", "safeguardingLead", "privacySteward", "portfolioModerator", "contentEditor", "technicalAdmin", "alumniCoordinator", "librarian", "auditor"];
 const everyone = (cell) => Object.fromEntries([...ROLE_IDS].map((role) => [role, cell]));
 const staffOnly = (cell) => Object.fromEntries(ALL_STAFF.map((role) => [role, cell]));
 
@@ -109,6 +111,8 @@ const MATRIX = {
   announcements: { ...everyone("V relevant"), teacher: "A class", classTeacher: "A class", specialistTeacher: "A class", schoolAdmin: "A", leadership: "A" },
   messages: { ...staffOnly("C/U own"), parent: "C/U own" },
   forms: { ...everyone("C/U own"), schoolAdmin: "A", privacySteward: "A" },
+  // Each person sees the queues their roles hold (functions/forms-registry.js HANDLER_ROLES); restricted cases only their own PIC roles.
+  formsCentre: Object.fromEntries(["superAdmin", "schoolAdmin", "leadership", "admissionsOfficer", "attendanceManager", "privacySteward", "academicCoordinator", "portfolioModerator", "librarian", "safeguardingLead", "alumniCoordinator", "contentEditor", "technicalAdmin", "financeOfficer"].map((role) => [role, "U assigned"])),
 
   students: {
     student: "V own", parent: "V child", teacher: "V class", classTeacher: "V class", specialistTeacher: "V assigned",

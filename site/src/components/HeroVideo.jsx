@@ -9,7 +9,8 @@ export const HERO_CLIPS = {
 };
 
 // The poster is always available; video downloads begin only when playback is allowed.
-export default function HeroVideo({ clip, className = '', priority = false, autoPlay = false, playbackRate = .8 }) {
+// `compact` shows a small round pause/play button, for footage used as a page-header background.
+export default function HeroVideo({ clip, className = '', priority = false, autoPlay = false, playbackRate = .8, compact = false }) {
   const container = useRef(null);
   const video = useRef(null);
   const [automatic, setAutomatic] = useState(false);
@@ -51,10 +52,21 @@ export default function HeroVideo({ clip, className = '', priority = false, auto
     if (!element) return;
     element.playbackRate = playbackRate;
     let cancelled = false;
+    let retry;
     if ((automatic || requested) && !userPaused && visible && tabVisible && !failed) {
-      element.play()?.catch(() => { if (!cancelled) setPlaying(false); });
+      element.play()?.catch(() => {
+        if (cancelled) return;
+        setPlaying(false);
+        // Browsers in a power-saving mode can refuse autoplay; start on the visitor's first scroll, tap or key.
+        retry = () => element.play()?.catch(() => {});
+        for (const type of ['pointerdown', 'keydown', 'scroll']) window.addEventListener(type, retry, { once: true, passive: true });
+      });
     } else element.pause();
-    return () => { cancelled = true; element.pause(); };
+    return () => {
+      cancelled = true;
+      element.pause();
+      if (retry) for (const type of ['pointerdown', 'keydown', 'scroll']) window.removeEventListener(type, retry);
+    };
   }, [automatic, requested, userPaused, visible, tabVisible, failed, small, playbackRate]);
 
   const toggle = () => {
@@ -72,9 +84,9 @@ export default function HeroVideo({ clip, className = '', priority = false, auto
       onLoadedMetadata={() => { video.current.playbackRate = playbackRate; }}
       onLoadedData={() => setHasFrame(true)} onPlaying={() => setPlaying(true)} onPause={() => setPlaying(false)}
       onError={() => { setFailed(true); setPlaying(false); }} />
-    {!failed && <button type="button" className="hero-video-control" onClick={toggle} aria-label={playing ? 'Pause background video' : 'Play background video'} aria-pressed={playing}>
-      {playing ? <Pause size={15} weight="fill" aria-hidden="true" /> : <Play size={15} weight="fill" aria-hidden="true" />}
-      <span>{playing ? 'Pause' : 'Play'}</span>
+    {!failed && <button type="button" className={`hero-video-control${compact ? ' is-compact' : ''}`} onClick={toggle} aria-label={playing ? 'Pause background video' : 'Play background video'} title={compact ? (playing ? 'Pause video' : 'Play video') : undefined} aria-pressed={playing}>
+      {playing ? <Pause size={compact ? 14 : 15} weight="fill" aria-hidden="true" /> : <Play size={compact ? 14 : 15} weight="fill" aria-hidden="true" />}
+      {!compact && <span>{playing ? 'Pause' : 'Play'}</span>}
     </button>}
   </div>;
 }

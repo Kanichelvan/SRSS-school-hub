@@ -2027,6 +2027,7 @@ html.nav-locked { overflow: hidden; }
 .page-section .faq-list { max-width: 860px; }
 .page-note { margin: 22px 0 0; color: var(--muted); font-size: 14px; }
 .page-note a:not(.text-link) { color: var(--purple-700); font-weight: 600; text-decoration: underline; }
+.page-note .text-link, .fees-prose .text-link, .fees-options .text-link { white-space: normal; }
 .page-closing { padding: 64px 0; text-align: center; background: var(--cream); }
 .page-closing h2 { margin: 0; color: var(--navy-950); font: 600 clamp(28px, 3vw, 38px)/1.15 var(--serif); }
 .page-closing .landing-hero-actions { justify-content: center; }
@@ -2290,3 +2291,6 @@ a.mega-group-title:hover::after { translate: 3px 0; }
   .mobile-menu-button { display: inline-grid; }
   .mobile-nav-backdrop { position: fixed; inset: 0; z-index: 39; display: block; border: 0; background: rgba(6, 22, 47, .45); cursor: pointer; }
 }
+
+/* The Admissions page shows the full admission pathways (AdmissionPathways.jsx), so the homepage's short step list is hidden there. */
+#how-to-apply .home-pathway { display: none; }

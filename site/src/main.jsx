@@ -20,11 +20,14 @@ import "./components/our-people.css";
 // /portal and retired /parent-hub and /admin addresses that redirect into it.
 const HubApp = lazy(() => import("./hub/HubApp.jsx").then((module) => ({ default: module.HubApp })));
 const isHubRoute = /^\/(sign-in|login|dashboard|portal|hub|parent-hub|admin)(\/|$)/.test(window.location.pathname);
+// Public forms (/forms, /forms/<id>) load the form registry and Firebase Functions on demand.
+const PublicForms = lazy(() => import("./forms/PublicForms.jsx").then((module) => ({ default: module.PublicForms })));
+const isFormsRoute = /^\/forms(\/|$)/.test(window.location.pathname);
 
 const root = import.meta.hot?.data.root || createRoot(document.getElementById("root"));
 if (import.meta.hot) import.meta.hot.dispose((data) => { data.root = root; });
 root.render(
   <React.StrictMode>
-    <CookiePreferencesProvider>{isHubRoute ? <Suspense fallback={<div className="hub-loading">Loading…</div>}><HubApp /></Suspense> : <App />}</CookiePreferencesProvider>
+    <CookiePreferencesProvider>{isHubRoute ? <Suspense fallback={<div className="hub-loading">Loading…</div>}><HubApp /></Suspense> : isFormsRoute ? <Suspense fallback={<div className="hub-loading">Loading…</div>}><PublicForms /></Suspense> : <App />}</CookiePreferencesProvider>
   </React.StrictMode>,
 );

@@ -1,9 +1,11 @@
 // Landing pages for Website Architecture v2.0. They assemble existing, verified content in its new home:
 // shared homepage blocks (passed in as `blocks`), FAQ records and the route map. Child URLs that are
 // "sections" scroll to the matching anchor here until they earn standalone pages (see src/data/siteMap.js).
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import HeroVideo, { HERO_CLIPS } from '../components/HeroVideo.jsx';
 import HeroPhoto, { HERO_PHOTOS } from '../components/HeroPhoto.jsx';
+// Loaded only on the Admissions page: its icons would otherwise weigh on every public page.
+const AdmissionPathways = lazy(() => import('../components/AdmissionPathways.jsx'));
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
 import { CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
@@ -28,9 +30,10 @@ export function Breadcrumbs({ entry }) {
   );
 }
 
-function PageHero({ eyebrow, title, children, actions, image, alt, video, photo }) {
+export function PageHero({ eyebrow, title, children, actions, image, alt, video, photo }) {
   return (
-    <section className={`landing-hero${image || video || photo ? "" : " landing-hero-plain"}`} id="top">
+    <section className={`landing-hero${video && !photo ? " landing-hero-video" : image || photo ? "" : " landing-hero-plain"}`} id="top">
+      {video && !photo && <HeroVideo clip={video} className="landing-hero-backdrop" priority autoPlay compact playbackRate={.65} />}
       <div className="page-inner landing-hero-grid">
         <div>
           <p className="eyebrow">{eyebrow}</p>
@@ -38,7 +41,7 @@ function PageHero({ eyebrow, title, children, actions, image, alt, video, photo 
           <div className="landing-hero-copy">{children}</div>
           {actions && <div className="landing-hero-actions">{actions}</div>}
         </div>
-        {photo ? <figure><HeroPhoto image={photo} priority /></figure> : video ? <figure><HeroVideo clip={video} priority autoPlay playbackRate={.65} /></figure> : image && <figure><img src={image} alt={alt} /></figure>}
+        {photo ? <figure><HeroPhoto image={photo} priority /></figure> : video ? null : image && <figure><img src={image} alt={alt} /></figure>}
       </div>
     </section>
   );
@@ -54,7 +57,7 @@ function Directory({ path, title = "Explore this section" }) {
   );
 }
 
-function PageSection({ id, eyebrow, title, intro, children, tone }) {
+export function PageSection({ id, eyebrow, title, intro, children, tone }) {
   return (
     <section className={`page-section${tone ? ` page-section-${tone}` : ""}`} id={id} aria-labelledby={`${id}-title`}>
       <div className="page-inner">
@@ -65,7 +68,7 @@ function PageSection({ id, eyebrow, title, intro, children, tone }) {
   );
 }
 
-function Closing({ title, children }) {
+export function Closing({ title, children }) {
   return <section className="page-closing"><div className="page-inner"><h2>{title}</h2><div className="landing-hero-actions">{children}</div></div></section>;
 }
 
@@ -175,7 +178,7 @@ const COMMUNITY = [
   { id: "alumni", title: "Alumni", copy: "Reconnect with the school that shaped you. Tell us where life has taken you, and stay in touch for SRSS25.", form: { subject: "Alumni", extra: [["years", "Years at SRSS", "For example 2002–2007"]], messageLabel: "Where life has taken you, and how you’d like to stay in touch", submitLabel: "Register as an alumnus", note: "", done: "Thank you — you’re on the SRSS alumni list. We’ll be in touch about SRSS25." }, links: [["Read alumni voices", "/about/voices#alumni"], ["Share an SRSS memory", "/about/silver-jubilee#memories"]] },
   { id: "volunteer", title: "Volunteer", copy: "Offer your time, expertise or practical support to school activities.", form: { subject: "Volunteer", extra: [["availability", "When you’re available", "Weekdays, weekends, events"]], messageLabel: "How you’d like to help", submitLabel: "Offer to volunteer", note: "Volunteers who work with pupils follow the Child Protection & Safeguarding Policy, including suitability checks.", done: "Thank you for offering to help. The school office will contact you." }, links: [["Safeguarding policy", "/legal/child-safeguarding"]] },
   { id: "support-srss", title: "Support SRSS", copy: "Contribute to approved school initiatives, including SRSS25 anniversary projects.", form: { subject: "Support SRSS", extra: [], messageLabel: "How you’d like to support the school", submitLabel: "Ask how to help", note: "", done: "Thank you. The school office will reply with the current approved initiatives." }, links: [] },
-  { id: "parents-community", title: "Parents & Community", copy: "Take part in school-community life alongside our teachers, including through the Teacher-Parent Association.", links: [["Contact the school office", "/resources/contact"], ["Current families: sign in", "/login"]] },
+  { id: "parents-community", title: "Parents & Community", copy: "Take part in school-community life alongside our teachers, including through the Teacher-Parent Association.", links: [["The Parent–School Partnership", "/join/parent-partnership"], ["Contact the school office", "/resources/contact"], ["Current families: sign in", "/login"]] },
 ];
 
 function CommunityCard({ item }) {
@@ -218,10 +221,16 @@ export function AdmissionsPage({ blocks, faqs, pillars }) {
       <ul className="page-pillars">{pillars.map(([Icon, title, copy]) => <li key={title}><Icon size={26} weight="duotone" aria-hidden="true" /><h3>{title}</h3><p>{copy}</p></li>)}</ul>
       <FaqList items={faqs} questions={FAQ_TOPICS.whySrss} idPrefix="why" />
     </PageSection>
+    <PageSection id="admission-pathways" eyebrow="How admission works" title="How children join SRSS." intro="Most children join in Standard 1 at age six, through the school's yearly intake. Families can also apply during the year when a place opens.">
+      <Suspense fallback={null}><AdmissionPathways /></Suspense>
+    </PageSection>
     <div id="how-to-apply" className="anchor-block">{blocks.admissions()}</div>
-    <PageSection id="fees" eyebrow="Fees" title="Fees and financial information." tone="ivory">
+    <PageSection id="fees" eyebrow="Fees" title="Affordable education. An enduring commitment." tone="ivory">
       <FaqList items={faqs} questions={FAQ_TOPICS.fees} idPrefix="fees" firstOpen />
-      <p className="page-note"><a className="text-link" href={mailto("Fee enquiry")}>Request the current fee schedule <ArrowRight size={15} /></a></p>
+      <p className="page-note"><a className="text-link" href="/join/fees">School fees, sibling discounts and the family fee calculator <ArrowRight size={15} /></a> · <a className="text-link" href="/join/fees/sponsorship">Sponsorship and financial assistance <ArrowRight size={15} /></a> · <a className="text-link" href="/about/our-commitment">Why SRSS is not-for-profit <ArrowRight size={15} /></a></p>
+    </PageSection>
+    <PageSection id="partnership" eyebrow="A shared commitment" title="A partnership between the family and the school." intro="Our educational philosophy gives equal importance to academic development and the five universal human values. Before joining, please read what we ask of families, and what SRSS undertakes in return, including our vegetarian food policy.">
+      <p className="page-note"><a className="text-link" href="/join/parent-partnership">The Parent–School Partnership <ArrowRight size={15} /></a> · <a className="text-link" href="/student-life/vegetarian-food">Vegetarian food at school <ArrowRight size={15} /></a></p>
     </PageSection>
     <PageSection id="admissions-faq" eyebrow="Admissions FAQs" title="Questions families ask.">
       <FaqList items={faqs} questions={FAQ_TOPICS.admissions} idPrefix="admissions-faq" />
@@ -234,10 +243,14 @@ export function AdmissionsPage({ blocks, faqs, pillars }) {
 // ---------- 05 Resources ----------
 const DOWNLOADS = [
   ["School prospectus", "Request a copy by email.", mailto("Prospectus request")],
-  ["Fee information", "Request the current fee schedule.", mailto("Fee enquiry")],
+  ["School fees", "Tuition, meals, sibling discounts and payment options.", "/join/fees"],
+  ["Fees and Payment Policy", "The school's fees policy in full.", "/join/fees/policy"],
+  ["Sponsorship and financial assistance", "Who is fully sponsored, and how to ask for help.", "/join/fees/sponsorship"],
+  ["Parent–School Partnership Agreement", "What we ask of families, and what SRSS undertakes.", "/join/parent-partnership"],
+  ["Vegetarian Food and School Activities Policy", "What may be served at school and school activities.", "/student-life/vegetarian-food"],
   ["Before the First Bell", "The morning assembly guide, printable.", "/resources/prayer-pledge-anthem"],
 ];
-const POLICY_LINKS = [["Privacy Policy", "/legal/privacy"], ["Terms of Use", "/legal/terms"], ["Child Protection & Safeguarding", "/legal/child-safeguarding"], ["Photography & Media Consent", "/legal/media-consent"], ["Accessibility & Complaints", "/legal/accessibility-complaints"]];
+const POLICY_LINKS = [["Parent–School Partnership Agreement", "/join/parent-partnership"], ["Vegetarian Food and School Activities Policy", "/student-life/vegetarian-food"], ["Fees and Payment Policy", "/join/fees/policy"], ["Privacy Policy", "/legal/privacy"], ["Terms of Use", "/legal/terms"], ["Child Protection & Safeguarding", "/legal/child-safeguarding"], ["Photography & Media Consent", "/legal/media-consent"], ["Accessibility & Complaints", "/legal/accessibility-complaints"]];
 
 export function SiteSearch({ autoFocus = false, id = "resources-search" }) {
   const [query, setQuery] = useState("");

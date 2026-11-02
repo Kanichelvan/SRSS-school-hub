@@ -58,6 +58,12 @@ export const PACKS = {
         "/hub/parent/consent",
       ],
       [
+        "partnership",
+        "Agree to the Parent–School Partnership",
+        "Read what the school asks of families and what SRSS undertakes, including the vegetarian food policy, then record your agreement.",
+        "/hub/requests/new/B16",
+      ],
+      [
         "orientation",
         "Attend orientation",
         "Ask the office for the next orientation date. Check school routines and the calendar.",
