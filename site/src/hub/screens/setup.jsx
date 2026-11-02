@@ -135,7 +135,7 @@ export function Classes() {
     fields={[
       { key: "academicYearId", label: "Academic year", type: "select", required: true, immutable: true, options: yearOptions },
       { key: "standard", label: "Standard", type: "select", required: true, immutable: true, options: () => [1, 2, 3, 4, 5, 6].map((level) => [String(level), `Standard ${level}`]) },
-      { key: "name", label: "Class name", type: "text", required: true, maxLength: 60, placeholder: "4 Amanah" },
+      { key: "name", label: "Class name", type: "text", required: true, maxLength: 60, placeholder: "Standard 4 Shanti" },
       { key: "room", label: "Room", type: "text", maxLength: 60 },
       { key: "capacity", label: "Places", type: "number", min: 1, max: 60 },
       { key: "classTeacherUid", label: "Class teacher", type: "select", options: (lookups) => teacherOptions(lookups, auth.user.uid), placeholder: "Not yet chosen", help: "Only staff with a hub account appear here." },

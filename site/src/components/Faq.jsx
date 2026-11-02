@@ -9,6 +9,7 @@ export function FaqAnswer({ item }) {
     {item.bullets?.length ? <ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}
     {item.sections?.map((section) => <section key={section.heading}><h4>{section.heading}</h4>{section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}{section.bullets?.length ? <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul> : null}</section>)}
     {item.closing ? <p>{item.closing}</p> : null}
+    {item.link ? <p><a className="text-link" href={item.link[1]}>{item.link[0]}</a></p> : null}
   </div>;
 }
 
@@ -32,8 +33,8 @@ export const FAQ_TOPICS = {
   curriculum: ["What curriculum does SRSS follow?", "What subjects are offered at SRSS?", "What is the medium of instruction at SRSS?", "How are students assessed at SRSS?"],
   journey: ["What year levels are offered at SRSS?", "What is the teacher-to-student ratio at SRSS?"],
   profile: ["Is SRSS a registered school in Malaysia?", "What year levels are offered at SRSS?", "What are the school hours at SRSS?", "Where is SRSS located?"],
-  schoolDay: ["What are the school hours at SRSS?", "Does SRSS provide meals and transport?"],
+  schoolDay: ["What are the school hours at SRSS?", "Does SRSS provide meals and transport?", "Can we bring food for a birthday or class celebration?"],
   whySrss: ["What makes SRSS different from other schools?", "Is SRSS a religious school?"],
-  fees: ["What are the school fees?"],
-  admissions: ["What year levels are offered at SRSS?", "Does SRSS accept mid-year admissions?", "Is SRSS a registered school in Malaysia?", "Is SRSS a religious school?"],
+  fees: ["What are the school fees?", "Is financial assistance or sponsorship available?"],
+  admissions: ["What year levels are offered at SRSS?", "How does admission to Standard 1 work?", "Does SRSS accept mid-year admissions?", "Is SRSS a registered school in Malaysia?", "Is SRSS a religious school?", "What does SRSS ask of parents?"],
 };

@@ -11,7 +11,7 @@ export const siteNav = [
       { title: "Our School", links: [["Our Story", "/about/our-story"], ["School Profile", "/about/school-profile"], ["Campus", "/about/campus"]] },
       { title: "Our Philosophy", links: [["Our Vision & Mission", "/about/vision-mission"], ["Human Excellence", "/about/human-excellence"], ["The Sathya Sai Educare Philosophy", "/about/sathya-sai-education"]] },
       { title: "Our Community", links: [["Our Leadership", "/about/leadership-governance"], ["Our Educators", "/about/our-educators"], ["Our People", "/about/our-people"], ["Community Voices", "/about/voices"]] },
-      { title: "Discover More", links: [["Why SRSS?", "/about/why-srss"], ["Silver Jubilee", "/about/silver-jubilee"]] },
+      { title: "Discover More", links: [["Why SRSS?", "/about/why-srss"], ["Our Commitment", "/about/our-commitment"], ["Pure Life Society", "/about/pure-life-society"], ["Silver Jubilee", "/about/silver-jubilee"]] },
     ],
   },
   {
@@ -31,7 +31,7 @@ export const siteNav = [
     groups: [
       { title: "Experiences", links: [["Events", "/student-life/events"], ["Sports", "/student-life/sports"], ["Arts & Culture", "/student-life/arts-culture"]] },
       { title: "Growth & Achievement", links: [["Student Leadership", "/student-life/leadership"], ["Achievements", "/student-life/achievements"], ["Service", "/student-life/service"]] },
-      { title: "Explore", links: [["Stories", "/student-life/stories"], ["Gallery", "/student-life/gallery"]] },
+      { title: "Explore", links: [["Stories", "/student-life/stories"], ["Gallery", "/student-life/gallery"], ["Vegetarian Food", "/student-life/vegetarian-food"]] },
     ],
   },
   {
@@ -39,7 +39,7 @@ export const siteNav = [
     href: "/join",
     intro: "Choosing a school for your child, reconnecting as an alumnus or offering your time — there is a place for you.",
     groups: [
-      { title: "Admissions", href: "/join/admissions", links: [["Why SRSS?", "/about/why-srss"], ["How to Apply", "/join/how-to-apply"], ["Fees", "/join/fees"], ["Book a Visit", "/join/book-a-visit"], ["Admissions FAQs", "/join/admissions-faq"]] },
+      { title: "Admissions", href: "/join/admissions", links: [["Why SRSS?", "/about/why-srss"], ["How to Apply", "/join/how-to-apply"], ["Fees", "/join/fees"], ["Sponsorship & Assistance", "/join/fees/sponsorship"], ["Parent–School Partnership", "/join/parent-partnership"], ["Book a Visit", "/join/book-a-visit"], ["Admissions FAQs", "/join/admissions-faq"]] },
       { title: "Get Involved", href: "/join/get-involved", links: [["Alumni", "/join/alumni"], ["Volunteer", "/join/volunteer"], ["Support SRSS", "/join/support-srss"], ["Parents & Community", "/join/parents-community"]] },
     ],
   },

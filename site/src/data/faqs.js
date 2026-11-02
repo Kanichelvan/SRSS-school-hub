@@ -1,8 +1,93 @@
 import { schoolHoursAnswer } from './academics.js';
 import { contact } from '../legal/registry.js';
+import { FEES, childFees, ringgit } from './fees.js';
+import { ENROLMENT } from './admissions.js';
 
-// The confirmed timetable has one owner; a stale saved FAQ must not publish older hours.
-export const verifiedFaqs = items => items.map(item => item.question === schoolHoursAnswer.question ? schoolHoursAnswer : item);
+// The School Fees and Payment Policy (src/data/fees.js) owns every amount quoted here.
+const firstChild = childFees(1);
+export const feesAnswer = {
+  question: "What are the school fees?",
+  paragraphs: [
+    `School tuition is ${ringgit(FEES.tuitionMonthly)} a month, charged for ${FEES.months} months from January to November (${ringgit(firstChild.tuitionAnnual)} a year). Meals are provided by an external vendor and charged separately at ${ringgit(FEES.mealMonthly)} a month, so a family using the meal service pays ${ringgit(firstChild.monthly)} a month for one child.`,
+    `Brothers and sisters enrolled at the same time receive sibling discounts on tuition: 20% for the second child, 35% for the third and 45% for the fourth child onwards. Fees can be paid monthly by the ${FEES.dueDay}th, six-monthly or fortnightly on a written schedule, at the same total cost.`,
+    "SRSS was tuition-free from 2002 to 2024 and operates on a not-for-profit basis. Full sponsorship continues for residential children of the Pure Life Society and for children from eligible B40 households, subject to verification; other families facing hardship may be considered for full or partial assistance.",
+    "Families who may need assistance are warmly encouraged to speak confidentially with the school administration. The School Fees page has the full table, a family fee calculator and the Fees and Payment Policy.",
+  ],
+  link: ["School fees and the family fee calculator", "/join/fees"],
+};
+
+// Vegetarian Food and School Activities Policy (src/pages/FamilyPages.jsx).
+export const mealsAnswer = {
+  question: "Does SRSS provide meals and transport?",
+  paragraphs: [
+    `Yes, meals are provided. An external vendor supplies them at ${ringgit(FEES.mealMonthly)} a month, charged separately from school tuition.`,
+    "Vegetarian food is an established part of school life at SRSS, reflecting our commitment to compassion, non-violence, respect for life and responsible living. All food served, shared or eaten during school-organised activities must be vegetarian. This includes food brought from home, celebrations, events, camps and excursions. The policy does not seek to regulate what families eat in their private lives.",
+    "If your child has a medically necessary dietary requirement, please tell the school so that an appropriate arrangement can be considered.",
+    "The school does not provide transport directly. Parents may contact the school office for guidance on transport services used by SRSS families.",
+  ],
+  link: ["The Vegetarian Food and School Activities Policy", "/student-life/vegetarian-food"],
+};
+
+export const celebrationAnswer = {
+  question: "Can we bring food for a birthday or class celebration?",
+  paragraphs: [
+    "Yes, as long as it is vegetarian. Please check with the school before you bring it, especially where allergies, ingredient restrictions or special dietary needs may be involved. The same applies to visitors, volunteers and external food providers.",
+    "Children are guided with kindness. Accidental mistakes are handled discreetly and without embarrassment.",
+  ],
+  link: ["Check food for an event with the school", "/forms/B17"],
+};
+export const sponsorshipAnswer = {
+  question: "Is financial assistance or sponsorship available?",
+  paragraphs: [
+    "Yes. Residential children of the Pure Life Society and children from eligible B40 households receive fully sponsored education. Full sponsorship is intended to cover tuition and essential school-related needs, including learning materials, uniforms and meals.",
+    "Families facing hardship outside the B40 category, or whose circumstances change unexpectedly, may also be considered for full or partial assistance. Requests are confidential and assessed with compassion and fairness.",
+  ],
+  link: ["Equitable access and student sponsorship", "/join/fees/sponsorship"],
+};
+export const parentsAnswer = {
+  question: "What does SRSS ask of parents?",
+  paragraphs: [
+    "Education works best when the school and family work together. Under the Parent–School Partnership and Shared Values Agreement, we ask parents to reinforce human values at home, lead by example, support regular attendance and respect the school's philosophy, including silent sitting and the vegetarian food policy. We also ask families to communicate respectfully and to work cooperatively with the school.",
+    "In return, SRSS undertakes to treat every child with dignity, fairness and compassion, and to work with parents in the best interests of their children.",
+  ],
+  link: ["The Parent–School Partnership", "/join/parent-partnership"],
+};
+
+// How children join SRSS (src/data/admissions.js), as described by the School in Nov 2026.
+export const intakeAnswer = {
+  question: "How does admission to Standard 1 work?",
+  paragraphs: [
+    "Most children join SRSS in Standard 1 at age six, through the school's yearly intake. The school announces a date on which parents are interviewed; prospective parents also meet one another and the school community, and children sit an entrance test. Families offered a place receive an offer letter.",
+    "Residential children of the Pure Life Society are enrolled automatically, with fully sponsored education.",
+    `To keep classes small, SRSS keeps enrolment at about ${ENROLMENT.usual} pupils and never more than ${ENROLMENT.max}.`,
+  ],
+  link: ["How admission works", "/join/admissions#admission-pathways"],
+};
+export const midYearAnswer = {
+  question: "Does SRSS accept mid-year admissions?",
+  paragraphs: [
+    "Yes, subject to available places.",
+    "Write to the school, or bring your child's documents to the school office. The school then discusses your child's previous learning, placement and needs with you, and offers a place at the earliest opening possible.",
+    `Places depend on availability because SRSS keeps enrolment at about ${ENROLMENT.usual} pupils, never more than ${ENROLMENT.max}, so that the ratio of teachers to pupils stays at its best.`,
+    "For students joining midway through the year, our teachers work with the child and family to make the transition into SRSS as smooth and comfortable as possible.",
+  ],
+  link: ["How admission works", "/join/admissions#admission-pathways"],
+};
+
+// The confirmed timetable, fees and food policy have one owner each; a stale saved FAQ must not publish older answers.
+const VERIFIED = [schoolHoursAnswer, feesAnswer, mealsAnswer, midYearAnswer];
+// Answers the School added with its family policies (Nov 2026) also appear when a saved FAQ list predates them,
+// next to the question they follow.
+const POLICY_ADDITIONS = [[intakeAnswer, "What year levels are offered at SRSS?"], [sponsorshipAnswer, "What are the school fees?"], [parentsAnswer, "Is SRSS a religious school?"], [celebrationAnswer, "Does SRSS provide meals and transport?"]];
+export function verifiedFaqs(items) {
+  const list = items.map(item => VERIFIED.find(answer => answer.question === item.question) || item);
+  for (const [answer, after] of POLICY_ADDITIONS) {
+    if (list.some(item => item.question === answer.question)) continue;
+    const index = list.findIndex(item => item.question === after);
+    list.splice(index < 0 ? list.length : index + 1, 0, answer);
+  }
+  return list;
+}
 
 export const defaultFaqs = [
   {
@@ -12,6 +97,7 @@ export const defaultFaqs = [
       "Beginning with the 2027 school year, SRSS will also open Year 1 admission to eligible six-year-old children, in line with Malaysia’s introduction of optional Year 1 entry at age six.",
     ],
   },
+  intakeAnswer,
   {
     question: "Is SRSS a registered school in Malaysia?",
     paragraphs: [
@@ -77,19 +163,12 @@ export const defaultFaqs = [
       "Our values education is centred on the universal human values of Truth, Right Conduct, Peace, Love and Non-violence—values that can be found across religions, cultures, traditions and civilisations around the world.",
       "The purpose of values education at SRSS is not religious conversion or instruction. Rather, it is to help children develop good character, self-discipline, compassion, responsibility, respect for others and an appreciation of human diversity alongside their academic education.",
       "We believe that education should help children become not only knowledgeable, but also good human beings.",
+      "Taking part in the school's values-based programme does not require families to adopt a particular religious belief.",
     ],
   },
-  {
-    question: "What are the school fees?",
-    paragraphs: [
-      "SRSS operates on a not-for-profit basis, with school fees directed towards the education and wellbeing of our students, the delivery of school programmes, and the maintenance and continued improvement of our facilities.",
-      "We seek to keep our fees reasonable and accessible while ensuring that students continue to receive a meaningful and enriching educational experience. Fees vary according to the student’s year level and any applicable school programmes.",
-      "Please visit our Fee Structure page for the current tuition fees, registration charges and other applicable fees. Our Admissions Team will also be happy to explain the fee structure and answer any questions before enrolment.",
-      "In keeping with our commitment to service and inclusive education, no school fees are charged for students residing at the neighbouring Pure Life Society children’s home.",
-      "SRSS may also consider full or partial fee assistance for deserving families experiencing financial difficulty, subject to assessment and the school’s available resources. Such consideration is extended without discrimination on the basis of race or religion.",
-      "Families who may require assistance are encouraged to speak confidentially with our Admissions Team.",
-    ],
-  },
+  parentsAnswer,
+  feesAnswer,
+  sponsorshipAnswer,
   {
     question: "What is the teacher-to-student ratio at SRSS?",
     paragraphs: [
@@ -97,30 +176,17 @@ export const defaultFaqs = [
       "Many lessons and activities are conducted in even smaller groups, allowing teachers to know their students well, identify individual learning needs and provide more personalised guidance and support.",
     ],
   },
-  {
-    question: "Does SRSS accept mid-year admissions?",
-    paragraphs: [
-      "Yes, subject to available places.",
-      "SRSS welcomes applications throughout the school year, including from children transferring from other schools or educational systems.",
-      "For students joining midway through the year, our teachers work with the child and family to understand the student’s previous learning experience and help make the transition into SRSS as smooth and comfortable as possible.",
-      "Parents considering a mid-year transfer are encouraged to contact the Admissions Team to discuss availability, placement and the most suitable transition arrangements for their child.",
-    ],
-  },
+  midYearAnswer,
   schoolHoursAnswer,
   {
     question: "Where is SRSS located?",
     paragraphs: [
-      `Sekolah Rendah Sathya Sai is located at ${contact.address.join(' ')} The school is situated adjacent to the Pure Life Society.`,
+      `Sekolah Rendah Sathya Sai is located at ${contact.address.join(' ')} The school is situated adjacent to the Pure Life Society, whose premises SRSS leases under an agreement renewed through 2035.`,
       `Telephone: ${contact.phone}`,
     ],
   },
-  {
-    question: "Does SRSS provide meals and transport?",
-    paragraphs: [
-      "SRSS provides students with wholesome vegetarian meals and snacks as part of the school day. Our vegetarian food practice reflects our commitment to student wellbeing as well as responsible and sustainable living. Students, staff, parents and volunteers are encouraged to support this practice during school activities, programmes and events. Through simple everyday choices such as these, we hope to help children understand that caring for their own wellbeing can go hand in hand with caring for the environment and the wider world.",
-      "Transport arrangements are not provided directly by the school. Parents may contact the school office for guidance on any available transport arrangements or services used by SRSS families.",
-    ],
-  },
+  mealsAnswer,
+  celebrationAnswer,
   {
     question: "What makes SRSS different from other schools?",
     paragraphs: ["SRSS combines a strong academic foundation with a distinctive commitment to Human Values and Human Excellence. We believe education should develop not only what a child knows, but also who the child becomes."],

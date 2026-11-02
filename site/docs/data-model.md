@@ -90,3 +90,17 @@ Composite indexes for the built screens are in [`firestore.indexes.json`](../fir
 - `portfolioEvidence/{entryId}/{file}` (Storage): create/read permissions follow the actual portfolio entry. Store authenticated paths in `portfolioEntries.mediaFiles`, never public download tokens. Images are resized and camera metadata stripped before upload; supported document/audio/video files are size/type checked.
 
 New Firestore composite indexes cover internal document audiences, family published academic records and application document lookups. Deploy rules/indexes/Storage/Functions with Hosting. Audit triggers record changes to welcome progress, preferences, activity forms, appraisals, plans, applications, private selection notes and downloads.
+
+## Forms & Response Centre (1 November 2026)
+
+- `formCases/{id}` — one case per submission: `reference` (SRSS-ADM-2027-0042), `formId`, `status`, `picRole` / `backupRole` / `escalationRole`, `assignedToUid`, `submitterUid` or public name/email, `studentId`, `dueAt` (working days, school closures excluded), `reminders`, `source` `{ collection, id, link }`. History in `formCases/{id}/activity` (`visibility: external | internal`). Server-written only.
+- `restrictedCases/{id}` — the same for restricted matters; answers live on the case; readable only by the case's own roles and (external history only) the submitter. The office has no general access.
+- `formSubmissions/{id}` — answers to hub and website forms (`caseId` links back). Domain forms write their own collection instead (`admissionEnquiries` for visit requests, `staffLeave` for leave). Website messages (`contactMessages`), enquiries, applications, absence reports, activity forms and event registrations open a case through triggers and keep their own status in sync.
+- `settings/formsRouting` (Workflow rules), `settings/formsTemplates` (response templates). Server-only: `formCounters`, `formRateLimits`, `mail` (Trigger Email extension outbox).
+
+## Fees-Lite (2 November 2026)
+
+- `studentFeeAssignments/{studentId}_{academicYearId}` — one statement per pupil per year: `siblingPosition` (oldest enrolled first, families found through shared guardians), `meals`, `concessionRate` / `concessionLabel` (no assessment details), `plan` (monthly · sixMonthly · fortnightly), and the derived `tuitionMonthly`, `mealMonthly`, `tuitionCharged`, `mealsCharged`, `paidTuition`, `paidMeals`, `outstanding`. Written by the Finance Officer.
+- `payments/{id}` — `studentId`, `academicYearId`, `line` (`tuition` | `meals`), `amount`, `date`, `method`, `reference`. School tuition and vendor meals are never combined into one line.
+- The Finance Officer may read `studentGuardianLinks` to find siblings.
+

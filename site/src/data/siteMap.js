@@ -24,6 +24,8 @@ export const SITE = [
   { path: "/about/voices", label: "Community Voices", parent: "/about", page: "voices", status: "page", editable: "append", owner: "Leadership", summary: "Reflections from educators, alumni, former parents and volunteers." },
   { path: "/about/school-profile", label: "School Profile", parent: "/about", page: "aboutProfile", status: "page", editable: "append", owner: "School office", summary: "Key facts: registration, levels, curriculum, hours and location." },
   { path: "/about/campus", label: "Campus", parent: "/about", page: "aboutCampus", status: "page", editable: "append", owner: "School office", summary: "The spaces where children learn, play and grow." },
+  { path: "/about/our-commitment", label: "Our Commitment", parent: "/about", page: "commitment", status: "page", owner: "Leadership", summary: "Not-for-profit education, financial stewardship and our 2025 finances." },
+  { path: "/about/pure-life-society", label: "Pure Life Society", parent: "/about", page: "pureLife", status: "page", owner: "Leadership", summary: "Our enduring partnership with the Pure Life Society: a home made possible through generosity." },
   { path: "/about/silver-jubilee", label: "Silver Jubilee", parent: "/about", page: "jubilee", status: "page", owner: "Content editor", summary: "SRSS25 — 25 years of education for life." },
 
   // 02 Learning — how we educate
@@ -45,13 +47,17 @@ export const SITE = [
   { path: "/student-life/leadership", label: "Student Leadership", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Leadership", status: "section", owner: "Content editor", summary: "Leadership opportunities and responsibilities." },
   { path: "/student-life/achievements", label: "Achievements", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Achievements", status: "section", owner: "Content editor", summary: "Competitions, awards and accomplishments." },
   { path: "/student-life/stories", label: "Stories", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "School stories and student experiences." },
+  { path: "/student-life/vegetarian-food", label: "Vegetarian Food", parent: "/student-life", page: "foodPolicy", status: "page", owner: "School office", summary: "The Vegetarian Food and School Activities Policy: what may be served at school and at school activities." },
   { path: "/student-life/gallery", label: "Gallery", parent: "/student-life", page: "studentLife", anchor: "gallery", status: "section", owner: "Content editor", summary: "Curated photographs of school life." },
 
   // 04 Join SRSS — admissions and community
   { path: "/join", label: "Join SRSS", page: "join", status: "page", owner: "Admissions officer", summary: "Admissions, alumni, volunteering and support." },
   { path: "/join/admissions", label: "Admissions", parent: "/join", page: "admissions", status: "page", owner: "Admissions officer", summary: "Who can apply, the process, fees and enquiries." },
   { path: "/join/how-to-apply", label: "How to Apply", parent: "/join/admissions", page: "admissions", anchor: "how-to-apply", status: "section", editable: true, owner: "Admissions officer", summary: "The admissions process, step by step." },
-  { path: "/join/fees", label: "Fees", parent: "/join/admissions", page: "admissions", anchor: "fees", status: "section", owner: "Admissions officer", summary: "Fees and how to request fee information." },
+  { path: "/join/fees", label: "Fees", parent: "/join/admissions", page: "fees", status: "page", owner: "Admissions officer", summary: "Tuition, vendor meals, sibling discounts, payment options, financial assistance and a family fee calculator." },
+  { path: "/join/fees/policy", label: "Fees and Payment Policy", parent: "/join/fees", page: "feePolicy", status: "page", owner: "Leadership", summary: "The School Fees and Payment Policy in full." },
+  { path: "/join/fees/sponsorship", label: "Sponsorship & Assistance", parent: "/join/fees", page: "sponsorship", status: "page", owner: "Leadership", summary: "Equitable access: full sponsorship for Pure Life Society and B40 children, and confidential financial assistance." },
+  { path: "/join/parent-partnership", label: "Parent–School Partnership", parent: "/join/admissions", page: "partnership", status: "page", owner: "Leadership", summary: "The Parent–School Partnership and Shared Values Agreement: what we ask of families and what SRSS undertakes." },
   { path: "/join/book-a-visit", label: "Book a Visit", parent: "/join/admissions", page: "admissions", anchor: "how-to-apply", status: "section", owner: "Admissions officer", openVisit: true, summary: "Request a school tour." },
   { path: "/join/admissions-faq", label: "Admissions FAQs", parent: "/join/admissions", page: "admissions", anchor: "admissions-faq", status: "section", owner: "Admissions officer", summary: "Questions families ask about joining SRSS." },
   { path: "/join/get-involved", label: "Get Involved", parent: "/join", page: "join", anchor: "community", status: "section", owner: "School office", summary: "A school built by a community." },

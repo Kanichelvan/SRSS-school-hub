@@ -10,6 +10,8 @@ import { recomputeAllScopes, recomputeConsentStatus, recomputeUserScope, refresh
 import { handleQuest } from "./quest-service.js";
 import { QuestError } from "./quest-engine.js";
 import { malaysiaDate, syncAnnouncement } from "./announcement-service.js";
+import { caseAction as handleCaseAction, openCase, runFormsSchedule as formsSchedule, submitForm as handleSubmitForm, syncSourceStatus } from "./forms-service.js";
+import { ACTIVITY_FORM_IDS, CONTACT_SUBJECT_FORMS, FORM } from "./forms-registry.js";
 
 initializeApp();
 setGlobalOptions({ region: "asia-southeast1", maxInstances: 5 });
@@ -377,3 +379,31 @@ export const auditPortfolioTags = auditWrite("portfolioTags");
 export const auditDownloadCategories = auditWrite("downloadCategories");
 export const auditAttendanceMovements = auditWrite("attendanceMovements");
 export const auditAttendanceFollowUps = auditWrite("attendanceFollowUps");
+
+// ---------- Forms & Response Centre (forms-service.js) ----------
+export const submitForm = onCall((request) => handleSubmitForm(db, request));
+export const caseAction = onCall((request) => handleCaseAction(db, request));
+export const formsDaily = onSchedule({ schedule: "0 7 * * 1-5", timeZone: "Asia/Kuala_Lumpur" }, async () => { await formsSchedule(db); });
+// Lets the office run reminders and the daily summary now (also used to exercise them in the emulators).
+export const runFormsSchedule = onCall(async (request) => {
+  if (!(request.auth?.token?.roles || []).some((role) => ["schoolAdmin", "superAdmin", "leadership"].includes(role))) throw new HttpsError("permission-denied", "Only the school office can run this.");
+  return formsSchedule(db, request.data?.today);
+});
+// Records made on the website or in another hub screen open a case; later status changes are mirrored onto it.
+function caseFromSource(collection, describe) {
+  return onDocumentWritten(`${collection}/{id}`, async (event) => {
+    const before = event.data?.before?.data(); const after = event.data?.after?.data();
+    if (!after) return;
+    if (before && before.status !== after.status) await syncSourceStatus(db, collection, event.params.id, after.status);
+    const opening = describe(after, before);
+    if (!opening || after.caseId) return; // forms sent through submitForm already have their case
+    await openCase(db, { caseId: `${collection}_${event.params.id}`, source: { collection, id: event.params.id, link: opening.link || null }, priority: "normal", ...opening, form: FORM[opening.formId] });
+  });
+}
+export const formsFromContact = caseFromSource("contactMessages", (data, before) => !before && { formId: CONTACT_SUBJECT_FORMS[data.subject] || "A01", link: "/hub/admin/inbox", summary: data.subject, submitter: { name: data.name, email: data.email } });
+export const formsFromEnquiry = caseFromSource("admissionEnquiries", (data, before) => !before && { formId: data.source === "visitRequest" ? "A03" : "A02", link: "/hub/admin/admissions", summary: data.enteringStandard ? `Standard ${String(data.enteringStandard).replace(/^Standard /, "")}` : "", submitter: { name: data.parentName, email: data.email } });
+export const formsFromApplication = caseFromSource("applications", (data, before) => data.status === "submitted" && before?.status !== "submitted" && { formId: "A04", link: "/hub/admin/admissions", summary: data.childName || data.applicantName || "", submitter: { uid: data.applicantUid, name: data.parentName || null, email: data.email || null } });
+export const formsFromAbsence = caseFromSource("absenceReports", (data, before) => !before && { formId: "B05", link: `/hub/admin/attendance`, summary: `${data.from}${data.to && data.to !== data.from ? ` to ${data.to}` : ""}`, studentId: data.studentId, submitter: { uid: data.reporterUid } });
+export const formsFromActivity = caseFromSource("activityForms", (data, before) => !before && ACTIVITY_FORM_IDS[data.formId] && { formId: ACTIVITY_FORM_IDS[data.formId], link: "/hub/forms", summary: data.activity || data.title || "", studentId: data.studentId || null, submitter: { uid: data.ownerUid } });
+export const formsFromRegistration = caseFromSource("registrations", (data, before) => !before && { formId: "G01", link: "/hub/calendar", summary: data.eventTitle || "", studentId: data.studentId || null, submitter: { uid: data.registrantUid } });
+export const auditFormSubmissions = auditWrite("formSubmissions");

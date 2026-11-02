@@ -23,7 +23,7 @@ service cloud.firestore {
     function uid() { return request.auth.uid; }
 
     function teaching() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher']); }
-    function isStaff() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher', 'academicCoordinator', 'schoolAdmin', 'admissionsOfficer', 'financeOfficer', 'leadership', 'safeguardingLead', 'privacySteward', 'portfolioModerator', 'contentEditor', 'technicalAdmin', 'librarian', 'auditor', 'superAdmin', 'attendanceManager']); }
+    function isStaff() { return hasAny(['teacher', 'classTeacher', 'specialistTeacher', 'academicCoordinator', 'schoolAdmin', 'admissionsOfficer', 'financeOfficer', 'leadership', 'safeguardingLead', 'privacySteward', 'portfolioModerator', 'contentEditor', 'technicalAdmin', 'librarian', 'auditor', 'superAdmin', 'attendanceManager', 'alumniCoordinator']); }
     function isAdmin() { return hasAny(['schoolAdmin', 'superAdmin']); }
     function isLeader() { return hasAny(['leadership', 'superAdmin']); }
     // Roles with school-wide read of ordinary (non-restricted) student records.
@@ -119,7 +119,7 @@ service cloud.firestore {
     // Student ↔ Guardian (PRD §18). Relationship is separate from portal access (hasPortalAccess).
     match /studentGuardianLinks/{linkId} {
       allow read: if (signedIn() && resource.data.get('guardianUid', '') == uid()) || isGuardianOf(resource.data.studentId)
-        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin', 'attendanceManager'])
+        || hasAny(['schoolAdmin', 'leadership', 'privacySteward', 'safeguardingLead', 'superAdmin', 'attendanceManager', 'financeOfficer']) // finance: siblings share a guardian (sibling discounts)
         || staffCanSee(resource.data.studentId, resource.data.get('classId', ''));
       // Only the office links a guardian to a child — a parent can never link themselves. The account id and
       // class are copied from the guardian and student records, so a link can't point anywhere else.
@@ -453,7 +453,7 @@ service cloud.firestore {
     match /messageThreads/{threadId} {
       allow read: if signedIn() && uid() in resource.data.participantUids;
       function target() { return get(/databases/$(database)/documents/users/$(data().participantUids[1])).data; }
-      function staffTarget() { return target().get('roles',[]).hasAny(['teacher','classTeacher','specialistTeacher','schoolAdmin','superAdmin','leadership','safeguardingLead','privacySteward','contentEditor','academicCoordinator','admissionsOfficer','attendanceManager']); }
+      function staffTarget() { return target().get('roles',[]).hasAny(['teacher','classTeacher','specialistTeacher','schoolAdmin','superAdmin','leadership','safeguardingLead','privacySteward','contentEditor','academicCoordinator','admissionsOfficer','attendanceManager','alumniCoordinator']); }
       allow create: if (isStaff() || hasRole('parent')) && createdByMe() && data().participantUids is list && data().participantUids.size() == 2
         && data().participantUids[0] == uid() && data().participantUids[1] != uid() && text('subject',140) && data().createdAt == request.time
         && (staffTarget() || ((isAdmin() || isLeader() || (teaching() && target().get('familyClassIds',[]).hasAny(me().get('classIds',[])))) && target().get('roles',[]).hasAny(['parent'])));
@@ -550,7 +550,8 @@ service cloud.firestore {
     // Requests addressed to a user (requestedFromUid, status 'pending') power the Actions Required widget.
     match /formSubmissions/{id} {
       allow read: if signedIn() && (resource.data.get('requestedFromUid', '') == uid() || resource.data.get('submittedByUid', '') == uid()
-        || resource.data.get('assignedToUid', '') == uid() || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']));
+        || resource.data.get('assignedToUid', '') == uid() || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin'])
+        || (resource.data.get('caseId', null) != null && caseHandler(get(/databases/$(database)/documents/formCases/$(resource.data.caseId)).data)));
       allow create: if (signedIn() && data().submittedByUid == uid() && data().status in ['draft', 'submitted']
           && (data().get('studentId', null) == null || familyCanSee(data().studentId)))
         || ((isAdmin() || hasRole('privacySteward') || teaching()) && data().status == 'pending' && createdByMe());
@@ -560,6 +561,37 @@ service cloud.firestore {
              && data().submittedByUid == uid() && onlyChanges(['answers','status','submittedByUid','submittedAt','updatedBy','updatedAt']))
           || (signedIn() && resource.data.get('assignedToUid', '') == uid()) || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']));
     }
+    // Forms & Response Centre (functions/forms-service.js). Cases and their history are written only by the
+    // server. A case is visible to its submitter, its assignee, the people holding its PIC, backup or
+    // escalation role and — for ordinary cases — the school office. Restricted cases (complaints, grievances,
+    // safeguarding, incidents, financial assistance) are never visible to the office as such: only to the
+    // case's own roles. Submitters read only the history entries marked external.
+    function caseHandler(item) {
+      return signedIn() && (item.get('assignedToUid', '') == uid() || hasRole(item.picRole) || hasRole(item.backupRole) || hasRole(item.escalationRole));
+    }
+    match /formCases/{caseId} {
+      allow read: if caseHandler(resource.data) || (signedIn() && resource.data.submitterUid == uid()) || hasAny(['schoolAdmin', 'superAdmin', 'leadership']);
+      allow write: if false;
+      match /activity/{entryId} {
+        function parent() { return get(/databases/$(database)/documents/formCases/$(caseId)).data; }
+        allow read: if caseHandler(parent()) || hasAny(['schoolAdmin', 'superAdmin', 'leadership'])
+          || (signedIn() && parent().submitterUid == uid() && resource.data.visibility == 'external');
+        allow write: if false;
+      }
+    }
+    match /restrictedCases/{caseId} {
+      allow read: if caseHandler(resource.data) || (signedIn() && resource.data.submitterUid == uid());
+      allow write: if false;
+      match /activity/{entryId} {
+        function parent() { return get(/databases/$(database)/documents/restrictedCases/$(caseId)).data; }
+        allow read: if caseHandler(parent()) || (signedIn() && parent().submitterUid == uid() && resource.data.visibility == 'external');
+        allow write: if false;
+      }
+    }
+    // Server-only: reference counters, the email outbox and the public-form rate limit.
+    match /formCounters/{id} { allow read, write: if false; }
+    match /mail/{id} { allow read, write: if false; }
+    match /formRateLimits/{id} { allow read, write: if false; }
     match /workflowActions/{id} {
       allow read: if signedIn() && (uid() in resource.data.get('participantUids', []) || hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']));
       allow create: if signedIn() && data().actorUid == uid() && (hasAny(['schoolAdmin', 'privacySteward', 'superAdmin']) || teaching());

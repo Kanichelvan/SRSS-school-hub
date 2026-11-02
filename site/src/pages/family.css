@@ -1,0 +1,75 @@
+/* Family policy pages (src/pages/FamilyPages.jsx): vegetarian food, the Pure Life Society, sponsorship and
+   the Parent–School Partnership. Builds on fees.css; the five values reuse the school's petal colours. */
+.family-occasions { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1px; margin: 0; padding: 0; border: 1px solid var(--line); background: var(--line); list-style: none; }
+.family-occasions li { display: flex; align-items: center; gap: 14px; padding: 20px; background: var(--white); color: var(--ink); font: 15px/1.5 var(--body); }
+.family-occasions svg { flex: none; color: var(--gold-800); }
+
+.family-plate { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+.family-plate section { padding: 22px 24px; border-radius: 10px; background: var(--white); }
+.family-plate h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; color: var(--navy-950); font: 600 19px/1.3 var(--serif); }
+.family-plate ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px 16px; margin: 0 0 12px; padding: 0; list-style: none; }
+.family-plate li { display: flex; align-items: center; gap: 10px; color: var(--ink); font: 500 15px var(--ui); }
+.family-plate p { margin: 0; color: var(--muted); font: 14px/1.6 var(--body); }
+.family-plate-yes { border-top: 4px solid #0d8a52; }
+.family-plate-yes svg { color: #0d8a52; }
+.family-plate-no { border-top: 4px solid var(--muted); }
+.family-plate-no li { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.family-plate-no svg { color: var(--muted); }
+.family-plate-pending { grid-column: 1 / -1; border: 1px dashed var(--gold-800); background: color-mix(in srgb, var(--gold-500) 14%, var(--white)) !important; }
+.family-plate-pending p { color: var(--ink); }
+.family-actions { margin-top: 26px; }
+.family-actions .text-link { display: inline-flex; margin-top: 12px; }
+
+.family-timeline { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin: 8px 0 0; padding: 30px 0 0; list-style: none; }
+.family-timeline::before { content: ""; position: absolute; top: 7px; left: 8px; right: 25%; height: 2px; background: var(--navy-950); }
+.family-timeline::after { content: ""; position: absolute; top: 7px; left: 75%; right: 0; border-top: 2px dashed var(--gold-800); }
+.family-timeline li { position: relative; }
+.family-timeline li::before { content: ""; position: absolute; top: -30px; left: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--navy-950); box-shadow: 0 0 0 4px var(--white); }
+.family-timeline li.is-future::before { border: 2px dashed var(--gold-800); background: var(--white); }
+.family-timeline-when { margin: 0 0 4px; color: var(--gold-800); font: 600 12px var(--ui); letter-spacing: .08em; text-transform: uppercase; }
+.family-timeline h3 { margin: 0 0 6px; color: var(--navy-950); font: 600 clamp(20px, 2.2vw, 26px)/1.2 var(--serif); }
+.family-timeline p:last-child { margin: 0; color: var(--ink); font: 15px/1.6 var(--body); }
+
+.family-split { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr); gap: clamp(24px, 5vw, 56px); align-items: start; }
+.family-figures { grid-template-columns: 1fr; margin: 0; }
+.family-figures dt { color: var(--muted); font: 600 13px var(--ui); }
+.family-figures dd { display: grid; gap: 2px; margin: 0; }
+
+.family-paths { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.family-paths li { display: grid; align-content: start; gap: 8px; padding: 24px; border-top: 3px solid var(--navy-950); background: var(--white); scroll-margin-top: 120px; }
+.family-paths li:last-child { border-top-color: var(--gold-700); }
+.family-paths .eyebrow { margin: 0; }
+.family-paths h3 { margin: 0; color: var(--navy-950); font: 600 21px/1.25 var(--serif); }
+.family-paths p { margin: 0; color: var(--ink); font: 15px/1.6 var(--body); }
+.family-paths .family-paths-how { padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+.family-matrix td { color: var(--muted); font-size: 14px; }
+.family-matrix td svg { color: #0d8a52; vertical-align: middle; }
+
+.family-values { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 24px; padding: 0; list-style: none; }
+.family-values li { display: flex; align-items: center; gap: 10px; padding: 8px 18px 8px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--navy-950); font: 600 15px var(--ui); }
+.family-values li::before { content: ""; width: 26px; height: 26px; border-radius: 50%; box-shadow: var(--petal-rim); }
+.family-values li:nth-child(1)::before { background: var(--petal-truth); }
+.family-values li:nth-child(2)::before { background: var(--petal-conduct); }
+.family-values li:nth-child(3)::before { background: var(--petal-peace); }
+.family-values li:nth-child(4)::before { background: var(--petal-love); }
+.family-values li:nth-child(5)::before { background: var(--petal-nonviolence); }
+
+.family-covenant { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); padding-top: clamp(48px, 7vw, 80px); padding-bottom: clamp(48px, 7vw, 80px); }
+.family-covenant > div { scroll-margin-top: 120px; }
+.family-covenant h2 { margin: 0 0 20px; color: var(--navy-950); font: 600 clamp(26px, 3vw, 34px)/1.2 var(--serif); }
+.family-expectations { display: grid; gap: 18px; margin: 0; padding-left: 1.6em; }
+.family-expectations li::marker { color: var(--gold-800); font: 600 18px var(--serif); }
+.family-expectations h3 { margin: 0 0 4px; color: var(--navy-950); font: 600 18px/1.3 var(--ui); }
+.family-expectations p { margin: 0; color: var(--ink); font: 15px/1.65 var(--body); }
+.family-undertakings { position: sticky; top: 120px; display: grid; gap: 12px; margin: 0; padding: 24px; border-radius: 10px; background: var(--navy-950); list-style: none; }
+.family-undertakings li { display: flex; gap: 10px; color: var(--white); font: 15px/1.55 var(--body); }
+.family-undertakings svg { flex: none; margin-top: 3px; color: var(--gold-500); }
+
+@media (max-width: 860px) {
+  .family-plate, .family-split, .family-covenant { grid-template-columns: 1fr; }
+  .family-undertakings { position: static; }
+  .family-timeline { grid-template-columns: 1fr; gap: 22px; padding: 0 0 0 30px; }
+  .family-timeline::before { top: 8px; bottom: 25%; left: 7px; right: auto; width: 2px; height: auto; }
+  .family-timeline::after { top: 75%; bottom: 0; left: 7px; right: auto; border-top: 0; border-left: 2px dashed var(--gold-800); }
+  .family-timeline li::before { top: 4px; left: -30px; }
+}

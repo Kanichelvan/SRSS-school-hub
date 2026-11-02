@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import HeroVideo, { HERO_CLIPS } from './components/HeroVideo.jsx';
+import { ADMISSION_ROUTES } from './data/admissions.js';
 import HeroPhoto, { HERO_PHOTOS } from './components/HeroPhoto.jsx';
 import OutcomeTabs from './components/OutcomeTabs.jsx';
 import ValuesGarden from './components/ValuesGarden.jsx';
@@ -36,7 +37,6 @@ import { Pause } from "@phosphor-icons/react/dist/csr/Pause";
 import { Play } from "@phosphor-icons/react/dist/csr/Play";
 import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
 import { loadPublicContent, loadSitePage, submitPublicForm } from "./lib/publicContent.js";
-import { PrayerPledgeAnthemPage } from "./PrayerPledgeAnthemPage.jsx";
 import { defaultFaqs, verifiedFaqs } from "./data/faqs.js";
 import { srssVoices } from "./data/voices.js";
 import OurPeople from "./pages/OurPeople.jsx";
@@ -52,6 +52,16 @@ import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
 const AboutNetwork = lazy(() => import('./pages/AboutNetwork.jsx'));
 const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
 const LegalPage = lazy(() => import("./legal/LegalPage.jsx"));
+const FeesPages = () => import("./pages/FeesPages.jsx");
+const FeesPage = lazy(() => FeesPages().then((module) => ({ default: module.FeesPage })));
+const FeePolicyPage = lazy(() => FeesPages().then((module) => ({ default: module.FeePolicyPage })));
+const CommitmentPage = lazy(() => FeesPages().then((module) => ({ default: module.CommitmentPage })));
+const PrayerPledgeAnthemPage = lazy(() => import("./PrayerPledgeAnthemPage.jsx").then((module) => ({ default: module.PrayerPledgeAnthemPage })));
+const FamilyPages = () => import("./pages/FamilyPages.jsx");
+const FoodPolicyPage = lazy(() => FamilyPages().then((module) => ({ default: module.FoodPolicyPage })));
+const PureLifePage = lazy(() => FamilyPages().then((module) => ({ default: module.PureLifePage })));
+const SponsorshipPage = lazy(() => FamilyPages().then((module) => ({ default: module.SponsorshipPage })));
+const PartnershipPage = lazy(() => FamilyPages().then((module) => ({ default: module.PartnershipPage })));
 // Current route from the address bar; old addresses are swapped for their canonical URL in place.
 function currentRoute() {
   const { pathname, hash } = window.location;
@@ -230,14 +240,8 @@ function VoicesPage({ extra }) {
   </main>;
 }
 
-const admissionSteps = [
-  ["Enquiry", "Send the form or call the school office."],
-  ["Visit", "See classrooms and meet the team."],
-  ["Application", "Share your child’s details and records."],
-  ["Readiness conversation", "A friendly meeting with your child."],
-  ["Offer", "We confirm a place and the next steps."],
-  ["Enrolment", "An onboarding checklist and a first-day welcome."],
-];
+// The School's Standard 1 intake (src/data/admissions.js); the Admissions page shows every route in full.
+const admissionSteps = ADMISSION_ROUTES.standard1.steps;
 const newsItems = [
   ["School News", "A new term of curious, caring learning", "20 Jul 2026", "/assets/photos/processed/science-microscope-1600.jpg"],
   ["Achievements", "Celebrating effort, teamwork and every growing voice", "14 Jul 2026", "/assets/photos/processed/sports-day-podium-1600.jpg"],
@@ -519,7 +523,7 @@ export function App() {
               <h2 id="admissions-title">Begin the <em>journey.</em></h2>
               <p>SRSS welcomes primary-age children, Year 1 to Year 6, from families of every background who share a values-based approach to education. Admission is a warm conversation about readiness, learning needs and the values that matter to your family.</p>
               <ol className="home-pathway" aria-label="Admissions pathway">{admissionSteps.map(([step, detail], index) => <li key={step}><span aria-hidden="true">{index + 1}</span><div><strong>{step}</strong><small>{detail}</small></div></li>)}</ol>
-              <div className="home-links"><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Fee%20enquiry">Request fee information <ArrowRight size={16} /></a><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Prospectus%20request">Request the prospectus <ArrowRight size={16} /></a></div>
+              <div className="home-links"><a className="text-link" href="/join/fees">School fees <ArrowRight size={16} /></a><a className="text-link" href="mailto:saischoolpuchong@gmail.com?subject=Prospectus%20request">Request the prospectus <ArrowRight size={16} /></a></div>
             </div>
             <div className="home-join-card" id="enquiry" data-reveal>
               {!formMode ? <div className="home-form-choice">
@@ -585,9 +589,16 @@ export function App() {
     studentLife: () => <StudentLifePage blocks={blocks} faqs={pageFaqs} entry={route} />,
     join: () => <JoinPage />,
     admissions: () => <AdmissionsPage blocks={blocks} faqs={pageFaqs} pillars={whySrss} />,
+    fees: () => <Suspense fallback={<main id="main" aria-busy="true" />}><FeesPage /></Suspense>,
+    feePolicy: () => <Suspense fallback={<main id="main" aria-busy="true" />}><FeePolicyPage /></Suspense>,
+    commitment: () => <Suspense fallback={<main id="main" aria-busy="true" />}><CommitmentPage /></Suspense>,
+    foodPolicy: () => <Suspense fallback={<main id="main" aria-busy="true" />}><FoodPolicyPage /></Suspense>,
+    pureLife: () => <Suspense fallback={<main id="main" aria-busy="true" />}><PureLifePage /></Suspense>,
+    sponsorship: () => <Suspense fallback={<main id="main" aria-busy="true" />}><SponsorshipPage /></Suspense>,
+    partnership: () => <Suspense fallback={<main id="main" aria-busy="true" />}><PartnershipPage /></Suspense>,
     resources: () => <ResourcesPage blocks={blocks} />,
     faq: () => <FaqPage items={pageFaqs} />,
-    prayer: () => <PrayerPledgeAnthemPage />,
+    prayer: () => <Suspense fallback={<main id="main" aria-busy="true" />}><PrayerPledgeAnthemPage /></Suspense>,
     notFound: () => <NotFoundPage />,
     // School life → founder quote → reports, SRSS25 and calendar → journey and hubs → FAQ.
     home: () => <main id="main">

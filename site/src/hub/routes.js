@@ -30,6 +30,9 @@ export const hubRoutes = [
   { path: "/hub/messages", hub: "shared", label: "Messages", module: "messages", google: ["Gmail"], screen: "messages" },
   { path: "/hub/forms", hub: "shared", label: "Downloads / Forms", module: "forms", google: ["Forms", "Drive"], screen: "activityForms" },
   {path:"/hub/forms/:submissionId",hub:"shared",label:"Requested form",module:"forms",google:[],screen:"requestedForm",hidden:true},
+  { path: "/hub/requests", hub: "shared", label: "My requests & forms", module: "forms", google: [], screen: "myRequests" },
+  { path: "/hub/requests/new/:formId", hub: "shared", label: "New request", module: "forms", google: [], screen: "startRequest", hidden: true },
+  { path: "/hub/requests/:caseId", hub: "shared", label: "My request", module: "forms", google: [], screen: "requestView", hidden: true },
   { path: "/hub/notifications", hub: "shared", label: "Notifications", module: "notifications", google: [], screen: "notifications" },
   { path: "/hub/search", hub: "shared", label: "Search", module: "search", google: [] },
   { path: "/hub/profile", hub: "shared", label: "Profile", module: "profile", google: [], screen: "profile", hidden: true },
@@ -64,7 +67,7 @@ export const hubRoutes = [
   { path: "/hub/parent/progress", hub: "parent", label: "Progress", module: "assessments", google: [], screen: "academicRecords" },
   { path: "/hub/parent/tasks", hub: "parent", label: "Tasks", module: "teaching", google: ["Classroom"] },
   { path: "/hub/parent/reports", hub: "parent", label: "Reports", module: "reportCards", google: [], screen: "academicRecords" },
-  { path: "/hub/parent/fees", hub: "parent", label: "Fees", module: "fees", google: [] },
+  { path: "/hub/parent/fees", hub: "parent", label: "Fees", module: "fees", google: [], screen: "familyFees" },
   { path: "/hub/parent/meetings", hub: "parent", label: "Meetings", module: "meetings", google: ["Meet", "Calendar"] },
 
   // Student — Today | My Class | My Portfolio | My Achievements | Notices | Calendar (deliberately small)
@@ -80,6 +83,8 @@ export const hubRoutes = [
   // Admin — grouped as the admin hub navigation (user decision, 14 Oct 2026).
   { path: "/hub/admin", hub: "admin", label: "Admin dashboard", module: "dashboard", google: [], screen: "adminDashboard", index: true },
   { path: "/hub/admin/setup", hub: "admin", group: "Overview", label: "School setup wizard", module: "settings", google: [], screen: "setupWizard" },
+  { path: "/hub/admin/forms", hub: "admin", group: "Overview", label: "Forms & Response Centre", module: "formsCentre", google: ["Gmail", "Sheets"], screen: "formsCentre" },
+  { path: "/hub/admin/forms/case/:caseId", hub: "admin", label: "Case", module: "formsCentre", google: [], screen: "formsCase", hidden: true },
   { path: "/hub/admin/academic-years", hub: "admin", group: "School setup", label: "Academic years", module: "academics", google: [], screen: "academicYears" },
   { path: "/hub/admin/terms", hub: "admin", group: "School setup", label: "Terms", module: "academics", google: [], screen: "terms" },
   { path: "/hub/admin/standards", hub: "admin", group: "School setup", label: "Standards", module: "academics", google: [], screen: "standards" },
@@ -104,7 +109,7 @@ export const hubRoutes = [
   { path: "/hub/admin/consent", hub: "admin", group: "School operations", label: "Consent", module: "consent", google: [], screen: "consentOverview" },
   { path: "/hub/consent/print/:studentId?", hub: "admin", label: "Printable consent form", module: "consent", google: [], screen: "consentPrint", hidden: true },
   { path: "/hub/admin/assessments", hub: "admin", group: "School operations", label: "Assessments", module: "assessments", google: ["Sheets"], screen: "academicRecords" },
-  { path: "/hub/admin/fees", hub: "admin", group: "School operations", label: "Fees", module: "fees", google: ["Sheets"] },
+  { path: "/hub/admin/fees", hub: "admin", group: "School operations", label: "Fees", module: "fees", google: ["Sheets"], screen: "feesOffice" },
   { path: "/hub/admin/assets", hub: "admin", group: "School operations", label: "Assets", module: "assets", google: ["Drive"] },
   { path: "/hub/admin/reports", hub: "admin", group: "School operations", label: "Reports", module: "reports", google: ["Sheets"], screen: "communityReports" },
   { path: "/hub/admin/engagement/challenges", hub: "admin", group: "Engagement", label: "Challenges", module: "engagement", google: ["Drive", "Docs"], screen: "challengeCms", editorOnly: true },
