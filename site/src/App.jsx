@@ -57,6 +57,7 @@ const FeesPage = lazy(() => FeesPages().then((module) => ({ default: module.Fees
 const FeePolicyPage = lazy(() => FeesPages().then((module) => ({ default: module.FeePolicyPage })));
 const CommitmentPage = lazy(() => FeesPages().then((module) => ({ default: module.CommitmentPage })));
 const PrayerPledgeAnthemPage = lazy(() => import("./PrayerPledgeAnthemPage.jsx").then((module) => ({ default: module.PrayerPledgeAnthemPage })));
+const OrientationPage = lazy(() => import("./pages/OrientationPage.jsx").then((module) => ({ default: module.OrientationPage })));
 const FamilyPages = () => import("./pages/FamilyPages.jsx");
 const FoodPolicyPage = lazy(() => FamilyPages().then((module) => ({ default: module.FoodPolicyPage })));
 const PureLifePage = lazy(() => FamilyPages().then((module) => ({ default: module.PureLifePage })));
@@ -599,6 +600,7 @@ export function App() {
     resources: () => <ResourcesPage blocks={blocks} />,
     faq: () => <FaqPage items={pageFaqs} />,
     prayer: () => <Suspense fallback={<main id="main" aria-busy="true" />}><PrayerPledgeAnthemPage /></Suspense>,
+    orientation: () => <Suspense fallback={<main id="main" aria-busy="true" />}><OrientationPage /></Suspense>,
     notFound: () => <NotFoundPage />,
     // School life → founder quote → reports, SRSS25 and calendar → journey and hubs → FAQ.
     home: () => <main id="main">

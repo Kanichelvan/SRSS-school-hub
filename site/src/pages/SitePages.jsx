@@ -249,6 +249,7 @@ const DOWNLOADS = [
   ["Parent–School Partnership Agreement", "What we ask of families, and what SRSS undertakes.", "/join/parent-partnership"],
   ["Vegetarian Food and School Activities Policy", "What may be served at school and school activities.", "/student-life/vegetarian-food"],
   ["Before the First Bell", "The morning assembly guide, printable.", "/resources/prayer-pledge-anthem"],
+  ["Year 1 Orientation 2027", "The parent orientation for the first KP2027 class, printable.", "/resources/year-1-orientation-2027"],
 ];
 const POLICY_LINKS = [["Parent–School Partnership Agreement", "/join/parent-partnership"], ["Vegetarian Food and School Activities Policy", "/student-life/vegetarian-food"], ["Fees and Payment Policy", "/join/fees/policy"], ["Privacy Policy", "/legal/privacy"], ["Terms of Use", "/legal/terms"], ["Child Protection & Safeguarding", "/legal/child-safeguarding"], ["Photography & Media Consent", "/legal/media-consent"], ["Accessibility & Complaints", "/legal/accessibility-complaints"]];
 

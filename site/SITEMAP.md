@@ -109,6 +109,7 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/resources/faq` | FAQs | Own page | School office |
 | `/resources/contact` | Contact | Section of `/resources#contact` | School office |
 | `/resources/prayer-pledge-anthem` | Before the First Bell | Own page | Academic coordinator |
+| `/resources/year-1-orientation-2027` | Year 1 Orientation 2027 | Own page | Academic coordinator |
 | `/legal` | Legal & Policies | Own page | Privacy steward |
 
 The secure hub uses `/login` (with `/sign-in` kept as an alias) and `/hub/student`, `/hub/parent`, `/hub/teacher` and `/hub/admin`; see the next section. Legal pages are `/legal`, `/legal/privacy`, `/legal/terms`, `/legal/cookies`, `/legal/acceptable-use`, `/legal/child-safeguarding` and the other policies in `src/legal/registry.js`.
