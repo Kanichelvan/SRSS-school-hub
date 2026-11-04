@@ -75,6 +75,7 @@ export const SITE = [
   { path: "/resources/policies", label: "Policies", parent: "/resources", page: "resources", anchor: "policies", status: "section", owner: "Privacy steward", summary: "Public school policies, privacy and safeguarding." },
   { path: "/resources/faq", label: "FAQs", parent: "/resources", page: "faq", status: "page", owner: "School office", summary: "Clear answers about learning, admissions and school life." },
   { path: "/resources/contact", label: "Contact", parent: "/resources", page: "resources", anchor: "contact", status: "section", owner: "School office", summary: "Office details, directions and how to reach us." },
+  { path: "/resources/year-1-orientation-2027", label: "Year 1 Orientation 2027", parent: "/resources", page: "orientation", status: "page", owner: "Academic coordinator", summary: "The Year 1 2027 parent orientation: KP2027, the new subject, school hours, learning at home and assessment." },
   { path: "/resources/prayer-pledge-anthem", label: "Before the First Bell", parent: "/resources", page: "prayer", status: "page", owner: "Academic coordinator", summary: "Silent sitting, prayers, Negaraku, Rukun Negara, the school anthem and pledge." },
 
   // 07 Legal — handled by the legal registry (src/legal/registry.js)
