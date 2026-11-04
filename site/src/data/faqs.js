@@ -36,6 +36,16 @@ export const celebrationAnswer = {
   ],
   link: ["Check food for an event with the school", "/forms/B17"],
 };
+// School Uniform, Personal Appearance & Grooming Policy (src/pages/UniformPolicy.jsx, src/data/uniform.js).
+export const uniformAnswer = {
+  question: "What uniform do students wear?",
+  paragraphs: [
+    "Students wear a light-purple shirt or blouse with a dark-purple school tie, and dark-purple shorts or long trousers for boys or a pleated pinafore for girls, with the school badge, name tag, plain black socks and black shoes. Girls may wear the approved light-purple baju kurung with a school-purple headscarf, and Sikh students may wear a turban or patka.",
+    "On designated PE days, students may wear the complete sports uniform all day, except on Mondays, examination days and formal occasions, when the formal uniform is required.",
+    "If a uniform item is hard to obtain, or a substitute is needed for a day, please tell the school in writing. Families facing financial difficulty can speak to the school office confidentially; no child is singled out over a uniform item.",
+  ],
+  link: ["The School Uniform, Personal Appearance & Grooming Policy", "/student-life/uniform"],
+};
 export const sponsorshipAnswer = {
   question: "Is financial assistance or sponsorship available?",
   paragraphs: [
@@ -78,7 +88,7 @@ export const midYearAnswer = {
 const VERIFIED = [schoolHoursAnswer, feesAnswer, mealsAnswer, midYearAnswer];
 // Answers the School added with its family policies (Nov 2026) also appear when a saved FAQ list predates them,
 // next to the question they follow.
-const POLICY_ADDITIONS = [[intakeAnswer, "What year levels are offered at SRSS?"], [sponsorshipAnswer, "What are the school fees?"], [parentsAnswer, "Is SRSS a religious school?"], [celebrationAnswer, "Does SRSS provide meals and transport?"]];
+const POLICY_ADDITIONS = [[intakeAnswer, "What year levels are offered at SRSS?"], [sponsorshipAnswer, "What are the school fees?"], [parentsAnswer, "Is SRSS a religious school?"], [celebrationAnswer, "Does SRSS provide meals and transport?"], [uniformAnswer, "Can we bring food for a birthday or class celebration?"]];
 export function verifiedFaqs(items) {
   const list = items.map(item => VERIFIED.find(answer => answer.question === item.question) || item);
   for (const [answer, after] of POLICY_ADDITIONS) {
@@ -187,6 +197,7 @@ export const defaultFaqs = [
   },
   mealsAnswer,
   celebrationAnswer,
+  uniformAnswer,
   {
     question: "What makes SRSS different from other schools?",
     paragraphs: ["SRSS combines a strong academic foundation with a distinctive commitment to Human Values and Human Excellence. We believe education should develop not only what a child knows, but also who the child becomes."],

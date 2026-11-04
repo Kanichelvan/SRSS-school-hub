@@ -62,6 +62,7 @@ const FoodPolicyPage = lazy(() => FamilyPages().then((module) => ({ default: mod
 const PureLifePage = lazy(() => FamilyPages().then((module) => ({ default: module.PureLifePage })));
 const SponsorshipPage = lazy(() => FamilyPages().then((module) => ({ default: module.SponsorshipPage })));
 const PartnershipPage = lazy(() => FamilyPages().then((module) => ({ default: module.PartnershipPage })));
+const UniformPolicyPage = lazy(() => import("./pages/UniformPolicy.jsx").then((module) => ({ default: module.UniformPolicyPage })));
 // Current route from the address bar; old addresses are swapped for their canonical URL in place.
 function currentRoute() {
   const { pathname, hash } = window.location;
@@ -593,6 +594,7 @@ export function App() {
     feePolicy: () => <Suspense fallback={<main id="main" aria-busy="true" />}><FeePolicyPage /></Suspense>,
     commitment: () => <Suspense fallback={<main id="main" aria-busy="true" />}><CommitmentPage /></Suspense>,
     foodPolicy: () => <Suspense fallback={<main id="main" aria-busy="true" />}><FoodPolicyPage /></Suspense>,
+    uniformPolicy: () => <Suspense fallback={<main id="main" aria-busy="true" />}><UniformPolicyPage /></Suspense>,
     pureLife: () => <Suspense fallback={<main id="main" aria-busy="true" />}><PureLifePage /></Suspense>,
     sponsorship: () => <Suspense fallback={<main id="main" aria-busy="true" />}><SponsorshipPage /></Suspense>,
     partnership: () => <Suspense fallback={<main id="main" aria-busy="true" />}><PartnershipPage /></Suspense>,

@@ -248,9 +248,10 @@ const DOWNLOADS = [
   ["Sponsorship and financial assistance", "Who is fully sponsored, and how to ask for help.", "/join/fees/sponsorship"],
   ["Parent–School Partnership Agreement", "What we ask of families, and what SRSS undertakes.", "/join/parent-partnership"],
   ["Vegetarian Food and School Activities Policy", "What may be served at school and school activities.", "/student-life/vegetarian-food"],
+  ["School Uniform, Personal Appearance & Grooming Policy", "The uniform for every day, PE, roles and occasions, with religious options.", "/student-life/uniform"],
   ["Before the First Bell", "The morning assembly guide, printable.", "/resources/prayer-pledge-anthem"],
 ];
-const POLICY_LINKS = [["Parent–School Partnership Agreement", "/join/parent-partnership"], ["Vegetarian Food and School Activities Policy", "/student-life/vegetarian-food"], ["Fees and Payment Policy", "/join/fees/policy"], ["Privacy Policy", "/legal/privacy"], ["Terms of Use", "/legal/terms"], ["Child Protection & Safeguarding", "/legal/child-safeguarding"], ["Photography & Media Consent", "/legal/media-consent"], ["Accessibility & Complaints", "/legal/accessibility-complaints"]];
+const POLICY_LINKS = [["Parent–School Partnership Agreement", "/join/parent-partnership"], ["Vegetarian Food and School Activities Policy", "/student-life/vegetarian-food"], ["School Uniform Policy", "/student-life/uniform"], ["Fees and Payment Policy", "/join/fees/policy"], ["Privacy Policy", "/legal/privacy"], ["Terms of Use", "/legal/terms"], ["Child Protection & Safeguarding", "/legal/child-safeguarding"], ["Photography & Media Consent", "/legal/media-consent"], ["Accessibility & Complaints", "/legal/accessibility-complaints"]];
 
 export function SiteSearch({ autoFocus = false, id = "resources-search" }) {
   const [query, setQuery] = useState("");
