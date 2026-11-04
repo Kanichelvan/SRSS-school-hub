@@ -1,10 +1,11 @@
 // Facts behind the School Uniform, Personal Appearance & Grooming Policy (src/pages/UniformPolicy.jsx),
-// supplied by the School (Nov 2026) as a proposed policy for school management review and approval.
-// Switch `status` once management approves the text; keep the tables here so the page and FAQ agree.
+// supplied by the School (Nov 2026) and approved by school management on 4 November 2026.
+// Keep the tables here so the page and FAQ agree; record any later revision in `status` and `approved`.
 
 export const UNIFORM = {
   title: "School Uniform, Personal Appearance & Grooming Policy",
-  status: "Proposed for school management review and approval",
+  status: "Approved by school management",
+  approved: "4 November 2026",
   applicableTo: "All students enrolled in Standards 1–6",
   path: "/student-life/uniform",
 };

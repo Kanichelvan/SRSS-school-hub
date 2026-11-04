@@ -1,5 +1,5 @@
 // School Uniform, Personal Appearance & Grooming Policy (/student-life/uniform). Text supplied by the School
-// (Nov 2026) as a proposed policy for school management review and approval; it follows the formal layout of
+// (Nov 2026) and approved by school management on 4 November 2026; it follows the formal layout of
 // the School Fees and Payment Policy. Tables and illustrations live in src/data/uniform.js. Loaded on demand.
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
 import { Closing, PageHero, PageSection } from "./SitePages.jsx";
@@ -382,6 +382,7 @@ export function UniformPolicyPage() {
       <dl className="fees-policy-meta">
         <div><dt>Applicable to</dt><dd>{UNIFORM.applicableTo}</dd></div>
         <div><dt>Policy status</dt><dd>{UNIFORM.status}</dd></div>
+        <div><dt>Approved</dt><dd>{UNIFORM.approved}</dd></div>
       </dl>
     </PageHero>
     <PageSection id="glance" eyebrow="The uniform at a glance" title="What to wear, and when." tone="ivory">

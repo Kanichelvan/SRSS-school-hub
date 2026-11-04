@@ -19,8 +19,9 @@ describe("uniform policy page", () => {
     const links = siteNav.find((item) => item.label === "Student Life").groups.flatMap((group) => group.links);
     assert.ok(links.some(([, href]) => href === UNIFORM.path));
   });
-  test("stays proposed until school management approves it", () => {
-    assert.match(UNIFORM.status, /Proposed/);
+  test("shows school management's approval and its date", () => {
+    assert.match(UNIFORM.status, /^Approved/);
+    assert.match(UNIFORM.approved, /2026$/);
   });
   test("keeps all nineteen numbered sections, the statement and the commitment", () => {
     for (let n = 1; n <= 19; n += 1) assert.ok(page.includes(`"${n}. `), `section ${n}`);
