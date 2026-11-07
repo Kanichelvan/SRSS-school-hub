@@ -32,9 +32,9 @@
 .announcement-filters button { min-height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 99px; color: var(--navy-950); background: white; font: 500 13px var(--ui); cursor: pointer; }
 .announcement-filters button[aria-pressed="true"] { color: white; background: var(--navy-950); border-color: var(--navy-950); }
 .announcement-list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
-.announcement-card { display: grid; gap: 6px; padding: 20px 22px; border: 1px solid var(--line); border-left: 4px solid var(--gold-700); border-radius: 10px; background: white; }
-.announcement-card.announcement-P1 { border-left-color: #8f1d1d; background: #fdecec; }
-.announcement-card.announcement-P2 { background: #fffaf0; }
+.announcement-card { display: grid; gap: 6px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 10px; background: white; }
+.announcement-card.announcement-P1 { border-color: #8f1d1d; background: #fdecec; }
+.announcement-card.announcement-P2 { border-color: #e2c27e; background: #fffaf0; }
 .announcement-card h2 { margin: 0; font: 600 21px/1.3 var(--serif); }
 .announcement-card h2 a { color: var(--navy-950); text-decoration: none; }
 .announcement-card h2 a:hover { text-decoration: underline; }

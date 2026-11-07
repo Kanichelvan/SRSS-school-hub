@@ -2,11 +2,10 @@
    Priority is always written in words as well as colour (WCAG 1.4.1); no motion beyond hover. */
 
 /* Notice body (detail page, manage page, editor preview) */
-.connect-notice { position: relative; padding: 22px 24px; border: 1px solid var(--line); border-left: 4px solid var(--navy-800); border-radius: 10px; background: var(--hub-surface); }
+.connect-notice { position: relative; padding: 22px 24px; border: 1px solid var(--line); border-radius: 10px; background: var(--hub-surface); }
 .connect-notice h2 { margin: 6px 0 8px; color: var(--navy-950); font: 600 24px/1.25 var(--serif); overflow-wrap: anywhere; }
-.connect-notice.connect-P1 { border-color: var(--hub-bad); border-left-width: 6px; background: var(--hub-bad-bg); }
-.connect-notice.connect-P2 { border-left-color: #c38b24; background: #fffaf0; }
-.connect-notice.connect-P4 { border-left-color: var(--line); }
+.connect-notice.connect-P1 { border-color: var(--hub-bad); background: var(--hub-bad-bg); }
+.connect-notice.connect-P2 { border-color: #e2c27e; background: #fffaf0; }
 .connect-alert { display: inline-block; margin: 0 0 6px; padding: 4px 10px; border-radius: 4px; color: white; background: var(--hub-bad); font: 700 11px var(--ui); letter-spacing: .1em; text-transform: uppercase; }
 .connect-meta { display: block; margin: 0; color: var(--gold-800); font: 600 11px var(--ui); letter-spacing: .08em; text-transform: uppercase; }
 .connect-summary { margin: 0 0 12px; color: var(--ink); font: 500 16px/1.5 var(--body); }
@@ -24,10 +23,9 @@
 
 /* Feed cards */
 .connect-cards { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.connect-card { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 10px; background: var(--hub-surface); }
-.connect-card.connect-P1 { border-left-color: var(--hub-bad); background: var(--hub-bad-bg); }
-.connect-card.connect-P2 { border-left-color: #c38b24; background: #fffaf0; }
-.connect-card.connect-P3 { border-left-color: var(--navy-800); }
+.connect-card { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--hub-surface); }
+.connect-card.connect-P1 { border-color: var(--hub-bad); background: var(--hub-bad-bg); }
+.connect-card.connect-P2 { border-color: #e2c27e; background: #fffaf0; }
 .connect-card.connect-new strong::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; background: var(--gold-700); vertical-align: middle; }
 .connect-card-link { display: grid; gap: 4px; color: inherit; text-decoration: none; }
 .connect-card-link strong { color: var(--navy-950); font: 600 17px/1.35 var(--ui); }
@@ -60,7 +58,6 @@
 .connect-notifications > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 16px; border-top: 1px solid var(--line); }
 .connect-notifications > li:first-child { border-top: 0; }
 .connect-notifications > li.connect-unread { background: var(--cream); }
-.connect-notifications > li.connect-critical { box-shadow: inset 4px 0 0 #c38b24; }
 .connect-notification-open { display: grid; gap: 3px; min-height: 44px; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
 .connect-notification-open strong { color: var(--navy-950); font: 600 15px/1.4 var(--ui); }
 .connect-unread .connect-notification-open strong::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--gold-700); vertical-align: middle; }
