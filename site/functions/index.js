@@ -9,7 +9,9 @@ import { OFFICE_ASSIGNABLE_ROLES, ROLE_IDS } from "./roles.js";
 import { recomputeAllScopes, recomputeConsentStatus, recomputeUserScope, refreshCurrentClass, refreshGuardianClasses } from "./scope.js";
 import { handleQuest } from "./quest-service.js";
 import { QuestError } from "./quest-engine.js";
-import { malaysiaDate, syncAnnouncement } from "./announcement-service.js";
+import { syncAnnouncement } from "./announcement-service.js";
+import { ConnectError, handleConnect, runConnectSchedule } from "./connect-service.js";
+import { deliveryRevision } from "./connect-model.js";
 import { caseAction as handleCaseAction, openCase, runFormsSchedule as formsSchedule, submitForm as handleSubmitForm, syncSourceStatus } from "./forms-service.js";
 import { ACTIVITY_FORM_IDS, CONTACT_SUBJECT_FORMS, FORM } from "./forms-registry.js";
 
@@ -224,27 +226,31 @@ export const showcaseOnModeration = onDocumentWritten("portfolioEntries/{id}", a
   });
 });
 
-// ---------- Announcements: scheduled publication and expiry ----------
-export const deliverAnnouncement = onDocumentWritten({ document: 'announcements/{id}', retry: true }, async event => {
-  const notify = event.data?.before.data()?.status !== 'published' && event.data?.after.data()?.status === 'published';
-  await syncAnnouncement(db, event.params.id, { stamp: () => FieldValue.serverTimestamp(), notify });
+// ---------- SRSS Connect: announcements, circulars, notifications (docs/SRSS-CONNECT.md) ----------
+// Every lifecycle change goes through this callable; clients cannot write announcements directly.
+const stamp = () => FieldValue.serverTimestamp();
+export const connect = onCall(async (request) => {
+  try { return await handleConnect(db, request, { stamp }); }
+  catch (error) {
+    if (error instanceof ConnectError) throw new HttpsError(error.status, error.message, { code: error.code, ...error.details });
+    console.error(JSON.stringify({ op: "connect", action: request.data?.action, error: error.message }));
+    throw new HttpsError("internal", "Something went wrong. Please try again.", { code: "CONNECT_INTERNAL_ERROR" });
+  }
 });
 
-export async function publishDueAnnouncements(now = new Date()) {
-  const [due, live] = await Promise.all([db.collection("announcements").where("status", "==", "scheduled").get(), db.collection("announcements").where("status", "==", "published").get()]);
-  const batch = db.batch(); let published = 0; let expired = 0;
-  for (const item of due.docs) {
-    const at = item.data().publishAt?.toDate?.() ?? (item.data().publishAt ? new Date(item.data().publishAt) : null);
-    if (at && at <= now) { batch.update(item.ref, { status: "published", publishedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: "scheduler" }); published++; }
-  }
-  for (const item of live.docs) {
-    const until = item.data().expiresAt;
-    if (until && until < malaysiaDate(now)) { batch.update(item.ref, { status: "archived", archivedReason: "expired", archivedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(), updatedBy: "scheduler" }); expired++; }
-  }
-  if (published || expired) await batch.commit();
-  return { published, expired };
-}
-export const publishScheduledAnnouncements = onSchedule({ schedule: "every 15 minutes", timeZone: "Asia/Kuala_Lumpur" }, async () => { await publishDueAnnouncements(); });
+// Public copy always follows the notice; in-app delivery runs when a notice is (re)published.
+export const deliverAnnouncement = onDocumentWritten({ document: "announcements/{id}", retry: true }, async (event) => {
+  const before = event.data?.before.data();
+  const after = event.data?.after.data();
+  const notify = after?.status === "published" && (before?.status !== "published" || deliveryRevision(before) !== deliveryRevision(after));
+  await syncAnnouncement(db, event.params.id, { stamp, notify });
+});
+
+export const publishDueAnnouncements = (now = new Date()) => runConnectSchedule(db, { now, stamp });
+export const publishScheduledAnnouncements = onSchedule({ schedule: "every 15 minutes", timeZone: "Asia/Kuala_Lumpur" }, async () => {
+  const result = await publishDueAnnouncements();
+  console.log(JSON.stringify({ op: "connect.schedule", ...result }));
+});
 // Lets the office publish due notices immediately (also used to exercise scheduling in the emulators).
 export const runAnnouncementSchedule = onCall(async (request) => {
   if (!(request.auth?.token?.roles || []).some((role) => ["schoolAdmin", "superAdmin", "leadership"].includes(role))) throw new HttpsError("permission-denied", "Only the school office can run this.");

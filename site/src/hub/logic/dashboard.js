@@ -32,7 +32,8 @@ export function followUpPrompts(records, { today = new Date() } = {}) {
 }
 
 // DASH-001: everything a family needs to act on, isolated from announcements, most urgent first.
-export function parentActions({ children, consentDefinitions, consentStatus, formRequests, fees, today = new Date() }) {
+// `acknowledgements`: SRSS Connect notices still waiting for this parent's "I acknowledge" ({ id, title, deadline }).
+export function parentActions({ children, consentDefinitions, consentStatus, formRequests, fees, acknowledgements = [], today = new Date() }) {
   const actions = [];
   for (const child of children) {
     // Missing consents are grouped into one action per child so the list stays short and scannable.
@@ -48,6 +49,7 @@ export function parentActions({ children, consentDefinitions, consentStatus, for
     const child = children.find((item) => item.id === request.studentId);
     actions.push({ kind: "form", studentId: request.studentId || null, title: request.formTitle || "Form awaiting your response", childName: child ? child.preferredName || child.name : null, to: `/hub/forms/${request.id}`, dueDate: request.dueDate || null });
   }
+  for (const notice of acknowledgements) actions.push({ kind: "acknowledge", studentId: null, title: `Please acknowledge: ${notice.title}`, detail: notice.reference || null, childName: null, to: `/hub/announcements/${notice.id}`, dueDate: notice.deadline || null });
   const dueRank = (action) => (action.dueDate ? new Date(action.dueDate).getTime() : Number.MAX_SAFE_INTEGER);
   return actions.sort((a, b) => dueRank(a) - dueRank(b)).map((action) => ({ ...action, overdue: Boolean(action.dueDate && new Date(action.dueDate) < today) }));
 }

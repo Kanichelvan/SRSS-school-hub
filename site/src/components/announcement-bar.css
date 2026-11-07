@@ -1,0 +1,48 @@
+/* Public announcement bar and archive (SRSS Connect Part 1 §6). Calm and static: no marquee, no shimmer. */
+.announcement-bar { color: white; background: var(--purple-metal, var(--navy-950)); border-bottom: 1px solid #efcf7955; }
+.announcement-bar.announcement-P2 { color: var(--navy-950); background: #fff4cd; border-bottom: 2px solid var(--gold-700); }
+.announcement-bar.announcement-P1 { color: white; background: #8f1d1d; border-bottom: 2px solid #5f1010; }
+.announcement-inner { display: flex; align-items: center; gap: 14px; width: min(100% - 48px, 1180px); min-height: 46px; margin: 0 auto; padding: 8px 0; font: 13px/1.45 var(--ui); }
+.announcement-label { flex: none; margin: 0; color: #fff3c4; font: 700 11px var(--ui); letter-spacing: .14em; text-transform: uppercase; }
+.announcement-P2 .announcement-label { color: #61480a; }
+.announcement-P1 .announcement-label { color: white; }
+.announcement-text { flex: 1; min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.announcement-text span { opacity: .86; }
+.announcement-link { flex: none; display: inline-flex; align-items: center; gap: 6px; color: #fff3c4; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.announcement-P2 .announcement-link { color: var(--navy-950); }
+.announcement-P1 .announcement-link { color: white; }
+.announcement-steps { flex: none; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
+.announcement-steps button, .announcement-dismiss { display: inline-grid; place-items: center; width: 32px; height: 32px; border: 1px solid currentColor; border-radius: 50%; color: inherit; background: transparent; cursor: pointer; opacity: .85; }
+.announcement-dismiss { border-color: transparent; }
+.announcement-steps button:hover, .announcement-dismiss:hover { opacity: 1; background: rgba(255, 255, 255, .14); }
+.announcement-bar :focus-visible { outline: 3px solid var(--gold-500, #e3b94a); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .announcement-inner { flex-wrap: wrap; width: calc(100% - 32px); gap: 6px 10px; padding: 10px 0; }
+  .announcement-text { flex-basis: 100%; order: 2; white-space: normal; }
+  .announcement-text span { display: none; }
+  .announcement-link { order: 3; }
+  .announcement-steps { order: 4; margin-left: auto; }
+  .announcement-dismiss { order: 1; margin-left: auto; }
+}
+
+/* /announcements archive and detail */
+.announcement-archive { display: grid; gap: 22px; padding-block: 32px 64px; }
+.announcement-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.announcement-filters button { min-height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 99px; color: var(--navy-950); background: white; font: 500 13px var(--ui); cursor: pointer; }
+.announcement-filters button[aria-pressed="true"] { color: white; background: var(--navy-950); border-color: var(--navy-950); }
+.announcement-list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.announcement-card { display: grid; gap: 6px; padding: 20px 22px; border: 1px solid var(--line); border-left: 4px solid var(--gold-700); border-radius: 10px; background: white; }
+.announcement-card.announcement-P1 { border-left-color: #8f1d1d; background: #fdecec; }
+.announcement-card.announcement-P2 { background: #fffaf0; }
+.announcement-card h2 { margin: 0; font: 600 21px/1.3 var(--serif); }
+.announcement-card h2 a { color: var(--navy-950); text-decoration: none; }
+.announcement-card h2 a:hover { text-decoration: underline; }
+.announcement-card p { margin: 0; color: var(--muted); font: 15px/1.6 var(--body); }
+.announcement-card .eyebrow, .announcement-detail .eyebrow { margin: 0; }
+.announcement-detail { display: grid; gap: 16px; max-width: 760px; padding-block: 32px 64px; }
+.announcement-detail h1 { margin: 0; color: var(--navy-950); font: 600 clamp(28px, 4vw, 40px)/1.2 var(--serif); }
+.announcement-body { color: var(--ink); font: 16px/1.75 var(--body); white-space: pre-line; overflow-wrap: anywhere; }
+.announcement-detail .announcement-cta { justify-self: start; }
+.announcement-empty { padding: 28px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); text-align: center; }
+.announcement-lead { margin: 0; color: var(--navy-950); font: 500 18px/1.55 var(--body); }

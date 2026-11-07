@@ -5,6 +5,7 @@ import { where } from "firebase/firestore";
 import { useAuth } from "../../auth/AuthProvider";
 import { QuestDashboardCard } from "./quest";
 import { can } from "../../auth/permissions";
+import { feedOrder, isImportant, priorityOf, PRIORITIES } from "../../../functions/connect-model.js";
 import { announcementsFor, consentItems, currentYearId, daysAgo, eventsFor, getMany, list, listIn, one, today, useLoad } from "../data";
 import { HUMAN_VALUES, attendanceByClass, attendanceSummary, completeness, followUpPrompts, nextClass, parentActions, todaysLessons } from "../logic/dashboard";
 import { ActionsRequired, ChildSwitcher, EmptyState, ErrorNote, Loading, PageHeader, Section, StatCard, StatusBadge, TrendBars, formatDate } from "../ui";
@@ -13,12 +14,20 @@ const greeting = () => { const hour = new Date().getHours(); return hour < 12 ? 
 const firstName = (auth) => (auth.user.displayName || auth.user.email || "").split(/[ @]/)[0];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function Announcements({ keys, max = 4 }) {
-  const { data, loading, error } = useLoad(() => announcementsFor(keys, max), [keys.join("|")]);
-  return <Section title="Announcements" action={<Link to="/hub/announcements">All</Link>}>
-    <ErrorNote error={error} />
-    {loading ? <Loading /> : !data?.length ? <EmptyState title="No announcements." /> : <ul className="hub-list">{data.map((item) => <li key={item.id}><strong>{item.title}</strong><p>{item.body}</p><small>{formatDate(item.publishedAt)}</small></li>)}</ul>}
+const noticeLine = (item) => <li key={item.id}><Link className="hub-notice-link" to={`/hub/announcements/${item.id}`}><strong>{item.title}</strong></Link><p>{item.summary || item.body}</p><small>{[isImportant(item) ? `${priorityOf(item)} · ${PRIORITIES[priorityOf(item)].label}` : null, formatDate(item.publishedAt)].filter(Boolean).join(" · ")}</small></li>;
+function Announcements({ keys, max = 4, items }) {
+  const loaded = useLoad(() => (items ? items : announcementsFor(keys, max * 2)), [keys.join("|"), Boolean(items)]);
+  const list = (items || loaded.data || []).slice().sort(feedOrder).filter((item) => !items || !isImportant(item)).slice(0, max);
+  return <Section title={items ? "Latest announcements" : "Announcements"} action={<Link to="/hub/announcements">All</Link>}>
+    <ErrorNote error={items ? null : loaded.error} />
+    {!items && loaded.loading ? <Loading /> : !list.length ? <EmptyState title="No announcements." /> : <ul className="hub-list">{list.map(noticeLine)}</ul>}
   </Section>;
+}
+// Parent dashboard B (SRSS Connect §8.1): active P1/P2 notices relevant to this family.
+function ImportantNotices({ items }) {
+  const important = items.filter(isImportant).sort(feedOrder);
+  if (!important.length) return null;
+  return <Section title="Important school notices" className="hub-important-notices" action={<Link to="/hub/announcements">All notices</Link>}><ul className="hub-list">{important.slice(0, 4).map(noticeLine)}</ul></Section>;
 }
 
 function UpcomingEvents({ keys }) {
@@ -185,18 +194,22 @@ export function ParentDashboard() {
   const [selected, setSelected] = useState(null);
   const { data, loading, error } = useLoad(async () => {
     const children = (await getMany("students", childIds)).sort((a, b) => (b.currentStandard || 0) - (a.currentStandard || 0));
-    const [definitions, statuses, requests, fees] = await Promise.all([
+    const [definitions, statuses, requests, fees, notices, acks] = await Promise.all([
       consentItems(),
       getMany("studentConsentStatus", childIds),
       list("formSubmissions", where("requestedFromUid", "==", auth.user.uid), where("status", "==", "pending")),
       can(auth.roles, "fees", "V") ? listIn("studentFeeAssignments", "studentId", childIds) : [],
+      announcementsFor(keys, 40).catch(() => []),
+      list("announcementAcknowledgements", where("recipientUid", "==", auth.user.uid)).catch(() => []),
     ]);
-    return { children, definitions, statuses, requests, fees };
+    const acked = new Set(acks.map((ack) => `${ack.announcementId}_${ack.announcementRevision}`));
+    const acknowledgements = notices.filter((notice) => notice.requiresAcknowledgement && !acked.has(`${notice.id}_${notice.revision || 1}`)).map((notice) => ({ id: notice.id, title: notice.title, reference: notice.reference, deadline: notice.acknowledgementDeadline }));
+    return { children, definitions, statuses, requests, fees, notices, acknowledgements };
   }, [childIds.join("|")]);
 
   useEffect(() => { if (data?.children.length && !selected) setSelected(data.children[0].id); }, [data, selected]);
   const child = data?.children.find((item) => item.id === selected);
-  const actions = useMemo(() => data ? parentActions({ children: data.children, consentDefinitions: data.definitions, consentStatus: Object.fromEntries(data.statuses.map((status) => [status.id, status])), formRequests: data.requests, fees: data.fees }) : [], [data]);
+  const actions = useMemo(() => data ? parentActions({ children: data.children, consentDefinitions: data.definitions, consentStatus: Object.fromEntries(data.statuses.map((status) => [status.id, status])), formRequests: data.requests, fees: data.fees, acknowledgements: data.acknowledgements }) : [], [data]);
 
   const childData = useLoad(async () => {
     if (!child) return null;
@@ -214,6 +227,7 @@ export function ParentDashboard() {
     {loading ? <Loading /> : !data?.children.length ? <EmptyState title="No children are linked to this account yet.">Please contact the school office to link your account.</EmptyState> : <>
       <ChildSwitcher children={data.children} selectedId={selected} onSelect={setSelected} />
       <ActionsRequired actions={actions} />
+      <ImportantNotices items={data.notices} />
       {child && <>
         <div className="hub-stats">
           <StatCard label="Attendance (60 days)" value={childData.data ? `${attendanceSummary(childData.data.records).rate ?? "—"}%` : "…"} detail={childData.data ? `${attendanceSummary(childData.data.records).counts.absent} absent · ${attendanceSummary(childData.data.records).counts.late} late` : null} to="/hub/parent/attendance" />
@@ -230,7 +244,7 @@ export function ParentDashboard() {
           </Section>
         </div>
       </>}
-      <div className="hub-grid-2"><UpcomingEvents keys={keys} /><Announcements keys={keys} max={3} /></div>
+      <div className="hub-grid-2"><UpcomingEvents keys={keys} /><Announcements keys={keys} max={3} items={data.notices} /></div>
     </>}
   </>;
 }

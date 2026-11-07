@@ -83,7 +83,7 @@ export function ClassDashboard() {
   const teaches = subjectsFor({ ...data, homeroom: [] }, classId).map((subject) => subject.name);
   return <>
     <PageHeader kicker={`Standard ${data.cls.standard}${data.cls.room ? ` · ${data.cls.room}` : ""}`} title={data.cls.name}
-      actions={<><Link className="hub-button" to={`/hub/teacher/attendance/${classId}`}>{state === "submitted" ? "Review attendance" : "Take attendance"}</Link><Link className="hub-button hub-button-quiet" to={`/hub/teacher/portfolios?class=${classId}&new=1`}>New portfolio entry</Link><Link className="hub-button hub-button-quiet" to={`/hub/teacher/announcements?class=${classId}&new=1`}>New notice</Link></>}>
+      actions={<><Link className="hub-button" to={`/hub/teacher/attendance/${classId}`}>{state === "submitted" ? "Review attendance" : "Take attendance"}</Link><Link className="hub-button hub-button-quiet" to={`/hub/teacher/portfolios?class=${classId}&new=1`}>New portfolio entry</Link><Link className="hub-button hub-button-quiet" to={`/hub/teacher/announcements/new?class=${classId}`}>New notice</Link></>}>
       {data.homeroom.includes(classId) ? "You are the class teacher." : teaches.length ? `You teach ${teaches.join(", ")} here.` : null}
     </PageHeader>
     <div className="hub-stats">
@@ -211,42 +211,6 @@ export function TeacherPortfolio() {
 }
 
 // ---------- Class notices (routine announcements to the teacher's own classes) ----------
-const TEACHER_CATEGORIES = [["class", "Class"], ["academic", "Academic"], ["event", "Event"], ["reminder", "Reminder"]];
-export function TeacherAnnouncements() {
-  const auth = useAuth();
-  const publishKeys = auth.scope?.publishKeys || [];
-  const startClass = new URLSearchParams(window.location.search).get("class");
-  return <RecordManager kicker="Teaching" title="Class notices" noun="notice" collection="announcements" nameOf={(row) => row.title} canEdit={publishKeys.length > 0}
-    intro="Routine notices for the families and pupils of your classes. School-wide and urgent notices come from the school office."
-    load={() => list("announcements", where("createdBy", "==", auth.user.uid))}
-    lookups={async () => ({ classes: await getMany("classes", publishKeys.map((key) => key.slice(6))) })}
-    fields={[
-      { key: "classKey", label: "Class", type: "select", required: true, options: (lookups) => lookups.classes.map((cls) => [`class:${cls.id}`, cls.name]) },
-      { key: "category", label: "Category", type: "select", required: true, options: TEACHER_CATEGORIES },
-      { key: "title", label: "Headline", type: "text", required: true, maxLength: 140, wide: true },
-      { key: "body", label: "Message", type: "textarea", required: true, maxLength: 5000, rows: 4, wide: true },
-      { key: "expiresAt", label: "Remove after", type: "date", help: "Optional." },
-      { key: "status", label: "Publishing", type: "select", required: true, options: [["published", "Publish now"], ["draft", "Save as draft"]] },
-      { key: "attachmentsText", label: "Attachments (links)", type: "textarea", rows: 2, wide: true, placeholder: "Reading list | https://drive.google.com/…" },
-    ]}
-    defaults={() => ({ classKey: startClass ? `class:${startClass}` : publishKeys[0], category: "class", status: "published" })}
-    toDraft={(row) => ({ classKey: row.audienceKeys?.[0], attachmentsText: linksText(row.attachments) })}
-    validate={(values) => ({ attachmentsText: linksError(values.attachmentsText), classKey: values.classKey && !publishKeys.includes(values.classKey) ? "You can post only to your own classes." : null })}
-    prepare={(values, { original }) => {
-      const { classKey, attachmentsText, ...rest } = values;
-      return { ...rest, audienceKeys: [classKey], pinned: false, attachments: parseLinks(attachmentsText), ...(rest.status === "published" && original?.status !== "published" ? { publishedAt: new Date() } : {}), ...(!original ? { createdBy: auth.user.uid } : {}) };
-    }}
-    columns={(lookups) => [
-      { key: "title", label: "Notice", render: (row) => <span><span className="hub-cell-strong">{row.title}</span><br /><small>{lookups.classes.find((cls) => `class:${cls.id}` === row.audienceKeys?.[0])?.name || "Class"}</small></span> },
-      { key: "category", label: "Category", render: (row) => TEACHER_CATEGORIES.find(([id]) => id === row.category)?.[1] || row.category },
-      { key: "publishedAt", label: "Published", sortValue: (row) => row.publishedAt?.seconds || 0, render: (row) => formatDate(row.publishedAt, { day: "numeric", month: "short" }) },
-      { key: "statusBadge", label: "Status", sortValue: (row) => row.status, csv: (row) => row.status, render: (row) => <StatusBadge status={row.status} /> },
-    ]}
-    statusOptions={[["published", "Published"], ["draft", "Draft"], ["archived", "Archived"]]}
-    searchKeys={["title", "body"]} initialSort={{ key: "publishedAt", dir: -1 }} createLabel="New class notice" startOpen={new URLSearchParams(window.location.search).get("new") === "1"}
-    emptyHint="Notices you post to your classes appear here." />;
-}
-
 // ---------- Class events ----------
 const TEACHER_EVENT_CATEGORIES = EVENT_CATEGORIES.filter(([id]) => ["class", "academic", "meeting"].includes(id));
 export function TeacherEvents() {

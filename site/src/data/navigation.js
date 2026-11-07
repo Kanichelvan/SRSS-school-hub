@@ -48,7 +48,7 @@ export const siteNav = [
     href: "/resources",
     intro: "Everything you need, in one place.",
     groups: [
-      { title: "Information", links: [["Calendar", "/resources/calendar"], ["News & Updates", "/resources/news"], ["Notices", "/resources/notices"]] },
+      { title: "Information", links: [["Calendar", "/resources/calendar"], ["News & Updates", "/resources/news"], ["Announcements", "/announcements"]] },
       { title: "Documents", links: [["Downloads", "/resources/downloads"], ["Policies", "/resources/policies"]] },
       { title: "Assistance", links: [["FAQs", "/resources/faq"], ["Contact", "/resources/contact"]] },
     ],

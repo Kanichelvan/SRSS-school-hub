@@ -26,6 +26,7 @@ export const hubRoutes = [
   { path: "/hub/admin/development", hub: "admin", group: "People", label: "Teacher development", module: "teacherDevelopment", google: [], screen: "teacherDevelopment", publisherOnlyDevelopment: true },
   // Shared — Dashboard | Announcements | Calendar | Messages | Forms & Actions | Search
   { path: "/hub/announcements", hub: "shared", label: "Announcements", module: "announcements", google: ["Gmail", "Groups"], screen: "announcements" },
+  { path: "/hub/announcements/:id", hub: "shared", label: "Notice", module: "announcements", google: [], screen: "noticeDetail", hidden: true },
   { path: "/hub/calendar", hub: "shared", label: "Calendar", module: "calendar", google: ["Calendar"], screen: "calendar" },
   { path: "/hub/messages", hub: "shared", label: "Messages", module: "messages", google: ["Gmail"], screen: "messages" },
   { path: "/hub/forms", hub: "shared", label: "Downloads / Forms", module: "forms", google: ["Forms", "Drive"], screen: "activityForms" },
@@ -49,6 +50,9 @@ export const hubRoutes = [
   { path: "/hub/teacher/attendance", hub: "teacher", label: "Attendance", module: "attendance", google: [], screen: "attendance" },
   { path: "/hub/teacher/attendance/:classId", hub: "teacher", label: "Take attendance", module: "attendance", google: [], screen: "attendance", hidden: true },
   { path: "/hub/teacher/announcements", hub: "teacher", label: "Class notices", module: "announcements", google: ["Gmail"], screen: "teacherAnnouncements" },
+  { path: "/hub/teacher/announcements/new", hub: "teacher", label: "New class notice", module: "announcements", google: [], screen: "teacherNoticeEditor", hidden: true },
+  { path: "/hub/teacher/announcements/:id", hub: "teacher", label: "Class notice", module: "announcements", google: [], screen: "teacherNoticeManage", hidden: true },
+  { path: "/hub/teacher/announcements/:id/edit", hub: "teacher", label: "Edit class notice", module: "announcements", google: [], screen: "teacherNoticeEditor", hidden: true },
   { path: "/hub/teacher/portfolios", hub: "teacher", label: "Portfolio entries", module: "portfolio", google: ["Drive", "Classroom"], screen: "teacherPortfolio" },
   { path: "/hub/teacher/events", hub: "teacher", label: "Class events", module: "calendar", google: ["Calendar"], screen: "teacherEvents" },
   { path: "/hub/teacher/students", hub: "teacher", label: "Students", module: "students", google: [], screen: "studentRegister" },
@@ -98,7 +102,10 @@ export const hubRoutes = [
   { path: "/hub/admin/teacher-assignments", hub: "admin", group: "Assignments", label: "Teacher assignments", module: "academics", google: [], screen: "teacherAssignments" },
   { path: "/hub/admin/guardian-links", hub: "admin", group: "Assignments", label: "Guardian links", module: "guardians", google: [], screen: "guardianLinks" },
   { path: "/hub/admin/support-groups", hub: "admin", group: "Assignments", label: "Remedial group", module: "students", google: [], screen: "supportGroups" },
-  { path: "/hub/admin/communications", hub: "admin", group: "Content & communication", label: "Announcements", module: "announcements", google: ["Gmail", "Groups"], screen: "announcementsAdmin" },
+  { path: "/hub/admin/communications", hub: "admin", group: "Content & communication", label: "Announcements & circulars", module: "announcements", google: ["Gmail", "Groups"], screen: "announcementsAdmin" },
+  { path: "/hub/admin/communications/new", hub: "admin", label: "New announcement", module: "announcements", google: [], screen: "noticeEditor", hidden: true },
+  { path: "/hub/admin/communications/:id", hub: "admin", label: "Announcement", module: "announcements", google: [], screen: "noticeManage", hidden: true },
+  { path: "/hub/admin/communications/:id/edit", hub: "admin", label: "Edit announcement", module: "announcements", google: [], screen: "noticeEditor", hidden: true },
   { path: "/hub/admin/calendar", hub: "admin", group: "Content & communication", label: "Calendar", module: "calendar", google: ["Calendar"], screen: "calendarAdmin" },
   { path: "/hub/admin/showcase", hub: "admin", group: "Content & communication", label: "Portfolio moderation", module: "showcase", google: ["Drive"], screen: "showcase" },
   { path: "/hub/admin/content", hub: "admin", group: "Content & communication", label: "Website content", module: "content", google: ["Drive"], screen: "content" },
@@ -128,6 +135,11 @@ export const hubIndex = (hub) => hubRoutes.find((route) => route.hub === hub && 
 const ROLE_HUBS = ["admin", "teacher", "parent", "student"];
 export const ROUTE_ALIASES = [
   ["/sign-in", "/login"],
+  // SRSS Connect technical spec (Part 2 §3) addresses → the hub's canonical routes.
+  ["/dashboard/announcements", "/hub/announcements"], ["/dashboard/notifications", "/hub/notifications"], ["/dashboard/settings/notifications", "/hub/notifications?tab=preferences"],
+  ["/dashboard/actions", "/hub/parent"], ["/dashboard/parent/announcements", "/hub/announcements"], ["/dashboard/parent/actions", "/hub/parent"], ["/dashboard/parent/circulars", "/hub/announcements?filter=circular"],
+  ["/dashboard/teacher/communications", "/hub/teacher/announcements"], ["/dashboard/teacher/communications/new", "/hub/teacher/announcements/new"],
+  ["/admin/communications", "/hub/admin/communications"], ["/admin/communications/new", "/hub/admin/communications/new"],
   // Developer PRD (/dashboard/{role}) and Dual-Plane brief (/portal/{role}) addresses.
   ...["/dashboard", "/portal"].flatMap((prefix) => [[prefix, "/hub"], ...ROLE_HUBS.map((hub) => [`${prefix}/${hub}`, `/hub/${hub}`])]),
   // Retired prototype addresses (pre-Firebase Parent Hub and /admin CMS).

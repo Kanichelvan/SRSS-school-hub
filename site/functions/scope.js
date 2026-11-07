@@ -50,6 +50,8 @@ export async function computeUserScope(db, uid, roles = []) {
 
   const familyStudents = await getMany(db, "students", [...childIds, studentId]);
   const familyClassIds = unique(familyStudents.map((doc) => doc.data().currentClassId));
+  // Classes of the children this person is a verified guardian of (for "parents of …" audiences).
+  const childClassIds = roles.includes("parent") ? unique(familyStudents.filter((doc) => childIds.includes(doc.id)).map((doc) => doc.data().currentClassId)) : [];
   const classDocs = await getMany(db, "classes", [...familyClassIds, ...classIds]);
   const standardOf = Object.fromEntries(classDocs.map((doc) => [doc.id, doc.data().standard]));
 
@@ -61,6 +63,9 @@ export async function computeUserScope(db, uid, roles = []) {
     roles.some((role) => !["student", "parent"].includes(role)) ? "role:staff" : null,
     ...[...familyClassIds, ...classIds].map((classId) => `class:${classId}`),
     ...[...familyClassIds, ...classIds].map((classId) => (standardOf[classId] ? `standard:${standardOf[classId]}` : null)),
+    // SRSS Connect "parents only" audiences: Standard 4 parents → standard:4@parents.
+    ...childClassIds.map((classId) => `class:${classId}@parents`),
+    ...childClassIds.map((classId) => (standardOf[classId] ? `standard:${standardOf[classId]}@parents` : null)),
   ]);
 
   return {

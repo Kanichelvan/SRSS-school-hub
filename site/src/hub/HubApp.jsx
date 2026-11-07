@@ -13,6 +13,7 @@ const records = () => import("./screens/records");
 const attendance = () => import("./screens/attendance");
 const family = () => import("./screens/family");
 const comms = () => import("./screens/comms");
+const connect = () => import("./screens/connect");
 const admin = () => import("./screens/admin");
 const content = () => import("./screens/content");
 const consent = () => import("./screens/consent");
@@ -27,6 +28,7 @@ const questAdmin = () => import("./screens/quest-admin");
 const nilam = () => import("./screens/nilam");
 
 const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
+const NotificationBell = lazyNamed(connect, "NotificationBell");
 const SignIn = lazyNamed(() => import("./SignIn"), "SignIn");
 
 const community = () => import("./screens/community");
@@ -50,16 +52,17 @@ const SCREENS = {
   studentRegister: lazyNamed(records, "StudentRegister"), student360: lazyNamed(records, "Student360"), staffDirectory: lazyNamed(records, "StaffDirectory"), academics: lazyNamed(records, "Academics"),
   attendance: lazyNamed(attendance, "AttendanceHome"), attendanceOverview: lazyNamed(() => import("./screens/attendanceOffice"), "AttendanceOffice"), childAttendance: lazyNamed(attendance, "ChildAttendance"),
   myChildren: lazyNamed(family, "MyChildren"), journey: lazyNamed(family, "Journey"),
-  announcements: lazyNamed(comms, "Announcements"), calendar: lazyNamed(comms, "Calendar"), notifications: lazyNamed(comms, "Notifications"), profile: lazyNamed(comms, "Profile"),
+  announcements: lazyNamed(connect, "NoticeFeed"), calendar: lazyNamed(comms, "Calendar"), notifications: lazyNamed(connect, "NotificationCentre"), profile: lazyNamed(comms, "Profile"),
+  noticeDetail: lazyNamed(connect, "NoticeDetail"), noticeEditor: lazyNamed(connect, "AdminEditor"), noticeManage: lazyNamed(connect, "AdminManage"), teacherNoticeEditor: lazyNamed(connect, "TeacherEditor"), teacherNoticeManage: lazyNamed(connect, "TeacherManage"),
   admissions: lazyNamed(admin, "Admissions"), consentOverview: lazyNamed(admin, "ConsentOverview"), showcase: lazyNamed(admin, "Showcase"), audit: lazyNamed(admin, "Audit"),
   content: lazyNamed(content, "Content"), inbox: lazyNamed(content, "Inbox"), parentConsent: lazyNamed(consent, "ParentConsent"), consentPrint: lazyNamed(consent, "ConsentPrint"),
   // School setup, people and assignments (Admin hub)
   setupWizard: lazyNamed(wizard, "SetupWizard"), academicYears: lazyNamed(setup, "AcademicYears"), terms: lazyNamed(setup, "Terms"), standards: lazyNamed(setup, "Standards"), classes: lazyNamed(setup, "Classes"), subjects: lazyNamed(setup, "Subjects"),
   teacherAssignments: lazyNamed(setup, "TeacherAssignments"), enrolments: lazyNamed(setup, "Enrolments"),
   studentsAdmin: lazyNamed(people, "StudentsAdmin"), guardians: lazyNamed(people, "Guardians"), staffAdmin: lazyNamed(people, "StaffAdmin"), guardianLinks: lazyNamed(people, "GuardianLinks"), supportGroups: lazyNamed(people, "SupportGroups"), accounts: lazyNamed(people, "Accounts"),
-  rolesMatrix: lazyNamed(system, "RolesMatrix"), settings: lazyNamed(system, "Settings"), announcementsAdmin: lazyNamed(system, "AnnouncementsAdmin"), calendarAdmin: lazyNamed(system, "CalendarAdmin"),
+  rolesMatrix: lazyNamed(system, "RolesMatrix"), settings: lazyNamed(system, "Settings"), announcementsAdmin: lazyNamed(connect, "AdminCommunications"), calendarAdmin: lazyNamed(system, "CalendarAdmin"),
   // Teacher hub
-  myClasses: lazyNamed(teaching, "MyClasses"), classDashboard: lazyNamed(teaching, "ClassDashboard"), classRoster: lazyNamed(teaching, "ClassRoster"), teacherPortfolio: lazyNamed(teaching, "TeacherPortfolio"), teacherAnnouncements: lazyNamed(teaching, "TeacherAnnouncements"), teacherEvents: lazyNamed(teaching, "TeacherEvents"),
+  myClasses: lazyNamed(teaching, "MyClasses"), classDashboard: lazyNamed(teaching, "ClassDashboard"), classRoster: lazyNamed(teaching, "ClassRoster"), teacherPortfolio: lazyNamed(teaching, "TeacherPortfolio"), teacherAnnouncements: lazyNamed(connect, "TeacherCommunications"), teacherEvents: lazyNamed(teaching, "TeacherEvents"),
   // Student hub
   myClass: lazyNamed(student, "MyClass"), myAchievements: lazyNamed(student, "MyAchievements"),
 };
@@ -114,7 +117,7 @@ function Shell() {
       <div className="hub-topbar-actions">
         {/* Role switcher for people holding several roles (AUTH-001 AC3). */}
         {auth.hubs.length > 1 && <label className="hub-switcher"><span className="hub-visually-hidden">View as</span><select value={auth.currentHub} onChange={(event) => switchTo(event.target.value)}>{auth.hubs.map((hub) => <option key={hub} value={hub}>{HUB_LABELS[hub]}</option>)}</select></label>}
-        <Link to="/hub/notifications" className="hub-topbar-link">Notifications</Link>
+        <Suspense fallback={<Link to="/hub/notifications" className="hub-topbar-link">Notifications</Link>}><NotificationBell /></Suspense>
         <Link to="/hub/profile" className="hub-topbar-link hub-account" title={auth.roles.map((role) => ROLES[role]?.label).join(", ")}>{auth.user.displayName || auth.user.email}</Link>
         <button type="button" onClick={auth.signOut}>Sign out</button>
       </div>

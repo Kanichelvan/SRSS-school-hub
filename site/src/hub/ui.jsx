@@ -101,7 +101,7 @@ export function ChildSwitcher({ children, selectedId, onSelect }) {
 }
 
 // Actions Required (DASH-001): sits above announcements and routes straight to the action.
-const ACTION_ICONS = { consent: "Consent", form: "Form", payment: "Payment", meeting: "Meeting" };
+const ACTION_ICONS = { consent: "Consent", form: "Form", payment: "Payment", meeting: "Meeting", acknowledge: "Notice" };
 export function ActionsRequired({ actions, loading }) {
   return <section className="hub-actions" aria-labelledby="actions-title">
     <div className="hub-section-head"><h2 id="actions-title">Actions required</h2><span className="hub-actions-count">{loading ? "…" : actions.length}</span></div>

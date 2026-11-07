@@ -103,7 +103,7 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/resources` | Resources | Own page | School office |
 | `/resources/calendar` | Calendar | Section of `/resources#calendar` | School office |
 | `/resources/news` | News & Updates | Section of `/resources#news` | Content editor |
-| `/resources/notices` | Notices | Section of `/resources#news` | School office |
+| `/announcements` | School Announcements (SRSS Connect public archive; `/announcements/<id>` per notice; `/resources/notices` redirects here) | Page | School office |
 | `/resources/downloads` | Downloads | Section of `/resources#downloads` | School office |
 | `/resources/policies` | Policies | Section of `/resources#policies` | Privacy steward |
 | `/resources/faq` | FAQs | Own page | School office |

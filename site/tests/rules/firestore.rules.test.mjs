@@ -182,9 +182,10 @@ describe("DASH-001 / DASH-002 dashboards and targeting", () => {
     await assertFails(getDoc(doc(as("parent"), "announcements/an-c5")));
     await assertFails(getDoc(doc(as("parent"), "announcements/an-staff")));
   });
-  test("a teacher may publish to their own class but not school-wide", async () => {
-    await assertSucceeds(setDoc(doc(as("teacher"), "announcements/t1"), { title: "c4", audienceKeys: ["class:c4"], status: "published", createdBy: "teacher" }));
-    await assertFails(setDoc(doc(as("teacher"), "announcements/t2"), { title: "all", audienceKeys: ["school"], status: "published", createdBy: "teacher" }));
+  test("SRSS Connect: nobody writes notices directly — publication goes through the connect function (SEC-009)", async () => {
+    await assertFails(setDoc(doc(as("teacher"), "announcements/t1"), { title: "c4", audienceKeys: ["class:c4"], status: "published", createdBy: "teacher" }));
+    await assertFails(setDoc(doc(as("admin"), "announcements/t2"), { title: "all", audienceKeys: ["school"], status: "published", createdBy: "admin" }));
+    await assertFails(updateDoc(doc(as("admin"), "announcements/an-school"), { publishedAt: new Date() }));
   });
   test("a parent's Actions Required query reads only requests addressed to them", async () => {
     await seed("formSubmissions/fs-1", { formId: "f", requestedFromUid: "parent", status: "pending", studentId: "stu-a" });
@@ -395,13 +396,11 @@ describe("Portfolio: assigned pupils, subjects, moderation and the public copy",
 });
 
 describe("Announcements and calendar", () => {
-  test("teachers post routine notices to their own class only — never school-wide, urgent or pinned", async () => {
-    const notice = (data) => ({ title: "Notice", body: "", createdBy: "teacher2", status: "published", audienceKeys: ["class:c5"], category: "reminder", ...data });
-    await assertSucceeds(setDoc(doc(as("teacher2"), "announcements/ok"), notice({})));
-    await assertFails(setDoc(doc(as("teacher2"), "announcements/urgent"), notice({ category: "urgent" })));
-    await assertFails(setDoc(doc(as("teacher2"), "announcements/pinned"), notice({ pinned: true })));
-    await assertFails(setDoc(doc(as("teacher2"), "announcements/other"), notice({ audienceKeys: ["class:c4"] })));
-    await assertSucceeds(setDoc(doc(as("admin"), "announcements/school"), { title: "All", body: "", createdBy: "admin", status: "scheduled", audienceKeys: ["school"], category: "urgent", pinned: true }));
+  test("authors read their own drafts; the office reads all; other people never see drafts", async () => {
+    await seed("announcements/mine", { title: "Mine", audienceKeys: ["class:c4"], status: "draft", createdBy: "teacher" });
+    await assertSucceeds(getDoc(doc(as("teacher"), "announcements/mine")));
+    await assertSucceeds(getDoc(doc(as("admin"), "announcements/mine")));
+    await assertFails(getDoc(doc(as("teacher2"), "announcements/mine")));
   });
   test("drafts and scheduled notices are invisible to their audience", async () => {
     await seed("announcements/draft", { title: "Draft", audienceKeys: ["school"], status: "draft", createdBy: "admin" });
