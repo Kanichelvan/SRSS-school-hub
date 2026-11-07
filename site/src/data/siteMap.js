@@ -70,7 +70,7 @@ export const SITE = [
   { path: "/resources", label: "Resources", page: "resources", status: "page", owner: "School office", summary: "Calendars, news, documents, policies and contacts." },
   { path: "/resources/calendar", label: "Calendar", parent: "/resources", page: "resources", anchor: "calendar", status: "section", owner: "School office", summary: "Term dates, holidays and public events." },
   { path: "/resources/news", label: "News & Updates", parent: "/resources", page: "resources", anchor: "news", status: "section", owner: "Content editor", summary: "Announcements, newsletters and school news." },
-  { path: "/resources/notices", label: "Notices", parent: "/resources", page: "resources", anchor: "news", status: "section", owner: "School office", summary: "Public school notices." },
+  { path: "/announcements", label: "School Announcements", parent: "/resources", page: "announcements", status: "page", owner: "School office", summary: "Current public school notices from SRSS Connect." },
   { path: "/resources/downloads", label: "Downloads", parent: "/resources", page: "resources", anchor: "downloads", status: "section", editable: true, owner: "School office", summary: "Forms, brochures and approved documents." },
   { path: "/resources/policies", label: "Policies", parent: "/resources", page: "resources", anchor: "policies", status: "section", owner: "Privacy steward", summary: "Public school policies, privacy and safeguarding." },
   { path: "/resources/faq", label: "FAQs", parent: "/resources", page: "faq", status: "page", owner: "School office", summary: "Clear answers about learning, admissions and school life." },
@@ -118,6 +118,7 @@ export const REDIRECTS = {
   "/faq": "/resources/faq",
   "/admissions": "/join/admissions",
   "/news": "/resources/news",
+  "/resources/notices": "/announcements",
   "/contact": "/resources/contact",
   "/legal/privacy-policy": "/legal/privacy",
   "/legal/terms-of-use": "/legal/terms",
@@ -133,6 +134,8 @@ export function resolvePath(pathname) {
   const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
   if (REDIRECTS[path]) return { redirect: REDIRECTS[path] };
   if (byPath[path]) return { entry: byPath[path] };
+  // SRSS Connect public notice pages: /announcements/<id> (only sanitized public copies exist).
+  if (/^\/announcements\/[A-Za-z0-9_-]{1,128}$/.test(path)) return { entry: { path, label: "Announcement", parent: "/announcements", page: "announcement", slug: path.slice(15) } };
   if (path.startsWith("/legal/")) return { entry: { path, label: "Legal & Policies", parent: "/legal", page: "legal", slug: path.slice(7) } };
   return { entry: { path, label: "Page not found", page: "notFound" } };
 }

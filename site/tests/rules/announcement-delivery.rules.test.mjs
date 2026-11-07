@@ -55,10 +55,10 @@ test('making an existing notice public does not replay messages without an expli
   assert.equal((await db.doc('publicAnnouncements/n1').get()).exists, true);
   assert.equal((await db.collection('notificationRecords').get()).size, 0);
 });
-test('teachers cannot make class notices public; office must choose the whole-school audience', async () => {
+test('clients cannot write notices or public copies at all; the connect function owns publication', async () => {
   const teacher = env.authenticatedContext('teacher', { roles: ['teacher'] }).firestore();
   await assertFails(setDoc(doc(teacher, 'announcements/teacher-public'), { ...notice, createdBy: 'teacher', category: 'class', audienceKeys: ['class:b'], publicListing: true }));
   const office = env.authenticatedContext('office', { roles: ['schoolAdmin'] }).firestore();
-  await assertFails(setDoc(doc(office, 'announcements/office-class-public'), { ...notice, audienceKeys: ['class:a'], publicListing: true }));
-  await assertSucceeds(setDoc(doc(office, 'announcements/office-public'), { ...notice, publicListing: true }));
+  await assertFails(setDoc(doc(office, 'announcements/office-public'), { ...notice, createdBy: 'office', publicListing: true }));
+  await assertFails(setDoc(doc(office, 'notificationRecords/forged'), { recipientUid: 'parent', title: 'x' }));
 });

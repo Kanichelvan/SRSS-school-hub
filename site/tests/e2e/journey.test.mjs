@@ -141,8 +141,14 @@ describe("Teacher manages the class", () => {
     await setDoc(doc(teacher.db, "portfolioEntries/pe-internal"), { studentId: "stu-e2e", classId: ids.classId, title: "Private planning note", visibility: "internal", moderationStatus: null, ...stamp(teacher) });
   });
 
-  test("publishes a class notice", async () => {
-    await setDoc(doc(teacher.db, "announcements/an-e2e"), { title: "Bring a recycled item on Friday", body: "For our values project.", audienceKeys: [`class:${ids.classId}`], category: "class", pinned: false, attachments: [], publishedAt: serverTimestamp(), ...stamp(teacher), status: "published" });
+  test("publishes a class notice through SRSS Connect (direct writes are refused)", async () => {
+    const notice = { title: "Bring a recycled item on Friday", body: "For our values project.", audienceKeys: [`class:${ids.classId}`], category: "class", priority: "P3" };
+    await assert.rejects(setDoc(doc(teacher.db, "announcements/forged"), { ...notice, status: "published", createdBy: teacher.uid }));
+    await assert.rejects(teacher.call("connect", { action: "save", notice: { ...notice, audienceKeys: ["class:another-class"] } }).then((draft) => teacher.call("connect", { action: "publish", id: draft.data.id, revision: draft.data.revision })), /approval|own classes/i);
+    const draft = (await teacher.call("connect", { action: "save", notice })).data;
+    const published = (await teacher.call("connect", { action: "publish", id: draft.id, revision: draft.revision })).data;
+    assert.equal(published.status, "published");
+    ids.noticeId = draft.id;
   });
 });
 
@@ -158,7 +164,10 @@ describe("Parent follows their child", () => {
     const entries = await getDocs(query(collection(parent.db, "portfolioEntries"), where("studentId", "==", "stu-e2e"), where("visibility", "in", ["family", "showcaseCandidate", "publicShowcase"])));
     assert.deepEqual(entries.docs.map((item) => item.id), ["pe-e2e"]);
     const notices = await getDocs(query(collection(parent.db, "announcements"), where("status", "==", "published"), where("audienceKeys", "array-contains-any", scope.audienceKeys)));
-    assert.ok(notices.docs.some((item) => item.id === "an-e2e"));
+    assert.ok(notices.docs.some((item) => item.id === ids.noticeId));
+    // The deliverAnnouncement trigger places one in-hub notification for the parent.
+    const told = await waitFor(async () => { const found = (await getDocs(query(collection(parent.db, "notificationRecords"), where("recipientUid", "==", parent.uid), where("announcementId", "==", ids.noticeId)))).docs; return found.length ? found : null; }, "class notice notification");
+    assert.equal(told.length, 1);
   });
 });
 

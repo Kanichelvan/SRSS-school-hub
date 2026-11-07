@@ -184,64 +184,13 @@ function ConsentQuestions() {
   </>;
 }
 
-// ---------- Announcements (admin) ----------
-const ANNOUNCEMENT_STATUSES = [["published", "Published"], ["draft", "Draft"], ["scheduled", "Scheduled"], ["archived", "Archived"]];
-const toLocalInput = (value) => { const date = value?.toDate ? value.toDate() : value ? new Date(value) : null; if (!date) return ""; const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000); return local.toISOString().slice(0, 16); };
-
+// ---------- Announcements now live in SRSS Connect (screens/connect.jsx) ----------
 async function communicationLookups() {
   const [lookups, users, categories] = await Promise.all([schoolLookups(), list("users").catch(() => []), configList("announcementCategories").catch(() => [])]);
   const people = Object.fromEntries([...lookups.staff.filter((person) => person.uid).map((person) => [person.uid, person.name]), ...users.filter((user) => !lookups.staff.some((person) => person.uid === user.id)).map((user) => [user.id, user.displayName || user.email])]);
   return { ...lookups, users, people, categories: categories.length ? categories.map((item) => [item.id, item.name]) : ANNOUNCEMENT_CATEGORIES };
 }
 const userOptions = (lookups) => lookups.users.filter((user) => (user.roles || []).length && user.status !== "disabled").map((user) => [user.id, lookups.people[user.id] || user.email]).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
-
-export function AnnouncementsAdmin() {
-  const auth = useAuth();
-  const canEdit = Boolean(can(auth.roles, "announcements", "A") === "all");
-  const run = async ({ reload, setNotice }) => {
-    try { const { data } = await httpsCallable(functions, "runAnnouncementSchedule")({}); setNotice({ tone: "good", text: `${data.published} scheduled ${data.published === 1 ? "notice" : "notices"} published, ${data.expired} expired.` }); reload(); }
-    catch (error) { setNotice({ tone: "bad", text: error.message }); }
-  };
-  return <RecordManager kicker="Content & communication" title="Announcements" noun="announcement" collection="announcements" nameOf={(row) => row.title} canEdit={canEdit}
-    intro="Publishing sends an in-hub notification to the selected audience. For a whole-school notice, you can also show the message on the public website. Private attachments stay inside the hub."
-    lookups={communicationLookups}
-    fields={[
-      { key: "title", label: "Headline", type: "text", required: true, maxLength: 140, wide: true },
-      { key: "body", label: "Message", type: "textarea", required: true, maxLength: 5000, rows: 5, wide: true },
-      { key: "category", label: "Category", type: "select", required: true, options: (lookups) => lookups.categories },
-      ...audienceFields({ classOptions: (lookups) => classOptions(lookups), userOptions }),
-      { key: "publicListing", label: "Also show this message on the public website", type: "checkbox", wide: true, help: "Only for whole-school notices. The headline and message become public; attachments and recipient details stay private." },
-      { key: "status", label: "Publishing", type: "select", required: true, options: ANNOUNCEMENT_STATUSES },
-      { key: "publishAtLocal", label: "Publish at", type: "datetime-local", show: (draft) => draft.status === "scheduled", help: "Published automatically within 15 minutes of this time." },
-      { key: "expiresAt", label: "Remove after", type: "date", help: "Optional. Archived automatically after this day." },
-      { key: "pinned", label: "Pin to the top of everyone's list", type: "checkbox" },
-      { key: "attachmentsText", label: "Attachments (links)", type: "textarea", rows: 2, wide: true, placeholder: "Permission slip | https://drive.google.com/…", help: "One link per line, optionally “Label | link”. Files stay in the school's Google Drive with its sharing settings." },
-    ]}
-    defaults={() => ({ category: "school", audienceType: "school", status: "published" })}
-    toDraft={(row) => ({ ...draftFromKeys(row.audienceKeys), attachmentsText: linksText(row.attachments), publishAtLocal: toLocalInput(row.publishAt) })}
-    validate={(values) => ({
-      audienceType: audienceError(values), attachmentsText: linksError(values.attachmentsText),
-      publicListing: values.publicListing && values.audienceType !== 'school' ? 'Public notices must be addressed to everyone (whole school).' : null,
-      publishAtLocal: values.status === "scheduled" && !values.publishAtLocal ? "Choose when to publish." : values.status === "scheduled" && new Date(values.publishAtLocal) <= new Date() ? "Choose a time in the future, or publish now." : null,
-    })}
-    prepare={(values, { original }) => {
-      const { audienceType, audienceStandards, audienceClasses, audienceUsers, attachmentsText, publishAtLocal, ...rest } = values;
-      const audienceKeys = keysFromDraft({ audienceType, audienceStandards, audienceClasses, audienceUsers });
-      const publishing = rest.status === "published" && original?.status !== "published";
-      return { ...rest, publicListing: Boolean(rest.publicListing), pinned: Boolean(rest.pinned), audienceKeys, attachments: parseLinks(attachmentsText), publishAt: rest.status === "scheduled" ? new Date(publishAtLocal) : original?.publishAt ?? null, ...(publishing ? { publishedAt: serverTimestamp() } : {}), ...(!original ? { createdBy: auth.user.uid } : {}) };
-    }}
-    columns={(lookups) => [
-      { key: "title", label: "Announcement", render: (row) => <span><span className="hub-cell-strong">{row.title}</span>{row.pinned && <> <StatusBadge status="pending" label="Pinned" /></>}<br /><small>{describeAudience(row.audienceKeys, lookups)}</small></span> },
-      { key: "category", label: "Category", render: (row) => lookups.categories.find(([id]) => id === row.category)?.[1] || row.category || "—" },
-      { key: "publishedAt", label: "Published", sortValue: (row) => row.publishedAt?.seconds || row.publishAt?.seconds || 0, render: (row) => row.status === "scheduled" ? `Scheduled ${formatDate(row.publishAt, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}` : formatDate(row.publishedAt, { day: "numeric", month: "short", year: "numeric" }) },
-      { key: "expiresAt", label: "Until", render: (row) => (row.expiresAt ? formatDate(row.expiresAt, { day: "numeric", month: "short" }) : "—") },
-      { key: "statusBadge", label: "Status", sortValue: (row) => row.status, csv: (row) => row.status, render: (row) => <StatusBadge status={row.status} /> },
-    ]}
-    filters={(lookups) => [{ key: "category", label: "Category", options: lookups.categories }]}
-    statusOptions={ANNOUNCEMENT_STATUSES}
-    headerActions={(ctx) => canEdit && ctx.rows.some((row) => row.status === "scheduled") ? <button type="button" className="hub-button hub-button-quiet" onClick={() => run(ctx)}>Publish due notices now</button> : null}
-    searchKeys={["title", "body"]} initialSort={{ key: "publishedAt", dir: -1 }} createLabel="New announcement" />;
-}
 
 // ---------- Calendar (admin) ----------
 const EVENT_STATUSES = [["published", "Published"], ["draft", "Draft"], ["archived", "Archived"]];

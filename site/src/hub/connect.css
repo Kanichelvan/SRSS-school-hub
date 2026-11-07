@@ -1,0 +1,94 @@
+/* SRSS Connect — notices, circulars, notifications. Uses the hub tokens (hub.css / styles.css).
+   Priority is always written in words as well as colour (WCAG 1.4.1); no motion beyond hover. */
+
+/* Notice body (detail page, manage page, editor preview) */
+.connect-notice { position: relative; padding: 22px 24px; border: 1px solid var(--line); border-left: 4px solid var(--navy-800); border-radius: 10px; background: var(--hub-surface); }
+.connect-notice h2 { margin: 6px 0 8px; color: var(--navy-950); font: 600 24px/1.25 var(--serif); overflow-wrap: anywhere; }
+.connect-notice.connect-P1 { border-color: var(--hub-bad); border-left-width: 6px; background: var(--hub-bad-bg); }
+.connect-notice.connect-P2 { border-left-color: #c38b24; background: #fffaf0; }
+.connect-notice.connect-P4 { border-left-color: var(--line); }
+.connect-alert { display: inline-block; margin: 0 0 6px; padding: 4px 10px; border-radius: 4px; color: white; background: var(--hub-bad); font: 700 11px var(--ui); letter-spacing: .1em; text-transform: uppercase; }
+.connect-meta { display: block; margin: 0; color: var(--gold-800); font: 600 11px var(--ui); letter-spacing: .08em; text-transform: uppercase; }
+.connect-summary { margin: 0 0 12px; color: var(--ink); font: 500 16px/1.5 var(--body); }
+.connect-text { color: var(--ink); font: 15px/1.7 var(--body); white-space: pre-wrap; overflow-wrap: anywhere; }
+.connect-facts { margin-top: 14px; }
+.connect-action-line { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 18px 0 0; }
+.connect-action-line small { color: var(--muted); font: 13px var(--ui); }
+
+/* Acknowledgement */
+.connect-ack { margin-top: 18px; padding: 18px 22px; border: 1px solid var(--navy-800); border-radius: 10px; background: var(--navy-100); }
+.connect-ack h2 { margin: 0 0 6px; color: var(--navy-950); font: 600 18px var(--ui); }
+.connect-ack p { margin: 0 0 12px; color: var(--ink); line-height: 1.6; }
+.connect-ack-preview { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.connect-ack-preview small { color: var(--muted); font: 12px var(--ui); }
+
+/* Feed cards */
+.connect-cards { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.connect-card { display: grid; gap: 10px; padding: 16px 18px; border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 10px; background: var(--hub-surface); }
+.connect-card.connect-P1 { border-left-color: var(--hub-bad); background: var(--hub-bad-bg); }
+.connect-card.connect-P2 { border-left-color: #c38b24; background: #fffaf0; }
+.connect-card.connect-P3 { border-left-color: var(--navy-800); }
+.connect-card.connect-new strong::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; background: var(--gold-700); vertical-align: middle; }
+.connect-card-link { display: grid; gap: 4px; color: inherit; text-decoration: none; }
+.connect-card-link strong { color: var(--navy-950); font: 600 17px/1.35 var(--ui); }
+.connect-card-link:hover strong { text-decoration: underline; }
+.connect-card-summary { color: var(--muted); font: 14px/1.55 var(--body); }
+.connect-important .hub-section-head h2 { color: var(--hub-bad); }
+
+/* Workspace */
+.connect-tab-count { display: inline-grid; min-width: 20px; height: 20px; margin-left: 4px; padding: 0 6px; place-content: center; border-radius: 99px; color: var(--navy-950); background: var(--cream); font: 600 11px var(--ui); }
+
+/* Editor: form + sticky preview */
+.connect-editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 380px); gap: 24px; align-items: start; }
+.connect-form { display: grid; gap: 4px; min-width: 0; }
+.connect-form .hub-section { display: grid; gap: 14px; }
+.connect-preview { position: sticky; top: 16px; display: grid; gap: 12px; }
+.connect-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0 14px; }
+.connect-checks-long { max-height: 320px; overflow-y: auto; }
+.connect-reach { margin: 0; padding: 10px 14px; border-radius: 8px; color: var(--navy-950); background: var(--hub-info-bg); font: 13px/1.5 var(--ui); }
+
+/* Manage */
+.connect-actions { flex-wrap: wrap; justify-content: flex-start; margin: 0 0 18px; }
+.connect-manage { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr); gap: 20px; align-items: start; }
+.connect-reason { display: grid; gap: 10px; max-width: 640px; margin: 0 0 18px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--hub-surface); }
+.connect-returned { background: var(--hub-warn-bg); }
+.connect-pending-head { margin-top: 18px; }
+.connect-pending-head h3 { margin: 0; color: var(--navy-950); font: 600 16px var(--ui); }
+
+/* Notification Centre */
+.connect-notifications { display: grid; margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-radius: 10px; background: var(--hub-surface); overflow: hidden; }
+.connect-notifications > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 14px 16px; border-top: 1px solid var(--line); }
+.connect-notifications > li:first-child { border-top: 0; }
+.connect-notifications > li.connect-unread { background: var(--cream); }
+.connect-notifications > li.connect-critical { box-shadow: inset 4px 0 0 #c38b24; }
+.connect-notification-open { display: grid; gap: 3px; min-height: 44px; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.connect-notification-open strong { color: var(--navy-950); font: 600 15px/1.4 var(--ui); }
+.connect-unread .connect-notification-open strong::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--gold-700); vertical-align: middle; }
+.connect-notification-open > span:last-child:not(.connect-meta) { color: var(--muted); font: 13px/1.5 var(--body); }
+.connect-preferences { display: grid; gap: 8px; }
+.connect-always { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font: 13px/1.8 var(--ui); }
+
+/* Header bell — stays visible on phones (unlike the text links) */
+.connect-bell { position: relative; }
+.hub-topbar .connect-bell-button { position: relative; display: inline-grid; place-content: center; width: 44px; height: 44px; border-radius: 50%; color: white; }
+.hub-topbar .connect-bell-button:hover { background: rgba(255, 255, 255, .12); }
+.connect-bell-count { position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; color: var(--navy-950); background: var(--gold-700); font: 700 10px/18px var(--ui); text-align: center; }
+.connect-bell-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: min(360px, calc(100vw - 24px)); border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--hub-surface); box-shadow: 0 12px 32px rgba(10, 25, 60, .18); overflow: hidden; }
+.connect-bell-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); font: 13px var(--ui); }
+.hub-topbar .connect-bell-menu a { color: var(--navy-800); font: 500 12px var(--ui); }
+.connect-bell-menu ul { margin: 0; padding: 0; list-style: none; max-height: 60vh; overflow-y: auto; }
+.hub-topbar .connect-bell-menu li button { display: grid; gap: 2px; width: 100%; padding: 10px 14px; border-top: 1px solid var(--line); color: var(--ink); text-align: left; }
+.hub-topbar .connect-bell-menu li:first-child button { border-top: 0; }
+.hub-topbar .connect-bell-menu li button:hover { background: var(--cream); }
+.hub-topbar .connect-bell-menu li button.connect-unread { background: var(--cream); }
+.connect-bell-menu li strong { color: var(--navy-950); font: 600 13px/1.35 var(--ui); }
+.connect-bell-menu li span:last-child:not(.connect-meta) { color: var(--muted); font: 12px/1.4 var(--body); }
+.connect-bell-empty { margin: 0; padding: 18px 14px; color: var(--muted); font: 13px var(--ui); }
+.hub-topbar .connect-bell-all { display: block; padding: 12px 14px; border-top: 1px solid var(--line); text-align: center; }
+
+@media (max-width: 900px) {
+  .connect-editor, .connect-manage { grid-template-columns: 1fr; }
+  .connect-preview { position: static; }
+  .connect-notifications > li { grid-template-columns: 1fr; }
+  .connect-notice { padding: 18px; }
+}

@@ -419,34 +419,48 @@ service cloud.firestore {
       allow update: if isSelf(resource.data.studentId) && unchanged(['studentId', 'createdBy']);
     }
 
-    // ===================== COMMUNICATION (DASH-002) =====================
-    // audienceKeys: ['school'] · ['role:parents'] · ['standard:4'] · ['class:<id>'] · ['user:<uid>'] …
-    // Each user's own keys are derived server-side, so targeting is enforced here, not in the UI.
-    // Internal notices only — public website news is the separate newsPosts collection.
-    // Admins and leadership publish to any audience; a teacher publishes routine notices to one of their own
-    // classes. Scheduled notices are published by the publishScheduledAnnouncements function.
-    function announcementValid() {
-      return text('title', 140) && data().get('body', '') is string && data().get('body', '').size() <= 5000
-        && data().status in ['draft', 'scheduled', 'published', 'archived']
-        && data().audienceKeys is list && data().audienceKeys.size() > 0 && data().audienceKeys.size() <= 30
-        && data().get('pinned', false) is bool && data().get('attachments', []) is list && data().get('attachments', []).size() <= 5
-        && data().get('publicListing', false) is bool
-        && (data().get('publicListing', false) == false || ((isAdmin() || isLeader()) && data().audienceKeys == ['school']));
-    }
-    function teacherNotice() {
-      return teaching() && data().audienceKeys.size() == 1 && data().audienceKeys[0] in me().get('publishKeys', [])
-        && !(data().get('category', 'class') in ['school', 'urgent']) && data().get('pinned', false) == false;
-    }
+    // ===================== COMMUNICATION — SRSS Connect (DASH-002, docs/SRSS-CONNECT.md) =====================
+    // audienceKeys: ['school'] · ['role:parents'] · ['standard:4'] · ['standard:4@parents'] · ['class:<id>'] · ['user:<uid>'] …
+    // Each user's own keys are derived server-side (functions/scope.js), so targeting is enforced here, not in the UI.
+    // Every lifecycle change (draft, submit, approve, publish, schedule, cancel, archive, acknowledge) goes through
+    // the `connect` Cloud Function, which checks capability, class scope and workflow state; clients never write
+    // notices, approvals, publication times, delivery jobs, acknowledgements or other people's notifications.
+    function connectOffice() { return hasAny(['schoolAdmin', 'superAdmin', 'leadership', 'academicCoordinator', 'contentEditor']); }
     match /announcements/{id} {
       allow read: if signedIn() && ((resource.data.status == 'published' && audienceMatches())
-        || resource.data.createdBy == uid() || isAdmin() || isLeader());
-      allow create: if createdByMe() && announcementValid() && (isAdmin() || isLeader() || teacherNotice());
-      allow update: if unchanged(['createdBy']) && announcementValid() && (isAdmin() || isLeader() || (resource.data.createdBy == uid() && teacherNotice()));
+        || resource.data.createdBy == uid() || connectOffice());
+      allow write: if false;
+      match /revisions/{revision} {
+        allow read: if connectOffice() || (signedIn() && get(/databases/$(database)/documents/announcements/$(id)).data.createdBy == uid());
+        allow write: if false;
+      }
     }
     match /notificationRecords/{id} {
       allow read: if signedIn() && resource.data.recipientUid == uid();
-      allow update: if signedIn() && resource.data.recipientUid == uid() && onlyChanges(['readAt']);
-      allow create: if false; // system-generated
+      // People may only mark their own notifications read or archived (or restore them), stamped by the server clock.
+      allow update: if signedIn() && resource.data.recipientUid == uid() && onlyChanges(['readAt', 'archivedAt'])
+        && (data().get('readAt', null) == null || data().readAt == request.time || data().readAt == resource.data.get('readAt', null))
+        && (data().get('archivedAt', null) == null || data().archivedAt == request.time || data().archivedAt == resource.data.get('archivedAt', null));
+      allow create, delete: if false; // system-generated
+    }
+    match /announcementAcknowledgements/{id} {
+      allow read: if signedIn() && (resource.data.recipientUid == uid() || hasAny(['schoolAdmin', 'superAdmin', 'leadership', 'academicCoordinator', 'auditor']));
+      allow write: if false;
+    }
+    match /communicationDeliveryJobs/{id} {
+      allow read: if hasAny(['schoolAdmin', 'superAdmin', 'leadership', 'academicCoordinator', 'technicalAdmin']);
+      allow write: if false;
+    }
+    match /connectCounters/{id} { allow read: if connectOffice(); allow write: if false; }
+    // Optional notifications only: essential notices (P1/P2, acknowledgements, actions, health, forms, emergency) always arrive.
+    match /notificationPreferences/{id} {
+      allow read: if signedIn() && id == uid();
+      allow create, update: if signedIn() && id == uid()
+        && data().keys().hasOnly(['mutedCategories', 'language', 'digest', 'updatedAt'])
+        && data().mutedCategories is list && data().mutedCategories.size() <= 20
+        && data().mutedCategories.hasOnly(['general', 'academic', 'administrative', 'events', 'activities', 'humanExcellence', 'parentEngagement', 'staff', 'achievements', 'srss25', 'class'])
+        && data().get('language', 'en') in ['en', 'ms', 'ta', 'zh'] && data().get('digest', 'none') in ['none', 'daily', 'weekly']
+        && data().updatedAt == request.time;
     }
     // Server-written, explicitly approved public copies contain no private attachments or recipients.
     match /publicAnnouncements/{id} { allow read: if resource.data.status == 'published'; allow write: if false; }

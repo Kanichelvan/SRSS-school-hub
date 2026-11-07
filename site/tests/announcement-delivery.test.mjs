@@ -23,5 +23,5 @@ test('notification links stay in the hub and contain the source notice identity'
   assert.equal(result.recipientUid, 'u1');
   assert.equal(result.announcementId, 'n1');
   assert.equal(result.critical, true);
-  assert.equal(result.link, '/hub/announcements');
+  assert.equal(result.link, '/hub/announcements/n1');
 });

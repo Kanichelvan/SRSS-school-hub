@@ -1,4 +1,4 @@
-// SRSS Connect: announcements with audience targeting (DASH-002), calendar, notifications, profile.
+// Calendar and profile. Announcements, notifications and preferences are SRSS Connect (screens/connect.jsx).
 import { FamilyPreferences } from "./onboarding";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -11,29 +11,6 @@ import { icsCalendar, downloadText } from "../logic/community";
 import "../community.css";
 import { ANNOUNCEMENT_CATEGORIES, EVENT_CATEGORIES, describeAudience } from "../audience";
 import { EmptyState, ErrorNote, Loading, PageHeader, Section, StatusBadge, formatDate } from "../ui";
-
-export function Announcements() {
-  const auth = useAuth();
-  const keys = auth.scope?.audienceKeys || ["school"];
-  const [readFailure,setReadFailure]=useState("");
-  const [reading,setReading]=useState("");
-  const receipts=useLoad(()=>list("announcementReads",where("ownerUid","==",auth.user.uid)),[auth.user.uid]);
-  async function markNotice(id){setReading(id);setReadFailure("");try{await setDoc(doc(db,"announcementReads",`${auth.user.uid}_${id}`),{ownerUid:auth.user.uid,announcementId:id,readAt:serverTimestamp()});receipts.reload();}catch{setReadFailure("The acknowledgement could not be saved. Please try again.");}finally{setReading("");}}
-  const schoolWide = can(auth.roles, "announcements", "A") === "all";
-  const teacher = (auth.scope?.publishKeys || []).length > 0;
-  const student = auth.currentHub === "student";
-  const { data, loading, error } = useLoad(async () => { const [items, classes] = await Promise.all([announcementsFor(keys, 40), getMany("classes", keys.filter((key) => key.startsWith("class:")).map((key) => key.slice(6)))]); return { items, classes }; }, [keys.join("|")]);
-  return <div className={student ? "hub-student" : ""}>
-    <PageHeader kicker="SRSS Connect" title={student ? "Notices" : "Announcements"} actions={<>{schoolWide && <Link className="hub-button" to="/hub/admin/communications">Manage announcements</Link>}{teacher && <Link className={`hub-button ${schoolWide ? "hub-button-quiet" : ""}`} to="/hub/teacher/announcements">Post a class notice</Link>}</>}>{student ? "News from your school and your class." : "School notices meant for you, newest first. Pinned notices stay at the top."}</PageHeader>
-    <ErrorNote error={error} /><ErrorNote error={receipts.error}/>{readFailure&&<p role="alert" className="hub-error">{readFailure}</p>}
-    {loading ? <Loading /> : !data.items.length ? <EmptyState title="No announcements right now." /> : <ul className="hub-list hub-list-feed">{data.items.map((item) => <li key={item.id} className={`${item.pinned ? "hub-pinned" : ""} ${item.category === "urgent" ? "hub-urgent" : ""}`}>
-      <div className="hub-card-top"><strong>{item.title}</strong><small>{formatDate(item.publishedAt)}</small></div>
-      <p>{item.body}</p><div className="hub-read-line">{receipts.data?.some(r=>r.announcementId===item.id)?<small>Marked as read</small>:<button className="hub-button hub-button-small hub-button-quiet" disabled={!!reading || receipts.loading || !!receipts.error} onClick={()=>markNotice(item.id)}>{reading===item.id?"Saving…":"Mark as read"}</button>}</div>
-      {item.attachments?.length > 0 && <ul className="hub-attachments">{item.attachments.map((link) => <li key={link.url}><a href={link.url} target="_blank" rel="noreferrer">{link.label}</a></li>)}</ul>}
-      <div className="hub-badges">{item.pinned && <StatusBadge status="pending" label="Pinned" />}{item.category && <StatusBadge status={item.category === "urgent" ? "overdue" : "neutral"} label={ANNOUNCEMENT_CATEGORIES.find(([id]) => id === item.category)?.[1] || item.category} />}{!student && <StatusBadge status="info" label={describeAudience(item.audienceKeys, { classes: data.classes })} />}</div>
-    </li>)}</ul>}
-  </div>;
-}
 
 export function Calendar() {
   const auth = useAuth();
@@ -58,17 +35,6 @@ export function Calendar() {
     <ErrorNote error={error} />
     {loading ? <Loading /> : !events.length ? <EmptyState title="No upcoming events." /> : Object.entries(byMonth).map(([month, list]) => <Section key={month} title={formatDate(`${month}-01`, { month: "long", year: "numeric" })}><ul className="hub-list hub-list-dates">{list.map((event) => <li key={event.id} id={`event-${event.id}`}><time>{formatDate(event.date, { weekday: "short", day: "numeric" })}{event.endDate && event.endDate !== event.date ? <small>to {formatDate(event.endDate, { day: "numeric", month: "short" })}</small> : null}</time><span><strong>{event.title}</strong><small>{[event.allDay ? "All day" : [event.startTime || event.time, event.endTime].filter(Boolean).join("–"), event.location, EVENT_CATEGORIES.find(([id]) => id === event.category)?.[1]].filter(Boolean).join(" · ")}</small>{event.description && <small className="hub-event-detail">{event.description}</small>}{event.attachments?.map((link) => <a key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label}</a>)}</span>{event.schoolClosed && <StatusBadge status="neutral" label="School closed" />}{event.consentRequired && <StatusBadge status="pending" label="Consent needed" />}</li>)}</ul></Section>)}
   </div>;
-}
-
-export function Notifications() {
-  const auth = useAuth();
-  const { data, loading, error, reload } = useLoad(() => list("notificationRecords", where("recipientUid", "==", auth.user.uid), orderBy("createdAt", "desc")), [auth.user.uid]);
-  const markRead = async (id) => { await updateDoc(doc(db, "notificationRecords", id), { readAt: serverTimestamp() }); reload(); };
-  return <>
-    <PageHeader kicker="SRSS Connect" title="Notifications">System alerts about attendance, forms and actions.</PageHeader>
-    <ErrorNote error={error} />
-    {loading ? <Loading /> : !data.length ? <EmptyState title="No notifications." /> : <ul className="hub-list">{data.map((item) => <li key={item.id} className={item.readAt ? "" : "hub-unread"}><div className="hub-card-top"><strong>{item.title}</strong>{item.critical && <StatusBadge status="pending" label="Important" />}</div><p>{item.body}</p><div className="hub-form-actions">{item.link && <a href={item.link}>Open</a>}{!item.readAt && <button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => markRead(item.id)}>Mark as read</button>}</div></li>)}</ul>}
-  </>;
 }
 
 export function Profile() {

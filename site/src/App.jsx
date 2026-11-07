@@ -33,8 +33,6 @@ import { Phone } from "@phosphor-icons/react/dist/csr/Phone";
 import { TreeStructure } from "@phosphor-icons/react/dist/csr/TreeStructure";
 import { UsersThree } from "@phosphor-icons/react/dist/csr/UsersThree";
 import { X } from "@phosphor-icons/react/dist/csr/X";
-import { Pause } from "@phosphor-icons/react/dist/csr/Pause";
-import { Play } from "@phosphor-icons/react/dist/csr/Play";
 import { SignIn } from "@phosphor-icons/react/dist/csr/SignIn";
 import { loadPublicContent, loadSitePage, submitPublicForm } from "./lib/publicContent.js";
 import { defaultFaqs, verifiedFaqs } from "./data/faqs.js";
@@ -47,6 +45,7 @@ import { storyCategory } from "./data/stories.js";
 import { FaqAccordion, FaqList, FAQ_TOPICS } from "./components/Faq.jsx";
 import { AdmissionsPage, Breadcrumbs, ContentBody, ContentPage, GovernancePage, IntegralFramework, JoinPage, JubileePage, LearningPage, LearningSpaces, NotFoundPage, ResourcesPage, SiteSearch, StoryFilters, StudentLifePage } from "./pages/SitePages.jsx";
 import { PreFooter, SiteFooter } from "./SiteFooter.jsx";
+import { AnnouncementBar } from "./components/AnnouncementBar.jsx";
 
 // Policy pages load on demand so their text never weighs on the homepage.
 const AboutNetwork = lazy(() => import('./pages/AboutNetwork.jsx'));
@@ -57,6 +56,9 @@ const FeesPage = lazy(() => FeesPages().then((module) => ({ default: module.Fees
 const FeePolicyPage = lazy(() => FeesPages().then((module) => ({ default: module.FeePolicyPage })));
 const CommitmentPage = lazy(() => FeesPages().then((module) => ({ default: module.CommitmentPage })));
 const PrayerPledgeAnthemPage = lazy(() => import("./PrayerPledgeAnthemPage.jsx").then((module) => ({ default: module.PrayerPledgeAnthemPage })));
+const AnnouncementPages = () => import("./pages/AnnouncementsPage.jsx");
+const AnnouncementsPage = lazy(() => AnnouncementPages().then((module) => ({ default: module.AnnouncementsPage })));
+const AnnouncementPage = lazy(() => AnnouncementPages().then((module) => ({ default: module.AnnouncementPage })));
 const OrientationPage = lazy(() => import("./pages/OrientationPage.jsx").then((module) => ({ default: module.OrientationPage })));
 const FamilyPages = () => import("./pages/FamilyPages.jsx");
 const FoodPolicyPage = lazy(() => FamilyPages().then((module) => ({ default: module.FoodPolicyPage })));
@@ -309,7 +311,7 @@ export function App() {
   const [visitOpen, setVisitOpen] = useState(false);
   const [sent, setSent] = useState(false);
   const [storiesExpanded, setStoriesExpanded] = useState(false);
-  const [tickerPaused, setTickerPaused] = useState(false);
+  const [publicLoaded, setPublicLoaded] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const [statCounts, setStatCounts] = useState({ years: 0, values: 0 });
   const glanceRef = useRef(null);
@@ -354,7 +356,7 @@ export function App() {
     return () => { window.removeEventListener("hashchange", handleRouteChange); window.removeEventListener("popstate", handleRouteChange); };
   }, []);
 
-  useEffect(() => { loadPublicContent().then((data) => setManagedContent((current) => ({ ...current, ...data, homepage: { ...current.homepage, ...(data.homepage || {}) } }))).catch(() => {}); }, []);
+  useEffect(() => { loadPublicContent().then((data) => setManagedContent((current) => ({ ...current, ...data, homepage: { ...current.homepage, ...(data.homepage || {}) } }))).catch(() => {}).finally(() => setPublicLoaded(true)); }, []);
 
   useEffect(() => {
     if (!route.editable) return undefined;
@@ -421,7 +423,6 @@ export function App() {
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
     return (managedContent.notices || []).filter(item => !item.expiresAt || item.expiresAt >= today).sort((a, b) => Number(b.pinned) - Number(a.pinned) || String(b.date).localeCompare(String(a.date)));
   }, [managedContent.notices]);
-  const tickerItems = useMemo(() => [...publicNotices, ...storyItems].slice(0, 6).map(item => ({ id: `${item.type || 'notice'}-${item.id}`, date: item.date, title: item.title })), [publicNotices, storyItems]);
 
   // The homepage journey contains its visit invitation; the pre-footer invitation is for other pages.
   const isHome = route.page === "home";
@@ -445,7 +446,6 @@ export function App() {
     openVisit: () => { setSent(false); setVisitOpen(true); },
     hero: () => (
       <>
-        {!!publicNotices.length && <aside className="public-notices" id="school-notices" aria-label="School announcements">{publicNotices.map(item => <article key={item.id}><p className="eyebrow">School announcement</p><h2>{item.title}</h2><p>{item.body}</p></article>)}</aside>}
           <section className="hero" id="top" aria-labelledby="hero-title">
             <img className="hero-school-sketch" src="/assets/heritage/hero-school-sketch-v2-1536.webp" srcSet="/assets/heritage/hero-school-sketch-v2-640.webp 640w, /assets/heritage/hero-school-sketch-v2-960.webp 960w, /assets/heritage/hero-school-sketch-v2-1536.webp 1536w" sizes="(max-width: 900px) 140vw, 78vw" width="1536" height="1024" alt="" aria-hidden="true" decoding="async" fetchPriority="low" onError={(event) => { event.currentTarget.hidden = true; }} onLoad={(event) => { event.currentTarget.hidden = false; }} />
             <div className="hero-copy">
@@ -601,6 +601,8 @@ export function App() {
     faq: () => <FaqPage items={pageFaqs} />,
     prayer: () => <Suspense fallback={<main id="main" aria-busy="true" />}><PrayerPledgeAnthemPage /></Suspense>,
     orientation: () => <Suspense fallback={<main id="main" aria-busy="true" />}><OrientationPage /></Suspense>,
+    announcements: () => <Suspense fallback={<main id="main" className="site-page" aria-busy="true" />}><AnnouncementsPage notices={publicNotices} loaded={publicLoaded} /></Suspense>,
+    announcement: () => <Suspense fallback={<main id="main" className="site-page" aria-busy="true" />}><AnnouncementPage notices={publicNotices} id={route.slug} loaded={publicLoaded} /></Suspense>,
     notFound: () => <NotFoundPage />,
     // School life → founder quote → reports, SRSS25 and calendar → journey and hubs → FAQ.
     home: () => <main id="main">
@@ -634,15 +636,6 @@ export function App() {
       <a className="skip-link" href="#main">Skip to content</a>
 
       <header ref={headerRef} className="site-header" onMouseLeave={() => setNavOpen(null)}>
-        <div className={`updates-bar${tickerPaused ? " is-paused" : ""}`} role="region" aria-label="Announcements">
-          <div className="header-wrap updates-inner">
-            <span className="updates-label">Updates</span>
-            <button type="button" className="updates-toggle" onClick={() => setTickerPaused(!tickerPaused)} aria-pressed={tickerPaused} aria-label={tickerPaused ? "Play announcements" : "Pause announcements"}>{tickerPaused ? <Play size={13} weight="fill" /> : <Pause size={13} weight="fill" />}</button>
-            <div className="updates-ticker"><div className="updates-track">{[0, 1].map((copy) => <ul key={copy} aria-hidden={copy === 1}>{(tickerItems.length ? tickerItems : [{ id: "welcome", title: "Discover school life, upcoming dates and the latest news from the SRSS community." }]).map((item) => <li key={`${copy}-${item.id}`}>{item.date && <time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short" })}</time>}<span>{item.title}</span></li>)}</ul>)}</div></div>
-            <a href="/resources/news">View all updates <ArrowRight size={15} weight="bold" /></a>
-          </div>
-        </div>
-
         <div className="main-nav">
           <div className="header-wrap nav-inner">
             <a className="brand" href="/" aria-label="SRSS home">
@@ -692,6 +685,8 @@ export function App() {
           )}
         </div>
       </header>
+      {/* SRSS Connect public announcement bar: approved, live, whole-school notices only. */}
+      <AnnouncementBar notices={publicNotices} />
 
       {searchOpen && (
         <div className="search-layer" role="dialog" aria-modal="true" aria-label="Search SRSS">
