@@ -26,7 +26,7 @@ test("follow-up prompts follow the attendance policy and never label a child", (
   assert.equal(followUpPrompts(lates.slice(0, 4), { today }).length, 0);
 });
 
-test("DASH-001: actions cover missing consent, pending forms and outstanding fees, soonest first", () => {
+test("DASH-001: actions cover missing consent and pending forms, and ignore historic fee balances", () => {
   const actions = parentActions({
     children: [{ id: "a", name: "Aarav" }, { id: "b", name: "Anika" }],
     consentDefinitions: [{ type: "photoVideo", title: "Photo & video" }],
@@ -35,8 +35,8 @@ test("DASH-001: actions cover missing consent, pending forms and outstanding fee
     fees: [{ studentId: "a", outstanding: 600, nextDueDate: "2026-10-20" }, { studentId: "b", outstanding: 0 }],
     today: new Date("2026-10-09"),
   });
-  assert.deepEqual(actions.map((action) => action.kind), ["form", "payment", "consent"]);
-  assert.equal(actions[2].studentId, "b");
+  assert.deepEqual(actions.map((action) => action.kind), ["form", "consent"]);
+  assert.equal(actions[1].studentId, "b");
   const grouped = parentActions({ children: [{ id: "b", name: "Anika" }], consentDefinitions: [{ type: "photoVideo", title: "Photo & video" }, { type: "eventMedia", title: "Event media" }], consentStatus: {}, formRequests: [], fees: [] });
   assert.equal(grouped.length, 1);
   assert.match(grouped[0].title, /2 consent choices/);

@@ -244,7 +244,14 @@ test("conversations require school contacts and protect message participants", a
     }),
   );
 });
-test("families see published results only and teachers cannot rewrite a published report", async () => {
+test("results stay closed until opened from March 2027; then families see published results only and teachers cannot rewrite a published report", async () => {
+  await seed("operationsRelease/current", { resultsOpen: true });
+  if (Date.now() < Date.UTC(2027, 2, 1)) {
+    await seed("studentResults/a", { studentId: "a", classId: "c", status: "published" });
+    await assertFails(getDoc(doc(as("parent"), "studentResults/a")));
+    await assertFails(getDoc(doc(as("teacher"), "studentResults/a")));
+    return;
+  }
   await seed("studentResults/a", {
     studentId: "a",
     classId: "c",

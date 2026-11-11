@@ -14,7 +14,7 @@ import { createHash } from "node:crypto";
 import { malaysiaDate } from "./announcement-service.js";
 import {
   CATEGORIES, FORM, HANDLER_ROLES, OPEN_STATUSES, ROLE_LABELS, STATUSES, SUBMITTER_STATUS, canStart, closedDates, dueDateFor,
-  escalationStep, isOpen, isWorkingDay, referenceFor, routeFor, validateAnswers,
+  escalationStep, isOpen, isRetiredPaymentForm, isWorkingDay, referenceFor, routeFor, validateAnswers,
 } from "./forms-registry.js";
 
 const SITE = process.env.PUBLIC_SITE_URL || "https://srssdigitalhub.web.app";
@@ -63,6 +63,7 @@ function mail(db, batch, to, subject, text, meta = {}) {
 // `source` is the authoritative record ({ collection, id, link }). The case id is deterministic for records
 // that come from another module, so a repeated trigger never opens a second case.
 export async function openCase(db, { form, caseId, source, submitter, studentId = null, answers = null, summary = "", priority = "normal", status, extra = {} }) {
+  if (isRetiredPaymentForm(form.id)) throw new HttpsError("failed-precondition", "This process is handled directly by the school office.");
   const restricted = form.restricted;
   const ref = db.collection(casesOf(restricted)).doc(caseId);
   if ((await ref.get()).exists) return { caseId, existing: true };
@@ -190,6 +191,7 @@ export async function caseAction(db, request) {
   const snap = await ref.get();
   if (!snap.exists) throw new HttpsError("not-found", "This case doesn't exist.");
   const item = snap.data();
+  if (isRetiredPaymentForm(item.formId)) throw new HttpsError("failed-precondition", "This process is handled directly by the school office.");
   const form = FORM[item.formId];
   const uid = request.auth.uid;
   const roles = request.auth.token?.roles || [];
@@ -282,6 +284,7 @@ export async function caseAction(db, request) {
 // An approved change request updates the source record in the same batch, with an audit entry
 // (specification: "Approval of a change request must update the source record transactionally").
 async function applyOutcome(db, batch, item, status, uid) {
+  if (isRetiredPaymentForm(item.formId)) throw new HttpsError("failed-precondition", "This process is handled directly by the school office.");
   const form = FORM[item.formId];
   const stamp = { updatedAt: now(), updatedBy: uid };
   if (item.source?.collection === "staffLeave" && ["approved", "rejected", "cancelled"].includes(status)) batch.update(db.doc(`staffLeave/${item.source.id}`), { status, decidedBy: uid, decidedAt: now(), ...stamp });
@@ -305,7 +308,7 @@ export async function runFormsSchedule(db, today = malaysiaDate()) {
   const yesterdayIso = yesterday.toISOString().slice(0, 10);
   const lists = await Promise.all([false, true].map(async (restricted) => {
     const [open, done] = await Promise.all([db.collection(casesOf(restricted)).where("status", "in", OPEN_STATUSES).get(), db.collection(casesOf(restricted)).where("completedOn", ">=", yesterdayIso).get()]);
-    return { restricted, open: open.docs, done: done.docs };
+    return { restricted, open: open.docs.filter((doc) => !isRetiredPaymentForm(doc.data().formId)), done: done.docs.filter((doc) => !isRetiredPaymentForm(doc.data().formId)) };
   }));
   const holderCache = {};
   const roleHolders = async (role) => (holderCache[role] ||= await holders(db, role));

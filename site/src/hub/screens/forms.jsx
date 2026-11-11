@@ -1,3 +1,4 @@
+import { isRetiredPaymentForm } from "../../../functions/forms-registry.js";
 // Forms & Response Centre (staff) and My requests & forms (everyone). The registry, routing and every
 // status change live on the server (functions/forms-service.js); these screens read cases and call it.
 // The Centre is an operational overview, not a second database: each case links to its source module.
@@ -163,6 +164,7 @@ export function CaseView() {
   if (!data) return <EmptyState title="This case doesn't exist or isn't yours to see." />;
   const { item, activity, source, people } = data;
   const form = FORM[item.formId];
+  if (isRetiredPaymentForm(item.formId)) return <EmptyState title="Handled by the school office"><Link to="/hub/admin/fees">View fee information</Link></EmptyState>;
   const answers = restricted ? item.answers : source?.answers || (source ? Object.fromEntries(Object.entries(source).filter(([key]) => !META_KEYS.has(key) && key !== "id")) : null);
   const communication = activity.filter((entry) => ["submitted", "reply", "request", "submitterReply", "call", "meeting", "sourceUpdate"].includes(entry.kind));
   const notes = activity.filter((entry) => entry.kind === "note");
@@ -213,6 +215,7 @@ function ResponsePanel({ item, caseId, restricted, people, auth, reload }) {
   const [notice, setNotice] = useState(null);
   const custom = useLoad(() => one("settings/formsTemplates").then((doc) => doc?.items || []), []);
   const form = FORM[item.formId];
+  if (isRetiredPaymentForm(item.formId)) return <EmptyState title="Handled by the school office"><Link to="/hub/admin/fees">View fee information</Link></EmptyState>;
   const decision = form?.reply === "decision" || form?.type === "update";
   const open = isOpen(item.status);
   const statuses = open ? ["inProgress", "awaitingApproval", ...(decision ? ["approved", "rejected"] : []), "completed", "closed", "cancelled"].filter((status) => status !== item.status) : ["inProgress"];
