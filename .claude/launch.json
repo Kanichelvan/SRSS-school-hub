@@ -3,13 +3,10 @@
   "configurations": [
     {
       "name": "srss-site",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "/Users/macintoshhd/.nodejs/bin/node",
       "runtimeArgs": [
-        "--prefix",
+        "site/node_modules/vite/bin/vite.js",
         "site",
-        "run",
-        "dev",
-        "--",
         "--port",
         "5174"
       ],
@@ -17,13 +14,10 @@
     },
     {
       "name": "srss-hub-dev",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "/Users/macintoshhd/.nodejs/bin/node",
       "runtimeArgs": [
-        "--prefix",
+        "site/node_modules/vite/bin/vite.js",
         "site",
-        "run",
-        "dev",
-        "--",
         "--port",
         "5174",
         "--strictPort"
@@ -32,33 +26,44 @@
     },
     {
       "name": "srss-hub-check",
-      "runtimeExecutable": "npx",
+      "runtimeExecutable": "/Users/macintoshhd/.nodejs/bin/node",
       "runtimeArgs": [
-        "--prefix",
+        "site/node_modules/vite/bin/vite.js",
         "site",
-        "vite",
-        "--config",
-        "/private/tmp/claude-501/-Users-macintoshhd-Documents-SRSS-School-Hub/3ac604b3-322d-4f8d-a24e-670203394aec/scratchpad/vite.hub-check.config.mjs",
         "--port",
         "5175",
-        "--strictPort"
+        "--strictPort",
+        "--force"
       ],
       "port": 5175
     },
     {
       "name": "srss-hub-production",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "/Users/macintoshhd/.nodejs/bin/node",
       "runtimeArgs": [
-        "--prefix",
+        "site/node_modules/vite/bin/vite.js",
         "site",
-        "run",
-        "dev:production",
-        "--",
+        "--mode",
+        "production",
         "--port",
         "5176",
         "--strictPort"
       ],
       "port": 5176
+    },
+    {
+      "name": "srss-connect-check",
+      "runtimeExecutable": "/Users/macintoshhd/.nodejs/bin/node",
+      "runtimeArgs": [
+        "site/node_modules/vite/bin/vite.js",
+        "site",
+        "--config",
+        "/private/tmp/claude-501/-Users-macintoshhd--claude-spares-spare-qwIkte/602b026b-7e00-4220-b354-246d7fd41128/scratchpad/vite/connect-check.config.mjs",
+        "--port",
+        "5177",
+        "--strictPort"
+      ],
+      "port": 5177
     }
   ]
 }
