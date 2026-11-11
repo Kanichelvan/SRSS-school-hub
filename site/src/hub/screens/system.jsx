@@ -14,7 +14,7 @@ import { AuditLine, RecordManager, saveErrorMessage, slug } from "../manage";
 import { ErrorNote, Loading, PageHeader, Section, StatusBadge, formatDate } from "../ui";
 import { classOptions, schoolLookups, yearOptions } from "./setup";
 import { profilePatch } from "../logic/schoolProfile";
-import { removeSignatory } from "../../../functions/shared/fields.js";
+import { MAX_SIGNATORIES, removeSignatory } from "../../../functions/shared/fields.js";
 
 // ---------- Roles & permissions ----------
 const ACTION_NAMES = { V: "View", C: "Create", U: "Edit", A: "Approve / publish" };
@@ -56,7 +56,6 @@ export function Settings() {
 }
 
 export function SchoolInformation({ onSaved }) {
-  const MAX_SIGNATORIES = 10;
   const auth = useAuth();
   const canEdit = can(auth.roles, "settings", "U") === "all";
   const { data, loading, error, reload } = useLoad(async () => { forget("settings"); const [settings, lookups, terms, people] = await Promise.all([schoolSettings(), schoolLookups(), list("terms"), staffNames().catch(() => ({}))]); return { settings, lookups, terms, people }; }, []);
@@ -113,7 +112,7 @@ export function SchoolInformation({ onSaved }) {
         <label>Title<input disabled={!canEdit} maxLength={80} value={entry.title || ""} onChange={(event) => setSignatory(index, "title", event.target.value)} /></label>
         {canEdit && <button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => dropSignatory(index)} aria-label={`Remove signatory ${entry.name || index + 1}`}>Remove</button>}
       </div>)}
-      {canEdit && signatories.length < MAX_SIGNATORIES && <p><button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => set("signatories", [...signatories, { id: "", name: "", title: "", active: true }])}>Add signatory</button></p>}
+      {canEdit && shownSignatories.length < MAX_SIGNATORIES && <p><button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => set("signatories", [...signatories, { id: "", name: "", title: "", active: true }])}>Add signatory</button></p>}
     </fieldset>
     {(data.settings.timings || data.settings.curriculum) && <dl className="hub-facts">
       {data.settings.schoolStart && <div><dt>School day</dt><dd>Arrive by {data.settings.arriveBy || "07:35"} · registration {data.settings.schoolStart}{data.settings.week ? ` · ${data.settings.week}` : ""}</dd></div>}

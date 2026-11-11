@@ -113,6 +113,6 @@ Fields the School Data Request asks for. Allowed values, labels and parsers are 
 - `students`: `gender` (`boy` | `girl`), `motherTongue` (`tamil` | `chinese` | `telugu`), `meals` (boolean), `newThisYear` (boolean).
 - `staff`: `schoolName` (≤ 80, the name pupils and parents use), `staffType` (`teaching` | `nonTeaching`), `startedAt` (`YYYY-MM`).
 - `guardians`: `whatsapp` (E.164, e.g. `+60123456789`; local spellings are normalised before saving).
-- `settings/school`: `officeHours` (≤ 200), `parentPhone` (E.164, ≤ 30), `schoolCode` (≤ 30), `headmistress` `{ name ≤ 120, title ≤ 80 }`, `signatories[]` `{ id, name, title, active }` (at most 10). A signatory is retired (`active: false`), never deleted, because letters will refer to it by `id`.
+- `settings/school`: `officeHours` (≤ 200), `parentPhone` (E.164, ≤ 30), `schoolCode` (≤ 30), `headmistress` `{ name ≤ 120, title ≤ 80 }`, `signatories[]` `{ id, name, title, active }` (at most 10 active, 50 in all). A signatory is retired (`active: false`), never deleted, because letters will refer to it by `id`.
 
 Remedial group and staff extra responsibilities are not stored again: they are derived from `studentSupportPlans` and from account roles.

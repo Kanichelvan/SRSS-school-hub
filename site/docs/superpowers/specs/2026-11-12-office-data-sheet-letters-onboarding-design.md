@@ -31,7 +31,7 @@ Merged to `main` on 11 November 2026 (`d6cb2bc`) and earlier:
 ## 3. Decisions made by Kani (12 November 2026)
 
 1. The Google Sheet is **editable both ways**. This replaces the read-only export in architecture decision D4 for
-   the lists in section 6; record it as **D7** in `docs/architecture.md`. Applications, consent, medical, fees and
+   the lists in section 6; record it as **D8** in `docs/architecture.md`. Applications, consent, medical, fees and
    safeguarding records stay hub-only, as D4 and seam rule 3 require.
 2. Sheet edits are **mixed**: everyday columns apply to the hub within seconds; sensitive columns are locked in the
    Sheet and changed only in the hub.

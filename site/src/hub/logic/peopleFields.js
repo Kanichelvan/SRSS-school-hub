@@ -1,9 +1,12 @@
 // Form fields for the People screens (pupils, staff, guardians). Plain data so it can be tested and reused
 // without React or Firebase. Allowed values come from functions/shared/fields.js; firestore.rules enforces them.
-import { GENDERS, MOTHER_TONGUES, STAFF_TYPES, normalisePhone } from "../../../functions/shared/fields.js";
+import { GENDERS, MOTHER_TONGUES, STAFF_TYPES, normalisePhone, validMonth } from "../../../functions/shared/fields.js";
 
 export const LANGUAGES = [["English", "English"], ["Bahasa Melayu", "Bahasa Melayu"], ["Tamil", "Tamil"], ["Mandarin", "Mandarin"]];
 export const WHATSAPP_ERROR = "Enter the WhatsApp number with its country code, for example +60 12-345 6789.";
+
+export const STARTED_AT_ERROR = "Enter the month as year-month, for example 2019-01.";
+export const startedAtError = (value) => (String(value ?? "").trim() && !validMonth(String(value).trim()) ? STARTED_AT_ERROR : null);
 
 export const STUDENT_FIELDS = [
   { key: "name", label: "Full name", type: "text", required: true, maxLength: 120 },
@@ -25,7 +28,7 @@ export const STAFF_FIELDS = [
   { key: "staffType", label: "Teaching or non-teaching", type: "select", options: STAFF_TYPES, placeholder: "Not recorded" },
   { key: "email", label: "Email", type: "email", maxLength: 200 },
   { key: "phone", label: "Phone", type: "tel", maxLength: 30 },
-  { key: "startedAt", label: "Started at SRSS", type: "month" },
+  { key: "startedAt", label: "Started at SRSS", type: "month", placeholder: "2019-01", pattern: /^\d{4}-(0[1-9]|1[0-2])$/, patternMessage: STARTED_AT_ERROR },
   { key: "directoryVisible", label: "Show name and position to families in the hub directory", type: "checkbox", wide: true },
 ];
 

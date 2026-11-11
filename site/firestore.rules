@@ -70,7 +70,7 @@ service cloud.firestore {
       let signatories = data().get('signatories', null);
       return optionalText('officeHours', 200) && optionalText('parentPhone', 30) && optionalText('schoolCode', 30)
         && (head == null || (head is map && head.keys().hasOnly(['name', 'title']) && head.get('name', '') is string && head.get('name', '').size() <= 120 && head.get('title', '') is string && head.get('title', '').size() <= 80))
-        && (signatories == null || (signatories is list && signatories.size() <= 10));
+        && (signatories == null || (signatories is list && signatories.size() <= 50));
     }
     function isoDate(field) { return data()[field] is string && data()[field].matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'); }
     function lifecycle() { return data().status in ['active', 'archived']; }

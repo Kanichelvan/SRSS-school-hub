@@ -18,3 +18,8 @@ test('guardian whatsapp is normalised or refused before saving', () => {
   assert.equal(prepareGuardian({ name: 'P', whatsapp: null }).whatsapp, null);
   assert.throws(() => prepareGuardian({ name: 'P', whatsapp: '12345' }), /country code/);
 });
+test('staff start month is checked before saving (browsers without a month picker show a text box)', async () => {
+  const { startedAtError } = await import('../src/hub/logic/peopleFields.js');
+  assert.equal(startedAtError('2019-01'), null); assert.equal(startedAtError(''), null); assert.equal(startedAtError(null), null);
+  assert.match(startedAtError('Jan 2019'), /2019-01/);
+});

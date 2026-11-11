@@ -34,7 +34,7 @@ test('guardian whatsapp must be E.164', async () => {
 test('school profile limits; other settings documents unaffected', async () => {
   const d = db('o', ['schoolAdmin']);
   await assertSucceeds(setDoc(doc(d, 'settings/school'), { officeHours: 'Mon–Fri 7.30 am–2.30 pm', parentPhone: '+60126001926', schoolCode: 'X1', headmistress: { name: 'A', title: 'Headmistress' }, signatories: [{ id: 'sig-1', name: 'A', title: 'Headmistress', active: true }] }, { merge: true }));
-  for (const bad of [{ officeHours: 'x'.repeat(201) }, { headmistress: 'A' }, { headmistress: { name: 'x'.repeat(121), title: '' } }, { headmistress: { name: 'A', title: 'T', extra: 1 } }, { signatories: Array(11).fill({ id: 's', name: 'n', title: '', active: true }) }, { signatories: 'A' }]) await assertFails(setDoc(doc(d, 'settings/school'), bad, { merge: true }));
+  for (const bad of [{ officeHours: 'x'.repeat(201) }, { headmistress: 'A' }, { headmistress: { name: 'x'.repeat(121), title: '' } }, { headmistress: { name: 'A', title: 'T', extra: 1 } }, { signatories: Array(51).fill({ id: 's', name: 'n', title: '', active: true }) }, { signatories: 'A' }]) await assertFails(setDoc(doc(d, 'settings/school'), bad, { merge: true }));
   await assertSucceeds(setDoc(doc(d, 'settings/other'), { anything: 'x'.repeat(500) }));
   await assertFails(setDoc(doc(db('l', ['leadership']), 'settings/school'), { officeHours: 'x' }, { merge: true }));
 });
