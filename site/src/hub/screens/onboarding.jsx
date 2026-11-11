@@ -196,8 +196,9 @@ function Pack({ role }) {
               <article>
                 <h3>Privacy and safeguarding</h3>
                 <p>
-                  Confirm the named Safeguarding Lead with the school office.
-                  Use the formal school reporting routes for concerns.
+                  Safeguarding: Mr Ravi Balan, designated safeguarding lead.
+                  Privacy: Ms Vasanthi, data protection officer. Use the formal
+                  school reporting routes for concerns.
                 </p>
                 <a href="/legal/child-safeguarding">
                   Safeguarding contacts and reporting

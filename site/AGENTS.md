@@ -126,5 +126,6 @@ When implementing from a selected generated mock, treat that image as the source
 - School Setup & Upkeep at /hub/admin/operations links the annual setup wizard and editable records. Admin quick-reference modal includes urgent changes, hub-team duties and a blank sign-off form.
 - Weekly log checks, monthly updates and backup-restore tests, and termly hub-team audit participation require recorded evidence. Routine minutes, half-day audits and May/November slots are proposals configurable by leadership.
 - Clerk holds office responsibility, PIC Teacher leads audits. Content editor, Finance Officer and Safeguarding Lead remain unnamed until assigned. Responsibility assignment never grants account privileges.
+- That applies to the setup & upkeep responsibility slots only. The approved legal contacts (DSL Mr Ravi Balan, DPO Ms Vasanthi) stay named in staff materials such as the welcome pack (user decision, 12 Nov 2026).
 - Results/report cards say “From when it opens”, requiring explicit opening after February 2027 (earliest 1 March 2027).
 - Fee schedules, pricing and billing procedure information are permitted. No payment management, statements, payment recording, balances, receipts, reconciliation or refunds in the hub. This supersedes Fees-Lite instructions.
