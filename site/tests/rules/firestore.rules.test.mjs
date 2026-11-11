@@ -89,10 +89,10 @@ describe("Contextual RBAC for staff (PRD §44)", () => {
     await assertFails(getDoc(doc(as("teacher"), "students/stu-a/restricted/medical")));
     await assertSucceeds(getDoc(doc(as("welfare"), "students/stu-a/restricted/medical")));
   });
-  test("teachers never see fees; finance and the child's parent do (PRD §17/§36)", async () => {
+  test("historic pupil billing records are closed to every client role", async () => {
     await assertFails(getDoc(doc(as("teacher"), "studentFeeAssignments/f-a")));
-    await assertSucceeds(getDoc(doc(as("finance"), "studentFeeAssignments/f-a")));
-    await assertSucceeds(getDoc(doc(as("parent"), "studentFeeAssignments/f-a")));
+    await assertFails(getDoc(doc(as("finance"), "studentFeeAssignments/f-a")));
+    await assertFails(getDoc(doc(as("parent"), "studentFeeAssignments/f-a")));
   });
   test("restricted incidents are closed to the reporting teacher and leadership", async () => {
     await assertSucceeds(getDoc(doc(as("welfare"), "studentIncidents/inc-r")));

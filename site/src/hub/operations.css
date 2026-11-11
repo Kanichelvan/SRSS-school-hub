@@ -1,0 +1,94 @@
+.school-operations { --ops-navy:#0a1e3e; --ops-muted:#556276; color:var(--ops-navy); }
+.school-operations p, .school-operations li { line-height:1.65; }
+.school-operations :is(button,input,select,textarea):focus-visible { outline:3px solid #b78b22; outline-offset:3px; }
+.school-operations button { cursor:pointer; }
+.school-operations button:disabled { cursor:default; opacity:.55; }
+.school-operations :is(input,select,textarea) { min-width:0; max-width:100%; }
+.ops-toolbar,.ops-actions,.ops-filter { display:flex; gap:12px; flex-wrap:wrap; align-items:end; margin:16px 0 24px; }
+.ops-toolbar .hub-field { margin:0; min-width:150px; }
+.ops-filter label,.ops-filter { font-size:14px; }
+.ops-filter select { margin-left:12px; padding:9px; border:1px solid #b8c2cf; border-radius:5px; background:#fff; }
+.ops-progress { display:grid; grid-template-columns:1fr minmax(130px,240px); align-items:center; gap:24px; padding:22px 24px; background:#eaf2fa; border-left:4px solid #d2ac47; margin:20px 0; }
+.ops-progress strong { font:600 17px Poppins,sans-serif; }
+.ops-progress p { margin:8px 0 0; font-size:14px; }
+.ops-progress progress { width:100%; accent-color:#0d2f5c; height:10px; }
+.ops-tabs { display:flex; gap:4px; overflow-x:auto; border-bottom:1px solid #cbd2db; margin-top:28px; }
+.ops-tabs button { border:0; background:transparent; border-bottom:3px solid transparent; padding:14px 16px; font:500 13px Poppins,sans-serif; white-space:nowrap; color:#4b596c; }
+.ops-tabs button.active { border-bottom-color:#a77718; color:#0a1e3e; background:#f3f6fa; }
+.ops-view { padding-top:24px; }
+.ops-task-list { padding:0; margin:0 0 32px; list-style:none; }
+.ops-task-list>li { border-bottom:1px solid #d8dee6; }
+.ops-task-head { width:100%; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:22px 16px; text-align:left; border:0; background:transparent; color:var(--ops-navy); }
+.ops-task-head:hover,.ops-task-head[aria-expanded=true] { background:#f3f6fa; }
+.ops-task-head strong { display:block; font:600 16px Poppins,sans-serif; }
+.ops-task-head small { display:block; font:400 13px/1.65 'Open Sans',sans-serif; margin-top:6px; }
+.ops-muted { color:var(--ops-muted); }
+.ops-task-body { padding:12px 24px 28px; max-width:100%; }
+.ops-task-body h3,.ops-routine h3,.ops-role h3,.ops-help-item h3 { font:600 16px/1.4 Poppins,sans-serif; margin:20px 0 10px; }
+.ops-instructions { padding-left:24px; }
+.ops-instructions li { margin:9px 0; padding-left:6px; }
+.ops-details { border-top:1px solid #d8dee6; border-bottom:1px solid #d8dee6; padding:12px 0; margin:20px 0; }
+.ops-details summary { cursor:pointer; font:500 14px/1.6 Poppins,sans-serif; padding:5px 0; }
+.ops-record-check,.ops-notice { padding:16px 20px; background:#f3f6fa; border-left:3px solid #a77718; margin:20px 0; font-size:14px; }
+.ops-record-check.is-ready { border-left-color:#267152; }
+.ops-record-check p,.ops-notice p { margin:8px 0 0; }
+.ops-form { max-width:850px; }
+.school-operations .hub-form { max-width:100%; }
+.school-operations .hub-form fieldset { border:1px solid #cbd2db; padding:18px; min-width:0; margin:20px 0; }
+.school-operations .hub-form legend { font:600 14px Poppins,sans-serif; padding:0 8px; }
+.school-operations .hub-form .hub-check { display:flex; align-items:flex-start; gap:10px; margin:12px 0; line-height:1.55; }
+.school-operations .hub-form input[type=checkbox] { flex:0 0 auto; margin:4px 0 0; width:18px; height:18px; accent-color:#0a1e3e; }
+.ops-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.ops-form-grid>label { min-width:0; }
+.ops-feedback:empty { display:none; }
+.ops-feedback { font-size:14px; color:#236446; }
+.ops-review { margin:25px 0; padding:20px; background:#eaf2fa; }
+.ops-review h3 { margin-top:0; }
+.ops-row { display:flex; justify-content:space-between; align-items:start; gap:24px; }
+.ops-routine { padding:24px 0; border-bottom:1px solid #d8dee6; }
+.ops-routine h3 { margin:0 0 8px; }
+.ops-routine .hub-kicker { margin:0 0 7px; }
+.ops-routine small { font-size:13px; }
+.ops-routine ul { padding-left:20px; }
+.ops-routine li { padding-left:4px; margin:5px 0; }
+.ops-signoff { padding:20px; background:#f4f7fb; margin:20px 0; }
+.ops-history { margin:28px 0; }
+.school-operations .hub-table small { display:block; font-size:12px; line-height:1.6; margin-top:6px; }
+.school-operations .hub-table td { white-space:normal; overflow-wrap:anywhere; min-width:110px; }
+.ops-help-list { margin-top:32px; }
+.ops-help-item { padding:20px 0; border-top:1px solid #d8dee6; }
+.ops-help-item h3 { margin:0; }
+.ops-help-item>p { white-space:pre-wrap; overflow-wrap:anywhere; }
+.ops-role { border-bottom:1px solid #d8dee6; padding-bottom:12px; }
+.ops-role:last-child { border-bottom:0; }
+.ops-dialog { width:min(1040px,calc(100vw - 40px)); max-height:calc(100dvh - 40px); padding:0; border:0; border-radius:10px; color:#0a1e3e; background:#fff; box-shadow:0 24px 90px #06162f55; overflow:auto; }
+.ops-dialog::backdrop { background:#06162fb0; }
+.ops-dialog-head { display:flex; justify-content:space-between; align-items:start; gap:20px; padding:24px 28px; background:#0a1e3e; color:#fff; position:sticky; top:0; z-index:2; }
+.ops-dialog-head .hub-kicker { color:#fbe7a6; margin:0 0 8px; }
+.ops-dialog-head h2 { color:#fff; font:600 27px/1.25 'Playfair Display',Georgia,serif; margin:0; }
+.ops-dialog-head .hub-button { background:#fff; color:#0a1e3e; flex-shrink:0; }
+.ops-dialog-body { padding:22px 28px 32px; }
+.ops-dialog-body>h3 { font:600 20px/1.4 'Playfair Display',Georgia,serif; margin:28px 0 14px; }
+.ops-team-duties { padding-left:20px; }
+.ops-team-duties li { margin:9px 0; }
+.ops-team-duties strong { margin-right:7px; }
+.ops-readiness .hub-badge { margin-bottom:8px; }
+@media(max-width:700px) {
+ .ops-progress,.ops-form-grid { grid-template-columns:1fr; gap:14px; }
+ .ops-progress { padding:18px; }
+ .ops-task-head { padding:18px 4px; align-items:flex-start; gap:12px; }
+ .ops-task-head strong { font-size:14px; }
+ .ops-task-head small { font-size:12px; }
+ .ops-task-head>.hub-badge { max-width:110px; flex-shrink:0; white-space:normal; text-align:center; }
+ .ops-task-body { padding:10px 4px 24px; }
+ .ops-row { gap:12px; flex-wrap:wrap; }
+ .ops-signoff,.ops-review { padding:14px; }
+ .school-operations .hub-form fieldset { padding:14px; }
+ .ops-dialog { width:calc(100vw - 20px); max-height:calc(100dvh - 20px); }
+ .ops-dialog-head { padding:18px 16px; }
+ .ops-dialog-head h2 { font-size:23px; }
+ .ops-dialog-body { padding:16px; }
+ .ops-tabs button { padding:13px 10px; font-size:12px; }
+ .ops-toolbar .hub-button,.ops-actions .hub-button { white-space:normal; text-align:center; }
+}
+@media print { .ops-tabs,.ops-toolbar,.ops-actions,.ops-dialog-head button { display:none!important; } .ops-dialog { position:static; width:100%; max-height:none; box-shadow:none; overflow:visible; } .ops-dialog-head { position:static; color:#000; background:#fff; } .ops-dialog-head h2 { color:#000; } }

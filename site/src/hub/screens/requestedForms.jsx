@@ -1,3 +1,4 @@
+import { isRetiredPaymentForm } from "../../../functions/forms-registry.js";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { doc, serverTimestamp, updateDoc, where } from "firebase/firestore";
@@ -29,7 +30,7 @@ export function RequestedForms() {
         <EmptyState title="No requested forms." />
       ) : (
         <ul className="hub-list">
-          {data.map((r) => (
+          {data.filter(r => !isRetiredPaymentForm(r.formId)).map((r) => (
             <li key={r.id}>
               <Link to={"/hub/forms/" + r.id}>
                 {r.formTitle || "School form"}
@@ -56,6 +57,7 @@ export function RequestedForm() {
   const [busy, setBusy] = useState(false),
     [failure, setFailure] = useState("");
   async function submit(e) {
+    if(isRetiredPaymentForm(data?.record?.formId)) return;
     e.preventDefault();
     setBusy(true);
     setFailure("");
@@ -77,6 +79,7 @@ export function RequestedForm() {
     }
   }
   if (loading) return <Loading />;
+  if (isRetiredPaymentForm(data?.record?.formId)) return <EmptyState title="Please contact the school office about this matter." />;
   if (error) return <ErrorNote error={error} />;
   if (!data?.record || !data.definition)
     return <EmptyState title="This requested form is unavailable." />;

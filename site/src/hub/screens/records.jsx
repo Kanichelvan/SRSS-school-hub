@@ -88,7 +88,6 @@ function Student360Tab({ tab, student, cls }) {
     portfolio: async () => ({ entries: await portfolioFor(auth, student) }),
     humanExcellence: async () => ({ observations: await list("humanValuesObservations", where("studentId", "==", studentId), ...scope, ...(isFamily(auth) ? [where("familyVisible", "==", true)] : [])) }),
     achievements: async () => ({ items: await list("studentAchievements", where("studentId", "==", studentId), ...scope, ...(isFamily(auth) ? [where("visibility", "in", ["family", "public"])] : [])) }),
-    fees: async () => ({ fees: await list("studentFeeAssignments", where("studentId", "==", studentId)) }),
     history: async () => ({ logs: await list("auditLogs", where("path", ">=", `students/${studentId}`), where("path", "<=", `students/${studentId}`), limit(20)) }),
   }[tab];
   const { data, loading, error } = useLoad(loader || (async () => null), [tab, studentId]);
@@ -120,7 +119,6 @@ function Student360Tab({ tab, student, cls }) {
   if (tab === "portfolio") return <PortfolioList entries={data.entries} />;
   if (tab === "humanExcellence") return data.observations.length ? <ul className="hub-cards">{data.observations.map((item) => <li key={item.id} className="hub-card"><StatusBadge status="good" label={HUMAN_VALUES[item.value]} /><p>{item.observation}</p><small>{item.context}</small></li>)}</ul> : <EmptyState title="No observations recorded yet.">Teachers record specific observations, never scores.</EmptyState>;
   if (tab === "achievements") return <><JourneySummary studentId={studentId} compact />{data.items.length ? <ul className="hub-list">{data.items.map((item) => <li key={item.id}><strong>{item.title}</strong><small>{formatDate(item.date, { day: "numeric", month: "short", year: "numeric" })}</small></li>)}</ul> : <EmptyState title="No achievements recorded yet." />}</>;
-  if (tab === "fees") return data.fees.length ? <ul className="hub-list">{data.fees.map((fee) => <li key={fee.id}><strong>RM {fee.amountDue?.toLocaleString("en-MY")} due · RM {fee.amountPaid?.toLocaleString("en-MY")} paid</strong><StatusBadge status={fee.outstanding > 0 ? "pending" : "complete"} label={fee.outstanding > 0 ? `RM ${fee.outstanding.toLocaleString("en-MY")} outstanding` : "Paid"} /></li>)}</ul> : <EmptyState title="No fee records." />;
   if (tab === "history") return data.logs.length ? <ul className="hub-list">{data.logs.map((log) => <li key={log.id}><strong>{log.type}</strong><small>{formatDate(log.at, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} · {log.fields?.join(", ") || "—"}</small></li>)}</ul> : <EmptyState title="No changes recorded yet." />;
   return null;
 }

@@ -413,3 +413,5 @@ export const formsFromAbsence = caseFromSource("absenceReports", (data, before) 
 export const formsFromActivity = caseFromSource("activityForms", (data, before) => !before && ACTIVITY_FORM_IDS[data.formId] && { formId: ACTIVITY_FORM_IDS[data.formId], link: "/hub/forms", summary: data.activity || data.title || "", studentId: data.studentId || null, submitter: { uid: data.ownerUid } });
 export const formsFromRegistration = caseFromSource("registrations", (data, before) => !before && { formId: "G01", link: "/hub/calendar", summary: data.eventTitle || "", studentId: data.studentId || null, submitter: { uid: data.registrantUid } });
 export const auditFormSubmissions = auditWrite("formSubmissions");
+
+export { schoolOperations } from "./operations-service.js";

@@ -46,7 +46,6 @@ export function AdminDashboard() {
   const canStudents = can(roles, "students", "V") === "all";
   const canAttendance = Boolean(can(roles, "attendance", "V"));
   const canAdmissions = Boolean(can(roles, "admissions", "V"));
-  const canFees = Boolean(can(roles, "fees", "V"));
   const canConsent = Boolean(can(roles, "consent", "V"));
   const canModerate = Boolean(can(roles, "showcase", "A"));
   const canInbox = Boolean(can(roles, "inbox", "V"));
@@ -54,7 +53,7 @@ export function AdminDashboard() {
 
   const { data, loading, error } = useLoad(async () => {
     const yearId = await currentYearId();
-    const [students, staff, classes, sessions, records, enquiries, applications, consent, fees, portfolio, candidates, messages, enrolments] = await Promise.all([
+    const [students, staff, classes, sessions, records, enquiries, applications, consent, portfolio, candidates, messages, enrolments] = await Promise.all([
       canStudents ? list("students", where("status", "==", "active")) : [],
       list("staff", where("status", "==", "active")),
       list("classes", where("academicYearId", "==", yearId || "")),
@@ -63,13 +62,12 @@ export function AdminDashboard() {
       canAdmissions ? list("admissionEnquiries", where("status", "in", ["new", "contacted", "visitBooked"])) : [],
       canAdmissions ? list("applications", where("status", "in", ["submitted", "documentsPending", "underReview", "interview", "accepted"])) : [],
       canConsent ? list("studentConsentStatus") : [],
-      canFees ? list("studentFeeAssignments") : [],
       canStudents ? list("portfolioEntries", where("date", ">=", daysAgo(30))).catch(() => []) : [],
       canModerate ? list("portfolioEntries", where("visibility", "==", "showcaseCandidate")).catch(() => []) : [],
       canInbox ? list("contactMessages", where("status", "==", "new")).catch(() => []) : [],
       canStudents ? list("enrollments", where("academicYearId", "==", yearId || ""), where("status", "==", "active")).catch(() => []) : [],
     ]);
-    return { yearId, students, staff, classes: classes.filter((cls) => (cls.status ?? "active") === "active"), sessions, records, enquiries, applications, consent, fees, portfolio, candidates, messages, enrolments };
+    return { yearId, students, staff, classes: classes.filter((cls) => (cls.status ?? "active") === "active"), sessions, records, enquiries, applications, consent, portfolio, candidates, messages, enrolments };
   }, [roles.join("|")]);
 
   const view = useMemo(() => {
@@ -83,7 +81,6 @@ export function AdminDashboard() {
     const trend = dates.map((date) => ({ label: WEEKDAYS[new Date(`${date}T12:00:00`).getDay()], value: attendanceSummary(data.records.filter((record) => record.date === date && submitted.has(record.sessionId))).rate }));
     const incomplete = data.students.filter((student) => !completeness(student).complete);
     const consentGaps = data.consent.filter((status) => !status.types?.photoVideo).length;
-    const outstanding = data.fees.reduce((sum, fee) => sum + (fee.outstanding || 0), 0);
     const unenrolled = data.students.filter((student) => !data.enrolments.some((item) => item.studentId === student.id)).length;
     const notTaken = byClass.filter((row) => row.state !== "submitted").length;
     const pending = [
@@ -96,11 +93,11 @@ export function AdminDashboard() {
       incomplete.length && canStudents ? { to: "/hub/admin/students", label: `${incomplete.length} incomplete student records` } : null,
     ].filter(Boolean);
     const recentPortfolio = [...data.portfolio].sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5);
-    return { todayRecords, byClass, trend, outstanding, pending, recentPortfolio };
+    return { todayRecords, byClass, trend, pending, recentPortfolio };
   }, [data]);
 
   return <>
-    <PageHeader kicker="Admin dashboard" title={`${greeting()}, ${firstName(auth)}.`} actions={canSetup && <Link className="hub-button hub-button-quiet" to="/hub/admin/setup">School setup wizard</Link>}>A concise picture of the school today.</PageHeader>
+    <PageHeader kicker="Admin dashboard" title={`${greeting()}, ${firstName(auth)}.`} actions={canSetup && <Link className="hub-button hub-button-quiet" to="/hub/admin/operations">School setup & upkeep</Link>}>A concise picture of the school today.</PageHeader>
     <QuestDashboardCard staff />
     <ErrorNote error={error} />
     {loading || !view ? <Loading /> : <>
@@ -109,7 +106,6 @@ export function AdminDashboard() {
         <StatCard label="Active staff" value={data.staff.length} to="/hub/admin/staff" />
         <StatCard label="Active classes" value={data.classes.length} detail="this academic year" to="/hub/admin/classes" />
         <StatCard label="Attendance today" value={attendanceSummary(view.todayRecords).rate != null ? `${attendanceSummary(view.todayRecords).rate}%` : "—"} detail={`${view.byClass.filter((row) => row.state === "submitted").length} of ${view.byClass.length} classes submitted`} tone={view.byClass.some((row) => row.state !== "submitted") ? "warn" : "good"} to="/hub/admin/attendance" />
-        {canFees && <StatCard label="Fees outstanding" value={`RM ${view.outstanding.toLocaleString("en-MY")}`} detail={`${data.fees.filter((fee) => fee.outstanding > 0).length} families`} />}
       </div>
       <div className="hub-grid-2">
         <Section title="Pending actions">{view.pending.length ? <ul className="hub-list hub-list-compact hub-pending">{view.pending.map((item) => <li key={item.to}><Link to={item.to}>{item.label}</Link><span aria-hidden="true">→</span></li>)}</ul> : <EmptyState title="Nothing waiting.">Every register is in and nothing needs a decision.</EmptyState>}</Section>
@@ -194,22 +190,21 @@ export function ParentDashboard() {
   const [selected, setSelected] = useState(null);
   const { data, loading, error } = useLoad(async () => {
     const children = (await getMany("students", childIds)).sort((a, b) => (b.currentStandard || 0) - (a.currentStandard || 0));
-    const [definitions, statuses, requests, fees, notices, acks] = await Promise.all([
+    const [definitions, statuses, requests, notices, acks] = await Promise.all([
       consentItems(),
       getMany("studentConsentStatus", childIds),
       list("formSubmissions", where("requestedFromUid", "==", auth.user.uid), where("status", "==", "pending")),
-      can(auth.roles, "fees", "V") ? listIn("studentFeeAssignments", "studentId", childIds) : [],
       announcementsFor(keys, 40).catch(() => []),
       list("announcementAcknowledgements", where("recipientUid", "==", auth.user.uid)).catch(() => []),
     ]);
     const acked = new Set(acks.map((ack) => `${ack.announcementId}_${ack.announcementRevision}`));
     const acknowledgements = notices.filter((notice) => notice.requiresAcknowledgement && !acked.has(`${notice.id}_${notice.revision || 1}`)).map((notice) => ({ id: notice.id, title: notice.title, reference: notice.reference, deadline: notice.acknowledgementDeadline }));
-    return { children, definitions, statuses, requests, fees, notices, acknowledgements };
+    return { children, definitions, statuses, requests, notices, acknowledgements };
   }, [childIds.join("|")]);
 
   useEffect(() => { if (data?.children.length && !selected) setSelected(data.children[0].id); }, [data, selected]);
   const child = data?.children.find((item) => item.id === selected);
-  const actions = useMemo(() => data ? parentActions({ children: data.children, consentDefinitions: data.definitions, consentStatus: Object.fromEntries(data.statuses.map((status) => [status.id, status])), formRequests: data.requests, fees: data.fees, acknowledgements: data.acknowledgements }) : [], [data]);
+  const actions = useMemo(() => data ? parentActions({ children: data.children, consentDefinitions: data.definitions, consentStatus: Object.fromEntries(data.statuses.map((status) => [status.id, status])), formRequests: data.requests, acknowledgements: data.acknowledgements }) : [], [data]);
 
   const childData = useLoad(async () => {
     if (!child) return null;
@@ -233,7 +228,6 @@ export function ParentDashboard() {
           <StatCard label="Attendance (60 days)" value={childData.data ? `${attendanceSummary(childData.data.records).rate ?? "—"}%` : "…"} detail={childData.data ? `${attendanceSummary(childData.data.records).counts.absent} absent · ${attendanceSummary(childData.data.records).counts.late} late` : null} to="/hub/parent/attendance" />
           <StatCard label="Class" value={child.currentStandard ? `Standard ${child.currentStandard}` : "—"} to={`/hub/students/${child.id}`} detail="Open profile" />
           <StatCard label="Portfolio entries" value={childData.data?.entries.length ?? "…"} to="/hub/parent/portfolio" detail="My SRSS Journey" />
-          {data.fees.length > 0 && <StatCard label="Fees" value={(() => { const fee = data.fees.find((item) => item.studentId === child.id); return fee ? (fee.outstanding > 0 ? `RM ${fee.outstanding.toLocaleString("en-MY")} due` : "Paid") : "—"; })()} tone={data.fees.find((item) => item.studentId === child.id)?.outstanding > 0 ? "warn" : "good"} />}
         </div>
         <div className="hub-grid-2">
           <Section title="Portfolio highlight" action={<Link to="/hub/parent/portfolio">Journey</Link>}>

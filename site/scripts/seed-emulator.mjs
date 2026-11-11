@@ -202,16 +202,6 @@ put("admissionEnquiries/enq-1", { parentName: "Farah Aziz (demo)", email: "farah
 put("admissionEnquiries/enq-2", { parentName: "Kevin Ong (demo)", email: "kevin.demo@example.com", childName: "Ethan", enteringStandard: 3, source: "website", status: "visitBooked", createdAt: now, consentToContact: true });
 put("applications/app-1", meta({ applicantUid: null, status: "underReview", child: { name: "Zara Aziz", dateOfBirth: "2021-03-14" }, guardians: [{ name: "Farah Aziz (demo)", email: "farah.demo@example.com", relationship: "mother" }], enteringStandard: 1, submittedAt: now, createdBy: uid.admissions }));
 put("applications/app-2", meta({ applicantUid: null, status: "accepted", child: { name: "Hannah Lee", dateOfBirth: "2020-07-02" }, guardians: [{ name: "Grace Lee (demo)", email: "grace.demo@example.com", relationship: "mother" }], enteringStandard: 2, startDate: YEAR.startDate, submittedAt: now, createdBy: uid.admissions }));
-// Fees-Lite: the real fee schedule (src/data/fees.js) on fictional pupils. Aarav (Standard 4) is the Raman
-// family's first child; Anika (Standard 2) the second, with the 20% sibling discount. Meals are a separate line.
-for (const [name, position, paid] of [["Aarav Raman", 1, [["tuition", 385, "2027-01-08"], ["meals", 70, "2027-01-08"]]], ["Anika Raman", 2, []]]) {
-  const studentId = studentIds[name];
-  const assignment = { studentId, studentName: name.split(" ")[0], academicYearId: YEAR.id, year: 2027, familyKey: studentIds["Aarav Raman"], familySize: 2, siblingPosition: position, siblingDiscount: fees.siblingDiscount(position), meals: true, mealSponsored: false, concessionKey: "none", concessionRate: 0, concessionLabel: null, plan: "monthly" };
-  const payments = paid.map(([line, amount, date], index) => ({ id: `pay-${studentId}-${index}`, studentId, academicYearId: YEAR.id, line, amount, date, reference: `DEMO-${index + 1}`, method: "Bank transfer" }));
-  const result = fees.statement(assignment, payments, localDate(new Date()));
-  for (const { id, ...payment } of payments) put(`payments/${id}`, { ...payment, recordedBy: uid.finance, createdAt: now });
-  put(`studentFeeAssignments/${studentId}_${YEAR.id}`, meta({ ...assignment, tuitionMonthly: result.tuition.monthly, mealMonthly: result.meals.monthly, tuitionCharged: result.tuition.charged, mealsCharged: result.meals.charged, amountDue: result.tuition.charged + result.meals.charged, paidTuition: result.tuition.paid, paidMeals: result.meals.paid, outstanding: result.outstanding, status: "issued" }));
-}
 put("newsPosts/np-1", meta({ title: "Standard 4 recycling corner wins zone award", category: "Achievements", date: day(-3), image: "/assets/photos/processed/sports-day-podium-1600.jpg", excerpt: "Our Standard 4 pupils turned a quiet corner into a working recycling station.", status: "published", ownerRole: "contentEditor", reviewDate: day(60), publishedAt: now }));
 put("newsPosts/np-2", meta({ title: "SRSS25: call for alumni stories", category: "School News", date: day(2), excerpt: "Share how SRSS shaped your journey.", status: "review", ownerRole: "contentEditor", reviewDate: day(30) }));
 

@@ -33,7 +33,7 @@ export function followUpPrompts(records, { today = new Date() } = {}) {
 
 // DASH-001: everything a family needs to act on, isolated from announcements, most urgent first.
 // `acknowledgements`: SRSS Connect notices still waiting for this parent's "I acknowledge" ({ id, title, deadline }).
-export function parentActions({ children, consentDefinitions, consentStatus, formRequests, fees, acknowledgements = [], today = new Date() }) {
+export function parentActions({ children, consentDefinitions, consentStatus, formRequests, acknowledgements = [], today = new Date() }) {
   const actions = [];
   for (const child of children) {
     // Missing consents are grouped into one action per child so the list stays short and scannable.
@@ -41,8 +41,6 @@ export function parentActions({ children, consentDefinitions, consentStatus, for
     const missing = consentDefinitions.filter((definition) => !status[definition.type] || (status[definition.type].version ?? 1) < (definition.version ?? 1));
     if (missing.length === 1) actions.push({ kind: "consent", studentId: child.id, title: `${missing[0].title} consent awaiting your response`, childName: child.preferredName || child.name, to: `/hub/parent/consent?student=${child.id}`, dueDate: null });
     if (missing.length > 1) actions.push({ kind: "consent", studentId: child.id, title: `${missing.length} consent choices awaiting your response`, detail: missing.map((definition) => definition.title).join(", "), childName: child.preferredName || child.name, to: `/hub/parent/consent?student=${child.id}`, dueDate: null });
-    const fee = fees.find((item) => item.studentId === child.id);
-    if (fee && fee.outstanding > 0) actions.push({ kind: "payment", studentId: child.id, title: `Outstanding fees: RM ${fee.outstanding.toLocaleString("en-MY")}`, childName: child.preferredName || child.name, to: "/hub/parent/fees", dueDate: fee.nextDueDate || null });
   }
   for (const request of formRequests) {
     if (request.status !== "pending") continue;
@@ -88,5 +86,5 @@ export const STUDENT_360_TABS = [
   ["overview", "Overview", "students"], ["personal", "Personal", "students"], ["family", "Family & guardians", "guardians"],
   ["academic", "Academic", "assessments"], ["attendance", "Attendance", "attendance"], ["portfolio", "Portfolio", "portfolio"],
   ["humanExcellence", "Human Excellence", "humanExcellence"], ["support", "Support", "support"], ["achievements", "Achievements", "achievements"],
-  ["fees", "Fees", "fees"], ["documents", "Documents", "documents"], ["incidents", "Incidents & behaviour", "incidents"], ["history", "History", "governance"],
+  ["documents", "Documents", "documents"], ["incidents", "Incidents & behaviour", "incidents"], ["history", "History", "governance"],
 ];

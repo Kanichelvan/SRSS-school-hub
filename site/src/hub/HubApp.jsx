@@ -27,6 +27,9 @@ const quest = () => import("./screens/quest");
 const questAdmin = () => import("./screens/quest-admin");
 const nilam = () => import("./screens/nilam");
 
+const TutorialButton = lazyNamed(() => import("./TutorialModal"), "TutorialButton");
+const OperationsModalButton = lazyNamed(() => import("./screens/schoolOperations"), "OperationsModalButton");
+const ResultsOpeningGate = lazyNamed(() => import("./screens/resultsOpeningGate"), "ResultsOpeningGate");
 const StaffAcknowledgementCard = lazyNamed(consent, "StaffAcknowledgement");
 const NotificationBell = lazyNamed(connect, "NotificationBell");
 const SignIn = lazyNamed(() => import("./SignIn"), "SignIn");
@@ -35,6 +38,8 @@ const community = () => import("./screens/community");
 const forms = () => import("./screens/forms");
 const fees = () => import("./screens/fees");
 const SCREENS = {
+  schoolOperations: lazyNamed(() => import("./screens/schoolOperations"), "SchoolOperations"),
+  dataImport: lazyNamed(() => import("./screens/dataImport"), "DataImport"),
   familyFees: lazyNamed(fees, "FamilyFees"), feesOffice: lazyNamed(fees, "FeesOffice"),
   formsCentre: lazyNamed(forms, "FormsCentre"), formsCase: lazyNamed(forms, "CaseView"), myRequests: lazyNamed(forms, "MyRequests"), startRequest: lazyNamed(forms, "StartRequest"), requestView: lazyNamed(forms, "RequestView"),
   requestedForm: lazyNamed(() => import("./screens/requestedForms"), "RequestedForm"),
@@ -68,6 +73,7 @@ const SCREENS = {
 };
 
 function routeAllowed(route, auth) {
+  if(route.operationsOnly && !auth.roles.some(r=>["superAdmin","schoolAdmin","academicCoordinator","leadership","technicalAdmin","contentEditor","financeOfficer","safeguardingLead"].includes(r))) return false;
   if(route.officeOnly && !auth.roles.some(r=>["superAdmin","schoolAdmin"].includes(r))) return false;
   if (route.publisherOnlyDevelopment && !auth.roles.some(r => ["leadership", "superAdmin"].includes(r))) return false;
   if (route.editorOnly && !can(auth.roles, "engagement", "C")) return false;
@@ -115,6 +121,8 @@ function Shell() {
     <header className="hub-topbar">
       <a href="/" className="hub-brand" aria-label="SRSS Digital Hub · go to the school homepage"><img src="/assets/srss-logo.png" alt="" /><span><strong>SRSS Digital Hub</strong><small>Sekolah Rendah Sathya Sai</small></span></a>
       <div className="hub-topbar-actions">
+        <Suspense fallback={null}><TutorialButton hub={auth.currentHub} /></Suspense>
+        {auth.currentHub === "admin" && auth.roles.some(r=>["superAdmin","schoolAdmin","academicCoordinator","leadership","technicalAdmin","contentEditor","financeOfficer","safeguardingLead"].includes(r)) && <Suspense fallback={null}><OperationsModalButton /></Suspense>}
         {/* Role switcher for people holding several roles (AUTH-001 AC3). */}
         {auth.hubs.length > 1 && <label className="hub-switcher"><span className="hub-visually-hidden">View as</span><select value={auth.currentHub} onChange={(event) => switchTo(event.target.value)}>{auth.hubs.map((hub) => <option key={hub} value={hub}>{HUB_LABELS[hub]}</option>)}</select></label>}
         <Suspense fallback={<Link to="/hub/notifications" className="hub-topbar-link">Notifications</Link>}><NotificationBell /></Suspense>
@@ -134,7 +142,7 @@ function Guarded({ route }) {
   const auth = useAuth();
   if (!routeAllowed(route, auth)) return <Unauthorized />;
   const Screen = route.screen && SCREENS[route.screen];
-  return Screen ? <Suspense fallback={<Loading />}><Screen /></Suspense> : <ModulePlaceholder route={route} />;
+  return Screen ? <Suspense fallback={<Loading />}>{["assessments", "reportCards"].includes(route.module) ? <ResultsOpeningGate><Screen /></ResultsOpeningGate> : <Screen />}</Suspense> : <ModulePlaceholder route={route} />;
 }
 
 // Modules scheduled for later phases: route, navigation and access boundary exist; the workflow follows.

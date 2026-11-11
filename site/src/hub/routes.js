@@ -6,6 +6,8 @@
 export const HUB_LABELS = { shared: "My SRSS", admin: "Admin", teacher: "Teaching", parent: "My Family", student: "My Learning" };
 
 export const hubRoutes = [
+  { path: "/hub/admin/operations", hub: "admin", group: "Overview", label: "School setup & upkeep", module: "dashboard", google: [], screen: "schoolOperations", operationsOnly: true },
+  { path: "/hub/admin/import", hub: "admin", group: "School setup", label: "Import school records", module: "accessAdministration", google: [], screen: "dataImport", officeOnly: true },
   { path: "/hub/staff/quest", hub: "shared", label: "SRSS25 Staff Quest", module: "engagement", google: ["Drive", "Docs"], screen: "staffQuest", staffOnly: true },
   { path: "/hub/quest/play/:challengeId", hub: "shared", label: "Challenge", module: "engagement", google: [], screen: "challengePlayer", hidden: true },
   { path: "/hub/staff/passport", hub: "shared", label: "Staff Passport", module: "engagement", google: [], screen: "questJourney", staffOnly: true, hidden: true },
@@ -71,7 +73,7 @@ export const hubRoutes = [
   { path: "/hub/parent/progress", hub: "parent", label: "Progress", module: "assessments", google: [], screen: "academicRecords" },
   { path: "/hub/parent/tasks", hub: "parent", label: "Tasks", module: "teaching", google: ["Classroom"] },
   { path: "/hub/parent/reports", hub: "parent", label: "Reports", module: "reportCards", google: [], screen: "academicRecords" },
-  { path: "/hub/parent/fees", hub: "parent", label: "Fees", module: "fees", google: [], screen: "familyFees" },
+  { path: "/hub/parent/fees", hub: "parent", label: "Fee information", module: "fees", google: [], screen: "familyFees" },
   { path: "/hub/parent/meetings", hub: "parent", label: "Meetings", module: "meetings", google: ["Meet", "Calendar"] },
 
   // Student — Today | My Class | My Portfolio | My Achievements | Notices | Calendar (deliberately small)
@@ -116,7 +118,7 @@ export const hubRoutes = [
   { path: "/hub/admin/consent", hub: "admin", group: "School operations", label: "Consent", module: "consent", google: [], screen: "consentOverview" },
   { path: "/hub/consent/print/:studentId?", hub: "admin", label: "Printable consent form", module: "consent", google: [], screen: "consentPrint", hidden: true },
   { path: "/hub/admin/assessments", hub: "admin", group: "School operations", label: "Assessments", module: "assessments", google: ["Sheets"], screen: "academicRecords" },
-  { path: "/hub/admin/fees", hub: "admin", group: "School operations", label: "Fees", module: "fees", google: ["Sheets"], screen: "feesOffice" },
+  { path: "/hub/admin/fees", hub: "admin", group: "School operations", label: "Fee information", module: "fees", google: [], screen: "feesOffice" },
   { path: "/hub/admin/assets", hub: "admin", group: "School operations", label: "Assets", module: "assets", google: ["Drive"] },
   { path: "/hub/admin/reports", hub: "admin", group: "School operations", label: "Reports", module: "reports", google: ["Sheets"], screen: "communityReports" },
   { path: "/hub/admin/engagement/challenges", hub: "admin", group: "Engagement", label: "Challenges", module: "engagement", google: ["Drive", "Docs"], screen: "challengeCms", editorOnly: true },

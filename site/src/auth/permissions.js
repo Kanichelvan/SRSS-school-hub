@@ -84,7 +84,7 @@ export const MODULES = {
   support: { label: "Learning support", phase: 2 },
   incidents: { label: "Incidents & behaviour", phase: 2 },
   meetings: { label: "Parent–teacher meetings", phase: 2 },
-  fees: { label: "Fees-lite", phase: 1 }, // built Nov 2026 with the School Fees and Payment Policy
+  fees: { label: "Fee information", phase: 1 }, // Published schedule and billing guidance only.
   familyAdmissions: {label:"Family admissions applications",phase:1},
   teacherDevelopment: { label: "Teacher development", phase: 1 },
   staffHR: { label: "Staff HR (leave, training, appraisal)", phase: 2 },
@@ -170,7 +170,7 @@ const MATRIX = {
   },
   meetings: { parent: "C/U own", teacher: "C/U own", classTeacher: "C/U own", specialistTeacher: "C/U own", schoolAdmin: "U", leadership: "V" },
   // PRD §17/§33: financial permissions are separated from ordinary teacher access.
-  fees: { parent: "V child", financeOfficer: "U", schoolAdmin: "V", leadership: "V", auditor: "V" },
+  fees: { parent: "V", financeOfficer: "V", schoolAdmin: "V", leadership: "V", auditor: "V" },
   familyAdmissions: {parent:"C/U own"},
   teacherDevelopment: { teacher: "C/U own", classTeacher: "C/U own", specialistTeacher: "C/U own", leadership: "A", superAdmin: "A" },
   staffHR: { schoolAdmin: "U", leadership: "A" },

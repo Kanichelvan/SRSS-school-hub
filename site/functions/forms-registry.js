@@ -201,7 +201,7 @@ const ROWS = [
   ["K13", "P1", "Data Quality / Duplicate Record Report", "Admin", "System Hub → Data Quality / Duplicate Record Report", "formSubmissions → system", "Technical Administrator / Data Steward", "Digital Hub Product Owner", "exception", "record", "Review / respond / close", "operational", "confidential"],
   ["K14", "P1", "System Incident / Security Concern Report", "Authorised User", "Help → Report Security Issue", "securityIncidents (proposed)", "Technical Administrator", "Digital Hub Product Owner", "restricted", "triage", "Urgent containment / escalate", "triage", "confidential"],
   ["K15", "P2", "System Change / Release Approval", "Product Owner", "System Hub → System Change / Release Approval", "formSubmissions → system", "Technical Administrator / Data Steward", "Digital Hub Product Owner", "pic", "decision", "Review / respond / close", "2d", "confidential"],
-  ["L01", "P2", "Student Fee Information / Payment Enquiry", "Parent", "Finance Hub → Student Fee Information / Payment Enquiry", "formSubmissions → finance", "Finance Officer", "Headmistress / Authorised Finance Approver", "pic", "review", "Review / respond / close", "2d", "confidential"],
+  ["L01", "P2", "Fee Schedule / Billing Procedure Enquiry", "Parent", "Fee information → Billing procedure enquiry", "formSubmissions → finance", "Finance Officer", "Headmistress / Authorised Finance Approver", "pic", "review", "Review / respond / close", "2d", "confidential"],
   ["L02", "P2", "Payment Reference / Proof Submission", "Parent", "Parent → Finance → Payment Reference", "payments", "Finance Officer", "Headmistress / Authorised Finance Approver", "pic", "review", "Verify / reconcile", "2d", "confidential"],
   ["L03", "P2", "Fee Concession / Financial Assistance Request", "Parent", "Parent → Finance → Assistance", "concessions / restricted requests", "Finance Officer", "Headmistress / Authorised Finance Approver", "pic", "decision", "Confidential review", "2d", "restricted"],
   ["L04", "P2", "Fee Adjustment / Correction Request", "Finance Officer", "Finance Hub → Fee Adjustment / Correction Request", "formSubmissions → finance", "Finance Officer", "Headmistress / Authorised Finance Approver", "pic", "decision", "Review / respond / close", "2d", "confidential"],
@@ -227,7 +227,7 @@ export const CATEGORIES = {
   I: { code: "S25", name: "SRSS25, Alumni & Community Engagement", queue: "SRSS25 › Community Submissions", pic: "alumniCoordinator", backup: "leadership", escalation: "leadership", module: "/hub/admin/inbox" },
   J: { code: "WEB", name: "Website Content, CMS & Governance", queue: "CMS › Review & Publishing", pic: "contentEditor", backup: "leadership", escalation: "leadership", module: "/hub/admin/content" },
   K: { code: "SYS", name: "System Administration, Access & Data Management", queue: "System › Access & Data", pic: "technicalAdmin", backup: "superAdmin", escalation: "leadership", module: "/hub/admin/accounts" },
-  L: { code: "FIN", name: "Finance, Fees & School Resources", queue: "Finance › Requests & Reconciliation", pic: "financeOfficer", backup: "leadership", escalation: "leadership", module: "/hub/admin/fees" },
+  L: { code: "FIN", name: "Finance, Fees & School Resources", queue: "Fee information & School Resources", pic: "financeOfficer", backup: "leadership", escalation: "leadership", module: "/hub/admin/fees" },
 };
 
 // The specification's role names → hub roles. "Event Organiser", "Parent Liaison", "Academic Lead" and the
@@ -383,7 +383,7 @@ const LIVE = {
   K10: { audience: "staff", intro: "Request an export of hub data. The Technical Administrator checks you're authorised to receive it.", fields: [f("data", "What data?", "textarea"), f("purpose", "What it's for", "textarea"), pick("format", "Format", ["Google Sheets", "CSV", "PDF"]), opt("neededBy", "Needed by", "date")] },
   K13: { audience: "staff", intro: "Report a duplicate or inaccurate record.", fields: [f("record", "Which record?"), f("problem", "What is wrong?", "textarea")] },
   K14: { audience: "signedIn", emergency: "If you think an account has been taken over or data has leaked, also phone the school office now so the account can be locked.", intro: "Report a security concern about the Digital Hub or a school account.", fields: [f("what", "What did you notice?", "textarea"), f("when", "When?"), opt("accounts", "Accounts or data affected (if known)")] },
-  L01: { audience: "parent", intro: "Ask about a fee statement, payment schedule, sibling discount or payment arrangement.", fields: [CHILD, pick("topic", "What is it about?", ["My fee statement", "Payment schedule (monthly, six-monthly or fortnightly)", "Sibling discount", "Vendor meal charge", "A payment I made", "Something else"]), f("question", "Your question", "textarea")] },
+  L01: { audience: "parent", intro: "Ask about the published fee schedule, pricing or general billing procedure. Contact the school office directly for individual bills or payment matters; do not submit receipts or bank details here.", fields: [pick("topic", "What is it about?", ["Published fee schedule", "Sibling pricing", "Vendor meal pricing", "General billing procedure"]), f("question", "Your question about the published information", "textarea")] },
   L03: { audience: "parent", restrictedNote: true, intro: "No child should miss an SRSS education because of genuine financial hardship. Children from eligible B40 households receive full sponsorship, subject to verification of household circumstances; other families may be considered for full or partial assistance. Only the Finance Officer and the Headmistress see your request, and the decision is shared with you privately.", fields: [CHILD, pick("household", "Which describes your household?", ["A B40 household", "Outside B40, facing financial hardship", "Our circumstances have changed unexpectedly", "I'd rather explain below"]), pick("request", "What would help?", ["Full sponsorship", "Partial tuition assistance", "A modified payment arrangement", "Help with essential expenses (uniform, books, meals)"]), f("circumstances", "Tell us about your household circumstances, dependants and financial commitments", "textarea"), f("confirm", "The information I've given is accurate, and I can provide documents to verify it if asked", "checkbox"), SIGN("Sign your request")] },
   L05: { audience: "parent", intro: "Request a refund. Advance payments are reconciled under the school's withdrawal and refund schedule; meal refunds follow the vendor's terms.", fields: [CHILD, pick("line", "Refund of", ["School tuition", "Vendor meals", "Another charge"]), f("amount", "Amount (RM)", "number"), f("paymentReference", "Payment reference or date"), f("reason", "Reason", "textarea")] },
   L06: { audience: "staff", intro: "Request a purchase for school use.", fields: [f("item", "What is needed?"), f("quantity", "How many?", "number"), f("estimatedCost", "Estimated cost (RM)", "number"), opt("supplier", "Supplier (if known)"), f("justification", "Why it's needed", "textarea")] },
@@ -426,19 +426,22 @@ const STORED_IN = { A01: "contactMessages", B05: "absenceReports", I01: "contact
 for (const id of Object.values(ACTIVITY_FORM_IDS)) STORED_IN[id] = "activityForms";
 const ACTION_REQUIRED = ["A01", "A02", "A03", "B06", "D06", "J01", "J02", "J03", "E09", "K07"];
 
+// Existing identifiers are retained for historical references, with online payment workflows retired.
+export const RETIRED_PAYMENT_FORMS = ["L02", "L03", "L04", "L05", "L07", "L09", "L10"];
+export const isRetiredPaymentForm = (id) => RETIRED_PAYMENT_FORMS.includes(id);
 export const FORMS = ROWS.map((row) => {
   const [id, priority, title, user, entry, store, picLabel, backupLabel, notify, reply, action, target, classification] = row;
   const category = id[0];
   const live = LIVE[id];
   const restricted = classification === "restricted" || notify === "restricted";
   const routing = { pic: ROLE_OF[picLabel] || CATEGORIES[category].pic, backup: ROLE_OF[backupLabel] || CATEGORIES[category].backup, ...PIC_OVERRIDES[id] };
-  const availability = live ? (live.audience === "public" ? "public" : "form") : MODULE_LINKS[id] ? "module" : "planned";
+  const availability = isRetiredPaymentForm(id) ? "retired" : live ? (live.audience === "public" ? "public" : "form") : MODULE_LINKS[id] ? "module" : "planned";
   return {
     id, category, priority, stage: availability === "planned" ? 3 : priority === "P1" ? 2 : 3, title, user, entry, store: STORED_IN[id] || store, proposedStore: store, picLabel, backupLabel,
     pic: routing.pic, backup: routing.backup !== routing.pic ? routing.backup : CATEGORIES[category].escalation !== routing.pic ? CATEGORIES[category].escalation : "superAdmin", escalation: CATEGORIES[category].escalation,
     notify, reply, action, target, classification, restricted, type: typeOf(row),
     level: restricted ? 3 : reply === "decision" || ACTION_REQUIRED.includes(id) ? 2 : 1,
-    availability, link: live ? (availability === "public" ? `/forms/${id}` : `/hub/requests/new/${id}`) : MODULE_LINKS[id] || null,
+    availability, link: availability === "retired" ? null : live ? (availability === "public" ? `/forms/${id}` : `/hub/requests/new/${id}`) : MODULE_LINKS[id] || null,
     audience: live?.audience || null, fields: live?.fields || [], intro: live?.intro || "", emergency: live?.emergency || null,
     restrictedNote: Boolean(live?.restrictedNote), writesTo: live?.store || (restricted ? "restrictedCases" : "formSubmissions"),
     apply: live?.apply || null, atLeastOne: live?.atLeastOne || null,

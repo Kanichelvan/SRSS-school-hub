@@ -59,10 +59,10 @@ test("content editors and admissions officers get no student-record access", () 
   assert.equal(can(["admissionsOfficer"], "admissions", "U"), "all");
 });
 
-test("financial records are separated from teacher access (PRD §17, §36)", () => {
+test("fees access is informational and never grants payment writes", () => {
   for (const role of ["teacher", "classTeacher", "specialistTeacher"]) assert.equal(can([role], "fees"), null);
-  assert.equal(can(["parent"], "fees"), "child");
-  assert.equal(can(["financeOfficer"], "fees", "U"), "all");
+  assert.equal(can(["parent"], "fees"), "all");
+  assert.equal(can(["financeOfficer"], "fees", "U"), null);
 });
 
 test("only the portfolio moderator or leadership approves public showcase (CON-002)", () => {
