@@ -1,8 +1,12 @@
 // Strict, create-only CSV intake. Account privileges are never accepted from a file.
+import { GENDERS, MOTHER_TONGUES, STAFF_TYPES, normalisePhone, parseChoice, parseYesNo, validMonth } from '../../../functions/shared/fields.js';
+// Columns typed by a person ("Boy", "Yes", "012-345 6789") are stored in the canonical form the rules expect.
+const CHOICES = { gender: [GENDERS, 'gender must be Boy or Girl.'], motherTongue: [MOTHER_TONGUES, 'motherTongue must be Tamil, Chinese or Telugu.'], staffType: [STAFF_TYPES, 'staffType must be Teaching or Non-teaching.'] };
+const YES_NO = ['meals', 'newThisYear'];
 export const IMPORTS = {
-  staff: { label: 'Staff', fields: ['id','name','email','position','phone'], required: ['id','name','email'], to: '/hub/admin/staff' },
-  students: { label: 'Pupils', fields: ['id','name','preferredName','studentNumber','dateOfBirth','admissionDate'], required: ['id','name','studentNumber'], to: '/hub/admin/students' },
-  guardians: { label: 'Parents & guardians', fields: ['id','name','email','phone','preferredLanguage'], required: ['id','name','phone'], to: '/hub/admin/guardians' },
+  staff: { label: 'Staff', fields: ['id','name','schoolName','email','position','staffType','phone','startedAt'], required: ['id','name','email'], to: '/hub/admin/staff' },
+  students: { label: 'Pupils', fields: ['id','name','preferredName','studentNumber','gender','dateOfBirth','admissionDate','motherTongue','meals','newThisYear'], required: ['id','name','studentNumber'], to: '/hub/admin/students' },
+  guardians: { label: 'Parents & guardians', fields: ['id','name','email','phone','whatsapp','preferredLanguage'], required: ['id','name','phone'], to: '/hub/admin/guardians' },
   classes: { label: 'Classes', fields: ['id','name','academicYearId','standard','room'], required: ['id','name','academicYearId','standard'], to: '/hub/admin/classes' },
   subjects: { label: 'Subjects', fields: ['id','name'], required: ['id','name'], to: '/hub/admin/subjects' },
   enrollments: { label: 'Pupil enrolments', fields: ['id','studentId','classId','startDate'], required: ['id','studentId','classId','startDate'], to: '/hub/admin/enrolments' },
@@ -42,7 +46,7 @@ export function planImport(dataset, rows, context={}) {
     if(ids.has(row.id)||existing.some(r=>r.id===row.id))fail(`ID ${row.id} already exists. Edit existing records in their management screen.`);ids.add(row.id);
     if(row.name && row.name.length>(dataset==='subjects'?80:dataset==='classes'?60:120))fail('Name is too long.');
     if(row.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(row.email))fail('Email is invalid.');
-    for(const [key,max] of [['email',200],['phone',30],['position',80],['preferredName',60],['studentNumber',30],['room',80],['preferredLanguage',60]])if((row[key]||'').length>max)fail(`${key} is too long.`);
+    for(const [key,max] of [['email',200],['phone',30],['position',80],['schoolName',80],['preferredName',60],['studentNumber',30],['room',80],['preferredLanguage',60]])if((row[key]||'').length>max)fail(`${key} is too long.`);
     for(const key of ['dateOfBirth','admissionDate','startDate'])if(row[key]&&!validDate(row[key]))fail(`${key} must be a real YYYY-MM-DD date.`);
     const uniqueField=dataset==='students'?'studentNumber':['staff','guardians'].includes(dataset)?'email':null;
     if(uniqueField && row[uniqueField]){const v=row[uniqueField].toLowerCase();if(unique.has(v)||existing.some(r=>String(r[uniqueField]||'').toLowerCase()===v))fail(`Duplicate ${uniqueField}: ${row[uniqueField]}.`);unique.add(v);}
@@ -50,6 +54,14 @@ export function planImport(dataset, rows, context={}) {
     if(['staff','guardians','students'].includes(dataset))payload.uid=null;
     if(dataset==='staff')payload.directoryVisible=false;
     if(dataset==='students'){payload.currentClassId=null;payload.currentStandard=null;}
+    const blank=key=>!String(row[key]??'').trim();
+    for(const key of spec.fields){
+      if(CHOICES[key]){const [options,message]=CHOICES[key];payload[key]=blank(key)?null:parseChoice(options,row[key]);if(!blank(key)&&payload[key]===null)fail(message);}
+      if(YES_NO.includes(key)){const answer=blank(key)?false:parseYesNo(row[key]);if(answer===null)fail(`${key} must be Yes or No.`);payload[key]=answer===true;}
+      if(key==='startedAt'){payload[key]=blank(key)?null:row[key].trim();if(payload[key]&&!validMonth(payload[key]))fail('startedAt must be YYYY-MM.');}
+      if(key==='schoolName')payload[key]=blank(key)?null:row[key].trim();
+      if(key==='whatsapp'){payload[key]=blank(key)?null:normalisePhone(row[key]);if(!blank(key)&&!payload[key])fail('whatsapp must include the country code, for example +60123456789.');}
+    }
     if(dataset==='subjects'&&!/^[a-z0-9-]{1,30}$/.test(id||''))fail('Subject ID must use lowercase letters, numbers or hyphens (up to 30).');
     if(dataset==='classes'){
       payload.standard=Number(row.standard);payload.classTeacherUid=null;

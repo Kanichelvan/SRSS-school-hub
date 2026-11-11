@@ -11,12 +11,13 @@ import { useAuth } from "../../auth/AuthProvider";
 import { ADDITIONAL_ROLES, PRIMARY_ROLES, ROLES, assignableRoles, can, isSuperAdmin } from "../../auth/permissions";
 import { forget, list, today, useLoad } from "../data";
 import { COMPLETENESS_FIELDS, completeness } from "../logic/dashboard";
+import { GUARDIAN_FIELDS, STAFF_FIELDS, STUDENT_FIELDS, optionLabel, prepareGuardian, whatsappError } from "../logic/peopleFields";
+import { MOTHER_TONGUES, STAFF_TYPES } from "../../../functions/shared/fields.js";
 import { RecordManager, isActive } from "../manage";
 import { DataTable, EmptyState, ErrorNote, Loading, PageHeader, StatusBadge } from "../ui";
 import { classOptions, schoolLookups } from "./setup";
 
 export const RELATIONSHIPS = [["mother", "Mother"], ["father", "Father"], ["legalGuardian", "Legal guardian"], ["caregiver", "Authorised caregiver"], ["emergencyContact", "Emergency contact only"], ["collectionPerson", "Authorised collection person"]];
-const LANGUAGES = [["English", "English"], ["Bahasa Melayu", "Bahasa Melayu"], ["Tamil", "Tamil"], ["Mandarin", "Mandarin"]];
 const roleLabel = (role) => ROLES[role]?.label || role;
 const callable = (name) => httpsCallable(functions, name);
 const functionError = (error) => error?.message?.replace(/^.*?:\s*/, "") || "That didn't work. Please try again.";
@@ -65,12 +66,7 @@ export function StudentsAdmin() {
     intro="Pupil records. A pupil's class comes from their enrolment; add one here when you create the pupil, or later in Student enrolments."
     lookups={() => schoolLookups({ enrolments: () => list("enrollments", where("status", "==", "active")) })}
     fields={[
-      { key: "name", label: "Full name", type: "text", required: true, maxLength: 120 },
-      { key: "preferredName", label: "Preferred name", type: "text", maxLength: 60 },
-      { key: "studentNumber", label: "Student number", type: "text", maxLength: 30, placeholder: "2027-0001" },
-      { key: "dateOfBirth", label: "Date of birth", type: "date" },
-      { key: "admissionDate", label: "Admission date", type: "date" },
-      { key: "status", label: "Status", type: "select", required: true, options: [["active", "Active"], ["withdrawn", "Withdrawn"], ["graduated", "Graduated"]] },
+      ...STUDENT_FIELDS,
       { key: "enrolClassId", label: "Enrol in class", type: "select", options: (lookups) => classOptions(lookups), placeholder: "Not yet", show: (draft, lookups, editing) => editing.isNew, help: "Creates the enrolment for the current year at the same time." },
       ...Object.entries(COMPLETENESS_FIELDS).map(([key, label]) => ({ key: `has_${key}`, label: `${label} on file`, type: "checkbox" })),
     ]}
@@ -92,11 +88,12 @@ export function StudentsAdmin() {
     columns={(lookups) => [
       { key: "name", label: "Name", render: (row) => <Link className="hub-cell-strong" to={`/hub/students/${row.id}`}>{row.name}</Link> },
       { key: "studentNumber", label: "Student no." },
+      { key: "motherTongue", label: "Mother tongue", sortValue: (row) => optionLabel(MOTHER_TONGUES, row.motherTongue), csv: (row) => optionLabel(MOTHER_TONGUES, row.motherTongue), render: (row) => optionLabel(MOTHER_TONGUES, row.motherTongue) || <span className="hub-cell-muted">—</span> },
       { key: "currentClassId", label: "Class", sortValue: (row) => lookups.classes.find((cls) => cls.id === row.currentClassId)?.name || "", csv: (row) => lookups.classes.find((cls) => cls.id === row.currentClassId)?.name || "", render: (row) => lookups.classes.find((cls) => cls.id === row.currentClassId)?.name || <span className="hub-cell-muted">Not enrolled</span> },
       { key: "record", label: "Record", sortValue: (row) => completeness(row).percent, csv: (row) => `${completeness(row).percent}%`, render: (row) => completeness(row).complete ? <StatusBadge status="complete" label="Complete" /> : <span title={completeness(row).missing.join(", ")}><StatusBadge status="missing" label={`${completeness(row).missing.length} missing`} /></span> },
       { key: "uid", label: "Hub", sortValue: (row) => (row.uid ? 1 : 0), csv: (row) => (row.uid ? "yes" : "no"), render: accountBadge },
     ]}
-    filters={(lookups) => [{ key: "currentClassId", label: "Class", options: classOptions(lookups) }, { key: "currentStandard", label: "Standard", value: (row) => String(row.currentStandard ?? ""), options: [1, 2, 3, 4, 5, 6].map((level) => [String(level), `Standard ${level}`]) }]}
+    filters={(lookups) => [{ key: "currentClassId", label: "Class", options: classOptions(lookups) }, { key: "currentStandard", label: "Standard", value: (row) => String(row.currentStandard ?? ""), options: [1, 2, 3, 4, 5, 6].map((level) => [String(level), `Standard ${level}`]) }, { key: "motherTongue", label: "Mother tongue", options: MOTHER_TONGUES }]}
     statusOptions={[["active", "Active"], ["withdrawn", "Withdrawn"], ["graduated", "Graduated"], ["archived", "Archived"]]}
     archivable={(row, { lookups }) => (lookups.enrolments.some((item) => item.studentId === row.id) ? "End this pupil's enrolment first." : true)}
     rowActions={(row) => invite.action(row)} banner={invite.banner}
@@ -111,14 +108,9 @@ export function Guardians() {
   return <RecordManager kicker="People" title="Parents & guardians" noun="guardian" collection="guardians" canEdit={canEdit}
     intro="Family contacts. Link a guardian to their children in Guardian links; give them a hub account to follow their children online."
     lookups={async () => { const [links, students] = await Promise.all([list("studentGuardianLinks", where("status", "==", "active")), list("students")]); return { links, students }; }}
-    fields={[
-      { key: "name", label: "Full name", type: "text", required: true, maxLength: 120 },
-      { key: "email", label: "Email", type: "email", maxLength: 200 },
-      { key: "phone", label: "Phone", type: "tel", maxLength: 30 },
-      { key: "preferredLanguage", label: "Preferred language", type: "select", options: LANGUAGES },
-      { key: "address", label: "Address", type: "textarea", maxLength: 300, wide: true },
-    ]}
-    validate={(values, { rows, original }) => ({ email: values.email && rows.some((row) => row.id !== original?.id && String(row.email || "").toLowerCase() === values.email.toLowerCase()) ? "Another guardian already uses this email." : null })}
+    fields={GUARDIAN_FIELDS}
+    prepare={prepareGuardian}
+    validate={(values, { rows, original }) => ({ whatsapp: whatsappError(values.whatsapp), email: values.email && rows.some((row) => row.id !== original?.id && String(row.email || "").toLowerCase() === values.email.toLowerCase()) ? "Another guardian already uses this email." : null })}
     columns={(lookups) => [
       { key: "name", label: "Name", render: (row) => <span className="hub-cell-strong">{row.name}</span> },
       { key: "email", label: "Email" }, { key: "phone", label: "Phone" },
@@ -138,18 +130,14 @@ export function StaffAdmin() {
   return <RecordManager kicker="People" title="Staff & teachers" noun="staff member" collection="staff" canEdit={canEdit}
     intro="Staff records and the school directory. Give a teacher a hub account, then assign them to classes in Teacher assignments."
     lookups={() => list("users").then((users) => ({ users })).catch(() => ({ users: [] }))}
-    fields={[
-      { key: "name", label: "Full name", type: "text", required: true, maxLength: 120 },
-      { key: "position", label: "Position", type: "text", maxLength: 80, placeholder: "Class Teacher, Standard 4" },
-      { key: "email", label: "Email", type: "email", maxLength: 200 },
-      { key: "phone", label: "Phone", type: "tel", maxLength: 30 },
-      { key: "directoryVisible", label: "Show name and position to families in the hub directory", type: "checkbox", wide: true },
-    ]}
+    fields={STAFF_FIELDS}
     defaults={() => ({ directoryVisible: true })}
     afterSave={() => forget("staffNames")}
     columns={(lookups) => [
       { key: "name", label: "Name", render: (row) => <span className="hub-cell-strong">{row.name}</span> },
-      { key: "position", label: "Position" }, { key: "email", label: "Email" },
+      { key: "position", label: "Position" },
+      { key: "staffType", label: "Type", sortValue: (row) => optionLabel(STAFF_TYPES, row.staffType), csv: (row) => optionLabel(STAFF_TYPES, row.staffType), render: (row) => optionLabel(STAFF_TYPES, row.staffType) || <span className="hub-cell-muted">—</span> },
+      { key: "email", label: "Email" },
       { key: "roles", label: "Hub roles", sortable: false, csv: (row) => (lookups.users.find((user) => user.id === row.uid)?.roles || []).join("; "), render: (row) => row.uid ? <span className="hub-badges">{(lookups.users.find((user) => user.id === row.uid)?.roles || []).map((role) => <StatusBadge key={role} status="info" label={roleLabel(role)} />)}</span> : <span className="hub-cell-muted">No account</span> },
     ]}
     rowActions={(row) => invite.action(row)} banner={invite.banner}

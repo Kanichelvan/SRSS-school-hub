@@ -105,3 +105,14 @@ New Firestore composite indexes cover internal document audiences, family publis
 - `payments/{id}` — `studentId`, `academicYearId`, `line` (`tuition` | `meals`), `amount`, `date`, `method`, `reference`. School tuition and vendor meals are never combined into one line.
 - The Finance Officer may read `studentGuardianLinks` to find siblings.
 
+
+## Office data fields (12 November 2026)
+
+Fields the School Data Request asks for. Allowed values, labels and parsers are defined once in [`functions/shared/fields.js`](../functions/shared/fields.js) and used by the People screens, the CSV import and (later) the Google Sheet sync; `firestore.rules` enforces the same limits. All are optional, so records saved earlier stay valid.
+
+- `students`: `gender` (`boy` | `girl`), `motherTongue` (`tamil` | `chinese` | `telugu`), `meals` (boolean), `newThisYear` (boolean).
+- `staff`: `schoolName` (≤ 80, the name pupils and parents use), `staffType` (`teaching` | `nonTeaching`), `startedAt` (`YYYY-MM`).
+- `guardians`: `whatsapp` (E.164, e.g. `+60123456789`; local spellings are normalised before saving).
+- `settings/school`: `officeHours` (≤ 200), `parentPhone` (E.164, ≤ 30), `schoolCode` (≤ 30), `headmistress` `{ name ≤ 120, title ≤ 80 }`, `signatories[]` `{ id, name, title, active }` (at most 10 active, 50 in all). A signatory is retired (`active: false`), never deleted, because letters will refer to it by `id`.
+
+Remedial group and staff extra responsibilities are not stored again: they are derived from `studentSupportPlans` and from account roles.
