@@ -13,6 +13,8 @@ import { ANNOUNCEMENT_CATEGORIES, EVENT_CATEGORIES, audienceError, audienceField
 import { AuditLine, RecordManager, saveErrorMessage, slug } from "../manage";
 import { ErrorNote, Loading, PageHeader, Section, StatusBadge, formatDate } from "../ui";
 import { classOptions, schoolLookups, yearOptions } from "./setup";
+import { profilePatch } from "../logic/schoolProfile";
+import { removeSignatory } from "../../../functions/shared/fields.js";
 
 // ---------- Roles & permissions ----------
 const ACTION_NAMES = { V: "View", C: "Create", U: "Edit", A: "Approve / publish" };
@@ -54,6 +56,7 @@ export function Settings() {
 }
 
 export function SchoolInformation({ onSaved }) {
+  const MAX_SIGNATORIES = 10;
   const auth = useAuth();
   const canEdit = can(auth.roles, "settings", "U") === "all";
   const { data, loading, error, reload } = useLoad(async () => { forget("settings"); const [settings, lookups, terms, people] = await Promise.all([schoolSettings(), schoolLookups(), list("terms"), staffNames().catch(() => ({}))]); return { settings, lookups, terms, people }; }, []);
@@ -69,10 +72,15 @@ export function SchoolInformation({ onSaved }) {
     setState({ busy: true });
     try {
       const fields = ["name", "motto", "address", "phone", "email", "currentAcademicYearId", "currentTermId", "attendanceDueTime"];
-      await setDoc(doc(db, "settings", "school"), { ...Object.fromEntries(fields.map((key) => [key, typeof values[key] === "string" ? values[key].trim() || null : values[key] ?? null])), updatedAt: serverTimestamp(), updatedBy: auth.user.uid }, { merge: true });
+      await setDoc(doc(db, "settings", "school"), { ...Object.fromEntries(fields.map((key) => [key, typeof values[key] === "string" ? values[key].trim() || null : values[key] ?? null])), ...profilePatch(values), updatedAt: serverTimestamp(), updatedBy: auth.user.uid }, { merge: true });
       forget("settings"); setDraft(null); setState({ busy: false, message: "School information saved." }); onSaved?.(); reload();
     } catch (reason) { setState({ busy: false, error: saveErrorMessage(reason) }); }
   }
+  const signatories = values.signatories || [];
+  const setSignatory = (index, key, value) => set("signatories", signatories.map((entry, i) => (i === index ? { ...entry, [key]: value } : entry)));
+  // A saved signatory is retired (letters refer to it by id); one added in this edit and not yet saved is simply dropped.
+  const dropSignatory = (index) => set("signatories", signatories[index].id ? removeSignatory(signatories, signatories[index].id) : signatories.filter((_, i) => i !== index));
+  const shownSignatories = signatories.map((entry, index) => ({ entry, index })).filter(({ entry }) => entry.active !== false);
   const yearTerms = data.terms.filter((term) => term.academicYearId === values.currentAcademicYearId && term.status !== "archived");
   return <form className="hub-form hub-form-wide" onSubmit={save}>
     <AuditLine record={data.settings} people={data.people} />
@@ -88,6 +96,25 @@ export function SchoolInformation({ onSaved }) {
       <label>Current term<select disabled={!canEdit} value={values.currentTermId || ""} onChange={(event) => set("currentTermId", event.target.value)}><option value="">Not set</option>{yearTerms.map((term) => <option key={term.id} value={term.id}>{term.name}</option>)}</select></label>
       <label>Attendance due by<input type="time" disabled={!canEdit} value={values.attendanceDueTime || "09:00"} onChange={(event) => set("attendanceDueTime", event.target.value)} /></label>
     </div>
+    <fieldset className="hub-fieldset">
+      <legend>For parents and letters</legend>
+      <div className="hub-form-row">
+        <label>Office opening hours<input disabled={!canEdit} maxLength={200} placeholder="Monday to Friday, 7.30 am to 2.30 pm" value={values.officeHours || ""} onChange={(event) => set("officeHours", event.target.value)} /></label>
+        <label>Best phone number for parents<input type="tel" disabled={!canEdit} maxLength={30} placeholder="+60 12-345 6789" value={values.parentPhone || ""} onChange={(event) => set("parentPhone", event.target.value)} /></label>
+        <label>School code<input disabled={!canEdit} maxLength={30} value={values.schoolCode || ""} onChange={(event) => set("schoolCode", event.target.value)} /></label>
+      </div>
+      <div className="hub-form-row">
+        <label>Headmistress — name<input disabled={!canEdit} maxLength={120} value={values.headmistress?.name || ""} onChange={(event) => set("headmistress", { ...values.headmistress, name: event.target.value })} /></label>
+        <label>Headmistress — title<input disabled={!canEdit} maxLength={80} placeholder="Headmistress" value={values.headmistress?.title || ""} onChange={(event) => set("headmistress", { ...values.headmistress, title: event.target.value })} /></label>
+      </div>
+      <p className="hub-hint">Other people who sign letters to parents (up to {MAX_SIGNATORIES}).</p>
+      {shownSignatories.map(({ entry, index }) => <div className="hub-form-row" key={entry.id || `new-${index}`}>
+        <label>Name<input disabled={!canEdit} maxLength={120} value={entry.name || ""} onChange={(event) => setSignatory(index, "name", event.target.value)} /></label>
+        <label>Title<input disabled={!canEdit} maxLength={80} value={entry.title || ""} onChange={(event) => setSignatory(index, "title", event.target.value)} /></label>
+        {canEdit && <button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => dropSignatory(index)} aria-label={`Remove signatory ${entry.name || index + 1}`}>Remove</button>}
+      </div>)}
+      {canEdit && signatories.length < MAX_SIGNATORIES && <p><button type="button" className="hub-button hub-button-quiet hub-button-small" onClick={() => set("signatories", [...signatories, { id: "", name: "", title: "", active: true }])}>Add signatory</button></p>}
+    </fieldset>
     {(data.settings.timings || data.settings.curriculum) && <dl className="hub-facts">
       {data.settings.schoolStart && <div><dt>School day</dt><dd>Arrive by {data.settings.arriveBy || "07:35"} · registration {data.settings.schoolStart}{data.settings.week ? ` · ${data.settings.week}` : ""}</dd></div>}
       {[["standard1", "Standard 1 finishes"], ["standards2to6", "Standards 2–6 finish"]].filter(([key]) => data.settings.timings?.[key]).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => `${day} ${data.settings.timings[key][index + 1]}`).join(" · ")}</dd></div>)}
