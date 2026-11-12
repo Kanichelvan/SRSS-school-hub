@@ -38,3 +38,15 @@ test('school profile limits; other settings documents unaffected', async () => {
   await assertSucceeds(setDoc(doc(d, 'settings/other'), { anything: 'x'.repeat(500) }));
   await assertFails(setDoc(doc(db('l', ['leadership']), 'settings/school'), { officeHours: 'x' }, { merge: true }));
 });
+test('pupil list fields: religion, roll number, occupation, address and contact first', async () => {
+  const d = db('o', ['schoolAdmin']); const pupil = { name: 'Aarav', currentClassId: null, ...stamp() }, guardian = { name: 'P', ...stamp() };
+  await assertSucceeds(setDoc(doc(d, 'students/a'), { ...pupil, religion: 'hindu', rollNumber: '201' }));
+  await assertSucceeds(setDoc(doc(d, 'students/b'), { ...pupil, religion: null, rollNumber: null }));
+  for (const bad of [{ religion: 'Hindu' }, { religion: '' }, { rollNumber: 201 }, { rollNumber: 'x'.repeat(11) }]) await assertFails(setDoc(doc(d, 'students/x'), { ...pupil, ...bad }));
+  await assertSucceeds(setDoc(doc(d, 'guardians/g'), { ...guardian, occupation: 'Teacher', address: '1, Jalan A' }));
+  for (const bad of [{ occupation: 'x'.repeat(81) }, { address: 'x'.repeat(301) }, { occupation: 5 }]) await assertFails(setDoc(doc(d, 'guardians/x'), { ...guardian, ...bad }));
+  const link = { studentId: 'a', guardianId: 'g', guardianUid: null, classId: null, relationship: 'mother', hasPortalAccess: false, isEmergencyContact: true, canCollect: true, status: 'active', createdBy: 'o', createdAt: serverTimestamp(), updatedBy: 'o', updatedAt: serverTimestamp() };
+  await assertSucceeds(setDoc(doc(d, 'studentGuardianLinks/l1'), { ...link, contactFirst: true }));
+  await assertSucceeds(setDoc(doc(d, 'studentGuardianLinks/l2'), link));
+  await assertFails(setDoc(doc(d, 'studentGuardianLinks/l3'), { ...link, contactFirst: 'Yes' }));
+});

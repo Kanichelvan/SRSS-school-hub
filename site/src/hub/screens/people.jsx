@@ -88,6 +88,7 @@ export function StudentsAdmin() {
     columns={(lookups) => [
       { key: "name", label: "Name", render: (row) => <Link className="hub-cell-strong" to={`/hub/students/${row.id}`}>{row.name}</Link> },
       { key: "studentNumber", label: "Student no." },
+      { key: "rollNumber", label: "Roll no." },
       { key: "motherTongue", label: "Mother tongue", sortValue: (row) => optionLabel(MOTHER_TONGUES, row.motherTongue), csv: (row) => optionLabel(MOTHER_TONGUES, row.motherTongue), render: (row) => optionLabel(MOTHER_TONGUES, row.motherTongue) || <span className="hub-cell-muted">—</span> },
       { key: "currentClassId", label: "Class", sortValue: (row) => lookups.classes.find((cls) => cls.id === row.currentClassId)?.name || "", csv: (row) => lookups.classes.find((cls) => cls.id === row.currentClassId)?.name || "", render: (row) => lookups.classes.find((cls) => cls.id === row.currentClassId)?.name || <span className="hub-cell-muted">Not enrolled</span> },
       { key: "record", label: "Record", sortValue: (row) => completeness(row).percent, csv: (row) => `${completeness(row).percent}%`, render: (row) => completeness(row).complete ? <StatusBadge status="complete" label="Complete" /> : <span title={completeness(row).missing.join(", ")}><StatusBadge status="missing" label={`${completeness(row).missing.length} missing`} /></span> },
@@ -113,7 +114,7 @@ export function Guardians() {
     validate={(values, { rows, original }) => ({ whatsapp: whatsappError(values.whatsapp), email: values.email && rows.some((row) => row.id !== original?.id && String(row.email || "").toLowerCase() === values.email.toLowerCase()) ? "Another guardian already uses this email." : null })}
     columns={(lookups) => [
       { key: "name", label: "Name", render: (row) => <span className="hub-cell-strong">{row.name}</span> },
-      { key: "email", label: "Email" }, { key: "phone", label: "Phone" },
+      { key: "email", label: "Email" }, { key: "phone", label: "Phone" }, { key: "occupation", label: "Occupation" },
       { key: "children", label: "Children", sortable: false, csv: (row) => lookups.links.filter((link) => link.guardianId === row.id).map((link) => lookups.students.find((student) => student.id === link.studentId)?.name).join("; "), render: (row) => lookups.links.filter((link) => link.guardianId === row.id).map((link) => lookups.students.find((student) => student.id === link.studentId)?.name).filter(Boolean).join(", ") || <span className="hub-cell-muted">Not linked</span> },
       { key: "uid", label: "Hub", sortValue: (row) => (row.uid ? 1 : 0), csv: (row) => (row.uid ? "yes" : "no"), render: accountBadge },
     ]}
@@ -158,6 +159,7 @@ export function GuardianLinks() {
       { key: "guardianId", label: "Guardian", type: "select", required: true, immutable: true, options: (lookups) => lookups.guardians.filter(isActive).sort((a, b) => a.name.localeCompare(b.name)).map((guardian) => [guardian.id, `${guardian.name}${guardian.email ? ` · ${guardian.email}` : ""}`]) },
       { key: "relationship", label: "Relationship", type: "select", required: true, options: RELATIONSHIPS },
       { key: "hasPortalAccess", label: "Can see this child in the Parents Hub", type: "checkbox" },
+      { key: "contactFirst", label: "Contact this person first", type: "checkbox" },
       { key: "isEmergencyContact", label: "Emergency contact", type: "checkbox" },
       { key: "canCollect", label: "May collect the child", type: "checkbox" },
     ]}
@@ -168,7 +170,7 @@ export function GuardianLinks() {
       { key: "studentId", label: "Pupil", sortValue: (row) => lookups.students.find((item) => item.id === row.studentId)?.name || "", csv: (row) => lookups.students.find((item) => item.id === row.studentId)?.name, render: (row) => <Link to={`/hub/students/${row.studentId}`}>{lookups.students.find((item) => item.id === row.studentId)?.name || "—"}</Link> },
       { key: "guardianId", label: "Guardian", sortValue: (row) => lookups.guardians.find((item) => item.id === row.guardianId)?.name || "", csv: (row) => lookups.guardians.find((item) => item.id === row.guardianId)?.name, render: (row) => <span className="hub-cell-strong">{lookups.guardians.find((item) => item.id === row.guardianId)?.name || "—"}</span> },
       { key: "relationship", label: "Relationship", render: (row) => RELATIONSHIPS.find(([value]) => value === row.relationship)?.[1] || row.relationship },
-      { key: "access", label: "Access", sortable: false, csv: (row) => [row.hasPortalAccess && "hub", row.isEmergencyContact && "emergency", row.canCollect && "collect"].filter(Boolean).join("; "), render: (row) => <span className="hub-badges">{row.hasPortalAccess && <StatusBadge status={row.guardianUid ? "active" : "pending"} label={row.guardianUid ? "Hub access" : "Hub access · no account yet"} />}{row.isEmergencyContact && <StatusBadge status="info" label="Emergency" />}{row.canCollect && <StatusBadge status="info" label="May collect" />}</span> },
+      { key: "access", label: "Access", sortable: false, csv: (row) => [row.contactFirst && "contact first", row.hasPortalAccess && "hub", row.isEmergencyContact && "emergency", row.canCollect && "collect"].filter(Boolean).join("; "), render: (row) => <span className="hub-badges">{row.contactFirst && <StatusBadge status="complete" label="Contact first" />}{row.hasPortalAccess && <StatusBadge status={row.guardianUid ? "active" : "pending"} label={row.guardianUid ? "Hub access" : "Hub access · no account yet"} />}{row.isEmergencyContact && <StatusBadge status="info" label="Emergency" />}{row.canCollect && <StatusBadge status="info" label="May collect" />}</span> },
     ]}
     filters={(lookups) => [{ key: "classId", label: "Class", options: lookups.classes.map((cls) => [cls.id, cls.name]) }]}
     searchKeys={[]} exportName="srss-guardian-links" createLabel="Link a guardian" />;

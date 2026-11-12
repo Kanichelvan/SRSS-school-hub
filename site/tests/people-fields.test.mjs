@@ -7,6 +7,11 @@ test('forms carry every column the data request asks for', () => {
   assert.ok(keys(GUARDIAN_FIELDS).includes('whatsapp'));
   for (const f of [...STUDENT_FIELDS, ...STAFF_FIELDS, ...GUARDIAN_FIELDS].filter((f) => ['gender', 'motherTongue', 'staffType'].includes(f.key))) assert.ok(!f.required && f.placeholder, `${f.key} is optional with a blank choice`);
 });
+test('forms carry the pupil list columns the School supplied (roll number, religion, occupation)', () => {
+  for (const k of ['rollNumber', 'religion']) assert.ok(keys(STUDENT_FIELDS).includes(k), k);
+  assert.ok(keys(GUARDIAN_FIELDS).includes('occupation'));
+  for (const f of [...STUDENT_FIELDS, ...GUARDIAN_FIELDS].filter((f) => ['rollNumber', 'religion', 'occupation'].includes(f.key))) assert.ok(!f.required, `${f.key} is optional`);
+});
 test('existing form fields are all still present', () => {
   for (const k of ['name', 'preferredName', 'studentNumber', 'dateOfBirth', 'admissionDate', 'status']) assert.ok(keys(STUDENT_FIELDS).includes(k), k);
   for (const k of ['name', 'position', 'email', 'phone', 'directoryVisible']) assert.ok(keys(STAFF_FIELDS).includes(k), k);

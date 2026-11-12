@@ -112,6 +112,9 @@ Fields the School Data Request asks for. Allowed values, labels and parsers are 
 
 - `students`: `gender` (`boy` | `girl`), `motherTongue` (`tamil` | `chinese` | `telugu`), `meals` (boolean), `newThisYear` (boolean).
 - `staff`: `schoolName` (≤ 80, the name pupils and parents use), `staffType` (`teaching` | `nonTeaching`), `startedAt` (`YYYY-MM`).
+- `students` (added for the School's pupil list): `religion` (`hindu` | `buddhist` | `christian` | `islam` | `sikh` | `other`), `rollNumber` (≤ 10; the Standard followed by the pupil's alphabetical place in the class register, e.g. `201`). A pupil's own mobile number is not stored. Alumni are pupil records with `status: graduated` and no enrolment; the pupil CSV import accepts an optional `status` column (Active, Graduated or Withdrawn) for loading them.
+- `guardians` (same): `occupation` (≤ 80), `address` (≤ 300).
+- `studentGuardianLinks` (same): `contactFirst` (boolean) marks the parent or guardian the School contacts first for that pupil.
 - `guardians`: `whatsapp` (E.164, e.g. `+60123456789`; local spellings are normalised before saving).
 - `settings/school`: `officeHours` (≤ 200), `parentPhone` (E.164, ≤ 30), `schoolCode` (≤ 30), `headmistress` `{ name ≤ 120, title ≤ 80 }`, `signatories[]` `{ id, name, title, active }` (at most 10 active, 50 in all). A signatory is retired (`active: false`), never deleted, because letters will refer to it by `id`.
 

@@ -62,9 +62,10 @@ service cloud.firestore {
     function optionalBool(field) { return data().get(field, null) == null || data().get(field, null) is bool; }
     function optionalMatch(field, pattern) { return data().get(field, null) == null || (data().get(field, null) is string && data().get(field, null).matches(pattern)); }
     // Office data fields. The allowed values are defined once in functions/shared/fields.js; keep these in step.
-    function studentExtras() { return optionalIn('gender', ['boy', 'girl']) && optionalIn('motherTongue', ['tamil', 'chinese', 'telugu']) && optionalBool('meals') && optionalBool('newThisYear'); }
+    function studentExtras() { return optionalIn('gender', ['boy', 'girl']) && optionalIn('motherTongue', ['tamil', 'chinese', 'telugu']) && optionalBool('meals') && optionalBool('newThisYear')
+      && optionalIn('religion', ['hindu', 'buddhist', 'christian', 'islam', 'sikh', 'other']) && optionalText('rollNumber', 10); }
     function staffExtras() { return optionalText('schoolName', 80) && optionalIn('staffType', ['teaching', 'nonTeaching']) && optionalMatch('startedAt', '^[0-9]{4}-(0[1-9]|1[0-2])$'); }
-    function guardianExtras() { return optionalMatch('whatsapp', '^\\+[0-9]{8,15}$'); }
+    function guardianExtras() { return optionalMatch('whatsapp', '^\\+[0-9]{8,15}$') && optionalText('occupation', 80) && optionalText('address', 300); }
     function schoolProfileValid() {
       let head = data().get('headmistress', null);
       let signatories = data().get('signatories', null);
@@ -140,7 +141,7 @@ service cloud.firestore {
       // class are copied from the guardian and student records, so a link can't point anywhere else.
       function linkValid() {
         return data().relationship in ['mother', 'father', 'legalGuardian', 'caregiver', 'emergencyContact', 'collectionPerson']
-          && data().hasPortalAccess is bool && data().get('isEmergencyContact', false) is bool && data().get('canCollect', false) is bool;
+          && data().hasPortalAccess is bool && data().get('isEmergencyContact', false) is bool && data().get('canCollect', false) is bool && optionalBool('contactFirst');
       }
       allow create: if isAdmin() && newStamped() && linkValid() && data().status == 'active'
         && data().get('guardianUid', null) == get(/databases/$(database)/documents/guardians/$(data().guardianId)).data.get('uid', null)
