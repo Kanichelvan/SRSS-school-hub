@@ -1,3 +1,4 @@
+import { OFFICE_CONTACT } from "./logic/signIn";
 import { Suspense, lazy } from "react";
 import { BrowserRouter, Link, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "../auth/AuthProvider";
@@ -95,7 +96,7 @@ function RequireSignIn() {
 
 function AccountPending() {
   const { user, signOut, refresh } = useAuth();
-  return <div className="hub-message"><h1>Your account isn't linked yet</h1><p>You're signed in as <strong>{user.email}</strong>, but the school office hasn't assigned a hub role to this account.</p><p>Please contact the office, then refresh.</p><div><button type="button" className="hub-button" onClick={refresh}>Refresh access</button><button type="button" className="hub-button hub-button-quiet" onClick={signOut}>Sign out</button></div></div>;
+  return <div className="hub-message"><h1>We don't recognise this email yet</h1><p>You're signed in as <strong>{user.email}</strong>, but the school does not have this address on record for a parent, pupil or staff member, so there is nothing to show you yet.</p><p>If the school has a different email address for you, sign out and use that one. Otherwise ask the school office to add this address to your record: <a href={OFFICE_CONTACT.phoneHref}>{OFFICE_CONTACT.phone}</a> or <a href={`mailto:${OFFICE_CONTACT.email}`}>{OFFICE_CONTACT.email}</a>. Once they have, choose Check again.</p><div><button type="button" className="hub-button" onClick={signOut}>Sign out and use another email</button><button type="button" className="hub-button hub-button-quiet" onClick={refresh}>Check again</button></div></div>;
 }
 
 function HubHome() {
