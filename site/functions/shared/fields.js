@@ -4,6 +4,7 @@
 
 export const GENDERS = [["boy", "Boy"], ["girl", "Girl"]];
 export const MOTHER_TONGUES = [["tamil", "Tamil"], ["chinese", "Chinese"], ["telugu", "Telugu"]];
+export const RELIGIONS = [["hindu", "Hindu"], ["buddhist", "Buddhist"], ["christian", "Christian"], ["islam", "Islam"], ["sikh", "Sikh"], ["other", "Other"]];
 export const STAFF_TYPES = [["teaching", "Teaching"], ["nonTeaching", "Non-teaching"]];
 export const MAX_SIGNATORIES = 10; // active at one time
 export const MAX_SIGNATORY_RECORDS = 50; // active and retired together; firestore.rules enforces this

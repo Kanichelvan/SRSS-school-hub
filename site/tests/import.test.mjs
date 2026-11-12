@@ -31,3 +31,23 @@ test('bad values fail the row and name what is allowed', () => {
   assert.match(e('guardians', { id: 'g', name: 'P', phone: '1', whatsapp: '12345' }), /whatsapp must include the country code/);
   assert.ok(planImport('staff', [{ id: 's', name: 'K', email: 'k@s.test', roles: 'superAdmin' }]).errors.length, 'privilege columns still refused');
 });
+test('pupil list columns: religion, roll number, occupation, address and contact first', () => {
+  const s = planImport('students', [{ id: 'p1', name: 'A', studentNumber: '972/26', rollNumber: '201', religion: ' HINDU ' }, { id: 'p2', name: 'B', studentNumber: '2' }]);
+  assert.deepEqual(s.errors, []); assert.deepEqual([s.plan[0].payload.rollNumber, s.plan[0].payload.religion, s.plan[1].payload.rollNumber, s.plan[1].payload.religion], ['201', 'hindu', null, null]);
+  assert.match(planImport('students', [{ id: 'p', name: 'A', studentNumber: '1', religion: 'Jedi' }]).errors[0].message, /religion must be Hindu/);
+  assert.match(planImport('students', [{ id: 'p', name: 'A', studentNumber: '1', rollNumber: '12345678901' }]).errors[0].message, /rollNumber is too long/);
+  const g = planImport('guardians', [{ id: 'g1', name: 'P', phone: '+60123456789', occupation: 'Teacher', address: '1, Jalan A, 58200 KL' }, { id: 'g2', name: 'Q', phone: '+60123456780' }]);
+  assert.deepEqual(g.errors, []); assert.deepEqual([g.plan[0].payload.occupation, g.plan[0].payload.address, g.plan[1].payload.occupation, g.plan[1].payload.address], ['Teacher', '1, Jalan A, 58200 KL', null, null]);
+  const ctx = { students: [{ id: 's' }], guardians: [{ id: 'g' }, { id: 'h' }] }, link = { studentId: 's', relationship: 'mother', isEmergencyContact: 'Yes', canCollect: 'Yes' };
+  const l = planImport('studentGuardianLinks', [{ ...link, id: 'a', guardianId: 'g', contactFirst: 'yes' }, { ...link, id: 'b', guardianId: 'h' }], ctx);
+  assert.deepEqual(l.errors, []); assert.deepEqual(l.plan.map((r) => r.payload.contactFirst), [true, false]);
+  assert.match(planImport('studentGuardianLinks', [{ ...link, id: 'a', guardianId: 'g', contactFirst: 'maybe' }], ctx).errors[0].message, /contactFirst must be Yes or No/);
+});
+test('pupil import can load alumni: status Graduated, default Active, and alumni take no enrolment', () => {
+  const s = planImport('students', [{ id: 'a', name: 'A', studentNumber: '1', status: 'Graduated' }, { id: 'b', name: 'B', studentNumber: '2', status: '' }, { id: 'c', name: 'C', studentNumber: '3' }]);
+  assert.deepEqual(s.errors, []); assert.deepEqual(s.plan.map((r) => r.payload.status), ['graduated', 'active', 'active']);
+  assert.match(planImport('students', [{ id: 'a', name: 'A', studentNumber: '1', status: 'archived' }]).errors[0].message, /status must be Active, Graduated or Withdrawn/);
+  const ctx = { students: [{ id: 'a', status: 'graduated' }], classes: [{ id: 'c', academicYearId: 'y', standard: 6 }] };
+  assert.match(planImport('enrollments', [{ id: 'e', studentId: 'a', classId: 'c', startDate: '2027-01-04' }], ctx).errors[0].message, /Pupil does not exist or is inactive/);
+  assert.match(planImport('staff', [{ id: 's', name: 'K', email: 'k@s.test', status: 'graduated' }]).errors[0].message, /Unknown column: status/);
+});

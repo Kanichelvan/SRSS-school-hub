@@ -1,6 +1,6 @@
 // Form fields for the People screens (pupils, staff, guardians). Plain data so it can be tested and reused
 // without React or Firebase. Allowed values come from functions/shared/fields.js; firestore.rules enforces them.
-import { GENDERS, MOTHER_TONGUES, STAFF_TYPES, normalisePhone, validMonth } from "../../../functions/shared/fields.js";
+import { GENDERS, MOTHER_TONGUES, RELIGIONS, STAFF_TYPES, normalisePhone, validMonth } from "../../../functions/shared/fields.js";
 
 export const LANGUAGES = [["English", "English"], ["Bahasa Melayu", "Bahasa Melayu"], ["Tamil", "Tamil"], ["Mandarin", "Mandarin"]];
 export const WHATSAPP_ERROR = "Enter the WhatsApp number with its country code, for example +60 12-345 6789.";
@@ -12,7 +12,9 @@ export const STUDENT_FIELDS = [
   { key: "name", label: "Full name", type: "text", required: true, maxLength: 120 },
   { key: "preferredName", label: "Preferred name", type: "text", maxLength: 60 },
   { key: "studentNumber", label: "Student number", type: "text", maxLength: 30, placeholder: "2027-0001" },
+  { key: "rollNumber", label: "Roll number", type: "text", maxLength: 10, placeholder: "201", help: "The Standard, then the pupil's place in the class register." },
   { key: "gender", label: "Gender", type: "select", options: GENDERS, placeholder: "Not recorded" },
+  { key: "religion", label: "Religion", type: "select", options: RELIGIONS, placeholder: "Not recorded" },
   { key: "dateOfBirth", label: "Date of birth", type: "date" },
   { key: "admissionDate", label: "Admission date", type: "date" },
   { key: "motherTongue", label: "Mother-tongue class", type: "select", options: MOTHER_TONGUES, placeholder: "Not recorded" },
@@ -37,6 +39,7 @@ export const GUARDIAN_FIELDS = [
   { key: "email", label: "Email", type: "email", maxLength: 200 },
   { key: "phone", label: "Phone", type: "tel", maxLength: 30 },
   { key: "whatsapp", label: "WhatsApp number", type: "tel", maxLength: 30, placeholder: "+60 12-345 6789", help: "With country code. Used by the class teacher to message the family." },
+  { key: "occupation", label: "Occupation", type: "text", maxLength: 80 },
   { key: "preferredLanguage", label: "Preferred language", type: "select", options: LANGUAGES },
   { key: "address", label: "Address", type: "textarea", maxLength: 300, wide: true },
 ];

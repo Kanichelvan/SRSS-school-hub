@@ -62,3 +62,6 @@ node_modules.incomplete/
 # Byte-identical iCloud sync copies; originals remain versioned.
 * 2.*
 * 2
+
+# Real pupil and family records — never commit
+site/school-records-private/
