@@ -9,3 +9,4 @@ export const SENIOR_TEAM = [
 export const TEACHERS = ["Puvaneswary Kandasamy", "Vicanes Gunasekaran", "Pei Phing Elaine Ong", "Devi Mathavan", "Prema Latha S. Kandasamy", "Vimala Selvarajo", "Gayathiry Ponnakovandan", "Divija Ramanaidu",
   "Dharrmin Raam Jegathesan", "Vishwareena Vanoo", "Karishma Vishaaluxmee V. Ramanathan", "Thirumurugan Jayapalan", "Vinmugil Sivaraman", "Dinnishyasree Ravichandren", "Yahnusha Sri K Anbarasan"].map((name) => ({ name, role: "Teacher" }));
 export const OFFICE = [{ name: "Letchumi Radakrishnan", role: "Clerk" }];
+export const VOLUNTEERS = [{ name: "Dr Kanichelvan", role: "Digital Administrator (Volunteer), SRSS Digital Hub" }];

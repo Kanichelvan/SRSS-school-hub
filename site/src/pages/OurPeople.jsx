@@ -1,5 +1,5 @@
 import { srssVoices } from '../data/voices.js';
-import { BOARD, OFFICE, SENIOR_TEAM, TEACHERS } from '../data/people.js';
+import { BOARD, OFFICE, SENIOR_TEAM, TEACHERS, VOLUNTEERS } from '../data/people.js';
 
 function Profiles({ people }) {
   return <div className="people-profile-grid">{people.map((person, index) => <article className="people-profile people-profile-pending" key={person.name}>
@@ -26,7 +26,7 @@ export default function OurPeople({ extra }) {
       <Profiles people={SENIOR_TEAM} />
       <h3 className="people-group-title">Teachers</h3><Profiles people={TEACHERS} />
       <h3 className="people-group-title">Administration &amp; support staff</h3><p className="people-group-intro">The people supporting school operations, daily care and security.</p><Profiles people={OFFICE} /><Placeholders count={2} label="Support staff" />
-      <h3 className="people-group-title">Volunteers</h3><Placeholders count={2} label="Volunteer" />
+      <h3 className="people-group-title">Volunteers</h3><Profiles people={VOLUNTEERS} /><Placeholders count={1} label="Volunteer" />
       {extra?.people?.length > 0 && <div className="people-published"><h3 className="people-group-title">More of our school team</h3><div className="people-profile-grid">{extra.people.map((person,index) => <article className="people-profile" key={index}>{person.image && <img src={person.image} alt={person.imageAlt || person.name} loading="lazy"/>}<div><h3>{person.name}</h3><p>{person.role}</p></div></article>)}</div></div>}
     </div></section>
     <section className="people-section page-inner" id="pta"><header><p className="eyebrow">03 · Family partnership</p><h2>Parent–Teacher Association</h2><p>Parents and teachers working together in support of the children and school community.</p></header><div className="people-pta-pending"><h3>Meet the PTA committee</h3><p>Committee names and profiles will be added here.</p></div></section>

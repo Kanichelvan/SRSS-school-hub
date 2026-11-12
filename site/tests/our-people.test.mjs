@@ -1,8 +1,8 @@
 import test from 'node:test'; import assert from 'node:assert/strict';
-import { BOARD, OFFICE, SENIOR_TEAM, TEACHERS } from '../src/data/people.js';
+import { BOARD, OFFICE, SENIOR_TEAM, TEACHERS, VOLUNTEERS } from '../src/data/people.js';
 test('Our People lists the School team by name and role only', () => {
-  const everyone = [...BOARD, ...SENIOR_TEAM, ...TEACHERS, ...OFFICE];
-  assert.deepEqual([BOARD.length, SENIOR_TEAM.length, TEACHERS.length, OFFICE.length], [6, 2, 15, 1]);
+  const everyone = [...BOARD, ...SENIOR_TEAM, ...TEACHERS, ...OFFICE, ...VOLUNTEERS];
+  assert.deepEqual([BOARD.length, SENIOR_TEAM.length, TEACHERS.length, OFFICE.length, VOLUNTEERS.length], [6, 2, 15, 1, 1]);
   assert.equal(new Set(everyone.map((p) => p.name)).size, everyone.length, 'no one is listed twice');
   for (const person of everyone) {
     assert.deepEqual(Object.keys(person).sort(), ['name', 'role']);
