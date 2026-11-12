@@ -43,6 +43,15 @@
 .hub-signin label, .hub-form label, .hub-struct label { display: grid; gap: 6px; font: 500 13px var(--ui); }
 .hub-signin input, .hub-form input, .hub-form textarea, .hub-form select, .hub-struct input:not([type="checkbox"]), .hub-struct textarea, .hub-roster-extra input, .hub-filterbar input, .hub-filterbar select, .hub-inline-field select, .hub-inline-field input, .hub-switcher select { min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: white; font: 15px var(--body); color: var(--ink); }
 .hub-form textarea, .hub-struct textarea { padding: 10px 12px; }
+.hub-signin-or { display: flex; align-items: center; gap: 12px; margin: 4px 0; color: var(--muted); font: 500 12px var(--ui); text-transform: uppercase; letter-spacing: .08em; }
+.hub-signin-or::before, .hub-signin-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.hub-signin-help { margin-top: 20px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; font: 13px/1.6 var(--ui); }
+.hub-signin-help summary { cursor: pointer; font-weight: 600; color: var(--navy-950); }
+.hub-signin-help dl { display: grid; gap: 12px; margin: 12px 0; }
+.hub-signin-help dt { font-weight: 600; color: var(--navy-950); }
+.hub-signin-help dd { margin: 2px 0 0; color: var(--muted); }
+.hub-signin-help p { margin: 0; color: var(--muted); }
+.hub-signin-help a { color: var(--purple-700); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .hub-signin-links { display: flex; flex-wrap: wrap; gap: 16px; margin: 0; }
 .hub-signin-links button { padding: 0; border: 0; background: none; color: var(--navy-800); font: 500 13px var(--ui); text-decoration: underline; cursor: pointer; }
 .hub-demo { margin-top: 20px; padding: 12px 14px; border-radius: 8px; background: var(--cream); font: 13px var(--ui); }

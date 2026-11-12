@@ -143,11 +143,11 @@ const galleryItems = [
 ];
 
 const roleRoutes = [
-  ["Parent", "Notices, forms, dates and class updates.", "/hub/parent", UsersThree, "parent"],
-  ["Student", "Learning links, reading and values challenges.", "/hub/student", GraduationCap, "student"],
-  ["Teacher", "Timetables, resources and staff essentials.", "/hub/teacher", ChalkboardTeacher, "teacher"],
+  ["Parent", "Notices, forms, dates and class updates.", "/login?for=parent", UsersThree, "parent"],
+  ["Student", "Learning links, reading and values challenges.", "/login?for=student", GraduationCap, "student"],
+  ["Teacher", "Timetables, resources and staff essentials.", "/login?for=teacher", ChalkboardTeacher, "teacher"],
   ["Prospective family", "Visitors, guests and families exploring SRSS.", "/join/admissions", Compass, "prospective"],
-  ["Staff", "School operations, records and publishing.", "/hub/admin", LockKey, "staff"],
+  ["Staff", "School operations, records and publishing.", "/login?for=staff", LockKey, "staff"],
 ];
 
 const whySrss = [
@@ -472,8 +472,8 @@ export function App() {
     </>),
     router: () => (
           <section className="role-router" id="find-your-way" aria-labelledby="role-router-title">
-            <div className="role-router-heading"><div><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div><p>Choose your role for school information and secure hub access.</p></div>
-            <div className="role-router-grid">{roleRoutes.map(([label, copy, target, Icon, tone]) => <a key={label} className={`role-card role-${tone}`} href={target}><Icon size={25} weight="duotone" aria-hidden="true" /><span><strong>{label}</strong><small>{copy}</small>{target.startsWith("/hub") && <em className="role-signin"><LockKey size={12} aria-hidden="true" /> Sign in</em>}</span><ArrowRight size={17} aria-hidden="true" /></a>)}</div>
+            <div className="role-router-heading"><div><p className="eyebrow">Find your way</p><h2 id="role-router-title">I am a…</h2></div><p>Already part of SRSS? Choose who you are to sign in to your hub. New here? Start with Prospective family.</p></div>
+            <div className="role-router-grid">{roleRoutes.map(([label, copy, target, Icon, tone]) => <a key={label} className={`role-card role-${tone}`} href={target}><Icon size={25} weight="duotone" aria-hidden="true" /><span><strong>{label}</strong><small>{copy}</small>{target.startsWith("/login") && <em className="role-signin"><LockKey size={12} aria-hidden="true" /> Sign in</em>}</span><ArrowRight size={17} aria-hidden="true" /></a>)}</div>
           </section>
     ),
     jubilee: () => (
@@ -660,6 +660,7 @@ export function App() {
 
             <div className="nav-actions">
               <button className="icon-action" type="button" onClick={() => setSearchOpen(true)} aria-label="Search SRSS"><MagnifyingGlass size={22} /></button>
+              <a className="icon-action mobile-signin" href={signInLink.href} aria-label="Sign in to the SRSS Digital Hub"><SignIn size={22} aria-hidden="true" /></a>
               <a className="admissions-button" href="/join/admissions">Admissions &amp; Visits</a>
               <button className="mobile-menu-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">{menuOpen ? <X size={25} /> : <List size={25} />}</button>
             </div>
