@@ -31,7 +31,7 @@ export const siteNav = [
     groups: [
       { title: "Experiences", links: [["Events", "/student-life/events"], ["Sports", "/student-life/sports"], ["Arts & Culture", "/student-life/arts-culture"]] },
       { title: "Growth & Achievement", links: [["Student Leadership", "/student-life/leadership"], ["Achievements", "/student-life/achievements"], ["Service", "/student-life/service"]] },
-      { title: "Explore", links: [["Stories", "/student-life/stories"], ["Gallery", "/student-life/gallery"], ["Vegetarian Food", "/student-life/vegetarian-food"]] },
+      { title: "Explore", links: [["Stories", "/student-life/stories"], ["Gallery", "/student-life/gallery"], ["Vegetarian Food", "/student-life/vegetarian-food"], ["School Uniform", "/student-life/uniform"]] },
     ],
   },
   {

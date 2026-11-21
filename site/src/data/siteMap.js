@@ -48,6 +48,7 @@ export const SITE = [
   { path: "/student-life/achievements", label: "Achievements", parent: "/student-life", page: "studentLife", anchor: "stories", category: "Achievements", status: "section", owner: "Content editor", summary: "Competitions, awards and accomplishments." },
   { path: "/student-life/stories", label: "Stories", parent: "/student-life", page: "studentLife", anchor: "stories", status: "section", owner: "Content editor", summary: "School stories and student experiences." },
   { path: "/student-life/vegetarian-food", label: "Vegetarian Food", parent: "/student-life", page: "foodPolicy", status: "page", owner: "School office", summary: "The Vegetarian Food and School Activities Policy: what may be served at school and at school activities." },
+  { path: "/student-life/uniform", label: "School Uniform", parent: "/student-life", page: "uniformPolicy", status: "page", owner: "School office", summary: "The School Uniform, Personal Appearance & Grooming Policy: the uniform for every day, PE, roles and occasions, religious options, grooming and hygiene." },
   { path: "/student-life/gallery", label: "Gallery", parent: "/student-life", page: "studentLife", anchor: "gallery", status: "section", owner: "Content editor", summary: "Curated photographs of school life." },
 
   // 04 Join SRSS — admissions and community
