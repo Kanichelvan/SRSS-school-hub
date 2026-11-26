@@ -1,0 +1,75 @@
+# Builds the SRSS website and publishes it to Firebase Hosting (project srssdigitalhub) whenever main changes.
+# Hosting only: Firestore/Storage rules and Cloud Functions are still deployed by hand (see site/docs/DEPLOYMENT.md).
+#
+# Repository secrets it needs (Settings → Secrets and variables → Actions):
+#   ENV_PRODUCTION_LOCAL                   the full contents of site/.env.production.local
+#   FIREBASE_SERVICE_ACCOUNT_SRSSDIGITALHUB the JSON key of a service account with the Firebase Hosting Admin role
+name: Deploy website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/deploy-site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer merge waits for the running one instead of cancelling it half-way.
+concurrency:
+  group: deploy-website-live
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Test, build and deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://srssdigitalhub.web.app
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the deploy secrets are set
+        env:
+          ENV_FILE: ${{ secrets.ENV_PRODUCTION_LOCAL }}
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SRSSDIGITALHUB }}
+        run: |
+          missing=0
+          if [ -z "$ENV_FILE" ]; then echo "::error::Add the ENV_PRODUCTION_LOCAL secret (the contents of site/.env.production.local)."; missing=1; fi
+          if [ -z "$SERVICE_ACCOUNT" ]; then echo "::error::Add the FIREBASE_SERVICE_ACCOUNT_SRSSDIGITALHUB secret (a service account JSON key)."; missing=1; fi
+          exit $missing
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run tests
+        run: npm test
+
+      - name: Write the live settings
+        env:
+          ENV_FILE: ${{ secrets.ENV_PRODUCTION_LOCAL }}
+        run: printf '%s\n' "$ENV_FILE" > .env.production.local
+
+      # Also checks the bundle budgets and refuses a build that points at the local test database.
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Firebase Hosting (live)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SRSSDIGITALHUB }}
+          projectId: srssdigitalhub
+          channelId: live
+          entryPoint: site
