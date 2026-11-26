@@ -46,7 +46,7 @@ Menu data lives in `src/data/navigation.js`.
 |---|---|
 | About SRSS | **Our School:** Our Story · School Profile · Campus. **Our Philosophy:** Our Vision & Mission · Human Excellence · The Sathya Sai Educare Philosophy. **Our Community:** Our Leadership · Our Educators · Our People · Community Voices. **Discover More:** Why SRSS? · Silver Jubilee |
 | Learning | **Learning Foundations:** Curriculum · Learning Journey. **Our Programmes:** Human Values · Enrichment · Learning Environment. **Supporting Every Child:** Learning Support · Reading & Library |
-| Student Life | **Experiences:** Events · Sports · Arts & Culture. **Growth & Achievement:** Student Leadership · Achievements · Service. **Explore:** Stories · Gallery |
+| Student Life | **Experiences:** Events · Sports · Arts & Culture. **Growth & Achievement:** Student Leadership · Achievements · Service. **Explore:** Stories · Gallery · Vegetarian Food · School Uniform |
 | Join SRSS | **Admissions:** Why SRSS? · How to Apply · Fees · Book a Visit · Admissions FAQs. **Get Involved:** Alumni · Volunteer · Support SRSS · Parents & Community |
 | Resources | **Information:** Calendar · News & Updates · Notices. **Documents:** Downloads · Policies. **Assistance:** FAQs · Contact |
 
@@ -89,6 +89,7 @@ The source of truth is `src/data/siteMap.js`, and this table is generated from i
 | `/student-life/achievements` | Achievements | Section of `/student-life#stories` (Achievements stories only) | Content editor |
 | `/student-life/stories` | Stories | Section of `/student-life#stories` | Content editor |
 | `/student-life/gallery` | Gallery | Section of `/student-life#gallery` | Content editor |
+| `/student-life/uniform` | School Uniform | Own page (School Uniform, Personal Appearance & Grooming Policy) | School office |
 | `/join` | Join SRSS | Own page | Admissions officer |
 | `/join/admissions` | Admissions | Own page | Admissions officer |
 | `/join/how-to-apply` | How to Apply | Section of `/join/admissions#how-to-apply` | Admissions officer |

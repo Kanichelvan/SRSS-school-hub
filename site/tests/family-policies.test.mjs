@@ -44,7 +44,7 @@ describe("FAQ answers follow the policies", () => {
   });
   test("a saved FAQ list from before the policies still shows the new answers, next to the related question", () => {
     const saved = [{ question: "What are the school fees?" }, { question: "Where is SRSS located?" }, { question: "Does SRSS provide meals and transport?" }];
-    assert.deepEqual(verifiedFaqs(saved).map((item) => item.question), ["What are the school fees?", "Is financial assistance or sponsorship available?", "Where is SRSS located?", "Does SRSS provide meals and transport?", "Can we bring food for a birthday or class celebration?", "How does admission to Standard 1 work?", "What does SRSS ask of parents?"]);
+    assert.deepEqual(verifiedFaqs(saved).map((item) => item.question), ["What are the school fees?", "Is financial assistance or sponsorship available?", "Where is SRSS located?", "Does SRSS provide meals and transport?", "Can we bring food for a birthday or class celebration?", "What uniform do students wear?", "How does admission to Standard 1 work?", "What does SRSS ask of parents?"]);
     assert.equal(verifiedFaqs(defaultFaqs).length, defaultFaqs.length);
   });
 });
