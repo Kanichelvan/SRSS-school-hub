@@ -6,6 +6,8 @@ import HeroVideo, { HERO_CLIPS } from '../components/HeroVideo.jsx';
 import HeroPhoto, { HERO_PHOTOS } from '../components/HeroPhoto.jsx';
 // Loaded only on the Admissions page: its icons would otherwise weigh on every public page.
 const AdmissionPathways = lazy(() => import('../components/AdmissionPathways.jsx'));
+// Loaded only on Student Life, with its photos.
+const SpacesCarousel = lazy(() => import('../components/SpacesCarousel.jsx'));
 import { CaretDown } from "@phosphor-icons/react/dist/csr/CaretDown";
 import { CheckCircle } from "@phosphor-icons/react/dist/csr/CheckCircle";
 import { ArrowRight } from "@phosphor-icons/react/dist/csr/ArrowRight";
@@ -126,6 +128,9 @@ export function StudentLifePage({ blocks, faqs, entry }) {
       <p>Beyond lessons and examinations, SRSS offers children opportunities to discover their talents, build friendships, develop confidence and practise human values through meaningful experiences.</p>
     </PageHero>
     <Directory path="/student-life" title="Student Life" />
+    <PageSection id="inside-srss" eyebrow="The student experience" title="Step inside SRSS." intro="From the library and classrooms to the hall, the prayer hall and the games arena, these are the spaces where our pupils learn, reflect, play and celebrate together.">
+      <Suspense fallback={<div style={{ minHeight: "min(92vw, 620px)" }} />}><SpacesCarousel /></Suspense>
+    </PageSection>
     <PageSection id="a-day" eyebrow="A day at SRSS" title="Every day begins before the first bell." intro="Silent sitting, school prayers, Negaraku, Rukun Negara, the school anthem and pledge set the tone for learning each morning.">
       <div className="page-split">
         <a className="feature-link" href="/resources/prayer-pledge-anthem"><img src="/assets/prayer-page/silent-sitting-practice.jpg" alt="SRSS pupils in silent sitting at morning assembly." /><span><strong>Before the First Bell</strong><small>Practise the morning assembly at home</small></span><ArrowRight size={18} aria-hidden="true" /></a>

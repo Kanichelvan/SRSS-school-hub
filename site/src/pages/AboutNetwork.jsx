@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+const SpacesCarousel = lazy(() => import('../components/SpacesCarousel.jsx'));
 import HeroPhoto, { HERO_PHOTOS } from '../components/HeroPhoto.jsx';
 import ValuesGarden from '../components/ValuesGarden.jsx';
 import { ContentBody, GovernancePage, LearningSpaces } from './SitePages.jsx';
@@ -139,6 +140,6 @@ function Educators({extra}) {return <>
 export default function AboutNetwork({page,onVisit,onReady,anchor,faqs,extra}) {
  useEffect(()=>{onReady(true);return()=>onReady(false);},[onReady]);
  useEffect(()=>{if(!anchor)return;const frame=requestAnimationFrame(()=>document.getElementById(anchor)?.scrollIntoView());return()=>cancelAnimationFrame(frame);},[anchor,page]);
- const render={story:()=> <Story/>,purpose:()=> <Purpose/>,excellence:()=> <Excellence/>,educare:()=> <Educare/>,why:()=> <Why onVisit={onVisit}/>,leadership:()=> <Leadership/>,educators:()=> <Educators extra={extra}/>,profile:()=> <><Intro eyebrow="School profile" title="SRSS at a glance."><p>Practical information for your family.</p></Intro><section className="about-inner about-network-section" id="school-profile"><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="network-profile"/></section></>,campus:()=> <><Intro eyebrow="Our campus" title="Space to learn." accent="Room to grow."><p>The spaces where children explore ideas, practise skills and grow together.</p></Intro><LearningSpaces id="campus" eyebrow="Our campus"/></>};
+ const render={story:()=> <Story/>,purpose:()=> <Purpose/>,excellence:()=> <Excellence/>,educare:()=> <Educare/>,why:()=> <Why onVisit={onVisit}/>,leadership:()=> <Leadership/>,educators:()=> <Educators extra={extra}/>,profile:()=> <><Intro eyebrow="School profile" title="SRSS at a glance."><p>Practical information for your family.</p></Intro><section className="about-inner about-network-section" id="school-profile"><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="network-profile"/></section></>,campus:()=> <><Intro eyebrow="Our campus" title="Space to learn." accent="Room to grow."><p>The spaces where children explore ideas, practise skills and grow together.</p></Intro><Section id="inside-srss" eyebrow="The student experience" title="Step inside SRSS."><Suspense fallback={<div style={{minHeight:'min(92vw, 620px)'}}/>}><SpacesCarousel/></Suspense></Section><LearningSpaces id="campus" eyebrow="Our campus"/></>};
  return <main id="main" className="about-network about-experience"><JourneyNav page={page}/>{render[page]?.()}{extra&&page!=='educators'&&<section className="about-inner about-network-section"><PublishedAdditions content={extra}/></section>}<Continue page={page} onVisit={onVisit}/></main>;
 }
