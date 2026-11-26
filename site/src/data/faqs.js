@@ -9,11 +9,11 @@ export const feesAnswer = {
   question: "What are the school fees?",
   paragraphs: [
     `School tuition is ${ringgit(FEES.tuitionMonthly)} a month, charged for ${FEES.months} months from January to November (${ringgit(firstChild.tuitionAnnual)} a year). Meals are provided by an external vendor and charged separately at ${ringgit(FEES.mealMonthly)} a month, so a family using the meal service pays ${ringgit(firstChild.monthly)} a month for one child.`,
-    `Brothers and sisters enrolled at the same time receive sibling discounts on tuition: 20% for the second child, 35% for the third and 45% for the fourth child onwards. Fees can be paid monthly by the ${FEES.dueDay}th, six-monthly or fortnightly on a written schedule, at the same total cost.`,
-    "SRSS was tuition-free from 2002 to 2024 and operates on a not-for-profit basis. Full sponsorship continues for residential children of the Pure Life Society and for children from eligible B40 households, subject to verification; other families facing hardship may be considered for full or partial assistance.",
-    "Families who may need assistance are warmly encouraged to speak confidentially with the school administration. The School Fees page has the full table, a family fee calculator and the Fees and Payment Policy.",
+    "Separate costs may be incurred for excursions, uniforms, books, stationery and graduation-related items where applicable. For residential children of the Pure Life Society and children from eligible B40 households, these essential costs—along with tuition and meals—are covered through full sponsorship supported by SSIOM.",
+    `Fees can be paid monthly by the ${FEES.dueDay}th, six-monthly or fortnightly on a written schedule, at the same total cost. SRSS was tuition-free from 2002 to 2024 and operates on a not-for-profit basis; families outside the B40 category facing genuine hardship may also be considered for full or partial assistance.`,
+    "Families who may need assistance are warmly encouraged to speak confidentially with the school administration. Please review the School Fees page and the Fees and Payment Policy for complete details.",
   ],
-  link: ["School fees and the family fee calculator", "/join/fees"],
+  link: ["School Fees and Payment Policy", "/join/fees/policy"],
 };
 
 // Vegetarian Food and School Activities Policy (src/pages/FamilyPages.jsx).

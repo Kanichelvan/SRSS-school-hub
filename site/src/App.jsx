@@ -311,6 +311,7 @@ export function App() {
   const [visitOpen, setVisitOpen] = useState(false);
   const [sent, setSent] = useState(false);
   const [storiesExpanded, setStoriesExpanded] = useState(false);
+  const [newsDrawer, setNewsDrawer] = useState(null);
   const [publicLoaded, setPublicLoaded] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const [statCounts, setStatCounts] = useState({ years: 0, values: 0 });
@@ -468,7 +469,7 @@ export function App() {
               <p>Sekolah Rendah Sathya Sai by the Sathya Sai International Organisation of Malaysia is a human values-centered learning community where academic excellence meets character development. Rooted in Truth, Right Conduct, Peace, Love and Nonviolence, we help every child realise their potential and empower them to contribute positively to their communities, the nation and the wider world.</p>
             </div>
           </section>
-          <OutcomeTabs />
+          <OutcomeTabs values={values} />
     </>),
     router: () => (
           <section className="role-router" id="find-your-way" aria-labelledby="role-router-title">
@@ -499,20 +500,164 @@ export function App() {
     learning: () => <AcademicOverview />,
     activeBodies: () => <ActiveBodies />,
     values: () => <ValuesGarden values={values} />,
-    faq: () => (
-      <section className="home-faq-dropdown" id="faq"><details><summary><span><span className="eyebrow">Helpful answers</span><span className="faq-dropdown-title" role="heading" aria-level="2">Questions, welcomed.</span></span><CaretDown size={24} aria-hidden="true" /></summary><div className="faq-dropdown-content"><p>Find answers to the questions families ask most often.</p><FaqAccordion items={verifiedFaqs(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs).slice(0, 5)} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" /><a className="text-link" href="/resources/faq">View all frequently asked questions</a></div></details></section>
-    ),
+    faq: () => {
+      const all = verifiedFaqs(managedContent.faqs?.length ? managedContent.faqs : defaultFaqs);
+      const priorityQuestions = [
+        "What year levels are offered at SRSS?",
+        "How does admission to Standard 1 work?",
+        "Is SRSS a registered school in Malaysia?",
+        "What curriculum does SRSS follow?",
+        "What subjects are offered at SRSS?",
+        "What are the school hours at SRSS?",
+        "What is the medium of instruction at SRSS?",
+        "Is SRSS a religious school?",
+        "What are the school fees?",
+      ];
+      const featured = priorityQuestions.map((q) => all.find((item) => item.question === q)).filter(Boolean);
+      const displayed = featured.length ? featured : all.slice(0, 9);
+      return (
+        <section className="home-faq-open" id="faq" aria-labelledby="home-faq-title">
+          <div className="home-faq-grid">
+            <div className="home-faq-intro">
+              <p className="eyebrow">Helpful answers</p>
+              <h2 id="home-faq-title">Questions, <em>welcomed.</em></h2>
+              <p>Essential details about our national curriculum, subjects, school hours, admissions and values-based approach—select any question to read the answer.</p>
+              <a className="text-link" href="/resources/faq">View all frequently asked questions</a>
+            </div>
+            <div className="home-faq-panel">
+              <FaqAccordion items={displayed} openIndex={openFaq} onToggle={setOpenFaq} idPrefix="home-faq" />
+            </div>
+          </div>
+        </section>
+      );
+    },
     // A category shows only that kind of story (Student Life pages, SRSS25 updates); otherwise the latest eight.
     news: ({ category, homeUpdates = false } = {}) => {
       const list = category ? allStories.filter((item) => storyCategory(item) === category) : storyItems;
+      if (homeUpdates) {
+        const eventsList = managedContent.events || [];
+        const latestStory = list[0]?.title || "Recent school news and reflections";
+        const nextEvent = eventsList[0];
+        const nextEventLabel = nextEvent
+          ? `${new Date(`${nextEvent.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short" })} · ${nextEvent.title}`
+          : "Academic, cultural and seva dates";
+        const toggleDrawer = (key) => setNewsDrawer((current) => (current === key ? null : key));
+        return (
+          <section className="news-section news-home-updates" id="news" aria-labelledby="news-title">
+            <div className="news-head" data-reveal>
+              <div>
+                <p className="eyebrow">News &amp; events</p>
+                <h2 id="news-title">Stories &amp; <em>Happenings.</em></h2>
+              </div>
+              <a href="/resources/news">View all news <ArrowRight size={16} /></a>
+            </div>
+
+            {blocks.jubilee()}
+
+            <div className="news-drawer-bar" role="group" aria-label="More news, photos and school dates">
+              <button
+                type="button"
+                className={`news-drawer-trigger${newsDrawer === "stories" ? " is-open" : ""}`}
+                aria-expanded={newsDrawer === "stories"}
+                aria-controls="home-news-drawer"
+                onClick={() => toggleDrawer("stories")}
+              >
+                <Newspaper size={22} weight="duotone" aria-hidden="true" />
+                <span>
+                  <small>Latest updates · {list.length}</small>
+                  <strong>Stories &amp; Reports</strong>
+                  <em>{latestStory}</em>
+                </span>
+                <CaretDown size={17} weight="bold" className="news-drawer-caret" aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                className={`news-drawer-trigger${newsDrawer === "moments" ? " is-open" : ""}`}
+                aria-expanded={newsDrawer === "moments"}
+                aria-controls="home-news-drawer"
+                onClick={() => toggleDrawer("moments")}
+              >
+                <Heart size={22} weight="duotone" aria-hidden="true" />
+                <span>
+                  <small>Life at SRSS · Gallery</small>
+                  <strong>Small Moments. Lasting Roots.</strong>
+                  <em>Auto-rotating photographs of school life</em>
+                </span>
+                <CaretDown size={17} weight="bold" className="news-drawer-caret" aria-hidden="true" />
+              </button>
+
+              <button
+                type="button"
+                className={`news-drawer-trigger${newsDrawer === "calendar" ? " is-open" : ""}`}
+                aria-expanded={newsDrawer === "calendar"}
+                aria-controls="home-news-drawer"
+                onClick={() => toggleDrawer("calendar")}
+              >
+                <CalendarBlank size={22} weight="duotone" aria-hidden="true" />
+                <span>
+                  <small>Dates &amp; gatherings · {eventsList.length}</small>
+                  <strong>School Calendar</strong>
+                  <em>{nextEventLabel}</em>
+                </span>
+                <CaretDown size={17} weight="bold" className="news-drawer-caret" aria-hidden="true" />
+              </button>
+            </div>
+
+            {newsDrawer && (
+              <div id="home-news-drawer" className="news-drawer-panel" key={newsDrawer}>
+                <div className="news-drawer-panel-top">
+                  <span className="eyebrow">
+                    {newsDrawer === "stories" ? "Latest stories & happenings" : newsDrawer === "moments" ? "Life at SRSS" : "Dates & gatherings"}
+                  </span>
+                  <button type="button" className="news-drawer-close" onClick={() => setNewsDrawer(null)} aria-label="Close panel">
+                    <X size={16} aria-hidden="true" /> Close
+                  </button>
+                </div>
+
+                {newsDrawer === "stories" && (
+                  <>
+                    {list.length ? (
+                      <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`}>
+                        {list.map((item) => (
+                          <li key={`${item.type}-${item.id}`}>
+                            <img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" />
+                            <div>
+                              <span><item.Icon size={14} aria-hidden="true" />{item.type}</span>
+                              <time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time>
+                              <h3>{item.title}</h3>
+                              {item.excerpt && <p>{item.excerpt}</p>}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="calendar-empty">News and events will appear here once they are published.</p>
+                    )}
+                    {list.length > 4 && (
+                      <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>
+                        {storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} />
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {newsDrawer === "moments" && <SchoolMoments embedded />}
+
+                {newsDrawer === "calendar" && <SchoolCalendar items={eventsList} onAdd={addToCalendar} embedded />}
+              </div>
+            )}
+          </section>
+        );
+      }
+
       return (
-          <section className={`news-section${homeUpdates ? " news-home-updates" : ""}`} id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">{category ? <>{category} <em>stories.</em></> : <>Stories &amp; <em>Happenings.</em></>}</h2></div>{route.page === "studentLife" && <StoryFilters current={category} />}<a href={route.page === "home" ? "/resources/news" : "#events-title"}>{route.page === "home" ? "View all news" : "See the calendar"} <ArrowRight size={16} /></a></div>
-            {(homeUpdates || route.page === 'studentLife' && !category) && blocks.jubilee()}
+          <section className="news-section" id="news" aria-labelledby="news-title"><div className="news-head" data-reveal><div><p className="eyebrow">News &amp; events</p><h2 id="news-title">{category ? <>{category} <em>stories.</em></> : <>Stories &amp; <em>Happenings.</em></>}</h2></div>{route.page === "studentLife" && <StoryFilters current={category} />}<a href="#events-title">See the calendar <ArrowRight size={16} /></a></div>
+            {route.page === 'studentLife' && !category && blocks.jubilee()}
             {list.length ? <ul className={`story-gallery${storiesExpanded ? "" : " is-collapsed"}`} data-reveal-stagger>{list.map((item) => <li key={`${item.type}-${item.id}`}><img src={item.image || "/assets/photos/processed/classroom-art-1280.jpg"} alt="" loading="lazy" /><div><span><item.Icon size={14} aria-hidden="true" />{item.type}</span><time dateTime={item.date}>{new Date(`${item.date}T12:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" })}</time><h3>{item.title}</h3>{item.excerpt && <p>{item.excerpt}</p>}</div></li>)}</ul> : <p className="calendar-empty">{category ? "No stories in this category have been published yet. They appear here as soon as the school publishes them." : "News and events will appear here once they are published."}</p>}
             {list.length > 4 && <button type="button" className="reveal-toggle" aria-expanded={storiesExpanded} onClick={() => setStoriesExpanded(!storiesExpanded)}>{storiesExpanded ? "Show fewer stories" : "Show more stories"} <CaretRight size={15} className={storiesExpanded ? "turned-up" : "turned-down"} /></button>}
-            {homeUpdates && <SchoolCalendar items={managedContent.events || []} onAdd={addToCalendar} embedded />}
           </section>
-    );
+      );
     },
     calendar: ({ category } = {}) => (
           <SchoolCalendar items={(managedContent.events || []).filter((item) => !category || item.category === category)} onAdd={addToCalendar} />
@@ -604,17 +749,12 @@ export function App() {
     announcements: () => <Suspense fallback={<main id="main" className="site-page" aria-busy="true" />}><AnnouncementsPage notices={publicNotices} loaded={publicLoaded} /></Suspense>,
     announcement: () => <Suspense fallback={<main id="main" className="site-page" aria-busy="true" />}><AnnouncementPage notices={publicNotices} id={route.slug} loaded={publicLoaded} /></Suspense>,
     notFound: () => <NotFoundPage />,
-    // School life → founder quote → reports, SRSS25 and calendar → journey and hubs → FAQ.
+    // Hero → Welcome + 5 pillar tabs → Admissions + Find your way → News & Events (SRSS25, stories, Life at SRSS carousel, calendar) → FAQ.
     home: () => <main id="main">
       {blocks.hero()}
       {blocks.welcome()}
-      {blocks.values()}
-      {blocks.learning()}
-      {blocks.activeBodies()}
-      {blocks.gallery()}
-      {blocks.quote()}
-      {blocks.news({ homeUpdates: true })}
       <div className="home-journey">{blocks.admissionsCta()}{blocks.router()}<details className="journey-contact"><summary>Contact &amp; visit the school <CaretDown size={18} /></summary>{blocks.contact()}</details></div>
+      {blocks.news({ homeUpdates: true })}
       {blocks.faq()}
     </main>,
   };

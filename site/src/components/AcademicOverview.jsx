@@ -1,9 +1,11 @@
 import { academicSubjects, schoolHours, standards } from '../data/academics.js';
 
-export default function AcademicOverview() {
-  return <section className="academic-learning" id="learning" aria-labelledby="learning-title">
+export default function AcademicOverview({ embedded = false }) {
+  const reveal = embedded ? {} : { 'data-reveal': '' };
+  const revealImage = embedded ? {} : { 'data-reveal': 'image' };
+  return <section className={`academic-learning${embedded ? ' is-embedded' : ''}`} id="learning" aria-labelledby="learning-title">
     <div className="academic-main">
-      <div className="academic-copy" data-reveal>
+      <div className="academic-copy" {...reveal}>
         <p className="eyebrow">Learning experience</p>
         <h2 id="learning-title">Strong foundations.<br />Open hearts.</h2>
         <p className="academic-intro">Rooted in Malaysia’s national curriculum, SRSS nurtures confident learners with a global outlook. Bahasa Malaysia is the main language of instruction, with English woven through the curriculum and school life.</p>
@@ -15,7 +17,7 @@ export default function AcademicOverview() {
         <p className="academic-maths">Mathematics develops arithmetic, logical reasoning and problem-solving, supported by understanding in English and Bahasa Malaysia.</p>
         <a className="text-link" href="/learning/curriculum">Explore the curriculum</a>
       </div>
-      <figure className="academic-photo" data-reveal="image"><img src="/assets/photos/processed/science-microscope-1600.jpg" alt="An SRSS pupil examining a specimen through a microscope during a science activity." width="1600" height="1200" loading="lazy" decoding="async" /></figure>
+      <figure className="academic-photo" {...revealImage}><img src="/assets/photos/processed/science-microscope-1600.jpg" alt="An SRSS pupil examining a specimen through a microscope during a science activity." width="1600" height="1200" loading="lazy" decoding="async" /></figure>
     </div>
     <div className="academic-essentials">
       <div><h3>Our six-year journey</h3><dl className="academic-standards">{standards.map((name, index) => <div key={name}><dt>Standard {index + 1}</dt><dd>{name}</dd></div>)}</dl></div>
@@ -25,15 +27,17 @@ export default function AcademicOverview() {
   </section>;
 }
 
-export function ActiveBodies() {
-  return <section className="active-bodies" id="active-bodies" aria-labelledby="active-bodies-title">
-    <figure className="active-bodies-photo" data-reveal="image"><img src="/assets/photos/processed/football-match-1600.jpg" alt="SRSS pupils competing in a football match." width="1600" height="900" loading="lazy" decoding="async" /></figure>
-    <div className="active-bodies-copy" data-reveal>
+export function ActiveBodies({ embedded = false }) {
+  const reveal = embedded ? {} : { 'data-reveal': '' };
+  const revealImage = embedded ? {} : { 'data-reveal': 'image' };
+  return <section className={`active-bodies${embedded ? ' is-embedded' : ''}`} id="active-bodies" aria-labelledby="active-bodies-title">
+    <figure className="active-bodies-photo" {...revealImage}><img src="/assets/photos/processed/football-match-1600.jpg" alt="SRSS pupils competing in a football match." width="1600" height="900" loading="lazy" decoding="async" /></figure>
+    <div className="active-bodies-copy" {...reveal}>
       <p className="eyebrow">Co-curricular life</p>
       <h2 id="active-bodies-title">Active bodies.<br />Confident spirits.</h2>
-      <p>Sports, games and co-curricular activities give children space to build strength, confidence and friendships. They learn to practise with commitment, compete fairly and support one another.</p>
+      <p>Sports clubs, chess lessons, co-curricular activities and community programmes give children space to build strength, confidence, discipline and friendships. They learn to practise with commitment, compete fairly and support one another.</p>
       <div className="active-bodies-achievement"><h3>2025 · State football champions</h3><p>SRSS’s boys’ and girls’ football teams won state titles in 2025, celebrating their teamwork, discipline and determination.</p></div>
-      <p>Chess tournament participation develops concentration, strategic thinking and patience. Across these experiences, children discover their strengths and grow through challenge.</p>
+      <p>Chess lessons and tournament participation develop concentration, strategic thinking and patience. Alongside sports, Scouts, visual arts, music, and signature initiatives such as <strong>Walk for Values</strong>, recycling and tree planting unite Head, Heart and Hands so children discover their strengths and grow through service and challenge.</p>
       <a className="text-link" href="/student-life/sports">Explore sports and co-curricular life</a>
     </div>
   </section>;

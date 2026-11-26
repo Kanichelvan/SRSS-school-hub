@@ -10,18 +10,18 @@ describe("the published fee tables", () => {
     assert.deepEqual([one.tuition, one.meal, one.monthly], [385, 70, 455]);
     assert.deepEqual([one.tuitionAnnual, one.mealAnnual, one.annual], [4235, 770, 5005]);
   });
-  test("sibling discounts apply to tuition only", () => {
-    assert.deepEqual([1, 2, 3, 4, 5, 6].map(siblingTuition), [385, 308, 250.25, 211.75, 211.75, 211.75]);
-    assert.deepEqual([1, 2, 3, 4].map((n) => childFees(n).monthly), [455, 378, 320.25, 281.75]);
+  test("standard tuition applies uniformly per child when sibling discounts are inactive", () => {
+    assert.deepEqual([1, 2, 3, 4, 5, 6].map(siblingTuition), [385, 385, 385, 385, 385, 385]);
+    assert.deepEqual([1, 2, 3, 4].map((n) => childFees(n).monthly), [455, 455, 455, 455]);
     for (const n of [1, 2, 3, 4]) assert.equal(childFees(n).meal, FEES.mealMonthly);
   });
-  test("the family calculator adds children oldest first, with or without meals", () => {
+  test("the family calculator adds children with or without meals", () => {
     const six = familyFees(6);
-    assert.equal(six.tuition, 385 + 308 + 250.25 + 211.75 * 3);
+    assert.equal(six.tuition, 385 * 6);
     assert.equal(six.meal, 420);
     assert.equal(six.annual, (six.tuition + six.meal) * 11);
-    assert.equal(familyFees(2, { meals: false }).monthly, 693);
-    assert.equal(familyFees(2).saving, 77);
+    assert.equal(familyFees(2, { meals: false }).monthly, 770);
+    assert.equal(familyFees(2).saving, 0);
   });
   test("amounts read as the policy prints them", () => {
     assert.equal(ringgit(385), "RM385");
@@ -29,9 +29,11 @@ describe("the published fee tables", () => {
     assert.equal(ringgit(250.25), "RM250.25");
     assert.equal(ringgit(308, { decimals: 2 }), "RM308.00");
   });
-  test("the FAQ quotes the policy's figures", () => {
+  test("the FAQ quotes the policy's figures without inactive sibling discounts", () => {
     const text = feesAnswer.paragraphs.join(" ");
-    for (const figure of ["RM385", "RM4,235", "RM70", "RM455", "20%", "35%", "45%"]) assert.ok(text.includes(figure), figure);
+    for (const figure of ["RM385", "RM4,235", "RM70", "RM455", "Pure Life Society", "B40", "SSIOM"]) assert.ok(text.includes(figure), figure);
+    for (const removed of ["20%", "35%", "45%", "sibling discount"]) assert.ok(!text.toLowerCase().includes(removed), removed);
+    assert.equal(feesAnswer.link[1], "/join/fees/policy");
   });
 });
 
@@ -50,10 +52,10 @@ describe("Fees-Lite", () => {
   });
   test("a statement keeps school tuition and vendor meals apart", () => {
     const assignment = { year: 2027, siblingPosition: 2, meals: true, plan: "monthly" };
-    const result = statement(assignment, [{ line: "tuition", amount: 308 }, { line: "meals", amount: 70 }], "2027-02-15");
-    assert.deepEqual([result.tuition.monthly, result.tuition.due, result.tuition.outstanding], [308, 616, 308]);
+    const result = statement(assignment, [{ line: "tuition", amount: 385 }, { line: "meals", amount: 70 }], "2027-02-15");
+    assert.deepEqual([result.tuition.monthly, result.tuition.due, result.tuition.outstanding], [385, 770, 385]);
     assert.deepEqual([result.meals.monthly, result.meals.due, result.meals.outstanding], [70, 140, 70]);
-    assert.equal(result.outstanding, 378);
+    assert.equal(result.outstanding, 455);
   });
   test("full sponsorship covers tuition and, where approved, meals", () => {
     const result = statement({ year: 2027, siblingPosition: 1, meals: true, mealSponsored: true, concessionRate: 1, plan: "monthly" }, [], "2027-11-30");

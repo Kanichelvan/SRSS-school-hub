@@ -9,8 +9,8 @@ export const FEES = {
   mealMonthly: 70, // charged by the independent food vendor; not a school tuition fee
   months: 11, // January to November
   dueDay: 10, // monthly tuition is due by the 10th
-  // Sibling tuition discounts for concurrently enrolled children (policy §4). Tuition only.
-  siblingDiscounts: [0, 0.2, 0.35, 0.45],
+  // Sibling tuition discounts are not in effect for the current academic year.
+  siblingDiscounts: [0],
   // Six-monthly plan: January–June and July–November (recommended decision).
   sixMonthly: [{ label: "January–June", months: 6, dueMonth: 1 }, { label: "July–November", months: 5, dueMonth: 7 }],
 };

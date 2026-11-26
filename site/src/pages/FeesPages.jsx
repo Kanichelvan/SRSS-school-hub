@@ -10,7 +10,6 @@ import "./fees.css";
 const OFFICE = "saischoolpuchong@gmail.com";
 const mailto = (subject) => `mailto:${OFFICE}?subject=${encodeURIComponent(subject)}`;
 const money = (value) => ringgit(value, { decimals: 2 });
-const percent = (rate) => (rate ? `${Math.round(rate * 100)}%` : "—");
 const PRINCIPLE = ["Education is our service.", "Human Excellence is our purpose.", "Every child is our responsibility."];
 
 function Principle() {
@@ -30,32 +29,24 @@ function FeeTable() {
   </table></div>;
 }
 
-function SiblingTable({ meals = true }) {
-  return <div className="fees-table-wrap"><table className="fees-table">
-    <caption>Monthly tuition for children enrolled at the same time</caption>
-    <thead><tr><th scope="col">Child</th><th scope="col">Tuition discount</th><th scope="col">Monthly tuition</th>{meals && <th scope="col">Including meals</th>}</tr></thead>
-    <tbody>{FEES.siblingDiscounts.map((rate, index) => { const row = childFees(index + 1); return <tr key={rate}><th scope="row">{index === FEES.siblingDiscounts.length - 1 ? "Fourth child onwards" : CHILD_LABELS[index]}</th><td>{percent(rate)}</td><td>{money(row.tuition)}</td>{meals && <td>{money(row.monthly)}</td>}</tr>; })}</tbody>
-  </table></div>;
-}
-
 // Part B — the family fee calculator: standard tuition and vendor meals for up to six children.
 function Calculator() {
-  const [children, setChildren] = useState(2);
+  const [children, setChildren] = useState(1);
   const [meals, setMeals] = useState(true);
   const family = familyFees(children, { meals });
   return <div className="fees-calculator">
     <form className="fees-calculator-controls" onSubmit={(event) => event.preventDefault()}>
-      <fieldset><legend>Children enrolled at SRSS at the same time</legend><div className="fees-count">{[1, 2, 3, 4, 5, 6].map((count) => <label key={count}><input type="radio" name="children" value={count} checked={children === count} onChange={() => setChildren(count)} /><span>{count}</span></label>)}</div></fieldset>
+      <fieldset><legend>Children enrolled at SRSS</legend><div className="fees-count">{[1, 2, 3, 4, 5, 6].map((count) => <label key={count}><input type="radio" name="children" value={count} checked={children === count} onChange={() => setChildren(count)} /><span>{count}</span></label>)}</div></fieldset>
       <label className="fees-toggle"><input type="checkbox" checked={meals} onChange={(event) => setMeals(event.target.checked)} /> Include the vendor meal service</label>
     </form>
     <div className="fees-table-wrap"><table className="fees-table fees-ledger">
       <caption>Standard fees for {children === 1 ? "one child" : `${children} children`}{meals ? ", with meals" : ""}</caption>
-      <thead><tr><th scope="col">Child</th><th scope="col">Discount</th><th scope="col">Tuition / month</th>{meals && <th scope="col">Meals / month</th>}<th scope="col">Monthly</th><th scope="col">Year ({FEES.months} months)</th></tr></thead>
-      <tbody>{family.rows.map((row) => <tr key={row.position}><th scope="row">{CHILD_LABELS[row.position - 1]}</th><td>{percent(row.discount)}</td><td>{money(row.tuition)}</td>{meals && <td>{money(row.meal)}</td>}<td>{money(row.monthly)}</td><td>{money(row.annual)}</td></tr>)}</tbody>
-      <tfoot><tr><th scope="row">Family total</th><td>{family.saving ? `saves ${money(family.saving)}` : "—"}</td><td>{money(family.tuition)}</td>{meals && <td>{money(family.meal)}</td>}<td>{money(family.monthly)}</td><td>{money(family.annual)}</td></tr></tfoot>
+      <thead><tr><th scope="col">Child</th><th scope="col">Tuition / month</th>{meals && <th scope="col">Meals / month</th>}<th scope="col">Monthly</th><th scope="col">Year ({FEES.months} months)</th></tr></thead>
+      <tbody>{family.rows.map((row) => <tr key={row.position}><th scope="row">{CHILD_LABELS[row.position - 1]}</th><td>{money(row.tuition)}</td>{meals && <td>{money(row.meal)}</td>}<td>{money(row.monthly)}</td><td>{money(row.annual)}</td></tr>)}</tbody>
+      <tfoot><tr><th scope="row">Family total</th><td>{money(family.tuition)}</td>{meals && <td>{money(family.meal)}</td>}<td>{money(family.monthly)}</td><td>{money(family.annual)}</td></tr></tfoot>
     </table></div>
     <p className="fees-calculator-total" aria-live="polite"><span>Monthly</span><strong>{money(family.monthly)}</strong><span>School tuition {money(family.tuition)}{meals ? ` · vendor meals ${money(family.meal)}` : ""}</span></p>
-    <p className="page-note">Standard amounts before any financial assistance. The oldest enrolled child counts as the first child; the school recalculates when enrolment changes. Sibling discounts apply to tuition only, never to meals.</p>
+    <p className="page-note">Standard amounts before any approved financial assistance or sponsorship. Separate costs may be incurred for excursions, uniforms, books and stationery; these are covered by SSIOM for residential children of the Pure Life Society and children from eligible B40 households. <a href="/join/fees/policy">Read the Fees and Payment Policy</a>.</p>
   </div>;
 }
 
@@ -71,7 +62,7 @@ export function FeesPage() {
         <p>As the school grows, so too does our responsibility to ensure that every child continues to benefit from a safe, nurturing and enriching learning environment.</p>
         <p>Our modest parental contributions have been introduced to help sustain this commitment. At {ringgit(FEES.tuitionMonthly)} per month for tuition, SRSS remains among the more affordable private primary school options in Malaysia, based on selected published school fee schedules.</p>
         <p>The true cost of educating each child is considerably higher than the amount requested from families. Even with these contributions, the school continues to depend on the goodwill of donors, benefactors and supporters.</p>
-        <p>We also recognise that every family's circumstances are different. Our progressive sibling discounts, flexible payment arrangements and financial assistance provisions reflect our determination to make education accessible.</p>
+        <p>We also recognise that every family's circumstances are different. Our flexible payment arrangements and financial assistance provisions reflect our determination to make education accessible.</p>
         <p className="fees-pledge">No child should be deprived of an SRSS education solely because of genuine financial hardship.</p>
         <p>We remain deeply grateful to our parents, teachers, donors, the Pure Life Society and the wider SSIOM community, whose collective commitment has sustained the school since 2002.</p>
         <p><a className="text-link" href="/about/our-commitment">Why SRSS is not-for-profit <ArrowRight size={15} /></a></p>
@@ -80,18 +71,15 @@ export function FeesPage() {
     <PageSection id="structure" eyebrow="Our fee structure" title="Tuition, and meals charged separately." tone="ivory">
       <FeeTable />
       <ul className="fees-notes">
-        <li>Tuition is charged for {FEES.months} months, from January to November.</li>
-        <li>Meals are provided by an external vendor and charged separately from school tuition. Your statement always shows them as two lines.</li>
+        <li>School tuition is {ringgit(FEES.tuitionMonthly)} a month, charged for {FEES.months} months from January to November ({ringgit(FEES.tuitionMonthly * FEES.months)} a year).</li>
+        <li>Meals are provided by an external vendor and charged separately at {ringgit(FEES.mealMonthly)} a month, so a family using the meal service pays {ringgit(FEES.tuitionMonthly + FEES.mealMonthly)} a month for one child. Your statement always shows them as two lines.</li>
+        <li>Separate costs may be incurred for excursions, uniforms, books and stationery; these essential costs are covered by SSIOM for residential children of the Pure Life Society and children from eligible B40 households. <a href="/join/fees/policy">See the Fees and Payment Policy</a>.</li>
       </ul>
     </PageSection>
-    <PageSection id="siblings" eyebrow="Sibling discounts" title="Reduced tuition for families with more than one child at SRSS.">
-      <SiblingTable />
-      <p className="page-note">Sibling discounts apply to tuition fees only.</p>
-    </PageSection>
-    <PageSection id="calculator" eyebrow="Family fee calculator" title="What your family would pay." intro="Choose how many of your children would be at SRSS at the same time." tone="ivory">
+    <PageSection id="calculator" eyebrow="Family fee calculator" title="What your family would pay." intro="Estimate standard monthly and annual tuition and optional vendor meals for your family." >
       <Calculator />
     </PageSection>
-    <PageSection id="payment" eyebrow="Flexible payment options" title="Pay in the way that suits your family.">
+    <PageSection id="payment" eyebrow="Flexible payment options" title="Pay in the way that suits your family." tone="ivory">
       <ul className="fees-options">
         <li><h3>Monthly</h3><p>Payment by the {FEES.dueDay}th of each month, January to November.</p></li>
         <li><h3>Six-monthly</h3><p>Advance payment in instalments covering the academic year: January–June and July–November.</p></li>
@@ -99,12 +87,15 @@ export function FeesPage() {
       </ul>
       <p className="page-note">The total tuition is the same whichever option you choose. There is no instalment-plan fee and no automatic late-payment penalty.</p>
     </PageSection>
-    <PageSection id="additional" eyebrow="Additional expenses" title="Told in advance, never unannounced." tone="ivory">
-      <p className="fees-prose">School uniforms, books, stationery, educational visits and graduation-related expenses may be charged separately where applicable. Parents will be informed of these costs in advance.</p>
-    </PageSection>
-    <PageSection id="assistance" eyebrow="Financial assistance" title="Financial hardship should never prevent a child from receiving an education.">
+    <PageSection id="additional" eyebrow="Additional expenses" title="Told in advance, never unannounced.">
       <div className="fees-prose">
-        <p>Full sponsorship continues to be provided for residential children of the Pure Life Society and for children from eligible B40 households, subject to verification of household circumstances. Full sponsorship is intended to cover tuition and essential school-related requirements, including necessary learning materials, uniforms and meals.</p>
+        <p>Separate costs may be incurred for excursions, school uniforms, books, stationery and graduation-related expenses where applicable. Parents will be informed of these costs in advance.</p>
+        <p>For residential children of the Pure Life Society and children from eligible B40 households, these essential costs are covered by SSIOM under full sponsorship. <a href="/join/fees/policy#other">Read more in the Fees and Payment Policy</a>.</p>
+      </div>
+    </PageSection>
+    <PageSection id="assistance" eyebrow="Financial assistance" title="Financial hardship should never prevent a child from receiving an education." tone="ivory">
+      <div className="fees-prose">
+        <p>Full sponsorship continues to be provided for residential children of the Pure Life Society and for children from eligible B40 households, subject to verification of household circumstances. Full sponsorship, supported by SSIOM, covers tuition and essential school-related requirements, including necessary learning materials, uniforms, stationery, excursions and meals.</p>
         <p>Families experiencing hardship outside the B40 category, or whose circumstances change unexpectedly, may also be considered for full or partial assistance on a case-by-case basis.</p>
         <p><a className="text-link" href="/join/fees/sponsorship">Equitable access and student sponsorship <ArrowRight size={15} /></a></p>
         <p>Parents requiring assistance are warmly encouraged to speak confidentially with the school administration. Parents with a hub account can also ask privately through <a href="/hub/requests/new/L03">My requests &amp; forms</a>; only the Finance Officer and the Headmistress see the request.</p>
@@ -144,26 +135,19 @@ const POLICY = [
     <p>The school will communicate the approved meal arrangement, collection procedure and vendor-related terms to parents.</p>
     <p>Meal-related refunds, cancellations, dietary requirements and adjustments are subject to the vendor service terms communicated by the school.</p>
   </>],
-  ["siblings", "4. Sibling Tuition Discounts", <>
-    <p>SRSS recognises the financial commitment involved in educating several children from the same family.</p>
-    <p>Where siblings are concurrently enrolled at SRSS, the following discounts apply to school tuition.</p>
-    <SiblingTable meals={false} />
-    <p>Sibling discounts apply only to tuition fees and do not reduce the independent vendor meal charge or other separately billed items.</p>
-    <p>The discount applies while the relevant siblings remain concurrently enrolled in Standards 1–6. The school will review the family's discount entitlement when enrolment circumstances change.</p>
-  </>],
-  ["assistance", "5. Financial Assistance and Full Sponsorship", <>
+  ["assistance", "4. Financial Assistance and Full Sponsorship", <>
     <p>SRSS remains committed to assisting children from families facing genuine financial hardship.</p>
     <h3>Full sponsorship</h3>
-    <p>Eligible students may receive full sponsorship covering tuition and, where approved, essential educational needs such as uniforms, books, stationery and the meal service.</p>
+    <p>Eligible students may receive full sponsorship supported by SSIOM covering tuition and, where approved, essential educational needs such as uniforms, books, stationery, excursions and the meal service.</p>
     <p>Full sponsorship is maintained for residential children of the Pure Life Society under the school's established charitable commitment.</p>
-    <p>Children from eligible B40 households receive full sponsorship, subject to verification of household circumstances and the school's admission and assistance procedures. Full sponsorship is intended to cover tuition and essential school-related requirements, including necessary learning materials, uniforms and meals.</p>
+    <p>Children from eligible B40 households receive full sponsorship, subject to verification of household circumstances and the school's admission and assistance procedures. Full sponsorship is intended to cover tuition and essential school-related requirements, including necessary learning materials, uniforms, stationery, excursions and meals.</p>
     <h3>Partial assistance</h3>
     <p>Families experiencing financial difficulty may apply for partial tuition assistance or a modified payment arrangement.</p>
     <p>Applications are assessed individually, taking into account household circumstances, dependants, financial obligations and the child's educational needs.</p>
     <p>Parents are encouraged to approach the school early and confidentially.</p>
     <p>Financial assistance decisions will be communicated privately. Information supplied for assessment will be handled with appropriate confidentiality and restricted access.</p>
   </>],
-  ["payment", "6. Payment Arrangements", <>
+  ["payment", "5. Payment Arrangements", <>
     <p>SRSS offers several payment arrangements to accommodate different family circumstances.</p>
     <h3>Option A — Monthly payment</h3>
     <p>Tuition is payable by the <strong>{FEES.dueDay}th day of each applicable month</strong>, January through November.</p>
@@ -176,22 +160,22 @@ const POLICY = [
     <p>Parents who find smaller, more frequent payments manageable may request a fortnightly payment plan.</p>
     <p>The school will issue a written instalment schedule showing the amount and due date of each payment.</p>
     <p>The total tuition charged remains the same regardless of the payment frequency. No additional instalment-plan fee is proposed.</p>
-    <p className="fees-callout"><strong>Important:</strong> A payment arrangement changes when the amount is paid; it does not change the approved annual tuition entitlement or any applicable discount.</p>
+    <p className="fees-callout"><strong>Important:</strong> A payment arrangement changes when the amount is paid; it does not change the approved annual tuition entitlement or any approved concession.</p>
   </>],
-  ["other", "7. Other Educational Expenses", <>
-    <p>Certain expenses may be billed separately when applicable, including:</p>
+  ["other", "6. Other Educational Expenses", <>
+    <p>Separate costs may be incurred and billed when applicable, including:</p>
     <ul><li>School uniforms and replacement garments.</li><li>Books, workbooks and stationery.</li><li>Educational visits, excursions and special activities.</li><li>Graduation-related items or activities.</li><li>Other specifically approved educational requirements.</li></ul>
     <p>The school will communicate the purpose, amount, due date and whether participation or purchase is compulsory before requesting payment.</p>
     <p>No unannounced additional charge should be imposed.</p>
-    <p>Families receiving financial assistance may request support for essential additional expenses.</p>
+    <p>For residential children of the Pure Life Society and children from eligible B40 households, these essential additional expenses are covered by SSIOM under full sponsorship. Other families receiving financial assistance may also request support for essential additional expenses.</p>
   </>],
-  ["records", "8. Invoices, Receipts and Payment Records", <>
+  ["records", "7. Invoices, Receipts and Payment Records", <>
     <p>Parents will receive a statement identifying:</p>
-    <ul><li>The student's name and academic year.</li><li>Tuition charged.</li><li>Sibling discounts or approved concessions.</li><li>Separately charged vendor meals, where applicable.</li><li>Other approved charges.</li><li>Payments received.</li><li>Outstanding balance and due dates.</li></ul>
+    <ul><li>The student's name and academic year.</li><li>Tuition charged.</li><li>Approved concessions or sponsorship, where applicable.</li><li>Separately charged vendor meals, where applicable.</li><li>Other approved charges.</li><li>Payments received.</li><li>Outstanding balance and due dates.</li></ul>
     <p>Official payment channels will be communicated by the school.</p>
     <p>Parents should retain payment references and receipts. Any discrepancy should be reported promptly so that it can be reviewed and corrected.</p>
   </>],
-  ["late", "9. Late Payments and Financial Difficulties", <>
+  ["late", "8. Late Payments and Financial Difficulties", <>
     <p>Parents are encouraged to settle fees by the agreed due dates.</p>
     <p>Where a payment cannot be made on time, parents should contact the school as early as possible to discuss a suitable arrangement.</p>
     <p>The school's preferred approach is supportive engagement rather than punitive action.</p>
@@ -199,24 +183,24 @@ const POLICY = [
     <ul><li>Parents receive a courteous reminder after a missed due date.</li><li>Persistent outstanding balances are followed up privately by the authorised school administration.</li><li>Families may request an instalment revision or financial assistance review.</li><li>No student should be publicly identified, embarrassed or subjected to punitive classroom treatment because of unpaid fees.</li><li>Any significant administrative action relating to prolonged non-payment must receive appropriate management review and comply with applicable requirements.</li></ul>
     <p>No automatic late-payment penalty is proposed.</p>
   </>],
-  ["withdrawals", "10. Mid-Year Admissions, Withdrawals and Refunds", <>
+  ["withdrawals", "9. Mid-Year Admissions, Withdrawals and Refunds", <>
     <p>Students admitted during the academic year will receive an individual fee statement indicating the applicable tuition period.</p>
     <p>Parents intending to withdraw a child should notify the school in writing.</p>
     <p>Fees already due, advance payments and any refundable balance will be reconciled in accordance with the school's approved withdrawal and refund schedule.</p>
     <p>The school should publish that schedule before accepting advance tuition payments. Any non-refundable charge must be clearly disclosed before payment.</p>
   </>],
-  ["review", "11. Annual Review of Fees", <>
+  ["review", "10. Annual Review of Fees", <>
     <p>SRSS may review its fee structure periodically to reflect operational requirements and the continuing needs of the school.</p>
     <p>Any change will require appropriate school approval and advance written notice to parents.</p>
     <p>Fee changes should not be applied retrospectively to periods already completed.</p>
   </>],
-  ["responsibilities", "12. Parent Responsibilities", <>
+  ["responsibilities", "11. Parent Responsibilities", <>
     <p>By accepting an enrolment offer, parents or authorised guardians agree to:</p>
     <ul><li>Review the applicable tuition schedule and concessions.</li><li>Select an agreed payment arrangement.</li><li>Make payments through official channels.</li><li>Notify the school promptly of relevant changes in family circumstances.</li><li>Contact the school early when financial difficulties arise.</li><li>Review and settle separately approved educational charges.</li></ul>
     <p>The school, in turn, undertakes to communicate charges clearly, maintain accurate records, respect confidentiality and administer assistance fairly.</p>
   </>],
-  ["questions", "13. Questions and Assistance", <>
-    <p>Parents may contact the school administration regarding fee statements, payment schedules, sibling discounts, sponsorship applications or financial difficulties.</p>
+  ["questions", "12. Questions and Assistance", <>
+    <p>Parents may contact the school administration regarding fee statements, payment schedules, sponsorship applications or financial difficulties.</p>
     <p className="fees-pledge">Our commitment is to work with families so that educational continuity and the welfare of every child remain central to our decisions.</p>
     <p><a className="text-link" href={mailto("Fee enquiry")}>Contact the school office <ArrowRight size={15} /></a></p>
   </>],

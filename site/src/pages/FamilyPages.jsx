@@ -166,7 +166,7 @@ export function SponsorshipPage() {
     <PageSection id="dignity" eyebrow="Equal participation" title="Every child takes part as an equal.">
       <p className="fees-prose">The school is committed to preserving the dignity, equal participation and educational opportunities of every student.</p>
     </PageSection>
-    <Closing title="Fees, discounts and the family calculator.">
+    <Closing title="Fees, payment options and the family calculator.">
       <a className="primary-button" href="/join/fees">School fees</a>
       <a className="text-button" href="/about/pure-life-society">The Pure Life Society</a>
     </Closing>

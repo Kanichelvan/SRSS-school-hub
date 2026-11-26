@@ -9,10 +9,10 @@ const positions = [
   { x: '70.3%', y: '76.5%', angle: '-24deg' },
 ];
 
-export default function ValuesGarden({ values, id = 'values', idPrefix = 'home-value' }) {
+export default function ValuesGarden({ values, id = 'values', idPrefix = 'home-value', embedded = false }) {
   const [active, setActive] = useState(0);
   const value = values[active];
-  return <section className="home-values-garden" id={id} aria-labelledby={`${idPrefix}s-title`}>
+  return <section className={`home-values-garden${embedded ? ' is-embedded' : ''}`} id={id} aria-labelledby={`${idPrefix}s-title`}>
     <div className="home-values-inner">
       <div className="home-values-art" role="group" aria-label="Explore the five human values">
         <svg viewBox="306 238 1458 1534" width="1458" height="1534" aria-hidden="true" focusable="false">

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+const SpacesCarousel = lazy(() => import('../components/SpacesCarousel.jsx'));
 import HeroPhoto, { HERO_PHOTOS } from '../components/HeroPhoto.jsx';
 import ValuesGarden from '../components/ValuesGarden.jsx';
 import { ContentBody, GovernancePage, LearningSpaces } from './SitePages.jsx';
@@ -8,6 +9,7 @@ import { srssVoices } from '../data/voices.js';
 import { schoolMoments } from '../data/schoolMoments.js';
 import { aboutValues, aboutPillars } from '../data/about.js';
 import { aboutJourney, principles, dimensions, valuesInLife, dayMoments, exampleJourney } from '../data/aboutNetwork.js';
+import { VisionMissionCards, OurInspirationSection, MethodologiesInfographic } from './VisionMissionSections.jsx';
 import './about-network.css';
 
 const moment = id => schoolMoments.find(item => item.id === id);
@@ -49,15 +51,10 @@ function Story() {return <>
  <Section id="jubilee" eyebrow="Twenty-five years and beyond" title="Honouring our journey. Preparing for tomorrow." dark><p className="network-lead">As SRSS approaches its Silver Jubilee in 2027, we celebrate more than twenty-five years. We honour the dedication of educators, the support of families, the contributions of volunteers and the experiences of generations of students.</p><p>The SRSS Digital Hub represents another step forward: connecting our school community while preserving the stories, achievements and growth of every child.</p><a className="primary-button" href="/about/silver-jubilee">Explore Our Silver Jubilee</a></Section>
  </>;}
 function Purpose() {return <>
- <Intro eyebrow="02 · Our Vision & Mission" title="Our Purpose." accent="Our Promise to Every Child."><p>Human Excellence, Lived with Purpose. Our aspirations become practical commitments through what children learn, how they grow and the ways they contribute.</p></Intro>
- <Section id="vision" eyebrow="Our vision" title="A promise to every child." dark><div className="network-vision-photo"><Photo image={HERO_PHOTOS.assembly}/><p className="network-statement">We empower the <em>mind, body and spirit</em> of every young person to rise to their <em>full potential</em> — so that each child may lead a healthy, productive and meaningful life of excellence.</p></div><div id="mission" className="network-mission-statement"><p className="eyebrow">Our mission</p><p className="network-statement"><em>Every child is special</em>, with their own needs and abilities. So we foster an environment that delivers <em>the best possible education.</em></p></div></Section>
- <Section id="purpose" eyebrow="Why we exist" title="Human Excellence, Lived with Purpose."><p className="network-lead">Every child carries within them the seed of greatness. Every lesson, every relationship and every moment at SRSS is a chance for a child to grow into the best version of themselves.</p><p>We provide a broad and balanced education grounded in Sai Educare principles, nurturing the skills, abilities, attitudes and values of the whole child.</p></Section>
- <Section id="commitments" eyebrow="Our mission in practice" title="Three commitments. One educational purpose."><div className="network-pillars">{[
- ['Academic Excellence','Developing Knowledge. Inspiring Curiosity. Building Confidence.','Purposeful, high-quality education develops strong foundations in literacy, numeracy, communication, critical thinking and independent learning, empowering every child to realise their academic potential.',HERO_PHOTOS.pledge],
- ['Character Development','Strengthening Values. Shaping Character.','We nurture self-awareness, integrity, humility, compassion, responsibility and self-discipline, guided by universal human values in thought, word and action.',HERO_PHOTOS.reflection],
- ['Holistic Empowerment','Honouring Our Nation. Embracing Humanity.','Respect for Malaysia, appreciation of its cultural and religious diversity, and responsibility as active national and global citizens grow through everyday learning.',sports],
- ].map(([name,title,body,image],i)=><article className="network-editorial" key={name} data-reveal><Photo image={image}/><div><p className="eyebrow">{String(i+1).padStart(2,'0')} · {name}</p><h3>{title}</h3><p>{body}</p>{i===2&&<><h4>Growing Compassion. Inspiring Service.</h4><p>A genuine social conscience grows through selfless service, contribution to community wellbeing and responsible care for the natural environment.</p><h4>Strong Body. Agile Mind.</h4><p>Sports, movement and play build physical confidence, discipline, resilience and teamwork.</p><a className="text-link" href="/student-life/sports">Explore sport at SRSS</a></>}<details className="network-disclosure"><summary>Our daily commitments</summary><ul>{aboutPillars[i].ways.map(([lead,copy])=><li key={lead}><strong>{lead}</strong><p>{copy}</p></li>)}</ul></details></div></article>)}</div></Section>
- <Section id="principles" eyebrow="Our guiding principles" title="The principles behind our practice."><div className="network-principles">{principles.map(([title,meaning,practice])=><details className="network-disclosure" key={title}><summary>{title}</summary><p>{meaning}</p><h3>What this means at SRSS</h3><p>{practice}</p></details>)}</div></Section>
+ <Intro eyebrow="02 · Our Vision & Mission" title="Our Purpose." accent="Human Excellence, Lived with Purpose."><p>Our vision, mission, inspiration and seven everyday methodologies come together to nurture capable, compassionate and values-guided children.</p></Intro>
+ <VisionMissionCards />
+ <OurInspirationSection />
+ <MethodologiesInfographic />
  </>;}
 function WholeChild() {const [active,setActive]=useState(0);return <>
  <div className="whole-child-desktop"><Explore id="whole-child-explorer" label="Explore Head, Heart and Hands" items={dimensions.map(d=>({...d,image:HERO_PHOTOS[d.photo]}))}/></div>
@@ -139,6 +136,6 @@ function Educators({extra}) {return <>
 export default function AboutNetwork({page,onVisit,onReady,anchor,faqs,extra}) {
  useEffect(()=>{onReady(true);return()=>onReady(false);},[onReady]);
  useEffect(()=>{if(!anchor)return;const frame=requestAnimationFrame(()=>document.getElementById(anchor)?.scrollIntoView());return()=>cancelAnimationFrame(frame);},[anchor,page]);
- const render={story:()=> <Story/>,purpose:()=> <Purpose/>,excellence:()=> <Excellence/>,educare:()=> <Educare/>,why:()=> <Why onVisit={onVisit}/>,leadership:()=> <Leadership/>,educators:()=> <Educators extra={extra}/>,profile:()=> <><Intro eyebrow="School profile" title="SRSS at a glance."><p>Practical information for your family.</p></Intro><section className="about-inner about-network-section" id="school-profile"><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="network-profile"/></section></>,campus:()=> <><Intro eyebrow="Our campus" title="Space to learn." accent="Room to grow."><p>The spaces where children explore ideas, practise skills and grow together.</p></Intro><LearningSpaces id="campus" eyebrow="Our campus"/></>};
+ const render={story:()=> <Story/>,purpose:()=> <Purpose/>,excellence:()=> <Excellence/>,educare:()=> <Educare/>,why:()=> <Why onVisit={onVisit}/>,leadership:()=> <Leadership/>,educators:()=> <Educators extra={extra}/>,profile:()=> <><Intro eyebrow="School profile" title="SRSS at a glance."><p>Practical information for your family.</p></Intro><section className="about-inner about-network-section" id="school-profile"><FaqList items={faqs} questions={FAQ_TOPICS.profile} idPrefix="network-profile"/></section></>,campus:()=> <><Intro eyebrow="Our campus" title="Space to learn." accent="Room to grow."><p>The spaces where children explore ideas, practise skills and grow together.</p></Intro><Section id="inside-srss" eyebrow="The student experience" title="Step inside SRSS."><Suspense fallback={<div style={{minHeight:'min(92vw, 620px)'}}/>}><SpacesCarousel/></Suspense></Section><LearningSpaces id="campus" eyebrow="Our campus"/></>};
  return <main id="main" className="about-network about-experience"><JourneyNav page={page}/>{render[page]?.()}{extra&&page!=='educators'&&<section className="about-inner about-network-section"><PublishedAdditions content={extra}/></section>}<Continue page={page} onVisit={onVisit}/></main>;
 }
